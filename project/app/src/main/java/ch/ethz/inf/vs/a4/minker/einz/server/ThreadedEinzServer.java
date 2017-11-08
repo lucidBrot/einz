@@ -34,7 +34,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * @return false if launching the server failed, true otherwise
      */
     private boolean launch(){
-        Log.d("EinzServer/launch","launching Server");
+        Log.d("EinzServer/launch","launching Server on "+PORT);
         serverSocket = null;
         Socket socket = null;
 
