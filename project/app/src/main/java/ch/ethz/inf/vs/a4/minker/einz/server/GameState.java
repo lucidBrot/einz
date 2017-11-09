@@ -41,4 +41,14 @@ public class GameState {
         return players.get(activePlayer);
     }
 
+    public boolean isPlayable (ICardDefinition card, PlayerDefinition p){
+        switch (card.type){
+            case "special card 1":
+                return false;
+            case "special card 2":
+                return false;
+            default: return false;
+        }
+    }
+
 }
