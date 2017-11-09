@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import ch.ethz.inf.vs.a4.minker.einz.ICardDefinition;
@@ -11,8 +12,14 @@ import ch.ethz.inf.vs.a4.minker.einz.PlayerDefinition;
 
 public class GameState {
 
+    public GameState(){
+        this.playerIPs = new HashMap<>();
+    }
+
+    private HashMap<String,String> playerIPs; // Storing players so that they can be identified by IP address
+
     //Array of all players in order in which they play
-    private HashMap <Integer,PlayerDefinition> players;
+    private ArrayList<PlayerDefinition> players; // I changed this from HashMap to Array, because why would you use a hashmap if every user has an index as identifier?
     //determines if we have to go up or down in the players Array to determine the next player
     private int order;
     private Integer activePlayer;

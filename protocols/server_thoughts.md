@@ -1,4 +1,5 @@
-## Serverthoughts
+# Serverthoughts
+
 Thoughts, considerations and ideas that came up during the development of the server.
 ***
 ## Threads vs Services
