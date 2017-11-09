@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Einz</string>
+    <string name="btn_s_start_game_initialization_text">start game</string>
+    <string name="btn_s_listen_for_clients_text">Listen for clients</string>
 </resources>
