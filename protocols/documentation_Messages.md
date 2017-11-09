@@ -39,7 +39,7 @@ Request to play on this server.
 
 The **Client** sends this and Server only reacts to it
 
-#####Request
+##### Request
 
 ```JSON
 {
@@ -65,7 +65,7 @@ Inform the clients that the game is about to start and they are allowed to reque
 
 The **Server** sends this.
 
-#####Request
+##### Request
 
 ```json
 {
@@ -77,7 +77,7 @@ The **Server** sends this.
 
 No response from the clients is needed, as their next step will be to demand cards.
 
-##DrawXCards
+## DrawXCards
 
 Request *x* new cards.
 `X` : *int*
@@ -85,7 +85,7 @@ Request *x* new cards.
 The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later. The response contains how many these will be.
 `will give` : *int*, can be 0
 
-#####Request
+##### Request
 
 ```json
 {
