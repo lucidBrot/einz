@@ -22,6 +22,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private ServerSocket serverSocket;
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
     private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
+    public GameState gameState;
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port

@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 import ch.ethz.inf.vs.a4.minker.einz.ICardDefinition;
@@ -25,7 +26,7 @@ public interface ServerFunctionDefinition {
 
         //returns the top x cards from the pile of played cards if at least x cards lie on the pile of played cards
         //returns the full pile of played cards otherwise
-        public HashSet<ICardDefinition> playedCards (int x);
+        public HashMap<Integer, ICardDefinition> playedCards (int x);
 
         //returns the player whos turn it currently is
         public PlayerDefinition activePlayer();
