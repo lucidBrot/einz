@@ -57,6 +57,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
         try {
             serverSocket = new ServerSocket(PORT);
+            PORT = serverSocket.getLocalPort();
         } catch (IOException e) {
             Log.e("EinzServer/launch", "IOException while creating serverSocket on Port "+PORT);
             Log.e("EinzServer/launch", "Error Message: "+e.getMessage());
@@ -64,6 +65,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             Log.e("EinzServer/launch", "Retrying with a different port");
             try {
                 serverSocket = new ServerSocket(0); // chooses a free port if available
+                PORT = serverSocket.getLocalPort();
             } catch (IOException e1) {
                 Log.e("EinzServer/launch", "Retrying didn't work - possibly no free ports available?");
                 Log.e("EinzServer/launch", "Error Message: "+e1.getMessage());
@@ -172,10 +174,14 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * Kills all clientHandler threads. Use this in case of an emergency, because Clients will not be informed.
      * THIS WILL PUT THE SERVER INTO UNDEFINED STATE. ONLY USE IT AS A KILL SWITCH
      */
-    public void abortAllClientHandlers(){ // TODO: stopAllClientHandlers gracefully
+    public void abortAllClientHandlers(){
         for (Thread ez : clientHandlerThreads){
             if(ez.getState() != Thread.State.TERMINATED)
                 ez.stop();
         }
+    }
+
+    public int getPORT() {
+        return PORT;
     }
 }
