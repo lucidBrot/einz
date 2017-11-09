@@ -64,7 +64,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         switch(view.getId()){
             case R.id.btn_s_listen_for_clients:
                 // start server
-                serverThread.start();
+                serverThread.start(); // TODO: stop server on back button
                 break;
             case R.id.btn_s_start_game_initialization:
                 // TODO: start game
@@ -83,8 +83,8 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
                     (ip >> 8 & 0xff),
                     (ip >> 16 & 0xff),
                     (ip >> 24 & 0xff));
-
-            return wifiIpAddress;
+            if(!wifiIpAddress.equals("0.0.0.0"))
+                return wifiIpAddress;
         }
 
         for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
