@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -50,8 +51,29 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         }
 
         while (!shouldStopServer){
+
+            Thread t = new Thread(){
+                @Override
+                public void run() {
+                    // DEBUG: start client
+                    // temporary. please do not use in real code
+                    Log.d("EinzServer/debug", "simulating client");
+                    TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
+                        @Override
+                        public void messageReceived(String message) {
+                            Log.d("TempClient", "received message "+message);
+                        }
+                    });
+                    Log.d("TempClient", "running main");
+                    tc.run();
+                    tc.sendMessage("test message");
+                }
+            };
+            t.run();
+
             try {
                 socket = serverSocket.accept();
+                Log.d("EinzServer/launch", "new connection");
             } catch (SocketException e){
                 Log.d("EinzServer/launch", "stopping accepting connections");
                 return false;
@@ -62,6 +84,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             }
 
             new Thread(new EinzServerThread(socket)).start(); // start new thread for this client.
+
         }
         return true;
     }

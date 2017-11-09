@@ -43,6 +43,7 @@ public class EinzServerThread implements Runnable{
                     return;
                 } else {
                     Log.d("EinzServerThread", "received line: "+line);
+
                     out.writeBytes(line + "\n\r");
                     out.flush();
                 }
