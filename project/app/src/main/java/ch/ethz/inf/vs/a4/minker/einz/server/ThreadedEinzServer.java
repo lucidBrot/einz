@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Waits for incoming TCP connections, handles each in a separate Thread, dispatches serverside logic if neccessary
@@ -16,6 +17,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private int PORT = 1337;
     private boolean shouldStopServer = false;
     private ServerSocket serverSocket;
+    private boolean DEBUG_ONE_MSG = true;
 
     public ThreadedEinzServer(int PORT){
         this.PORT = PORT;
@@ -50,41 +52,45 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             return false;
         }
 
-        //<DEBUG>
-        final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
-            @Override
-            public void messageReceived(String message) {
-                Log.d("TempClient", "received message "+message);
-            }
-        });
-        Thread t = new Thread(){
-            @Override
-            public void run() {
-                // DEBUG: start client
-                // temporary. please do not use in real code
-                Log.d("EinzServer/debug", "simulating client");
+        //DEBUG: Simulate a message from a client
+        if(DEBUG_ONE_MSG){
+            Log.d("ThreadedEinzServer", "DEBUG_ONE_MSG: Will simulate a message from a client");
+            DEBUG_ONE_MSG = false;
+            //<DEBUG>
+            final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
+                @Override
+                public void messageReceived(String message) {
+                    Log.d("TempClient", "received message "+message);
+                }
+            });
+            Thread t = new Thread(){
+                @Override
+                public void run() {
+                    // DEBUG: start client
+                    // temporary. please do not use in real code
+                    Log.d("EinzServer/debug", "simulating client");
 
-                tc.run();
-            }
-        };
-        t.start(); // start client stub for debug
-        Thread m = new Thread(){
-            @Override
-            public void run() {
-                Log.d("TempClient", "calling sendMessage");
-                tc.sendMessage("test message");
-            }
-        };
-        m.start(); // send message
-        Thread ms = new Thread(){
-            @Override
-            public void run() {
-                Log.d("TempClient", "calling sendMessage");
-                tc.sendMessage("test message");
-            }
-        };
-        ms.start(); // send message again
-        //</Debug>
+                    tc.run();
+                }
+            };
+            t.start(); // start client stub for debug
+            Thread m = new Thread(){
+                @Override
+                public void run() {
+                    Log.d("TempClient", "calling sendMessage");
+                    try {
+                        sleep(600); // wait until server hopefully runs
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                        Log.e("TempClient", "Sleeping Failed");
+                        interrupt();
+                    }
+                    tc.sendMessage("test message");
+                }
+            };
+            m.start(); // send message
+            //</Debug>
+        }
 
         while (!shouldStopServer){
 
@@ -100,7 +106,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
 
-            new Thread(new EinzServerThread(socket)).start(); // start new thread for this client.
+            Thread thread = new Thread(new EinzServerThread(socket)); thread.start(); // start new thread for this client.
 
         }
         return true;

@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 
 import java.io.*;
 import java.net.Socket;
@@ -10,7 +11,7 @@ import java.net.Socket;
  */
 public class EinzServerThread implements Runnable{
     private Socket socket;
-    private boolean spin = true;
+    public boolean spin = false;
     public EinzServerThread(Socket clientSocket) {
         Log.d("EinzServerThread", "started");
         this.socket = clientSocket;
@@ -20,7 +21,7 @@ public class EinzServerThread implements Runnable{
 
     @Override
     public void run() {
-        Log.d("EinzServerThread", "run() cas called. Listening for messages");
+        Log.d("EinzServerThread", "run() was called. Listening for messages");
         InputStream inp = null;
         BufferedReader brinp = null;
         DataOutputStream out = null;
@@ -35,6 +36,7 @@ public class EinzServerThread implements Runnable{
         }
 
         String line; // TODO: don't just echo the same thing back
+        spin = true;
         while (spin) {
             try {
                 line = brinp.readLine();
