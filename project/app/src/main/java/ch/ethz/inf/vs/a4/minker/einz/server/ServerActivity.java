@@ -56,9 +56,6 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         }
         String temp = ip + ":" + server.getPORT();
         ((TextView) findViewById(R.id.tv_s_ipport)).setText(temp);
-        // TODO: Serverside UI: start server on buttonpress
-        // TODO: set Server Port from UI
-        // TODO: show server IP and Port
 
     }
 
