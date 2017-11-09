@@ -21,14 +21,14 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private boolean shouldStopSpinning = false;
     private ServerSocket serverSocket;
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
-    private ArrayList<EinzServerClientHandler> clientHandlers;
+    private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
      */
     public ThreadedEinzServer(int PORT){
         this.PORT = PORT;
-        clientHandlers = new ArrayList<EinzServerClientHandler>();
+        clientHandlerThreads = new ArrayList<Thread>();
     }
 
     /**
@@ -139,7 +139,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
             EinzServerClientHandler ez = new EinzServerClientHandler(socket);
             Thread thread = new Thread(ez);
-            clientHandlers.add(ez);
+            clientHandlerThreads.add(thread);
             thread.start(); // start new thread for this client.
 
         }
@@ -164,6 +164,17 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 Log.e("EinzServer/stopServer", "Tried to close socket. Failed.");
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * Kills all clientHandler threads. Use this in case of an emergency, because Clients will not be informed.
+     * THIS WILL PUT THE SERVER INTO UNDEFINED STATE. ONLY USE IT AS A KILL SWITCH
+     */
+    public void abortAllClientHandlers(){ // TODO: stopAllClientHandlers gracefully
+        for (Thread ez : clientHandlerThreads){
+            if(ez.getState() != Thread.State.TERMINATED)
+                ez.stop();
         }
     }
 }
