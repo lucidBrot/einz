@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
@@ -46,7 +48,7 @@ public class EinzServerThread implements Runnable{
                     return;
                 } else {
                     Log.d("EinzServerThread", "received line: "+line);
-
+                    parseMessage(line);
                     out.writeBytes(line + "\n\r");
                     out.flush();
                 }
@@ -54,6 +56,35 @@ public class EinzServerThread implements Runnable{
                 e.printStackTrace();
                 Log.e("EinzServerThread", "Something Failed");
                 return;
+            }
+        }
+    }
+
+    private void parseMessage(String message){
+        // check if valid JSON Object
+        JSONObject msg = null;
+        try {
+            msg = new JSONObject(message);
+        } catch (JSONException e) {
+            // not a valid JSON Object
+            Log.w("EinzServerThread/parse", "Received message that isn't a JSON Object: "+message);
+        }
+
+        if (msg != null){ // if JSON
+            try {
+                switch (msg.getString("messagetype")){
+                    case "play card":
+                        break; // TODO: all cases
+                    case "debug message":
+                        Log.d("EinzServerThread/parse", "Received debug message");
+                        Log.d("EinzServerThread/parse", "\twith values "+msg.getJSONArray("val").toString());
+                        break;
+                    default:
+                        Log.w("EinzServerThread/parse", "Received JSON message without messagetype as String");
+                }
+            } catch (JSONException e) {
+                Log.w("EinzServerThread/parse", "Valid JSON but invalid messagetype");
+                //e.printStackTrace();
             }
         }
     }

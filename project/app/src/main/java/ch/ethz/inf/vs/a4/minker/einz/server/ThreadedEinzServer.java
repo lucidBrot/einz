@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -85,7 +87,19 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                         Log.e("TempClient", "Sleeping Failed");
                         interrupt();
                     }
-                    tc.sendMessage("test message");
+                    JSONObject myJSONObject = new JSONObject();
+                    String message = "test message";
+                    try {
+                        myJSONObject.put("messagetype", "debug message");
+                        myJSONObject.accumulate("val", 1);
+                        myJSONObject.accumulate("val", 2);
+                        message = myJSONObject.toString();
+                        Log.d("TempClient", "set message to JSON: "+message);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    tc.sendMessage(message);
                 }
             };
             m.start(); // send message
