@@ -35,7 +35,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * @return false if launching the server failed, true otherwise
      */
     private boolean launch(){
-        Log.d("EinzServer/launch","launching Server");
+        Log.d("EinzServer/launch","launching Server on "+PORT);
         serverSocket = null;
         Socket socket = null;
 
@@ -50,26 +50,43 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             return false;
         }
 
-        while (!shouldStopServer){
+        //<DEBUG>
+        final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
+            @Override
+            public void messageReceived(String message) {
+                Log.d("TempClient", "received message "+message);
+            }
+        });
+        Thread t = new Thread(){
+            @Override
+            public void run() {
+                // DEBUG: start client
+                // temporary. please do not use in real code
+                Log.d("EinzServer/debug", "simulating client");
 
-            Thread t = new Thread(){
-                @Override
-                public void run() {
-                    // DEBUG: start client
-                    // temporary. please do not use in real code
-                    Log.d("EinzServer/debug", "simulating client");
-                    TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
-                        @Override
-                        public void messageReceived(String message) {
-                            Log.d("TempClient", "received message "+message);
-                        }
-                    });
-                    Log.d("TempClient", "running main");
-                    tc.run();
-                    tc.sendMessage("test message");
-                }
-            };
-            t.run();
+                tc.run();
+            }
+        };
+        t.start(); // start client stub for debug
+        Thread m = new Thread(){
+            @Override
+            public void run() {
+                Log.d("TempClient", "calling sendMessage");
+                tc.sendMessage("test message");
+            }
+        };
+        m.start(); // send message
+        Thread ms = new Thread(){
+            @Override
+            public void run() {
+                Log.d("TempClient", "calling sendMessage");
+                tc.sendMessage("test message");
+            }
+        };
+        ms.start(); // send message again
+        //</Debug>
+
+        while (!shouldStopServer){
 
             try {
                 socket = serverSocket.accept();

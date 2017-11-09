@@ -20,6 +20,7 @@ public class EinzServerThread implements Runnable{
 
     @Override
     public void run() {
+        Log.d("EinzServerThread", "run() cas called. Listening for messages");
         InputStream inp = null;
         BufferedReader brinp = null;
         DataOutputStream out = null;
@@ -49,6 +50,7 @@ public class EinzServerThread implements Runnable{
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                Log.e("EinzServerThread", "Something Failed");
                 return;
             }
         }
