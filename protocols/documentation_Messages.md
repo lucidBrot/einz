@@ -1,5 +1,9 @@
 # JSON INTERFACE DOCUMENTATION
 
+work in progress
+
+***
+
 The IP of the sender should never be needed, as the TCP connection already provides this.
 
 The username of the client could also be stored, but shall be sent when useful as a matter of convenience, but should be checked for integrity by the Server.
@@ -73,7 +77,7 @@ The **Server** sends this.
 }
 ```
 
-#####Response
+##### Response
 
 No response from the clients is needed, as their next step will be to demand cards.
 
@@ -105,4 +109,4 @@ The **Client** sends this request. The Server checks whether the Client is allow
 
 ## DrawCard
 
-Just use  [**DrawXCards**](#DrawXCards) with `x=1`
+Just use  [**DrawXCards**](#drawxcards) with `x=1`
