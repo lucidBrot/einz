@@ -14,11 +14,11 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //Constructor
     public void ServerFunction(ThreadedEinzServer TES){
-        Server = TES;
+        server = TES;
     }
     //reference to the server thread containing the global state object
     //gets set in constructor
-    public ThreadedEinzServer Server;
+    public ThreadedEinzServer server;
 
 
     //(I) Functions to check after the state of the game (no side effects)
@@ -29,19 +29,18 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //look at the top card of the playpile on the table
     public ICardDefinition topCard(){
-        //return Server.gamestate.topCard();
-        return null;
+        return server.gameState.topCard();
     };
 
     //returns the top x cards from the pile of played cards if at least x cards lie on the pile of played cards
     //returns the full pile of played cards otherwise
     public HashMap<Integer, ICardDefinition> playedCards (int x){
-        return null;
+        return server.gameState.playedCards(x);
     };
 
     //returns the player whos turn it currently is
     public PlayerDefinition activePlayer(){
-        return null;
+        return server.gameState.getActivePlayer();
     };
 
     //check if a card can be played
