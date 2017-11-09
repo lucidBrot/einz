@@ -37,15 +37,15 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.btn_s_listen_for_clients).setOnClickListener(this);
         findViewById(R.id.btn_s_start_game_initialization).setOnClickListener(this);
 
-        server = new ThreadedEinzServer(8080); // TODO: don't specify port here
+        server = new ThreadedEinzServer();
         serverThread = new Thread(server);
         // run server to listen to clients only when button pressed
 
         // display server port
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         @SuppressWarnings("deprecation") // https://stackoverflow.com/a/20846328/2550406
-        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress()); // TODO: does this work if using mobile data instead of wlan?
-        if(ip.equals("0.0.0.0")){
+        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+        if(ip.equals("0.0.0.0") || ip.equals("") || ip==null || ip.equals("null")){
             // not connected via WIFI, use something else
             try {
                 ip=getLocalIpAddress(); // use the code of some stackoverflow dude.
@@ -94,10 +94,10 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
             NetworkInterface intf = en.nextElement();
             for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
                 InetAddress inetAddress = enumIpAddr.nextElement();
-                Log.i("","111 inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
+                Log.i("ServerActivity/IP","inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
 //the condition after && is missing in your snippet, checking instance of inetAddress
                 if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                    Log.i("","111 return inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
+                    Log.i("ServerActivity/IP","return inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
                     return inetAddress.getHostAddress();
                 }
 

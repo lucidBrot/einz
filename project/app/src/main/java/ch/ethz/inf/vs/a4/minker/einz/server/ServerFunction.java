@@ -63,7 +63,7 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //returns the top x cards from the drawpile to be drawn and ramoves them from the drawpile
     //this should be called when a player needs to draw cards because of effects from played cards
-    public HashSet<ICardDefinition> drawXCards(int x){
+    public HashSet<ICardDefinition> drawXCards(int x, PlayerDefinition p){
         return null;
     };
 

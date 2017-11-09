@@ -8,12 +8,12 @@
     tools:context="ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity">
 
     <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <TextView
-                android:text="TextView"
-                android:layout_width="wrap_content"
+                android:text="NumConnectedClients"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/tv_num_connected_clients"
                 android:layout_weight="1"/>
         <TextView
