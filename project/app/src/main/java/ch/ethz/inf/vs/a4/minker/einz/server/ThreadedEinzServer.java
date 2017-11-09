@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import org.json.JSONException;
@@ -23,11 +25,13 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
     private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
     public GameState gameState;
+    private int numClients;
+    private Context serverActivity;
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
      */
-    public ThreadedEinzServer(int PORT){
+    public ThreadedEinzServer(int PORT, Activity activity){
         this.PORT = PORT;
         clientHandlerThreads = new ArrayList<Thread>();
     }
@@ -35,8 +39,9 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     /**
      * Listen on any one free port. Dispatch an EinzServerThread for every Connection
      */
-    public ThreadedEinzServer(){
-        this(0);
+    public ThreadedEinzServer(Activity activity){
+        this(0, activity);
+        this.serverActivity = activity;
     }
 
     @Override
@@ -140,7 +145,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
 
-            EinzServerClientHandler ez = new EinzServerClientHandler(socket);
+            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this);
             Thread thread = new Thread(ez);
             clientHandlerThreads.add(thread);
             thread.start(); // start new thread for this client.
@@ -183,5 +188,23 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
     public int getPORT() {
         return PORT;
+    }
+
+    public int getNumClients() {
+        return numClients;
+    }
+
+    public void incNumClients(){
+        this.numClients++;
+        updateNumClientsUI();
+    }
+
+    public void decNumClients(){
+        this.numClients--;
+        updateNumClientsUI();
+    }
+
+    private void updateNumClientsUI(){
+        // TODO: implement this using a callbackinterface
     }
 }

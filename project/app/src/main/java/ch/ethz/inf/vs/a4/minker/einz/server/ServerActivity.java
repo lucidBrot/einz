@@ -37,7 +37,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.btn_s_listen_for_clients).setOnClickListener(this);
         findViewById(R.id.btn_s_start_game_initialization).setOnClickListener(this);
 
-        server = new ThreadedEinzServer();
+        server = new ThreadedEinzServer(this);
         serverThread = new Thread(server);
         // run server to listen to clients only when button pressed
 
