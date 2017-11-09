@@ -9,24 +9,33 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 
 /**
- * Waits for incoming TCP connections, handles each in a separate Thread, dispatches serverside logic if neccessary
+ * Waits for incoming TCP connections, handles each in a separate Thread, dispatches an EinzServerThread for every client
  * This class spins. It is a Runnable, supposed to be run in its own thread.
+ * Call stopSpinning() to stop accepting new connections
  */
-public class ThreadedEinzServer implements Runnable { // apparently, 'implements Runnable' is better than e'xtends thread': https://stackoverflow.com/questions/5853167/runnable-with-a-parameter
-    private int PORT = 1337;
-    private boolean shouldStopServer = false;
+public class ThreadedEinzServer implements Runnable { // apparently, 'implements Runnable' is better than 'extends thread': https://stackoverflow.com/questions/5853167/runnable-with-a-parameter
+    private int PORT;
+    private boolean shouldStopSpinning = false;
     private ServerSocket serverSocket;
-    private boolean DEBUG_ONE_MSG = true;
+    private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
+    private ArrayList<EinzServerClientHandler> clientHandlers;
 
+    /**
+     * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
+     */
     public ThreadedEinzServer(int PORT){
         this.PORT = PORT;
+        clientHandlers = new ArrayList<EinzServerClientHandler>();
     }
 
+    /**
+     * Listen on any one free port. Dispatch an EinzServerThread for every Connection
+     */
     public ThreadedEinzServer(){
-        this(1337);
+        this(0);
     }
 
     @Override
@@ -51,6 +60,14 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             Log.e("EinzServer/launch", "IOException while creating serverSocket on Port "+PORT);
             Log.e("EinzServer/launch", "Error Message: "+e.getMessage());
             e.printStackTrace();
+            Log.e("EinzServer/launch", "Retrying with a different port");
+            try {
+                serverSocket = new ServerSocket(0); // chooses a free port if available
+            } catch (IOException e1) {
+                Log.e("EinzServer/launch", "Retrying didn't work - possibly no free ports available?");
+                Log.e("EinzServer/launch", "Error Message: "+e1.getMessage());
+                e1.printStackTrace();
+            }
             return false;
         }
 
@@ -106,7 +123,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             //</Debug>
         }
 
-        while (!shouldStopServer){
+        while (!shouldStopSpinning){
 
             try {
                 socket = serverSocket.accept();
@@ -120,23 +137,26 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
 
-            Thread thread = new Thread(new EinzServerThread(socket)); thread.start(); // start new thread for this client.
+            EinzServerClientHandler ez = new EinzServerClientHandler(socket);
+            Thread thread = new Thread(ez);
+            clientHandlers.add(ez);
+            thread.start(); // start new thread for this client.
 
         }
         return true;
     }
 
-    public boolean isShouldStopServer() {
-        return shouldStopServer;
+    public boolean isShouldStopSpinning() {
+        return shouldStopSpinning;
     }
 
     /**
-     * @param shouldStopServer true if the server should stop waiting for incoming connections
+     * @param shouldStopSpinning true if the server should stop waiting for incoming connections
      */
-    public void stopServer(boolean shouldStopServer) {
-        this.shouldStopServer = shouldStopServer;
+    public void stopSpinning(boolean shouldStopSpinning) {
+        this.shouldStopSpinning = shouldStopSpinning;
 
-        if(shouldStopServer){
+        if(shouldStopSpinning){
             // interrupt the serverSocket.accept() call, so that it will throw a SocketException
             try {
                 serverSocket.close();

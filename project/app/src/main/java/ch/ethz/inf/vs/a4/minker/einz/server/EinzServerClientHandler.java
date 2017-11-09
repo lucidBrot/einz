@@ -11,10 +11,10 @@ import java.net.Socket;
 /**
  * This class handles one Connection per instance (thread)
  */
-public class EinzServerThread implements Runnable{
+public class EinzServerClientHandler implements Runnable{
     private Socket socket;
     public boolean spin = false;
-    public EinzServerThread(Socket clientSocket) {
+    public EinzServerClientHandler(Socket clientSocket) {
         Log.d("EinzServerThread", "started");
         this.socket = clientSocket;
     }
