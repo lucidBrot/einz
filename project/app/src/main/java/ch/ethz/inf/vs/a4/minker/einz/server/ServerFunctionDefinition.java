@@ -38,6 +38,7 @@ public interface ServerFunctionDefinition {
     //(II) Functions that change things in the game
 
         //player p plays a card
+        //This automatically sets the activePlayer to the next player to play after p laid his card
         public void play(ICardDefinition card, PlayerDefinition p);
 
         //returns the top card from the drawpile to be drawn and removes it from the drawpile
