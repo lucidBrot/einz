@@ -1,6 +1,6 @@
 # JSON INTERFACE DOCUMENTATION
 
-work in progress, implement at own risk, this documentation may still change
+How the Einz Server and Client are supposed to communicate.
 
 ***
 
@@ -9,6 +9,10 @@ The IP of the sender should never be needed, as the TCP connection already provi
 The username of the client will be stored serverside for convenience, no need to retransmit every time.
 
 Every String is case-sensitive!
+
+***
+
+**STILL TO SPECIFY** : [`card`](#drawxcards)  , [`style`](#showmessage)  , [`state`](#getstate) 
 
 ## Ping / Pong
 
@@ -75,6 +79,7 @@ If the client is not registered, `role` should have a return value of *"null"*.
 >
 > + *"not unique"* if the same username was already registered by a different IP
 > + "already registered" if the same IP already has registered a username
+> + *"empty"* if the username is the empty string. This is reserved for the server
 
 ```JSON
 {
@@ -363,3 +368,70 @@ The **Server** hands out 1 card to a client.
 
 Note that the format of the card is yet to be defined (10.11.2017)
 
+## ShowMessage
+
+Send some `message` that should be displayed to the clientside user.
+
+`style` : *JSONObject* 
+
+> The client might ignore this. If the UI supports multiple textcolors or background colors, this will specify a style
+
+`from`: *"String"*
+
+> From which user it is. empty string if it is from the server
+
+```json
+{
+  "messagetype":"ShowMessage",
+  "message":"сука блиать",
+  "style":{"some":"JSONOBJECT"}
+}
+```
+
+## SendMessage
+
+The **Client** requests the server to send [**ShowMessage**](#showmessage) to `target` username
+
+```Json
+{
+  "messagetype":"SendMessage",
+  "target":"roger",
+  "message":"my message"
+}
+```
+
+## BroadcastMessage
+
+The **Client** requests the server to send [**ShowMessage**](#showmessage) to all clients, including itself.
+
+```json
+{
+  "messagetype":"BroadcastMessage",
+  "message":"my message"
+}
+```
+
+## PlayerFinished
+
+The **Server** informs the clients that one Player has finished the game. E.g. by having played all cards. Optionally, depending on rules, there is `more` information included or `points`. If not, they should be *null*.
+
+```Json
+{
+  "messagetype":"PlayerFinished",
+  "username":"roger",
+  "points":1,
+  "more":{
+    "a":"b"
+  }
+}
+```
+
+## GameOver
+
+The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points.
+
+```Json
+{
+  "messagetype":"GameOver"
+}
+```
