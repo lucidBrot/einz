@@ -123,7 +123,7 @@ Also, the other Clients need to know about leaves.
 
 ```
 
-## SendRules / RulesInitialized
+## <a name="sendrules"></a>SendRules / RulesInitialized
 
 Informs the Client which rules will be used. The rules themselves might have to be implemented client-side as well.
 `ruleset` is a (not specifically sorted) JSONObject of rules. Every rule contains a `rulename` JSONObject and further details specific to the rule.
