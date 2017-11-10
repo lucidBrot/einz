@@ -1,12 +1,14 @@
 # JSON INTERFACE DOCUMENTATION
 
-work in progress
+work in progress, implement at own risk, this documentation may still change
 
 ***
 
 The IP of the sender should never be needed, as the TCP connection already provides this.
 
-The username of the client could also be stored, but shall be sent when useful as a matter of convenience, but should be checked for integrity by the Server.
+The username of the client will be stored serverside for convenience, no need to retransmit every time.
+
+Every String is case-sensitive!
 
 ## Ping / Pong
 
@@ -19,7 +21,7 @@ The **Server & Client** should both support sending both message types
 
 ```JSON
 {
-  "messagetype":"ping"
+  "messagetype":"Ping"
 }
 ```
 
@@ -27,7 +29,7 @@ The **Server & Client** should both support sending both message types
 
 ```JSON
 {
-  "messagetype":"pong"
+  "messagetype":"Pong"
 }
 ```
 
@@ -37,11 +39,17 @@ The **Server & Client** should both support sending both message types
 
 Request to play on this server, or to spectate.
 `username` : *String* 
+
+> should be unique. If it is not, `success` will be *false* and `reason` will be *"not unique"*
+
 `success` : *String* 
-​    Can be *"true"*, *"false"* (or later be further extended. E.g. *banned* )
-​    *"true"* means the client is allowed to stay on this server
+
+> Can be *"true"*, *"false"* (or later be further extended. E.g. *banned* )
+> *"true"* means the client is allowed to stay on this server
+
 `role` : *String*
-​    *"player"* or *"spectator"* 
+
+> *"player"* or *"spectator"* 
 
 The **Client** sends this and Server only reacts to it
 
@@ -49,7 +57,7 @@ The **Client** sends this and Server only reacts to it
 
 ```JSON
 {
-  "messagetype":"register",
+  "messagetype":"Register",
   "username":"roger",
   "role":"player"
 }
@@ -61,11 +69,19 @@ With our current goals, this should always return *"true"* and is thus like an A
 
 If the client is not registered, `role` should have a return value of *"null"*.
 
+`reason` : *String* 
+
+> if not `success` , can be one of the following options
+>
+> + *"not unique"* if the same username was already registered by a different IP
+> + "already registered" if the same IP already has registered a username
+
 ```JSON
 {
-  "messagetype":"register response",
+  "messagetype":"RegisterResponse",
   "success":"true",
-  "role":"spectator"
+  "role":"spectator",
+  "reason":"this can be anything if success was true"
 }
 ```
 
@@ -77,7 +93,7 @@ The **Client** requests to leave the game and close the connection.
 
 ```Json
 {
-  "messagetype":"unregister",
+  "messagetype":"Unregister",
   "username":"roger"
 }
 ```
@@ -95,14 +111,14 @@ Also, the other Clients need to know about leaves.
 
 ```Json
 {
-  "messagetype":"unregistered",
+  "messagetype":"Unregistered",
   "username":"that random dude who we didn't want",
   "kicked":true
 }
 
 ```
 
-## SendRules
+## SendRules / RulesInitialized
 
 Informs the Client which rules will be used. The rules themselves might have to be implemented client-side as well.
 `ruleset` is a (not specifically sorted) JSONObject of rules. Every rule contains a `rulename` JSONObject and further details specific to the rule.
@@ -113,7 +129,7 @@ The **Server** sends this to the Client. The Client responds with the response o
 
 ```Json
 {
-  "messagetype":"send rules",
+  "messagetype":"SendRules",
   "ruleset":{
     "startWithXCards":{
       "x":7
@@ -135,13 +151,12 @@ If rules were unknown or not completely specified, they are specified for debug 
 If everything is as it's supposed to be, this is simply a signal for the server that this client is ready to receive [**StartGame**](#startgame).
 `invalid rules` : *JSONArray*
 
-The username is as always only specified for convenience, not security.
+> Unsorted list of which rules were invalid or unknown
 
 ```Json
 {
-  "messagetype":"rules initialized",
+  "messagetype":"RulesInitialized",
   "invalid rules":["instantWinOnCardXPlayed", "';DROP DATABASE usernames"],
-  "username":"roger"
 }
 ```
 
@@ -155,7 +170,7 @@ The **Server** sends this.
 
 ```json
 {
-  "messagetype":"start game"
+  "messagetype":"StartGame"
 }
 ```
 
@@ -168,18 +183,15 @@ No response from the clients is needed, as their next step will be to demand car
 Request *x* new cards.
 `X` : *int*
 
-The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later. The response contains how many these will be.
+The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later using [**HandOutCard**](#handoutcard) `x` times . The response contains how many these will be.
 `will give` : *int*, can be 0
-
-The username is included for convenience, but the Server should still check whether it fits to the IP.
 
 ##### Request
 
 ```json
 {
-  "messagetype":"draw x cards",
+  "messagetype":"DrawXCards",
   "x":3
-  "username":"some russian hacker"
 }
 ```
 
@@ -187,7 +199,7 @@ The username is included for convenience, but the Server should still check whet
 
 ```Json
 {
-  "messagetype":"draw x cards response",
+  "messagetype":"DrawXCardsResponse",
   "will give":2
 }
 ```
@@ -204,7 +216,7 @@ The **Server** informs each Client whenever somebodys' turn starts. The Client c
 
 ```Json
 {
-  "messagetype":"whose turn",
+  "messagetype":"WhoseTurn",
   "username":"Donald Trump"
 }
 ```
@@ -213,8 +225,6 @@ The **Server** informs each Client whenever somebodys' turn starts. The Client c
 
 The **Client** can request to play a card. If `dry-run` is false, the Server will play the card if it is valid and otherwise return a failure message. So the client should wait to handle the response before doing anything else.
 If `dry-run` is true, the Server will only answer whether the move is valid but not play the card.
-
-As always, `username` is only for convenience and has to be validated by the server for security reasons. If `username` does not fit to the IP of the client, the Server should answer with [**InvalidUsername**](#invalidusername).
 
 `card` : *JSONObject*
 
@@ -225,9 +235,8 @@ As always, `username` is only for convenience and has to be validated by the ser
 
 ```Json
 {
-  "messagetype":"play card",
+  "messagetype":"PlayCard",
   "dry-run":true
-  "username":"roger",
   "card":{
     "color":"green"
     "num":1337
@@ -251,7 +260,7 @@ As always, `username` is only for convenience and has to be validated by the ser
 
 ```Json
 {
-  "messagetype":"play card response",
+  "messagetype":"PlayCardResponse",
   "dry-run":true,
   "play valid":true,
   "your turn":true
@@ -272,7 +281,7 @@ Usually broadcasted from the **Server** to all Clients if a valid play was made.
 
 ```Json
 {
-  "messagetype":"card played",
+  "messagetype":"CardPlayed",
   "card":{
     "some info":"to be specified",
     "color":"green"
@@ -290,23 +299,67 @@ Response from the **Server** if a [**PlayCard**](#playcard) request was invalid.
 
 ```Json
 {
-  "messagetype":"invalid card played",
+  "messagetype":"InvalidCardPlayed",
   "reason":"bad coding skills and an inexistent card"
 }
 ```
 
-## InvalidUsername
+## GetState
 
-Sent by the **Server** if the username is not registered or does not correspond to the IP. This is not supposed to actually happen in normal execution.
+The **Client** requests to know its own canonical state. This involves their current hand and the already played cards, also called the stack.
 
-`reason`
+The **Server** will then respond if the username matches the IP.
 
-> *"not registered"*  or *"not matching IP"*
+##### Request
 
 ```Json
 {
-  "messagetype":"invalid username",
-  "reason":"not registered"
+  "messagetype":"GetState"
 }
 ```
+
+##### Response
+
+`hand` : Array of *JSONObjects*
+
+> A List of Cards that the Client should have in their hand.
+
+`stack` : Array of *JSONObjects*
+
+> A List of the already played cards, the card at index 0 being the oldest card on the stack
+
+```Json
+{
+  "messagetype":"GetStateResponse",
+  "hand":[
+    {"color":"blue", "value":7},
+    {"color":"black", "special":"play Vitas"}
+  ],
+  "stack":[
+    {"color":"blue", "num":3},
+    {"color":"blue", "num":4},
+    {"color":"red", "num":4}
+  ]
+}
+```
+
+## HandOutCard
+
+The **Server** hands out 1 card to a client.
+
+`card` : *JSONObject* 
+
+> The card that is handed to the client
+
+```Json
+{
+  "messagetype":"HandOutCard",
+  "card":{
+    "color":"green",
+    "num":"black"
+  }
+}
+```
+
+Note that the format of the card is yet to be defined (10.11.2017)
 
