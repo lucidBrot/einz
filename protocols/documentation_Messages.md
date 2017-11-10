@@ -63,9 +63,51 @@ With our current goals, this should always return *"true"* and is thus like an A
 }
 ```
 
+## SendRules
+
+Informs the Client which rules will be used. The rules themselves might have to be implemented client-side as well.
+`ruleset` is a (not specifically sorted) JSONObject of rules. Every rule contains a `rulename` JSONObject and further details specific to the rule.
+
+The **Server** sends this to the Client. The Client responds with the response once it's ready.
+
+##### Request
+
+```Json
+{
+  "messagetype":"send rules",
+  "ruleset":{
+    "startWithXCards":{
+      "x":7
+    },
+    "instantWinOnCardXPlayed":{
+      "cardcolor":"green",
+      "cardnum":3
+    }
+  }
+}
+```
+
+Note that the example rules here were spontaneously written and might not be specified.
+
+##### Response
+
+Once a client has initialized based on the ruleset, it should inform the server that it's ready.
+If rules were unknown or not completely specified, they are specified for debug purposes, though the server should never use rules that the clients don't know.
+If everything is as it's supposed to be, this is simply a signal for the server that this client is ready to receive [**StartGame**](#startgame).
+`invalid rules` : *JSONArray*
+
+```Json
+{
+  "messagetype":"rules initialized",
+  "invalid rules":["instantWinOnCardXPlayed", "';DROP DATABASE usernames"],
+}
+```
+
+
+
 ## StartGame
 
-Inform the clients that the game is about to start and they are allowed to request cards.
+Inform the clients that the game is about to start and they are allowed to request cards. This will be sent after [**sendRules**](#sendrules).
 
 The **Server** sends this.
 
