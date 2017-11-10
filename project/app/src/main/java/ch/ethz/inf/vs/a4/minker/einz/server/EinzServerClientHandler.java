@@ -14,9 +14,13 @@ import java.net.Socket;
 public class EinzServerClientHandler implements Runnable{
     private Socket socket;
     public boolean spin = false;
-    public EinzServerClientHandler(Socket clientSocket) {
+    private ThreadedEinzServer papi;
+
+    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi) {
         Log.d("EinzServerThread", "started");
         this.socket = clientSocket;
+        this.papi = papi;
+        papi.incNumClients();
     }
 
     // source: https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server
@@ -44,6 +48,7 @@ public class EinzServerClientHandler implements Runnable{
                 line = brinp.readLine();
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
                     socket.close();
+                    papi.decNumClients();
                     Log.d("EinzServerThread", "closed clientSocket");
                     return;
                 } else {

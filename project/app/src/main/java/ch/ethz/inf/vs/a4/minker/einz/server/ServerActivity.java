@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * This Activity starts the server and manages the Serverside UI
  */
-public class ServerActivity extends AppCompatActivity implements View.OnClickListener {
+public class ServerActivity extends AppCompatActivity implements View.OnClickListener, ServerActivityCallbackInterface {
 
     private ThreadedEinzServer server;
     private Thread serverThread;
@@ -37,15 +37,15 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.btn_s_listen_for_clients).setOnClickListener(this);
         findViewById(R.id.btn_s_start_game_initialization).setOnClickListener(this);
 
-        server = new ThreadedEinzServer(8080); // TODO: don't specify port here
+        server = new ThreadedEinzServer(8080,this); // 8080 is needed for debug client. TODO: remove port specification
         serverThread = new Thread(server);
         // run server to listen to clients only when button pressed
 
         // display server port
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         @SuppressWarnings("deprecation") // https://stackoverflow.com/a/20846328/2550406
-        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress()); // TODO: does this work if using mobile data instead of wlan?
-        if(ip.equals("0.0.0.0")){
+        String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+        if(ip.equals("0.0.0.0") || ip.equals("") || ip==null || ip.equals("null")){
             // not connected via WIFI, use something else
             try {
                 ip=getLocalIpAddress(); // use the code of some stackoverflow dude.
@@ -56,9 +56,6 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         }
         String temp = ip + ":" + server.getPORT();
         ((TextView) findViewById(R.id.tv_s_ipport)).setText(temp);
-        // TODO: Serverside UI: start server on buttonpress
-        // TODO: set Server Port from UI
-        // TODO: show server IP and Port
 
     }
 
@@ -67,7 +64,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         switch(view.getId()){
             case R.id.btn_s_listen_for_clients:
                 // start server
-                serverThread.start();
+                serverThread.start(); // TODO: stop server on back button
                 break;
             case R.id.btn_s_start_game_initialization:
                 // TODO: start game
@@ -86,18 +83,18 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
                     (ip >> 8 & 0xff),
                     (ip >> 16 & 0xff),
                     (ip >> 24 & 0xff));
-
-            return wifiIpAddress;
+            if(!wifiIpAddress.equals("0.0.0.0"))
+                return wifiIpAddress;
         }
 
         for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
             NetworkInterface intf = en.nextElement();
             for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
                 InetAddress inetAddress = enumIpAddr.nextElement();
-                Log.i("","111 inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
+                Log.i("ServerActivity/IP","inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
 //the condition after && is missing in your snippet, checking instance of inetAddress
                 if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                    Log.i("","111 return inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
+                    Log.i("ServerActivity/IP","return inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
                     return inetAddress.getHostAddress();
                 }
 
@@ -105,5 +102,19 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         return null;
+    }
+
+    /**
+     * Updates the UI from within the UI thread
+     * @param num new number of Clients connected
+     */
+    @Override
+    public void updateNumClientsUI(final int num) {
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run() {
+                ((TextView) findViewById(R.id.tv_num_connected_clients)).setText(new String("#Connected clients: "+num));
+            }
+        });
     }
 }

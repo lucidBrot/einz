@@ -18,6 +18,10 @@ public interface ServerFunctionDefinition {
 
 
     //(I) Functions to check after the state of the game (no side effects)
+
+    /**
+     * Answers the message with "pong"
+     */
         //simple ping function
         public void ping();
 
@@ -29,7 +33,7 @@ public interface ServerFunctionDefinition {
         //keys in HashMap indicate how many cards lie on top of the card (top card has key 0)
         public HashMap<Integer, ICardDefinition> playedCards (int x);
 
-        //returns the player whos turn it currently is
+        //returns the player whose turn it currently is
         public PlayerDefinition activePlayer();
 
         //check if player p can play a certain card

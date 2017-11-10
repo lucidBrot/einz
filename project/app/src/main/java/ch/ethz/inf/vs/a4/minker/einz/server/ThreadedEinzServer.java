@@ -1,5 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import android.app.Activity;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import org.json.JSONException;
@@ -23,20 +27,23 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
     private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
     public GameState gameState;
+    private int numClients;
+    private ServerActivityCallbackInterface serverActivityCallbackInterface;
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
      */
-    public ThreadedEinzServer(int PORT){
+    public ThreadedEinzServer(int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface){
         this.PORT = PORT;
         clientHandlerThreads = new ArrayList<Thread>();
+        this.serverActivityCallbackInterface = serverActivityCallbackInterface;
     }
 
     /**
      * Listen on any one free port. Dispatch an EinzServerThread for every Connection
      */
-    public ThreadedEinzServer(){
-        this(0);
+    public ThreadedEinzServer(ServerActivityCallbackInterface serverActivityCallbackInterface){
+        this(0, serverActivityCallbackInterface);
     }
 
     @Override
@@ -58,6 +65,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         try {
             serverSocket = new ServerSocket(PORT);
             PORT = serverSocket.getLocalPort();
+            Log.d("EinzServer/launch", "updated PORT to "+PORT);
         } catch (IOException e) {
             Log.e("EinzServer/launch", "IOException while creating serverSocket on Port "+PORT);
             Log.e("EinzServer/launch", "Error Message: "+e.getMessage());
@@ -140,7 +148,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
 
-            EinzServerClientHandler ez = new EinzServerClientHandler(socket);
+            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this);
             Thread thread = new Thread(ez);
             clientHandlerThreads.add(thread);
             thread.start(); // start new thread for this client.
@@ -183,5 +191,19 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
     public int getPORT() {
         return PORT;
+    }
+
+    public int getNumClients() {
+        return numClients;
+    }
+
+    public void incNumClients(){
+        this.numClients++;
+        serverActivityCallbackInterface.updateNumClientsUI(numClients);
+    }
+
+    public void decNumClients(){
+        this.numClients--;
+        serverActivityCallbackInterface.updateNumClientsUI(numClients);
     }
 }
