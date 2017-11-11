@@ -18,7 +18,35 @@ Every String is case-sensitive!
 **TODO** 
 
 * Change all booleans to strings to provide extensibility.
-* Possibly change the messages such that the request and response have the same messagetypes. Possibly not. I'd prefer not.
+
+* Possibly change the messages such that the request and response have the same messagetypes. Possibly not. I'd rather leave the *messagetypes* the same and use some identifier *messagegroup* that is the same for messages that belong conceptually together. This has advantages in that changes would only have to be done in one class in the code.
+
+* message set-up so that they all have the same interface on the top-level. This has the advantage that we only need the *header* for finding out which parserobject to return and only the body for within the action.
+
+## General Form of Message
+
+The message consists of a *header* and a *body*, providing a consistent top-level interface over all kinds of messages. The `messagegroup`  is the same for messages that conceptually belong together. This simplifies the implementation of maintainable code because only one implementation of the Parser would have to be changed if we change the communication.
+If the body is changed, we only have to modify the Parser in the code. If the header is changed, we only have to modify the ParserFactory.
+
+All Strings and Booleans should be stored as String to allow further extensibility and should be handled like Strings in the code.
+
+The header must always contain `messagegroup` and `messagetype`. The body may vary.
+`messagegroup` is camelCase, `messagetype` is PascalCase, to make it easier to visually distinguish them.
+
+  ```json
+  {
+    "header":{
+      "messagegroup":"groupname",
+      "messagetype":"typename"
+    },
+    "body":{
+      "message-specifics":"some yeys",
+      "more":["some", "array"]
+    }
+  }
+  ```
+
+  ​
 
 ## Ping / Pong
 
@@ -31,7 +59,13 @@ The **Server & Client** should both support sending both message types
 
 ```JSON
 {
-  "messagetype":"Ping"
+  "header":{
+    "messagegroup":"ping",
+    "messagetype":"Ping"
+  },
+  "body":{
+    
+  }
 }
 ```
 
@@ -39,7 +73,13 @@ The **Server & Client** should both support sending both message types
 
 ```JSON
 {
-  "messagetype":"Pong"
+  "header":{
+    "messagegroup":"ping",
+    "messagetype":"Pong"
+  },
+  "body":{
+    
+  }
 }
 ```
 
@@ -67,9 +107,14 @@ The **Client** sends this and Server only reacts to it
 
 ```JSON
 {
-  "messagetype":"Register",
-  "username":"roger",
-  "role":"player"
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"Register"
+  },
+  "body":{
+    "username":"roger",
+    "role":"player"
+  }
 }
 ```
 
@@ -89,10 +134,15 @@ If the client is not registered, `role` should have a return value of *"null"*.
 
 ```JSON
 {
-  "messagetype":"RegisterResponse",
-  "success":"true",
-  "role":"spectator",
-  "reason":"this can be anything if success was true"
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"RegisterResponse"
+  },
+  "body":{
+    "success":"true",
+    "role":"spectator",
+    "reason":"this can be anything if success was true"
+  }
 }
 ```
 
@@ -104,8 +154,13 @@ The **Client** requests to leave the game and close the connection.
 
 ```Json
 {
-  "messagetype":"Unregister",
-  "username":"roger"
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"Unregister"
+  },
+  "body":{
+    "username":"roger"
+  }
 }
 ```
 
@@ -116,15 +171,20 @@ Also, the other Clients need to know about leaves.
 
 ##### Response
 
-`kicked` : *boolean*
+`kicked` : *String*
 
-> whether the client was kicked or asked to leave. *false* in the latter case.
+> whether the client was kicked or asked to leave. *"false"* in the latter case, *"true"* if kicked.
 
 ```Json
 {
-  "messagetype":"Unregistered",
-  "username":"that random dude who we didn't want",
-  "kicked":true
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"Unregistered"
+  },
+  "body":{
+    "username":"that random dude who we didn't want",
+    "kicked":"true"
+  }
 }
 
 ```
@@ -135,6 +195,8 @@ Informs the Client which rules will be used. The rules themselves might have to 
 `ruleset` is a (not specifically sorted) JSONObject of rules. Every rule contains a `rulename` JSONObject and further details specific to the rule.
 
 The **Server** sends this to the Client. The Client responds with the response once it's ready.
+
+Regarding extensibility, we don't need a String for the integers, because the negative numbers are free for this
 
 ##### Request
 
