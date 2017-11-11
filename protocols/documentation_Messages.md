@@ -2,6 +2,8 @@
 
 How the Einz Server and Client are supposed to communicate.
 
+Work in progress, not yet approved by team lead. Do not implement yet.
+
 ***
 
 The IP of the sender should never be needed, as the TCP connection already provides this.
@@ -13,6 +15,10 @@ Every String is case-sensitive!
 ***
 
 **STILL TO SPECIFY** : [`card`](#drawxcards)  , [`style`](#showmessage)  , [`state`](#getstate) 
+**TODO** 
+
+* Change all booleans to strings to provide extensibility.
+* Possibly change the messages such that the request and response have the same messagetypes. Possibly not. I'd prefer not.
 
 ## Ping / Pong
 
