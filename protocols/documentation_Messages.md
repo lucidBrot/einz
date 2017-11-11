@@ -453,7 +453,7 @@ Usually broadcasted from the **Server** to all Clients if a valid play was made.
   },
   "body":{
     "card":{
-      "some info":"to be specified",
+      ,"some info":"to be specified",
       "color":"green"
     }
     "player":"владимир путин"
