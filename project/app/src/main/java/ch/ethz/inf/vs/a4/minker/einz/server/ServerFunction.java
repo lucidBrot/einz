@@ -23,10 +23,6 @@ public class ServerFunction implements ServerFunctionDefinition {
 
 
     //(I) Functions to check after the state of the game (no side effects)
-    //simple ping function
-    public void ping(){
-
-    };
 
     //look at the top card of the playpile on the table
     public ICardDefinition topCard(){
@@ -282,13 +278,13 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     }
 
-    //returns the top card from the drawpile to be drawn and removes it from the drawpile
+    //returns the top card from the drawpile to be drawn and removes it from the drawpile and adds it to player p's hand
     //this should be called when it's a players turn and he can't play any cards from hand
     public ICardDefinition drawOneCard(PlayerDefinition p){
         return null;
     }
 
-    //returns the top x cards from the drawpile to be drawn and ramoves them from the drawpile
+    //returns the top x cards from the drawpile to be drawn and ramoves them from the drawpile and adds them to player p's hand
     //this should be called when a player needs to draw cards because of effects from played cards
     public HashSet<ICardDefinition> drawXCards(int x, PlayerDefinition p){
         return null;

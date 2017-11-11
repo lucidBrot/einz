@@ -16,14 +16,19 @@ public interface ServerFunctionDefinition {
     //gets set in constructor
     public ThreadedEinzServer Server = null;
 
+    /*
+    These Functions don't have an effect on EinzServerClientHandlers or Clients.
+    They only act on the server.gamestate object to keep it in a valid state and represent actions on that state
+    (e.g. playing a card) Everything done in here has to be communicated seperatly to the Clients
+    */
 
     //(I) Functions to check after the state of the game (no side effects)
 
     /**
      * Answers the message with "pong"
      */
-        //simple ping function
-        public void ping();
+
+        //There is no ping function. EinzServerClientHandler respond with Pong themselves.
 
         //look at the top card of the open cardpile on the table
         public ICardDefinition topCard();
@@ -45,11 +50,11 @@ public interface ServerFunctionDefinition {
         //This automatically sets the activePlayer to the next player to play after p laid his card
         public void play(ICardDefinition card, PlayerDefinition p);
 
-        //returns the top card from the drawpile to be drawn and removes it from the drawpile
+        //returns the top card from the drawpile to be drawn and removes it from the drawpile and adds it top player p's hand
         //this should be called when it's player p's turn and he can't play any cards from hand
         public ICardDefinition drawOneCard(PlayerDefinition p);
 
-        //returns the top x cards from the drawpile to be drawn and ramoves them from the drawpile
+        //returns the top x cards from the drawpile to be drawn and ramoves them from the drawpile and adds them to player p's hand
         //this should be called when player p needs to draw cards because of effects from played cards
         public HashSet<ICardDefinition> drawXCards(int x, PlayerDefinition p);
 

@@ -9,5 +9,7 @@ import java.util.HashSet;
 
 public interface PlayerDefinition {
 
+    public String name = "";
+    public String IP = "";
     public HashSet<ICardDefinition> Hand = null;
 }
