@@ -453,9 +453,9 @@ Usually broadcasted from the **Server** to all Clients if a valid play was made.
   },
   "body":{
     "card":{
-      ,"some info":"to be specified",
+      "some info":"to be specified",
       "color":"green"
-    }
+    },
     "player":"владимир путин"
   }
 }
@@ -533,11 +533,13 @@ The response might also be sent without being requested - e.g. after a player fi
       {"color":"red", "num":"4"}
     ],
     "playerinfo":[
-      "roger":{
+      {
+        "name":"roger",
       	"turn-order":"1",
       	"number of cards":"7"
       },
-      "cleminemz":{
+      {
+		"name":"clemi"
         "turn-order":"2",
         "number of cards": "5"
       }
@@ -660,7 +662,7 @@ The **Server** informs the clients that the game is over and they can show the a
   "header":{
     "messagegroup":"endGame",
     "messagetype":"GameOver"
-  }
+  },
   "body":{}
 }
 ```
