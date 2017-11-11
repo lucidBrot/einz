@@ -8,19 +8,21 @@ import ch.ethz.inf.vs.a4.minker.einz.ICardDefinition;
 
 public class Card implements ICardDefinition {
 
-    public void Card (String type, String color){
+    public Card (String type, String color){
         //This is used for cards which don't need the "wish" to function properly
+
         this.type = type;
         this.color = color;
         this.wish = "";
     }
 
-    public void Card (String type, String color, String wish){
+    public Card (String type, String color, String wish){
         //This is used for cards which need the "wish" to function properly
         this.type = type;
         this.color = color;
         this.wish =  wish;
     }
+
 
     //type determines what kind of card you play. This can be "zero", "one", "plusTwo", ...
     public String type;

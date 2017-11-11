@@ -25,11 +25,67 @@ public class CardAttributeList {
 
 
     //all possible colors of cards which are also
-    //all possible wishes of cards (except "none")
+    //all possible wishes of cards (if a card isn't played but you can choose a color as soon as you play it,
+    //it has "none" as wish
     public static final String yellow = "yellow";
     public static final String blue = "blue";
     public static final String red = "red";
     public static final String green = "green";
     public static final String none = "none";
+
+    //some functions to make coding easier
+    public static String intToType(int i){
+        switch(i){
+            case 0:
+                return zero;
+            case 1:
+                return one;
+            case 2:
+                return two;
+            case 3:
+                return three;
+            case 4:
+                return four;
+            case 5:
+                return five;
+            case 6:
+                return six;
+            case 7:
+                return seven;
+            case 8:
+                return eight;
+            case 9:
+                return nine;
+            case 10:
+                return plusTwo;
+            case 11:
+                return switchOrder;
+            case 12:
+                return stop;
+            case 13:
+                return changeColor;
+            case 14:
+                return changeColorPlusFour;
+            default:
+                return "";
+        }
+    }
+
+    public static String intToColor(int i){
+        switch (i){
+            case 0:
+                return yellow;
+            case 1:
+                return blue;
+            case 2:
+                return red;
+            case 3:
+                return green;
+            case 4:
+                return none;
+            default:
+                return "";
+        }
+    }
 
 }

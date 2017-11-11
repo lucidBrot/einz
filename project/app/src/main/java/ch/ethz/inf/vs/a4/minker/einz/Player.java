@@ -11,6 +11,7 @@ public class Player implements PlayerDefinition {
     public Player(String name, String IP){
         this.name = name;
         this.IP = IP;
+        this.Hand = new HashSet<>();
     }
 
     public String name;

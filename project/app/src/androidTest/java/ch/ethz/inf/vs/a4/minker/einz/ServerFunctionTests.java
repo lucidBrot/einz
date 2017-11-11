@@ -17,34 +17,17 @@ import static junit.framework.Assert.assertEquals;
  */
 
 public class ServerFunctionTests {
-    @Test
-    public void addRemovePlayersTest(){
 
+    @Test
+    public void constructorTest(){
         GameState gameState = new GameState();
-        gameState.addPlayer("1000", "Peter");
-        gameState.addPlayer("1200", "Paul1");
-        gameState.addPlayer("1200", "Paul2");
+
 
         assertEquals(gameState.getNumberOfPlayers(), 2);
-
-        gameState.removePlayer("1100");
-        gameState.removePlayer("1200");
-        gameState.removePlayer("1000");
-        gameState.removePlayer("1100");
-
-        assertEquals(gameState.getNumberOfPlayers(), 0);
+        assertEquals(gameState.getThreatenedCards(), 1);
+        assertEquals("1000", gameState.getActivePlayer().IP);
 
     }
 
-    @Test
-    public void dealCards(){
-        GameState gameState = new GameState();
-        //add players
-        gameState.addPlayer("1000", "Peter");
-        gameState.addPlayer("1200", "Paul");
-        //initialise drawPile
 
-
-
-    }
 }

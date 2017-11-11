@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import ch.ethz.inf.vs.a4.minker.einz.CardAttributeList;
-import ch.ethz.inf.vs.a4.minker.einz.ICardDefinition;
-import ch.ethz.inf.vs.a4.minker.einz.PlayerDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -25,27 +25,27 @@ public class ServerFunction implements ServerFunctionDefinition {
     //(I) Functions to check after the state of the game (no side effects)
 
     //look at the top card of the playpile on the table
-    public ICardDefinition topCard(){
+    public Card topCard(){
         return server.gameState.topCard();
     };
 
     //returns the top x cards from the pile of played cards if at least x cards lie on the pile of played cards
     //returns the full pile of played cards otherwise
-    public HashMap<Integer, ICardDefinition> playedCards (int x){
+    public HashMap<Integer, Card> playedCards (int x){
         return server.gameState.playedCards(x);
     };
 
     //returns the player whos turn it currently is
-    public PlayerDefinition activePlayer(){
+    public Player activePlayer(){
         return server.gameState.getActivePlayer();
     };
 
     //checks if a card can be played
-    public boolean isPlayable (ICardDefinition card, PlayerDefinition p){
+    public boolean isPlayable (Card card, Player p){
             //Here come all the fancy rules!
             //So far, only the very basics are implemented
             boolean pTurn = false, cardLegit = false;
-            ICardDefinition bottomCard = topCard();
+            Card bottomCard = topCard();
 
         if (server.gameState.getThreatenedCards() == 1) {
             switch (card.type) {
@@ -205,7 +205,7 @@ public class ServerFunction implements ServerFunctionDefinition {
     //(II) Functions that change things in the game
 
     //playing a card
-    public void play(ICardDefinition card, PlayerDefinition p){
+    public void play(Card card, Player p){
         //Here comes all the fancy stuff that happens when a card is played!
         //So far, only the basics are implemented
         if (isPlayable(card, p)){
@@ -280,20 +280,29 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //returns the top card from the drawpile to be drawn and removes it from the drawpile and adds it to player p's hand
     //this should be called when it's a players turn and he can't play any cards from hand
-    public ICardDefinition drawOneCard(PlayerDefinition p){
-        return null;
+    public Card drawOneCard(Player p){
+        return server.gameState.drawOneCard(p);
     }
 
     //returns the top x cards from the drawpile to be drawn and ramoves them from the drawpile and adds them to player p's hand
     //this should be called when a player needs to draw cards because of effects from played cards
-    public HashSet<ICardDefinition> drawXCards(int x, PlayerDefinition p){
-        return null;
+    public HashSet<Card> drawXCards(int x, Player p){
+        HashSet result = new HashSet();
+        for (int i = 0; i < x; i++){
+            result.add(server.gameState.drawOneCard(p));
+        }
+        server.gameState.resetThreatenedCards();
+        return result;
     }
 
     // (III) Other Functions
 
     //checks if a player has won the game (has 0 cards in hand)
-    public boolean hasWon(PlayerDefinition p){
-        return false;
+    public boolean hasWon(Player p){
+        if (p.Hand.isEmpty()){
+            return true;
+        } else {
+            return false;
+        }
     }
 }
