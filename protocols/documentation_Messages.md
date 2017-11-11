@@ -484,6 +484,8 @@ Response from the **Server** if a [**PlayCard**](#playcard) request was invalid.
 
 The **Client** requests to know its own canonical state. This involves their current hand and the already played cards, also called the stack.
 
+The response might also be sent without being requested - e.g. after a player finished his turn.
+
 ##### Request
 
 ```Json
@@ -508,6 +510,12 @@ The **Client** requests to know its own canonical state. This involves their cur
 
 > A List of the already played cards, the card at index 0 being the oldest card on the stack
 
+`playerinfo` : *JSONArray* of *JSONObjects* 
+
+> Contains number of cards the other players hold and maybe further info.
+>
+> One JSONObject for each player
+
 ```Json
 {
   "header":{
@@ -523,6 +531,16 @@ The **Client** requests to know its own canonical state. This involves their cur
       {"color":"blue", "num":"3"},
       {"color":"blue", "num":"4"},
       {"color":"red", "num":"4"}
+    ],
+    "playerinfo":[
+      "roger":{
+      	"turn-order":"1",
+      	"number of cards":"7"
+      },
+      "cleminemz":{
+        "turn-order":"2",
+        "number of cards": "5"
+      }
     ]
   }
 }
