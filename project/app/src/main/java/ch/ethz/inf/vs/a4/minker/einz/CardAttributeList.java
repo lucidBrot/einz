@@ -24,7 +24,7 @@ public class CardAttributeList {
     public static final String changeColorPlusFour = "changeColorPlusFour";
 
 
-    //all possible colors of cards
+    //all possible colors of cards which are also
     //all possible wishes of cards (except "none")
     public static final String yellow = "yellow";
     public static final String blue = "blue";
