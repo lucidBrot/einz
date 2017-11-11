@@ -1,5 +1,0 @@
-**specified messagegroups**
-* ping
-> Ping, Pong
-* registration
-> Register, RegisterResponse, Unregister, Unregistered

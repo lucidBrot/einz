@@ -28,7 +28,7 @@ Every String is case-sensitive!
 The message consists of a *header* and a *body*, providing a consistent top-level interface over all kinds of messages. The `messagegroup`  is the same for messages that conceptually belong together. This simplifies the implementation of maintainable code because only one implementation of the Parser would have to be changed if we change the communication.
 If the body is changed, we only have to modify the Parser in the code. If the header is changed, we only have to modify the ParserFactory.
 
-All Strings and Booleans should be stored as String to allow further extensibility and should be handled like Strings in the code.
+All Strings and Booleans should be stored as String to allow further extensibility and should be handled like Strings in the code. Same for Int.
 
 The header must always contain `messagegroup` and `messagetype`. The body may vary.
 `messagegroup` is camelCase, `messagetype` is PascalCase, to make it easier to visually distinguish them.
@@ -46,8 +46,58 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
   }
   ```
 
-  ​
+## Table of Contents
 
+**specified messagegroups**
+
+* ping
+
+  > [Ping](#ping / pong), Pong
+
+
+* registration
+
+  > [Register](#register), RegisterResponse, [UnregisterRequest](#unregister), UnregisterResponse
+
+
+* rules
+
+  > [SendRules](#sendrules), [RulesInitialized](#sendrules)
+
+
+* startGame
+
+  > [StartGame](#startgame)
+
+
+* draw
+
+  > [DrawXCards](#drawxcards), [HandOutCard](#handoutcard), ([DrawCard](#drawcard))
+
+
+* stateinfo
+
+  > [WhoseTurn](#whoseturn), [GetState](#getstate), GetStateResponse
+
+
+* playcard
+
+  > [PlayCard](#playcard), PlayCardResponse, [CardPlayed](#cardplayed), [InvalidCardPlayed](#invalidcardplayed)
+
+
+* toast
+
+  > [ShowMessage](#showmessage), [SendMessage](#sendmessage), [BroadcastMessage](#broadcastmessage)
+
+
+* playerFinished
+
+  > [PlayerFinished](#playerfinished)
+
+
+* endGame
+
+  > [GameOver](#gameover)
 ## Ping / Pong
 
 Request a simple answer from the other to make sure they're still there or to measure the delay.
@@ -156,7 +206,7 @@ The **Client** requests to leave the game and close the connection.
 {
   "header":{
     "messagegroup":"registration",
-    "messagetype":"Unregister"
+    "messagetype":"UnregisterRequest"
   },
   "body":{
     "username":"roger"
@@ -179,7 +229,7 @@ Also, the other Clients need to know about leaves.
 {
   "header":{
     "messagegroup":"registration",
-    "messagetype":"Unregistered"
+    "messagetype":"UnregisterResponse"
   },
   "body":{
     "username":"that random dude who we didn't want",
@@ -196,20 +246,23 @@ Informs the Client which rules will be used. The rules themselves might have to 
 
 The **Server** sends this to the Client. The Client responds with the response once it's ready.
 
-Regarding extensibility, we don't need a String for the integers, because the negative numbers are free for this
-
 ##### Request
 
 ```Json
 {
-  "messagetype":"SendRules",
-  "ruleset":{
-    "startWithXCards":{
-      "x":7
-    },
-    "instantWinOnCardXPlayed":{
-      "cardcolor":"green",
-      "cardnum":3
+  "header":{
+    "messagegroup":"rules",
+    "messagetype":"SendRules"
+  },
+  "body":{
+    "ruleset":{
+        "startWithXCards":{
+          "x":"7"
+        },
+       "instantWinOnCardXPlayed":{
+          "cardcolor":"green",
+          "cardnum":"3"
+       }
     }
   }
 }
@@ -228,8 +281,13 @@ If everything is as it's supposed to be, this is simply a signal for the server 
 
 ```Json
 {
-  "messagetype":"RulesInitialized",
-  "invalid rules":["instantWinOnCardXPlayed", "';DROP DATABASE usernames"],
+  "header":{
+    "messagegroup":"rules",
+    "messagetype":"RulesInitialized"
+  },
+  "body":{
+    "invalid rules":["instantWinOnCardXPlayed", "';DROP DATABASE usernames"] 
+  }
 }
 ```
 
@@ -243,7 +301,13 @@ The **Server** sends this.
 
 ```json
 {
-  "messagetype":"StartGame"
+  "header":{
+    "messagegroup":"startGame",
+    "messagetype":"StartGame"
+  },
+  "body":{
+    
+  }
 }
 ```
 
@@ -263,8 +327,13 @@ The **Client** sends this request. The Server checks whether the Client is allow
 
 ```json
 {
-  "messagetype":"DrawXCards",
-  "x":3
+  "header":{
+    "messagegroup":"draw",
+    "messagetype":"DrawXCards"
+  },
+  "body":{
+    "x":"3"
+  }
 }
 ```
 
@@ -272,14 +341,19 @@ The **Client** sends this request. The Server checks whether the Client is allow
 
 ```Json
 {
-  "messagetype":"DrawXCardsResponse",
-  "will give":2
+  "header":{
+    "messagegroup":"draw",
+    "messagetype":"DrawXCardsResponse"
+  },
+  "body":{
+    "will give":"2"
+  }
 }
 ```
 
 ## DrawCard
 
-Just use  [**DrawXCards**](#drawxcards) with `x=1`
+Just use  [**DrawXCards**](#drawxcards) with `x="1"`
 
 ## WhoseTurn
 
@@ -289,8 +363,13 @@ The **Server** informs each Client whenever somebodys' turn starts. The Client c
 
 ```Json
 {
-  "messagetype":"WhoseTurn",
-  "username":"Donald Trump"
+  "header":{
+    "messagegroup":"stateinfo",
+    "messagetype":"WhoseTurn"
+  },
+  "body":{
+    "username":"Donald Trump"
+  }
 }
 ```
 
@@ -308,16 +387,25 @@ If `dry-run` is true, the Server will only answer whether the move is valid but 
 
 ```Json
 {
-  "messagetype":"PlayCard",
-  "dry-run":true
-  "card":{
-    "color":"green"
-    "num":1337
+  "header":{
+    "messagegroup":"playcard",
+    "messagetype":"PlayCard"
+  },
+  "body":{
+    "dry-run":"true",
+    "card":{
+      "color":"green",
+      "num":"1337"
+    }
   }
 }
 ```
 
+Note that the contents of card are yet to be specified as of 11.11.2017.
+
 ##### Response
+
+As always the booleans are also stored as strings to allow easier extensibility. When coding, you have to make sure anyways that the input is of the correct type.
 
 `play valid` : *boolean*
 
@@ -333,10 +421,15 @@ If `dry-run` is true, the Server will only answer whether the move is valid but 
 
 ```Json
 {
-  "messagetype":"PlayCardResponse",
-  "dry-run":true,
-  "play valid":true,
-  "your turn":true
+  "header":{
+    "messagegroup":"playcard",
+    "messagetype":"PlaycardResponse"
+  },
+  "body":{
+    "dry-run":"true",
+    "play valid":"true",
+    "your turn":"true"
+  }
 }
 ```
 
@@ -354,12 +447,17 @@ Usually broadcasted from the **Server** to all Clients if a valid play was made.
 
 ```Json
 {
-  "messagetype":"CardPlayed",
-  "card":{
-    "some info":"to be specified",
-    "color":"green"
+  "header":{
+    "messagegroup":"playcard",
+    "messagetype":"CardPlayed"
+  },
+  "body":{
+    "card":{
+      "some info":"to be specified",
+      "color":"green"
+    }
+    "player":"владимир путин"
   }
-  "player":"владимир путин"
 }
 ```
 
@@ -372,8 +470,13 @@ Response from the **Server** if a [**PlayCard**](#playcard) request was invalid.
 
 ```Json
 {
-  "messagetype":"InvalidCardPlayed",
-  "reason":"bad coding skills and an inexistent card"
+  "header":{
+    "messagegroup":"playcard",
+    "messagetype":"InvalidCardPlayed"
+  },
+  "body":{
+    "reason":"bad coding skills and an inexistent card"
+  }
 }
 ```
 
@@ -381,13 +484,17 @@ Response from the **Server** if a [**PlayCard**](#playcard) request was invalid.
 
 The **Client** requests to know its own canonical state. This involves their current hand and the already played cards, also called the stack.
 
-The **Server** will then respond if the username matches the IP.
-
 ##### Request
 
 ```Json
 {
-  "messagetype":"GetState"
+  "header":{
+    "messagegroup":"stateinfo",
+    "messagetype":"GetState"
+  },
+  "body":{
+    
+  }
 }
 ```
 
@@ -403,16 +510,21 @@ The **Server** will then respond if the username matches the IP.
 
 ```Json
 {
-  "messagetype":"GetStateResponse",
-  "hand":[
-    {"color":"blue", "value":7},
-    {"color":"black", "special":"play Vitas"}
-  ],
-  "stack":[
-    {"color":"blue", "num":3},
-    {"color":"blue", "num":4},
-    {"color":"red", "num":4}
-  ]
+  "header":{
+    "messagegroup":"stateinfo",
+    "messagetype":"GetStateResponse"
+  },
+  "body":{
+    "hand":[
+      {"color":"blue", "value":"7"},
+      {"color":"black", "special":"play Vitas"}
+    ],
+    "stack":[
+      {"color":"blue", "num":"3"},
+      {"color":"blue", "num":"4"},
+      {"color":"red", "num":"4"}
+    ]
+  }
 }
 ```
 
@@ -426,10 +538,15 @@ The **Server** hands out 1 card to a client.
 
 ```Json
 {
-  "messagetype":"HandOutCard",
-  "card":{
-    "color":"green",
-    "num":"black"
+  "header":{
+    "messagegroup":"draw",
+    "messagetype":"HandOutCard"
+  },
+  "body":{
+    "card":{
+      "color":"green",
+      "num":"twelve"
+    }
   }
 }
 ```
@@ -450,9 +567,15 @@ Send some `message` that should be displayed to the clientside user.
 
 ```json
 {
-  "messagetype":"ShowMessage",
-  "message":"сука блиать",
-  "style":{"some":"JSONOBJECT"}
+  "header":{
+    "messagegroup":"toast",
+    "messagetype":"ShowMessage"
+  },
+  "body":{
+    "messagetype":"ShowMessage",
+    "message":"сука блиать",
+    "style":{"some":"JSONOBJECT"}
+  }
 }
 ```
 
@@ -462,9 +585,15 @@ The **Client** requests the server to send [**ShowMessage**](#showmessage) to `t
 
 ```Json
 {
-  "messagetype":"SendMessage",
-  "target":"roger",
-  "message":"my message"
+  "header":{
+    "messagegroup":"toast",
+    "messagetype":"SendMessage"
+  },
+  "body":{
+    "messagetype":"SendMessage",
+    "target":"roger",
+    "message":"my message"
+  }
 }
 ```
 
@@ -474,8 +603,13 @@ The **Client** requests the server to send [**ShowMessage**](#showmessage) to al
 
 ```json
 {
-  "messagetype":"BroadcastMessage",
-  "message":"my message"
+  "header":{
+    "messagegroup":"toast",
+    "messagetype":"BroadcastMessage"
+  },
+  "body":{
+    "message":"my message"
+  }
 }
 ```
 
@@ -485,11 +619,16 @@ The **Server** informs the clients that one Player has finished the game. E.g. b
 
 ```Json
 {
-  "messagetype":"PlayerFinished",
-  "username":"roger",
-  "points":1,
-  "more":{
-    "a":"b"
+  "header":{
+    "messagegroup":"playerFinished",
+    "messagetype":"PlayerFinished"
+  },
+  "body":{
+    "username":"roger",
+    "points":"1",
+    "more":{
+      "a":"b"
+    }
   }
 }
 ```
@@ -500,6 +639,10 @@ The **Server** informs the clients that the game is over and they can show the a
 
 ```Json
 {
-  "messagetype":"GameOver"
+  "header":{
+    "messagegroup":"endGame",
+    "messagetype":"GameOver"
+  }
+  "body":{}
 }
 ```
