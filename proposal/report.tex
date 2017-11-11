@@ -74,7 +74,7 @@
 
 % General information
 
-\title{Project Title\\
+\title{einz\\
 \normalsize{Distributed Systems -- Project Proposal}}
 \subtitle{subtitle}
 
@@ -97,11 +97,11 @@
 % e-mail address with \email.
 %
 % 1st. author
-\alignauthor \normalsize{Student One,  Student Two, Student Three}\\
-	\affaddr{\normalsize{ETH ID-1 XX-XXX-XXX, ETH ID-2 XX-XXX-XXX, ETH ID-3 XX-XXX-XXX}}\\
-	\email{\normalsize{one@student.ethz.ch, two@student.ethz.ch, three@student.ethz.ch}}
+\alignauthor \normalsize{Clemens Bachmann, Josua Cantieni, Fabian Gessler, Christian Knieling, Eric Mink, Silvia Siegrist}\\
+	\affaddr{\normalsize{ETH ID-1 13-932-488, ETH ID-2, ETH ID-3 15-939-341, ETH ID-4 14-923-809, ETH ID-5 15-917-057, ETH ID-6 15-935-893}}\\
+	\email{\normalsize{baclemen@student.ethz.ch, two@student.ethz.ch, fgesser@student.ethz.ch, knielinc@student.ethz.ch, minker@student.ethz.ch, sisilvia@student.ethz.ch}}
 }
-
+%TODO: überprüefed eui agabe
 
 \begin{document}
 
@@ -114,6 +114,10 @@ Concisely state
 \textit{(a)}~System overview
 \textit{(b)}~software and hardware you intend to use in this project,
 \textit{(c)}~expected deliveries of this project.
+
+OUR PART:
+We choose to create an android application for smartphones which allows to play the game "einz" which is very similar to the popluar UNO cardgame. The goal is to be able to play this game with friends wherever you are, as long as you have a smartphone and access to the Internet.
+For this purpose we will create an android application which is able to take the role of server and client at the same time. The device of one of the players is used as the server for the game which saves the state of the game and is responsible for synchronization. In this way there is no extra server needed, except for the lookup of the players in case that they are not in the same LAN.
 \end{abstract}
 
 \section{Introduction}
@@ -134,6 +138,11 @@ At this stage, however, you will only have a few ``real references'',
 so we put the Web-sites into the bibliography.
 Cite every source you used throughout the project.
 
+OUR PART:
+TDOD: fällt jemanden etwas ein das man hier schreiben könnte? dann bitte schreiben...
+TODO: jedes tutorial und co als referenz aufführen!
+
+
 \section{System Overview}
 
 This is the core of the proposal.
@@ -151,6 +160,13 @@ explain the figures in the text where you reference them.
 	\caption{Only include useful figures. Do not simply copy something from a Web.}
 \end{figure}
 
+OUR PART:
+We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like NAT-punchthrough to allow players from behind different routers to play via the internet with each other or adding more variations and rules.
+Specifically, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other client's IP address and ports, through which they can communicate as if they were within the same subnet, as already implemented in the first phase. The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
+
+TODO: kann da jemand noch mehr zur planung schreiben?
+
+TODO: wer macht eine Grafik als überblich zum aufbau und vielleicht noch eine zum UI?
 
 
 \section{Requirements}
@@ -165,6 +181,12 @@ Describe system setup, components, external libraries, hardware etc.
 	\caption{System Overview~\cite{estimote}}
 \end{figure}
 
+OUR PART:
+
+TODO:Josua beschreibst du das "system setup"?
+TODO:jeder der "external libraries, hardware etc." benutz bitte diejenigen beschreiben
+
+
 \section{Work Packages}
 Breakdown the work to subtasks to meet the project requirements.
 Define and describe these tasks.
@@ -178,10 +200,38 @@ Define and describe these tasks.
  
 Stick to a concise, scientific writing style. 
 
+OUR PART:
+There work will be broken down into the following subtasks:
+TODO: müsste man den WPs noch andere namen als nummern geben?
+TODO: jeder beschreibt das WP für das er verantworlich ist. dürft meine beschreibungen gerne löschen ;)
+\begin{itemize}
+        \item {\bf WP1}: Use the smartphone as a Server:   
+        \item {\bf WP2}: Server for hole punching:   
+        \item {\bf WP3}: Logic of the Clients: 
+        \item {\bf WP4}: User Interface: 
+        \item {\bf WP5}:  Modell (Interface zwischen client-server): TODO: ist das wirklich ein Package?
+\end{itemize}
+
 \section{Milestones}
 The milestones section provides a work plan for carrying out the project.
 This is your schedule for getting the project done.
 Clearly state how the work packages will be distributed among the team members. 
+
+
+OUR PART:
+We think it is important to have someone who has an overview of the whole project, therefore we assigned a project manager. For the implementation of the application we made two groups, one for the server side and one for the client side. There is one person responsible for the organisation and delegation of the work to other people for both server and client side. These two people also have to set an API to make the two parts work together in the application.
+
+As project manager and organizing the structure of the project: Josua
+
+Server: Responsable for organisation and also helps implementing: Eric, helps with implementation: Fabian
+
+Client: Responsable for organisation and also helps implementing: Chris, helps with implementation: Clemens
+
+UI and Logo: Chris
+
+First responsable for writing the proposal, then helps implementing where there is need: Silvia
+
+
 % The following two commands are all you need in the
 % initial runs of your .tex file to
 % produce the bibliography for the citations in your paper.
