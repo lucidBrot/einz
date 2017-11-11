@@ -52,7 +52,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * ping
 
-  > [Ping](#ping / pong), Pong
+  > [Ping](#ping--pong), Pong
 
 
 * registration
