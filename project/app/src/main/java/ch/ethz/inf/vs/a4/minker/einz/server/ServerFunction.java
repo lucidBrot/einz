@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -31,7 +32,7 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //returns the top x cards from the pile of played cards if at least x cards lie on the pile of played cards
     //returns the full pile of played cards otherwise
-    public HashMap<Integer, Card> playedCards (int x){
+    public ArrayList<Card> playedCards (int x){
         return server.gameState.playedCards(x);
     };
 
@@ -208,15 +209,27 @@ public class ServerFunction implements ServerFunctionDefinition {
     }
 
     //returns if the active player has already drawn his one card because he was not able to play anything
-    //doesn't return if the active player has drawn any cards from card effects
+    //(doesn't include if the player has drawn cards from card effects)
     public boolean hasDrawn(){
         return server.gameState.getHasDrawn();
     }
 
     //(II) Functions that change things in the game
 
+    //initialises a new game
+    //returns a new GameState object with:
+    //-the given players in the game, the players play in the order in which they are in the ArrayList (lowest index plays first)
+    //-a deck that contains the specified cards the specified amount of times
+    // in the HashMap, the Key determines the Card and the Mapped value determines how many times that card is put into the game
+    //-the given set of rules with which the game is played represented as an int
+    // since we haven't specified yet what options should be available, this int does nothing at the moment
+    public GameState startGame(ArrayList<Player> players, HashMap<Card, Integer> deck, int rules){
+        GameState result = new GameState(players, deck, rules);
+        return result;
+    }
+
     //playing a card
-    public void play(Card card, Player p){
+    public boolean play(Card card, Player p){
         //Here comes all the fancy stuff that happens when a card is played!
         //So far, only the basics are implemented
         if (isPlayable(card, p)){
@@ -284,15 +297,26 @@ public class ServerFunction implements ServerFunctionDefinition {
                 default:
                     break;
             }
-
+            if (hasWon(p)){
+                server.gameState.playerWon(p);
+            }
+            return true;
+        } else {
+            return false;
         }
 
     }
-
     //When a player plays a card that has a wish he can make, call this instead of play(card, player).
-    public void play(Card card, Player p, String wish){
-        card.wish = wish;
-        play(card, p);
+    public boolean play(Card card, Player p, String wish){
+        if (!wish.equals(CardAttributeList.blue) &&
+            !wish.equals(CardAttributeList.yellow) &&
+            !wish.equals(CardAttributeList.red) &&
+            !wish.equals(CardAttributeList.green)){
+            return false;
+        } else {
+            card.wish = wish;
+            return play(card, p);
+        }
     }
 
     //returns the top card from the drawpile to be drawn and removes it from the drawpile and adds it to player p's hand

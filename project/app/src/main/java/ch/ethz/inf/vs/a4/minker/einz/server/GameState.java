@@ -48,11 +48,11 @@ public class GameState {
                 }
             }
         }
-        //add the none-colored cards 8 times each
+        //add the none-colored cards 4 times each
         color = CardAttributeList.none;
         for (int i = 13; i < 15; i++){
             type = CardAttributeList.intToType(i);
-            for (int j = 0; j < 8; j++){
+            for (int j = 0; j < 4; j++){
                 addCardToDrawPile(new Card(type, "none", "none"));
             }
 
@@ -73,6 +73,11 @@ public class GameState {
         numberOfCardsInPlayPile++;
         drawPile.remove(numberOfCardsInDrawPile - 1);
         numberOfCardsInDrawPile--;
+    }
+
+    //This is the constructor that gets used when calling serverFunction.startGame
+    public GameState (ArrayList<Player> players, HashMap<Card, Integer> deck, int rules){
+        //TODO: Constructor
     }
 
     private HashMap<String,String> playerIPs = new HashMap<>(); // Storing players so that they can be identified by IP address
@@ -165,11 +170,11 @@ public class GameState {
         return result;
     }
 
-    public HashMap<Integer, Card> playedCards(int x) {
+    public ArrayList<Card> playedCards(int x) {
         x = Math.min(x, numberOfCardsInPlayPile);
-        HashMap<Integer, Card> result = new HashMap<>(x);
+        ArrayList<Card> result = new ArrayList<>(x);
         for (int i = 0; i < x; i++) {
-            result.put(i, playPile.get(numberOfCardsInPlayPile - 1 - i));
+            result.add(playPile.get(numberOfCardsInPlayPile - 1 - i));
         }
         return result;
     }
@@ -236,5 +241,9 @@ public class GameState {
         drawPile.add(card);
         numberOfCardsInDrawPile++;
         Log.i("dbgng", "totalCards: "+Integer.toString(numberOfCardsInDrawPile)+", topCard: (" + drawPileTopCard().type +", "+drawPileTopCard().color+", "+drawPileTopCard().wish+")");
+    }
+
+    public void playerWon(Player p){
+        players.remove(p);
     }
 }
