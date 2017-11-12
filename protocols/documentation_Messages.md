@@ -539,11 +539,12 @@ The response might also be sent without being requested - e.g. after a player fi
       	"number of cards":"7"
       },
       {
-		"name":"clemi"
+	"name":"clemi",
         "turn-order":"2",
         "number of cards": "5"
       }
-    ]
+    ],
+    "whoseturn":"clemi"
   }
 }
 ```
