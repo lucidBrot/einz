@@ -26,7 +26,7 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //look at the top card of the playpile on the table
     public Card topCard(){
-        return server.gameState.topCard();
+        return server.gameState.playPiletopCard();
     };
 
     //returns the top x cards from the pile of played cards if at least x cards lie on the pile of played cards
@@ -202,6 +202,17 @@ public class ServerFunction implements ServerFunctionDefinition {
         }
     }
 
+    //returns the number of cards a player needs to draw if he can't play anything
+    public int cardsToDraw(){
+        return server.gameState.getThreatenedCards();
+    }
+
+    //returns if the active player has already drawn his one card because he was not able to play anything
+    //doesn't return if the active player has drawn any cards from card effects
+    public boolean hasDrawn(){
+        return server.gameState.getHasDrawn();
+    }
+
     //(II) Functions that change things in the game
 
     //playing a card
@@ -278,9 +289,16 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     }
 
+    //When a player plays a card that has a wish he can make, call this instead of play(card, player).
+    public void play(Card card, Player p, String wish){
+        card.wish = wish;
+        play(card, p);
+    }
+
     //returns the top card from the drawpile to be drawn and removes it from the drawpile and adds it to player p's hand
     //this should be called when it's a players turn and he can't play any cards from hand
     public Card drawOneCard(Player p){
+        server.gameState.setHasDrawn(true);
         return server.gameState.drawOneCard(p);
     }
 
@@ -304,5 +322,13 @@ public class ServerFunction implements ServerFunctionDefinition {
         } else {
             return false;
         }
+    }
+
+
+    //Ends the running game
+    public void endGame(){
+        //TODO: Implement
+        //Maybe this isn't needed since the ServerFunction only keeps the GameState in a valid sate but once the game ends
+        //this isn't necessary anymore
     }
 }

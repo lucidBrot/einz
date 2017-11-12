@@ -67,7 +67,7 @@ public class CardAttributeList {
             case 14:
                 return changeColorPlusFour;
             default:
-                return "";
+                return "WrongIntToType";
         }
     }
 
@@ -84,7 +84,7 @@ public class CardAttributeList {
             case 4:
                 return none;
             default:
-                return "";
+                return "WrongIntToColor";
         }
     }
 

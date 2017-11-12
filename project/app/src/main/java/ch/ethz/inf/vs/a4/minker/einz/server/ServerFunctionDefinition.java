@@ -38,6 +38,9 @@ public interface ServerFunctionDefinition {
         //check if player p can play a certain card
         public boolean isPlayable (Card card, Player p);
 
+        //returns the number of cards a player needs to draw if he can't play anything
+        public int cardsToDraw();
+
     //(II) Functions that change things in the game
 
         //player p plays a card
@@ -56,6 +59,9 @@ public interface ServerFunctionDefinition {
 
         //checks if a player has won the game (has 0 cards in hand)
         public boolean hasWon(Player p);
+
+        //Ends the running game
+        public void endGame();
 
 
 

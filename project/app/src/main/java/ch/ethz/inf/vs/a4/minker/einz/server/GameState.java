@@ -35,12 +35,6 @@ public class GameState {
     -each players gets a starting hand of 7 cards
     -the top card from the drawPile gets put onto the (empty) playPile and is used as the starting card
      */
-        drawPile = new ArrayList<>();
-        playPile = new ArrayList<>();
-        order = 1;
-        activePlayer = 0;
-        threatenedCards = 1;
-
         drawPile.ensureCapacity(120);
         //go over the colored cards and add them to the deck twice each
         String type,color;
@@ -49,16 +43,14 @@ public class GameState {
             for (int j = 0; j < 4; j++){
                 color = CardAttributeList.intToColor(j);
                 for (int k = 0; k < 2; k++){
-                    Log.i("dbgng2", "("+type+", "+color+", "+""+")");
                     Card card = new Card(type, color);
-                    Log.i("dbgng2", "("+card.type+", "+card.color+", "+card.wish+")");
                     addCardToDrawPile(card);
                 }
             }
         }
         //add the none-colored cards 8 times each
         color = CardAttributeList.none;
-        for (int i = 14; i < 16; i++){
+        for (int i = 13; i < 15; i++){
             type = CardAttributeList.intToType(i);
             for (int j = 0; j < 8; j++){
                 addCardToDrawPile(new Card(type, "none", "none"));
@@ -85,36 +77,65 @@ public class GameState {
 
     private HashMap<String,String> playerIPs = new HashMap<>(); // Storing players so that they can be identified by IP address
 
+    public HashMap<String,String> getPlayerIPs(){
+        return playerIPs;
+    }
     //Array of all players in order in which they play
     private ArrayList<Player> players = new ArrayList<>(); // I changed this from HashMap to Array, because why would you use a hashmap if every user has an index as identifier?
+    public ArrayList<Player> getPlayers(){
+        return players;
+    }
 
     //determines if we have to go up or down in the players Array to determine the next player
     //order is either 1 or -1, nothing else
-    private int order;
-    private Integer activePlayer;
-    private int numberOfPlayers;
-
+    private int order = 1;
+    public int getOrder(){
+        return order;
+    }
+    private Integer activePlayer = 0;
+    public Player getActivePlayer() {
+        return players.get(activePlayer);
+    }
+    private boolean hasDrawn = false;
+    public boolean getHasDrawn(){
+        return hasDrawn;
+    }
+    public void setHasDrawn(boolean b){
+        hasDrawn = b;
+    }
+    private int numberOfPlayers = 0;
     public int getNumberOfPlayers(){
         return numberOfPlayers;
-    }
-    public void setNumberOfPlayers(int x){
-        numberOfPlayers = x;
     }
 
     //index indicates how many cards lie below the actual card (bottom card has index 0)
     private ArrayList<Card> drawPile = new ArrayList<>();
-    private int numberOfCardsInDrawPile;
+    public ArrayList<Card> getDrawPile(){
+        return drawPile;
+    }
+    private int numberOfCardsInDrawPile = 0;
+    public int getNumberOfCardsInDrawPile(){
+        return numberOfCardsInDrawPile;
+    }
     private ArrayList<Card> playPile = new ArrayList<>();
-    private int numberOfCardsInPlayPile;
+    public ArrayList<Card> getPlayPile(){
+        return playPile;
+    }
+    private int numberOfCardsInPlayPile = 0;
+    public int getNumberOfCardsInPlayPile(){
+        return numberOfCardsInPlayPile;
+    }
 
     //Server has to know which player has what cards in hand
     //this is currently not used, server gets cards over player.Hand in players
     private HashMap<Player, HashSet<Card>> playerHands = new HashMap<>();
+    public HashMap<Player, HashSet<Card>> getPlayerHands(){
+        return playerHands;
+    }
 
     //This indicates how many cards a player has to draw if he can't play a card on his turn
     //Special rules apply when this is greater than one (which means there lie some active plusTwo or changeColorPlusFour cards)
-    private int threatenedCards;
-    //Functions to manipulate threatenedCards
+    private int threatenedCards = 1;
     public int getThreatenedCards() {
         return threatenedCards;
     }
@@ -128,7 +149,7 @@ public class GameState {
         threatenedCards = x;
     }
 
-    public Card topCard() {
+    public Card playPiletopCard() {
         return playPile.get(numberOfCardsInPlayPile - 1);
     }
     public Card drawPileTopCard() {
@@ -153,14 +174,11 @@ public class GameState {
         return result;
     }
 
-    public Player getActivePlayer() {
-        return players.get(activePlayer);
-    }
-
     public void playCardFromHand (Card card, Player p){
-        if (playerHands.get(p).contains(card)){
-            playerHands.get(p).remove(card);
-            playPile.set(numberOfCardsInPlayPile, card);
+        if (p.Hand.contains(card)){
+            p.Hand.remove(card);
+            playPile.ensureCapacity(numberOfCardsInPlayPile + 1);
+            playPile.add(card);
             numberOfCardsInPlayPile++;
         }
     }
@@ -173,6 +191,7 @@ public class GameState {
         if (activePlayer == numberOfPlayers){
             activePlayer = 0;
         }
+        hasDrawn = false;
     }
 
     public void switchOrder(){
@@ -184,6 +203,15 @@ public class GameState {
         if (!playerIPs.containsKey(IP)) {
             playerIPs.put(IP, name);
             Player p = new Player(name, IP);
+            players.ensureCapacity(numberOfPlayers + 1);
+            players.add(numberOfPlayers, p);
+            numberOfPlayers++;
+        }
+    }
+
+    public void addPlayer (Player p){
+        if(!playerIPs.containsKey(p.IP)){
+            playerIPs.put(p.IP, p.name);
             players.ensureCapacity(numberOfPlayers + 1);
             players.add(numberOfPlayers, p);
             numberOfPlayers++;

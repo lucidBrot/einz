@@ -16,6 +16,6 @@ public class Player implements PlayerDefinition {
 
     public String name;
     public String IP;
-    public HashSet<ICardDefinition> Hand;
+    public HashSet<Card> Hand;
 
 }
