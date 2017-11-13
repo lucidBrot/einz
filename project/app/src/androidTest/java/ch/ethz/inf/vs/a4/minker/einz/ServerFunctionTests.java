@@ -29,7 +29,7 @@ public class ServerFunctionTests {
     public void constructorTest() {
         GameState gameState = new GameState();
 
-        assertEquals(gameState.getNumberOfPlayers(), 2);
+        assertEquals(gameState.getPlayers().size(), 2);
         assertEquals(gameState.getThreatenedCards(), 1);
         assertEquals("1000", gameState.getActivePlayer().IP);
 
@@ -45,9 +45,8 @@ public class ServerFunctionTests {
             }
         };
         ThreadedEinzServer dummyTES = new ThreadedEinzServer(1000, dummySACI);
-        ServerFunction serverFunction = new ServerFunction();
+        ServerFunction serverFunction = new ServerFunction(dummyTES);
         dummyTES.gameState = gameState;
-        serverFunction.server = dummyTES;
 
         serverFunction.drawXCards(27, gameState.getPlayers().get(0));
         serverFunction.drawXCards(54, gameState.getPlayers().get(1));
@@ -66,9 +65,8 @@ public class ServerFunctionTests {
             }
         };
         ThreadedEinzServer dummyTES = new ThreadedEinzServer(1000, dummySACI);
-        ServerFunction serverFunction = new ServerFunction();
+        ServerFunction serverFunction = new ServerFunction(dummyTES);
         dummyTES.gameState = gameState;
-        serverFunction.server = dummyTES;
 
 
         int count[] = new int[2];

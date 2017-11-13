@@ -15,7 +15,7 @@ import ch.ethz.inf.vs.a4.minker.einz.Player;
 public class ServerFunction implements ServerFunctionDefinition {
 
     //Constructor
-    public void ServerFunction(ThreadedEinzServer TES){
+    public ServerFunction(ThreadedEinzServer TES){
         server = TES;
     }
     //reference to the server thread containing the global state object

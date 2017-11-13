@@ -2,18 +2,13 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardAttributeList;
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 import static ch.ethz.inf.vs.a4.minker.einz.CardAttributeList.intToColor;
@@ -62,7 +57,7 @@ public class GameState {
         addPlayer("1000", "Peter");
         addPlayer("1200", "Paul");
 
-        for (int i=0; i < getNumberOfPlayers(); i++){
+        for (int i=0; i < players.size(); i++){
             for (int j=0; j < 7; j++) {
                 drawOneCard(players.get(i));
             }
@@ -70,9 +65,7 @@ public class GameState {
 
         playPile.ensureCapacity(1);
         playPile.add(drawPileTopCard());
-        numberOfCardsInPlayPile++;
-        drawPile.remove(numberOfCardsInDrawPile - 1);
-        numberOfCardsInDrawPile--;
+        drawPile.remove(drawPile.size() - 1);
     }
 
     //This is the constructor that gets used when calling serverFunction.startGame
@@ -82,99 +75,101 @@ public class GameState {
 
     private HashMap<String,String> playerIPs = new HashMap<>(); // Storing players so that they can be identified by IP address
 
-    public HashMap<String,String> getPlayerIPs(){
-        return playerIPs;
-    }
+
     //Array of all players in order in which they play
     private ArrayList<Player> players = new ArrayList<>(); // I changed this from HashMap to Array, because why would you use a hashmap if every user has an index as identifier?
-    public ArrayList<Player> getPlayers(){
-        return players;
-    }
+
 
     //determines if we have to go up or down in the players Array to determine the next player
     //order is either 1 or -1, nothing else
     private int order = 1;
-    public int getOrder(){
-        return order;
-    }
     private Integer activePlayer = 0;
-    public Player getActivePlayer() {
-        return players.get(activePlayer);
-    }
     private boolean hasDrawn = false;
-    public boolean getHasDrawn(){
-        return hasDrawn;
-    }
-    public void setHasDrawn(boolean b){
-        hasDrawn = b;
-    }
-    private int numberOfPlayers = 0;
-    public int getNumberOfPlayers(){
-        return numberOfPlayers;
-    }
 
     //index indicates how many cards lie below the actual card (bottom card has index 0)
     private ArrayList<Card> drawPile = new ArrayList<>();
-    public ArrayList<Card> getDrawPile(){
-        return drawPile;
-    }
-    private int numberOfCardsInDrawPile = 0;
-    public int getNumberOfCardsInDrawPile(){
-        return numberOfCardsInDrawPile;
-    }
+
     private ArrayList<Card> playPile = new ArrayList<>();
-    public ArrayList<Card> getPlayPile(){
-        return playPile;
-    }
-    private int numberOfCardsInPlayPile = 0;
-    public int getNumberOfCardsInPlayPile(){
-        return numberOfCardsInPlayPile;
-    }
+
 
     //Server has to know which player has what cards in hand
     //this is currently not used, server gets cards over player.Hand in players
     private HashMap<Player, HashSet<Card>> playerHands = new HashMap<>();
-    public HashMap<Player, HashSet<Card>> getPlayerHands(){
-        return playerHands;
-    }
+
 
     //This indicates how many cards a player has to draw if he can't play a card on his turn
     //Special rules apply when this is greater than one (which means there lie some active plusTwo or changeColorPlusFour cards)
     private int threatenedCards = 1;
+
+
+
+    //GetterFunctions
+
+    public HashMap<String,String> getPlayerIPs(){
+        return playerIPs;
+    }
+    public ArrayList<Player> getPlayers(){
+        return players;
+    }
+    public int getOrder(){
+        return order;
+    }
+    public Player getActivePlayer() {
+        return players.get(activePlayer);
+    }
+    public boolean getHasDrawn(){
+        return hasDrawn;
+    }
+    public ArrayList<Card> getDrawPile(){
+        return drawPile;
+    }
+    public ArrayList<Card> getPlayPile(){
+        return playPile;
+    }
+    public HashMap<Player, HashSet<Card>> getPlayerHands(){
+        return playerHands;
+    }
     public int getThreatenedCards() {
         return threatenedCards;
     }
+
+    //SetterFunctions
+
+    public void setHasDrawn(boolean b){
+        hasDrawn = b;
+    }
+
+
+    //Other Functions
+
     public void increaseThreatenedCards(int x){
         threatenedCards = threatenedCards + x;
     }
+
     public void resetThreatenedCards(){
         threatenedCards = 1;
     }
-    public void setThreatenedCards(int x){
-        threatenedCards = x;
-    }
 
     public Card playPiletopCard() {
-        return playPile.get(numberOfCardsInPlayPile - 1);
+        return playPile.get(playPile.size() - 1);
     }
     public Card drawPileTopCard() {
-        return drawPile.get(numberOfCardsInDrawPile - 1);
+        return drawPile.get(drawPile.size() - 1);
     }
 
     public Card drawOneCard(Player p){
         Card result = drawPileTopCard();
         drawPile.remove(drawPileTopCard());
-        numberOfCardsInDrawPile--;
         Log.i("dbgng3", p.toString());
         p.Hand.add(result);
         return result;
     }
 
     public ArrayList<Card> playedCards(int x) {
-        x = Math.min(x, numberOfCardsInPlayPile);
+        x = Math.min(x, playPile.size());
         ArrayList<Card> result = new ArrayList<>(x);
         for (int i = 0; i < x; i++) {
-            result.add(playPile.get(numberOfCardsInPlayPile - 1 - i));
+            result.add(playPile.get(playPile.size() - 1 - i));
         }
         return result;
     }
@@ -182,18 +177,17 @@ public class GameState {
     public void playCardFromHand (Card card, Player p){
         if (p.Hand.contains(card)){
             p.Hand.remove(card);
-            playPile.ensureCapacity(numberOfCardsInPlayPile + 1);
+            playPile.ensureCapacity(playPile.size() + 1);
             playPile.add(card);
-            numberOfCardsInPlayPile++;
         }
     }
 
     public void nextPlayer() {
         activePlayer = activePlayer + order;
         if (activePlayer == -1){
-            activePlayer = numberOfPlayers - 1;
+            activePlayer = players.size() - 1;
         }
-        if (activePlayer == numberOfPlayers){
+        if (activePlayer == players.size()){
             activePlayer = 0;
         }
         hasDrawn = false;
@@ -208,42 +202,36 @@ public class GameState {
         if (!playerIPs.containsKey(IP)) {
             playerIPs.put(IP, name);
             Player p = new Player(name, IP);
-            players.ensureCapacity(numberOfPlayers + 1);
-            players.add(numberOfPlayers, p);
-            numberOfPlayers++;
+            players.ensureCapacity(players.size() + 1);
+            players.add(p);
         }
     }
 
     public void addPlayer (Player p){
         if(!playerIPs.containsKey(p.IP)){
             playerIPs.put(p.IP, p.name);
-            players.ensureCapacity(numberOfPlayers + 1);
-            players.add(numberOfPlayers, p);
-            numberOfPlayers++;
+            players.ensureCapacity(players.size() + 1);
+            players.add(p);
         }
     }
 
     public void removePlayer(String IP){
         if (playerIPs.containsKey(IP)) {
             playerIPs.remove(IP);
-            for (int i = 0; i < numberOfPlayers; i++){
+            for (int i = 0; i < players.size(); i++){
                 if (players.get(i).IP.equals(IP)){
                     players.remove(i);
                 }
             }
-            numberOfPlayers--;
         }
-
     }
 
     public void addCardToDrawPile(Card card){
-        drawPile.ensureCapacity(numberOfCardsInDrawPile + 1);
+        drawPile.ensureCapacity(drawPile.size() + 1);
         drawPile.add(card);
-        numberOfCardsInDrawPile++;
-        Log.i("dbgng", "totalCards: "+Integer.toString(numberOfCardsInDrawPile)+", topCard: (" + drawPileTopCard().type +", "+drawPileTopCard().color+", "+drawPileTopCard().wish+")");
     }
 
     public void playerWon(Player p){
-        players.remove(p);
+       // players.remove(p);
     }
 }
