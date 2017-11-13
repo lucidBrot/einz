@@ -1,20 +1,279 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
+import android.content.ClipData;
+import android.graphics.Canvas;
+import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import android.support.v7.widget.GridLayout;
 import android.util.Log;
+import android.view.Display;
+import android.view.DragEvent;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
+
 import ch.ethz.inf.vs.a4.minker.einz.R;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 public class ClientActivity extends AppCompatActivity {
+    private static final int NBR_ITEMS = 20;
+    private GridLayout mGrid;
+    private ImageView trayStack;
+    private LayoutInflater inflater;
+    private final android.os.Handler mHideHandler = new android.os.Handler();
+    private final Runnable mHideRunnable = new Runnable() {
+        @Override
+        public void run() {
+            makeFullscreen();
+        }
+    };
+
+
+
+    int[] cards;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        makeFullscreen();
+        //make fullscreen
+        View decorView = getWindow().getDecorView();
+        decorView.setOnSystemUiVisibilityChangeListener
+                (new View.OnSystemUiVisibilityChangeListener() {
+                    @Override
+                    public void onSystemUiVisibilityChange(int visibility) {
+                        // Note that system bars will only be "visible" if none of the
+                        // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
+                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                            // TODO: The system bars are visible. Make any desired
+                            // adjustments to your UI, such as showing the action bar or
+                            // other navigational controls.
+                            mHideHandler.removeCallbacks(mHideRunnable);
+                            mHideHandler.postDelayed(mHideRunnable, 2000);
+                        }
+                    }
+                });
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
+        trayStack = findViewById(R.id.tray_stack);
+        trayStack.setOnDragListener(new TrayDragListener());
+        mGrid = findViewById(R.id.grid_layout);
+        mGrid.setOnDragListener(new DragListener());
+        initCards();
+
+        inflater = LayoutInflater.from(this);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getRealSize(size);
+        for (int i = 0; i < NBR_ITEMS; i++) {
+            final View itemView = inflater.inflate(R.layout.card_view, mGrid, false);
+            ImageView localImgView = (ImageView) itemView;
+            localImgView.setImageResource(cards[i]);
+            localImgView.getLayoutParams().width  = (size.x / mGrid.getColumnCount());
+            localImgView.getLayoutParams().height = (size.y / (3*mGrid.getRowCount()));
+            System.out.println("TESTESTOUT" + mGrid.getMeasuredHeight());
+            itemView.setOnTouchListener(new LongPressListener());
+            mGrid.addView(itemView);
+        }
     }
 
+    public void makeFullscreen(){
+        getSupportActionBar().hide();
+
+        getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
+    }
+
+    public void onResume(){
+        super.onResume();
+        makeFullscreen();
+        }
+
+    class LongPressListener implements View.OnTouchListener {
+
+        /*@Override
+        public boolean onLongClick(View view) {
+            final ClipData data = ClipData.newPlainText("", "");
+            View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                view.startDragAndDrop(data, shadowBuilder, view, 0);
+            } else {
+                view.startDrag(data, shadowBuilder, view, 0);
+            }
+            view.setVisibility(View.INVISIBLE);
+            return true;
+        }*/
+
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+
+            if (motionEvent.getAction()==MotionEvent.ACTION_DOWN) {
+                final ClipData data = ClipData.newPlainText("", "");
+
+                View.DragShadowBuilder shadowBuilder = new CustomDragShadowBuilder(view);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    view.startDragAndDrop(data, shadowBuilder, view, 0);
+                } else {
+                    view.startDrag(data, shadowBuilder, view, 0);
+                }
+                return true;
+            }
+
+
+            return false;
+        }
+    }
+
+    class DragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            final View view = (View) event.getLocalState();
+            if (view != null && view instanceof ImageView) {
+
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        view.setVisibility(View.INVISIBLE);
+                    case DragEvent.ACTION_DRAG_LOCATION:
+                        // do nothing if hovering above own position
+                        if (view == v) return true;
+                        // get the new list index
+                        final int index = calculateNewIndex(event.getX(), event.getY());
+                        // remove the view from the old position
+                        mGrid.removeView(view);
+                        // and push to the new
+                        mGrid.addView(view, index);
+
+                        break;
+                    case DragEvent.ACTION_DROP:
+                        view.setVisibility(View.VISIBLE);
+
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        view.setVisibility(View.VISIBLE);
+
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    class CustomDragShadowBuilder extends View.DragShadowBuilder{
+        CustomDragShadowBuilder(View v){
+            super(v);
+        }
+
+        @Override
+        public void onProvideShadowMetrics(Point shadowSize, Point shadowTouchPoint) {
+            final View view = getView();
+            if (view != null) {
+                shadowSize.set(view.getWidth()*2, view.getHeight()*2);
+                shadowTouchPoint.set(shadowSize.x / 2, shadowSize.y + shadowSize.y / 2);
+            }
+        }
+
+        @Override
+        public void onDrawShadow(Canvas canvas) {
+            final View view = getView();
+            if (view != null) {
+                canvas.scale(2,2);
+                canvas.translate(0,0);
+                view.draw(canvas);
+                }
+            }
+    }
+
+    class TrayDragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            final View view = (View) event.getLocalState();
+            if (view != null && view instanceof ImageView) {
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DRAG_LOCATION:
+                        // do nothing if hovering above own position
+                        if (view == v) return true;
+                        // get the new list index
+                        break;
+                    case DragEvent.ACTION_DROP:
+                        ImageView tmpView = (ImageView) view;
+                        trayStack.setImageDrawable(tmpView.getDrawable());
+                        mGrid.removeView(view);
+                        view.setVisibility(View.VISIBLE);
+
+
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        view.setVisibility(View.VISIBLE);
+
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private int calculateNewIndex(float x, float y) {
+        // calculate which column to move to
+        final float cellWidth = mGrid.getWidth() / mGrid.getColumnCount();
+        final int column = (int)(x / cellWidth);
+
+        // calculate which row to move to
+        final float cellHeight = mGrid.getHeight() / mGrid.getRowCount();
+        final int row = (int)Math.floor(y / cellHeight);
+
+        // the items in the GridLayout is organized as a wrapping list
+        // and not as an actual grid, so this is how to get the new index
+        int index = row * mGrid.getColumnCount() + column;
+        if (index >= mGrid.getChildCount()) {
+            index = mGrid.getChildCount() - 1;
+        }
+
+        return index;
+    }
+
+
+    private void initCards(){
+        cards = new int[20];
+        cards[0] = R.drawable.card_einz_blue;
+        cards[1] = R.drawable.card_take2_red;
+        cards[2] = R.drawable.card_take4;
+        cards[3] = R.drawable.card_rev_green;
+        cards[4] = R.drawable.card_4_red;
+        cards[5] = R.drawable.card_2_yellow;
+        cards[6] = R.drawable.card_skip_red;
+        cards[7] = R.drawable.card_7_green;
+        cards[8] = R.drawable.card_2_red;
+        cards[9] = R.drawable.card_8_blue;
+        cards[10] = R.drawable.card_einz_blue;
+        cards[11] = R.drawable.card_take2_red;
+        cards[12] = R.drawable.card_take4;
+        cards[13] = R.drawable.card_rev_green;
+        cards[14] = R.drawable.card_4_red;
+        cards[15] = R.drawable.card_2_yellow;
+        cards[16] = R.drawable.card_skip_red;
+        cards[17] = R.drawable.card_7_green;
+        cards[18] = R.drawable.card_2_red;
+        cards[19] = R.drawable.card_8_blue;
+    }
 }
