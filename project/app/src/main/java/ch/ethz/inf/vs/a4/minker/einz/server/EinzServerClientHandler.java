@@ -7,30 +7,34 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.concurrent.locks.Lock;
 
 /**
  * This class handles one Connection per instance (thread)
  */
 public class EinzServerClientHandler implements Runnable{
-    private Socket socket;
+    public Socket socket;
+
     public boolean spin = false;
     private ThreadedEinzServer papi;
+    private DataOutputStream out = null;
+    public final Object socketWriteLock; // lock onto this for writing
+    public final Object socketReadLock;
+    private InputStream inp;
+    private BufferedReader brinp;
 
     public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi) {
         Log.d("EinzServerThread", "started");
         this.socket = clientSocket;
         this.papi = papi;
         papi.incNumClients();
-    }
 
-    // source: https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server
+        socketWriteLock = new Object();
+        socketReadLock = new Object();
 
-    @Override
-    public void run() {
-        Log.d("EinzServerThread", "run() was called. Listening for messages");
-        InputStream inp = null;
-        BufferedReader brinp = null;
-        DataOutputStream out = null;
+        // initialize socket stuff
+        inp = null;
+        brinp = null;
         try {
             inp = socket.getInputStream();
             brinp = new BufferedReader(new InputStreamReader(inp));
@@ -40,12 +44,21 @@ public class EinzServerClientHandler implements Runnable{
             e.printStackTrace();
             return;
         }
+    }
+
+    // source: https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server
+
+    @Override
+    public void run() {
+        Log.d("EinzServerThread", "run() was called. Listening for messages");
 
         String line; // TODO: don't just echo the same thing back
         spin = true;
         while (spin) {
             try {
-                line = brinp.readLine();
+                synchronized (socketReadLock) {
+                    line = brinp.readLine();
+                }
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
                     socket.close();
                     papi.decNumClients();
@@ -54,13 +67,41 @@ public class EinzServerClientHandler implements Runnable{
                 } else {
                     Log.d("EinzServerThread", "received line: "+line);
                     parseMessage(line);
-                    out.writeBytes(line + "\n\r");
-                    out.flush();
+                    synchronized (socketWriteLock) {
+                        out.writeBytes(line + "\n\r");
+                        out.flush();
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("EinzServerThread", "Something Failed");
                 return;
+            }
+        }
+    }
+
+    /**
+     * sends the message to the client associated with this EinzServerClientHandler instance.
+     * Makes sure only one thread is concurrently writing to socket
+     * @param message the line to send. Do not include \r\n as we're reading a packet each line.
+     */
+    public void sendMessage(String message) {
+        if(out==null){
+            Log.e("EinzServerThread", "sendMessage: Not yet fully initialized. cannot send message.");
+        }
+        synchronized(socketWriteLock){
+            // maybe need to append  + "\n\r" to message ?
+            try {
+                out.writeBytes(message);
+            } catch (IOException e) {
+                Log.e("EinzServerThread","sendMessage: failed because of IOException "+e.getMessage());
+                e.printStackTrace();
+            }
+            try {
+                out.flush();
+            } catch (IOException e) {
+                Log.e("EinzServerThread","sendMessage: failed because of IOException 2 "+e.getMessage());
+                e.printStackTrace();
             }
         }
     }
