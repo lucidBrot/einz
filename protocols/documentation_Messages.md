@@ -15,13 +15,6 @@ Every String is case-sensitive!
 ***
 
 **STILL TO SPECIFY** : [`card`](#drawxcards)  , [`style`](#showmessage)  , [`state`](#getstate) 
-**TODO** 
-
-* Change all booleans to strings to provide extensibility.
-
-* Possibly change the messages such that the request and response have the same messagetypes. Possibly not. I'd rather leave the *messagetypes* the same and use some identifier *messagegroup* that is the same for messages that belong conceptually together. This has advantages in that changes would only have to be done in one class in the code.
-
-* message set-up so that they all have the same interface on the top-level. This has the advantage that we only need the *header* for finding out which parserobject to return and only the body for within the action.
 
 ## General Form of Message
 
