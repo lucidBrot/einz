@@ -1,10 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import org.json.JSONException;
 import org.json.JSONObject;

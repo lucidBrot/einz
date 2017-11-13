@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 /**
