@@ -136,11 +136,16 @@ Web-sites for documentation~\cite{devServices}, tutorials, etc., are a special c
 In a thesis, you would put them as footnotes.
 At this stage, however, you will only have a few ``real references'',
 so we put the Web-sites into the bibliography.
-Cite every source you used throughout the project.
+Cite every source you used throughout the project.\\
 
 OUR PART:
-TDOD: fällt jemanden etwas ein das man hier schreiben könnte? dann bitte schreiben...
-TODO: jedes tutorial und co als referenz aufführen!
+We build a distributed game similar to then known card game "UNO". Because you might often find yourself wanting to play a game with friends - e.g. while you are waiting for the next train - but without a set of cards to play it, it would be useful to always have the cards on your body. We make this easy by implementing a similar game on the phone as a native application.\\
+
+Obvious difficulties awaiting us include the coordination of a team consisting of six people, each with different skillsets and time available.
+We intend to create an easily extensible codebase so that we can first build the base game and in a second phase add further rules without much effort. This poses difficulties on its own as we have to learn coding patterns such as using factories to make the program code more modular.\\
+Technical problems will be the selection of one device as the server, smooth and clean communication between the clients and the server and implementing concurrency within the server.\\
+
+For the usual difficulties in networking like message ordering and making sure the peers actually get the messages, we will rely on TCP.
 
 
 \section{System Overview}
@@ -161,11 +166,16 @@ explain the figures in the text where you reference them.
 \end{figure}
 
 OUR PART:
-We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like NAT-punchthrough to allow players from behind different routers to play via the internet with each other or adding more variations and rules.
-Specifically, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other client's IP address and ports, through which they can communicate as if they were within the same subnet, as already implemented in the first phase. The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
-
-TODO: kann da jemand noch mehr zur planung schreiben?
-
+We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like NAT-punchthrough to allow players from behind different routers to play via the internet with each other or adding more variations and rules. The additional rules will be available to the user of the device the server runs on before game start, such that we can dynamically change the way the game works.\\
+Specifically, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other client's IP address and ports, through which they can communicate as if they were within the same subnet, as already implemented in the first phase. The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.\\
+\\
+First of all, we implement a simple server-client setup and define the format and the messages that should be provided as an interface between the client and the server.~\cite{messaging} At the same time, we can start implementing the user interface and writing this proposal.\\
+In a second step, once the basic communication between server and client works and the exact behaviour of the two parts has been defined, we implement the serverside game logic and the previously defined messaging functionality.
+We will make it so that the server does most of the computations and only sends the client its state, containing the players hand, the number of cards other players are holding and the most recently played cards. The client receives also a list of possible actions, from which it can choose one without having any clientside support for them, except for the user interface. This allows us to later add gamemodes and rules with ease, because we will only need to change a few classes.
+We are also trying to keep the classes themselves very modular to make updating them - e.g. by adding further messages - just as simple.\\
+Once the game is in a working state with a few rules such as an additional card like the one where the player can choose a color or the well-known "+2" card from UNO, we will decide whether we need to focus on bugfixing, cleaning up code, implementing a LUS or adding more rule options.\\
+\newline
+\newline
 TODO: wer macht eine Grafik als überblich zum aufbau und vielleicht noch eine zum UI?
 
 
@@ -228,9 +238,9 @@ We think it is important to have someone who has an overview of the whole projec
 
 As project manager and organizing the structure of the project: Josua
 
-Server: Responsable for organisation and also helps implementing: Eric, helps with implementation: Fabian
+Server: Responsible for organisation and also helps implementing: Eric, helps with implementation: Fabian
 
-Client: Responsable for organisation and also helps implementing: Chris, helps with implementation: Clemens
+Client: Responsible for organisation and also helps implementing: Chris, helps with implementation: Clemens
 
 UI and Logo: Chris
 
