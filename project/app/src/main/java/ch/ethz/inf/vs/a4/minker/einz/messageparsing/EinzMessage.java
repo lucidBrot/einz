@@ -13,4 +13,24 @@ public class EinzMessage {
         this.header = header;
         this.body = body;
     }
+
+    public EinzMessage (){
+
+    }
+
+    public EinzMessageHeader getHeader() {
+        return header;
+    }
+
+    public void setHeader(EinzMessageHeader header) {
+        this.header = header;
+    }
+
+    public EinzMessageBody getBody() {
+        return body;
+    }
+
+    public void setBody(EinzMessageBody body) {
+        this.body = body;
+    }
 }

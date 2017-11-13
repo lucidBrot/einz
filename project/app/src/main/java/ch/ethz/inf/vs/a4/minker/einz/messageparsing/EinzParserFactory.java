@@ -39,7 +39,7 @@ public class EinzParserFactory {
      * Might return null if message is not a valid message
      * @param message JSON representation of a message as specified in protocols/documentation_Messages.md
      * @return Parser specifically for this messagegroup
-     * @throws JSONException if the message is invalidly formatted. E.g. if it is not a JSONObject or if it has no header...
+     * @throws JSONException if the message is invalidly formatted. E.g. if it is not a JSONObject or if it has no header etc.
      */
     public EinzParser generateEinzParser(JSONObject message) throws JSONException {
         JSONObject header = message.getJSONObject("header");

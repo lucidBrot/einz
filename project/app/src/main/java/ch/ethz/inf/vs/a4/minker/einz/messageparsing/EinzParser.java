@@ -48,9 +48,16 @@ public abstract class EinzParser {
 
 
     /**
+     * This is predefined as all headers are supposed to be the same, but can be overridden if neccessary.
      * @param message SON-encoded message as defined in protocols/documentation_Messages.md
      * @return an EinzMessageHeader Object. This is uniform across all messages
      */
-    public abstract EinzMessageHeader parseHeader (JSONObject message) throws JSONException;
+    public EinzMessageHeader parseHeader (JSONObject message) throws JSONException{
+        String messagegroup, messagetype;
+        JSONObject hdr = message.getJSONObject("header");
+        messagegroup = hdr.getString("messagegroup");
+        messagetype = hdr.getString("messagetype");
+        return new EinzMessageHeader(messagegroup, messagetype);
+    }
 
 }
