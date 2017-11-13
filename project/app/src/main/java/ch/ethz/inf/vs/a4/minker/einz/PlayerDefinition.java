@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
 /**
@@ -8,5 +9,4 @@ import java.util.HashSet;
 
 public interface PlayerDefinition {
 
-    public HashSet<ICardDefinition> Hand = null;
 }

@@ -24,10 +24,11 @@ import java.util.List;
 /**
  * This Activity starts the server and manages the Serverside UI
  */
-public class ServerActivity extends AppCompatActivity implements View.OnClickListener {
+public class ServerActivity extends AppCompatActivity implements View.OnClickListener, ServerActivityCallbackInterface {
 
     private ThreadedEinzServer server;
     private Thread serverThread;
+    private ServerFunctionDefinition serverLogicInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,9 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.btn_s_listen_for_clients).setOnClickListener(this);
         findViewById(R.id.btn_s_start_game_initialization).setOnClickListener(this);
 
-        server = new ThreadedEinzServer(this);
+        serverLogicInterface = new ServerFunction(); // Fabians Part
+
+        server = new ThreadedEinzServer(8080,this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
         serverThread = new Thread(server);
         // run server to listen to clients only when button pressed
 
@@ -56,9 +59,6 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         }
         String temp = ip + ":" + server.getPORT();
         ((TextView) findViewById(R.id.tv_s_ipport)).setText(temp);
-        // TODO: Serverside UI: start server on buttonpress
-        // TODO: set Server Port from UI
-        // TODO: show server IP and Port
 
     }
 
@@ -67,7 +67,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         switch(view.getId()){
             case R.id.btn_s_listen_for_clients:
                 // start server
-                serverThread.start();
+                serverThread.start(); // TODO: stop server on back button
                 break;
             case R.id.btn_s_start_game_initialization:
                 // TODO: start game
@@ -86,8 +86,8 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
                     (ip >> 8 & 0xff),
                     (ip >> 16 & 0xff),
                     (ip >> 24 & 0xff));
-
-            return wifiIpAddress;
+            if(!wifiIpAddress.equals("0.0.0.0"))
+                return wifiIpAddress;
         }
 
         for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
@@ -105,5 +105,19 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         return null;
+    }
+
+    /**
+     * Updates the UI from within the UI thread
+     * @param num new number of Clients connected
+     */
+    @Override
+    public void updateNumClientsUI(final int num) {
+        runOnUiThread(new Runnable(){
+            @Override
+            public void run() {
+                ((TextView) findViewById(R.id.tv_num_connected_clients)).setText(new String("#Connected clients: "+num));
+            }
+        });
     }
 }

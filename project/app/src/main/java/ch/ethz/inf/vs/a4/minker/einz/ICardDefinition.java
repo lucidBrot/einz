@@ -6,6 +6,4 @@ package ch.ethz.inf.vs.a4.minker.einz;
 
 public interface ICardDefinition {
 
-    public String type = "";
-    public String color = "";
 }
