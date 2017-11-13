@@ -79,7 +79,7 @@ public class EinzServerClientHandler implements Runnable{
                     Log.d("EinzServerThread", "received line: "+line);
                     parseMessage(line);
                     synchronized (socketWriteLock) {
-                        out.writeBytes(line + "\n\r");
+                        out.writeBytes(line + "\r\n");
                         out.flush();
                     }
                 }
