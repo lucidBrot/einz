@@ -1,8 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
 public class EinzMessage<MESSAGEBODYTYPE extends EinzMessageBody> {
-    public EinzMessageHeader header;
-    public MESSAGEBODYTYPE body;
+    protected EinzMessageHeader header;
+    protected MESSAGEBODYTYPE body;
 
     /**
      * Create a <i>EinzMessage</i> Object that consists of a Header and a Body

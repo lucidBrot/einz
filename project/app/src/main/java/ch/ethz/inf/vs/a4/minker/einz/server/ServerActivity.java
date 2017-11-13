@@ -26,7 +26,11 @@ import java.util.List;
  */
 public class ServerActivity extends AppCompatActivity implements View.OnClickListener, ServerActivityCallbackInterface {
 
-    private ThreadedEinzServer server;
+    public static ThreadedEinzServer getServer() {
+        return server;
+    }
+
+    private static ThreadedEinzServer server; //static because there should be only one
     private Thread serverThread;
     private ServerFunctionDefinition serverLogicInterface;
 

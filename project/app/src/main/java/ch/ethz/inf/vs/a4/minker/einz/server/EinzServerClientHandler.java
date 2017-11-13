@@ -31,7 +31,7 @@ public class EinzServerClientHandler implements Runnable{
     private EinzActionFactory einzActionFactory = new EinzActionFactory(serverInterface);
 
     // identify this connection by its user as soon as this is available
-    private Player connectedUser; // TODO: set connectedUser on register
+    private String connectedUser; // TODO: set connectedUser on register
 
     public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi, ServerFunctionDefinition serverFunctionDefinition) {
         Log.d("EinzServerThread", "started");
@@ -78,10 +78,11 @@ public class EinzServerClientHandler implements Runnable{
                 } else {
                     Log.d("EinzServerThread", "received line: "+line);
                     parseMessage(line);
-                    synchronized (socketWriteLock) {
+                    /* synchronized (socketWriteLock) {
                         out.writeBytes(line + "\r\n");
                         out.flush();
-                    }
+                    } */
+                    sendMessage(line + "\r\n");
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -94,14 +95,15 @@ public class EinzServerClientHandler implements Runnable{
     /**
      * sends the message to the client associated with this EinzServerClientHandler instance.
      * Makes sure only one thread is concurrently writing to socket
-     * @param message the line to send. Do not include \r\n as we're reading a packet each line.
+     * @param message the line to send. Do not include \r\n except as the end of your package (as we're reading a packet each line)
+     *                DO include it at the end of the package
      */
     public void sendMessage(String message) {
         if(out==null){
             Log.e("EinzServerThread", "sendMessage: Not yet fully initialized. cannot send message.");
         }
         synchronized(socketWriteLock){
-            // maybe need to append  + "\n\r" to message ?
+            // maybe need to append  + "\r\n" to message ?
             try {
                 out.writeBytes(message);
             } catch (IOException e) {
@@ -131,7 +133,7 @@ public class EinzServerClientHandler implements Runnable{
             try {
                 switch (msg.getString("messagetype")){
                     case "play card":
-                        break; // TODO: all cases
+                        break;
                     case "debug message":
                         Log.d("EinzServerThread/parse", "Received debug message");
                         Log.d("EinzServerThread/parse", "\twith values "+msg.getJSONArray("val").toString());
@@ -144,14 +146,16 @@ public class EinzServerClientHandler implements Runnable{
                 //e.printStackTrace();
             }
         }
+
+        Log.d("EinzServerThread/parse","YOU'RE STILL USING THE OLD PARSE FUNCTION.");
     }
 
-    private void parseMessageNew(String message){
+    private void parseMessageNew(String message){ // TODO: if message is register/deregister, make sure register/deregister is called
         try {
             EinzParser einzParser = this.einzParserFactory.generateEinzParser(message);
             EinzMessage einzMessage = einzParser.parse(message);
-            EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage);
-            einzAction.run(connectedUser);
+            EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, connectedUser);
+            einzAction.run();
         } catch (JSONException e) {
             Log.e("EinzServerThread/parse", "JSON Error in parseMessageNew");
             e.printStackTrace();
@@ -159,11 +163,11 @@ public class EinzServerClientHandler implements Runnable{
 
     }
 
-    public Player getConnectedUser() {
+    public String getConnectedUser() {
         return connectedUser;
     }
 
-    public void setConnectedUser(Player connectedUser) {
+    public void setConnectedUser(String connectedUser) {
         this.connectedUser = connectedUser;
     }
 }
