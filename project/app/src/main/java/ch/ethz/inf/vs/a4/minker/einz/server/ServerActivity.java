@@ -28,6 +28,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
 
     private ThreadedEinzServer server;
     private Thread serverThread;
+    private ServerFunctionDefinition serverLogicInterface;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +38,9 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.btn_s_listen_for_clients).setOnClickListener(this);
         findViewById(R.id.btn_s_start_game_initialization).setOnClickListener(this);
 
-        server = new ThreadedEinzServer(8080,this); // 8080 is needed for debug client. TODO: remove port specification
+        serverLogicInterface = new ServerFunction(); // Fabians Part
+
+        server = new ThreadedEinzServer(8080,this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
         serverThread = new Thread(server);
         // run server to listen to clients only when button pressed
 

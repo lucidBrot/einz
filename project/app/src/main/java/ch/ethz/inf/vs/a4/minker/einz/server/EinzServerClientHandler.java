@@ -22,10 +22,12 @@ public class EinzServerClientHandler implements Runnable{
     public final Object socketReadLock;
     private InputStream inp;
     private BufferedReader brinp;
+    private ServerFunctionDefinition serverInterface; // used to call EinzActions
 
-    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi) {
+    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi, ServerFunctionDefinition serverFunctionDefinition) {
         Log.d("EinzServerThread", "started");
         this.socket = clientSocket;
+        this.serverInterface = serverFunctionDefinition;
         this.papi = papi;
         papi.incNumClients();
 

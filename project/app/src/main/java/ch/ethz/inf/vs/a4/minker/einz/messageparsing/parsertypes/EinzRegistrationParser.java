@@ -1,7 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzJsonMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
@@ -38,7 +38,7 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         }
          */
         EinzMessageHeader emh = new EinzMessageHeader("registration", "register");
-        EinzMessageBody emb = new EinzJsonMessageBody(message.getJSONObject("body"));
+        EinzMessageBody emb = new EinzJsonMessageBody(message.getJSONObject("body")); // TODO: does it make sense to use JSON for body instead of parsing everything individually?
         EinzMessage einzMessage = new EinzMessage(emh, emb);
         return einzMessage;
     }

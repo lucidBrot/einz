@@ -1,5 +1,6 @@
-package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
+package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import org.json.JSONObject;
 
 /**
