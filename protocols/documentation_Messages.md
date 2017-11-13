@@ -173,7 +173,7 @@ If the client is not registered, `role` should have a return value of *"null"*.
 >
 > + *"not unique"* if the same username was already registered by a different IP
 > + "already registered" if the same IP already has registered a username
-> + *"empty"* if the username is the empty string. This is reserved for the server
+> + *"invalid"* if the username is the empty string. This is reserved for the server as username. Or if the username contains invalid characters.
 
 ```JSON
 {
@@ -588,6 +588,7 @@ Send some `message` that should be displayed to the clientside user.
   "body":{
     "messagetype":"ShowMessage",
     "message":"сука блиать",
+    "from":"josua",
     "style":{"some":"JSONOBJECT"}
   }
 }
