@@ -2,4 +2,10 @@
     <string name="app_name">Einz</string>
     <string name="btn_s_start_game_initialization_text">start game</string>
     <string name="btn_s_listen_for_clients_text">Listen for clients</string>
+
+    <string name="title_activity_client_test">ClientActivity_test</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+    <string name="title_activity_fullscreen">FullscreenActivity</string>
 </resources>

@@ -15,13 +15,6 @@ Every String is case-sensitive!
 ***
 
 **STILL TO SPECIFY** : [`card`](#drawxcards)  , [`style`](#showmessage)  , [`state`](#getstate) 
-**TODO** 
-
-* Change all booleans to strings to provide extensibility.
-
-* Possibly change the messages such that the request and response have the same messagetypes. Possibly not. I'd rather leave the *messagetypes* the same and use some identifier *messagegroup* that is the same for messages that belong conceptually together. This has advantages in that changes would only have to be done in one class in the code.
-
-* message set-up so that they all have the same interface on the top-level. This has the advantage that we only need the *header* for finding out which parserobject to return and only the body for within the action.
 
 ## General Form of Message
 
@@ -180,7 +173,7 @@ If the client is not registered, `role` should have a return value of *"null"*.
 >
 > + *"not unique"* if the same username was already registered by a different IP
 > + "already registered" if the same IP already has registered a username
-> + *"empty"* if the username is the empty string. This is reserved for the server
+> + *"invalid"* if the username is the empty string. This is reserved for the server as username. Or if the username contains invalid characters.
 
 ```JSON
 {
@@ -539,11 +532,12 @@ The response might also be sent without being requested - e.g. after a player fi
       	"number of cards":"7"
       },
       {
-		"name":"clemi"
+	"name":"clemi",
         "turn-order":"2",
         "number of cards": "5"
       }
-    ]
+    ],
+    "whoseturn":"clemi"
   }
 }
 ```
@@ -594,6 +588,7 @@ Send some `message` that should be displayed to the clientside user.
   "body":{
     "messagetype":"ShowMessage",
     "message":"сука блиать",
+    "from":"josua",
     "style":{"some":"JSONOBJECT"}
   }
 }

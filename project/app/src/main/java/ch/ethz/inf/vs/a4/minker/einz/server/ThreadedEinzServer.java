@@ -1,10 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,21 +26,23 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     public GameState gameState;
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
+    private ServerFunctionDefinition serverFunctionDefinition; // interface to server logic
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
      */
-    public ThreadedEinzServer(int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface){
+    public ThreadedEinzServer(int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
         clientHandlerThreads = new ArrayList<Thread>();
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
+        this.serverFunctionDefinition = serverFunctionDefinition;
     }
 
     /**
      * Listen on any one free port. Dispatch an EinzServerThread for every Connection
      */
-    public ThreadedEinzServer(ServerActivityCallbackInterface serverActivityCallbackInterface){
-        this(0, serverActivityCallbackInterface);
+    public ThreadedEinzServer(ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
+        this(0, serverActivityCallbackInterface, serverFunctionDefinition);
     }
 
     @Override
@@ -148,7 +147,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
 
-            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this);
+            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.serverFunctionDefinition);
             Thread thread = new Thread(ez);
             clientHandlerThreads.add(thread);
             thread.start(); // start new thread for this client.

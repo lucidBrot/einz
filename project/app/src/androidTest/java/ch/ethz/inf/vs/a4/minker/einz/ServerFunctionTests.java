@@ -1,18 +1,11 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import java.util.HashSet;
 import java.util.concurrent.ThreadLocalRandom;
 
-import ch.ethz.inf.vs.a4.minker.einz.server.GameState;
-import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;

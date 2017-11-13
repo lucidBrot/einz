@@ -98,7 +98,7 @@
 %
 % 1st. author
 \alignauthor \normalsize{Clemens Bachmann, Josua Cantieni, Fabian Gessler, Christian Knieling, Eric Mink, Silvia Siegrist}\\
-	\affaddr{\normalsize{ETH ID-1 13-932-488, ETH ID-2, ETH ID-3 15-939-341, ETH ID-4 14-923-809, ETH ID-5 15-917-057, ETH ID-6 15-935-893}}\\
+	\affaddr{\normalsize{ETH ID-1 13-932-488, ETH ID-2 15-919-038, ETH ID-3 15-939-341, ETH ID-4 14-923-809, ETH ID-5 15-917-057, ETH ID-6 15-935-893}}\\
 	\email{\normalsize{baclemen@student.ethz.ch, two@student.ethz.ch, fgesser@student.ethz.ch, knielinc@student.ethz.ch, minker@student.ethz.ch, sisilvia@student.ethz.ch}}
 }
 %TODO: überprüefed eui agabe
@@ -136,11 +136,16 @@ Web-sites for documentation~\cite{devServices}, tutorials, etc., are a special c
 In a thesis, you would put them as footnotes.
 At this stage, however, you will only have a few ``real references'',
 so we put the Web-sites into the bibliography.
-Cite every source you used throughout the project.
+Cite every source you used throughout the project.\\
 
 OUR PART:
-TDOD: fällt jemanden etwas ein das man hier schreiben könnte? dann bitte schreiben...
-TODO: jedes tutorial und co als referenz aufführen!
+We build a distributed game similar to then known card game "UNO". Because you might often find yourself wanting to play a game with friends - e.g. while you are waiting for the next train - but without a set of cards to play it, it would be useful to always have the cards on your body. We make this easy by implementing a similar game on the phone as a native application.\\
+
+Obvious difficulties awaiting us include the coordination of a team consisting of six people, each with different skillsets and time available.
+We intend to create an easily extensible codebase so that we can first build the base game and in a second phase add further rules without much effort. This poses difficulties on its own as we have to learn coding patterns such as using factories to make the program code more modular.\\
+Technical problems will probably be the selection of one device as the server, smooth and clean communication between the clients and the server and implementing concurrency within the server.\\
+
+For the usual difficulties in networking like message ordering and making sure the peers actually get the messages, we will rely on TCP.
 
 
 \section{System Overview}
@@ -161,11 +166,23 @@ explain the figures in the text where you reference them.
 \end{figure}
 
 OUR PART:
-We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like NAT-punchthrough to allow players from behind different routers to play via the internet with each other or adding more variations and rules.
-Specifically, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other client's IP address and ports, through which they can communicate as if they were within the same subnet, as already implemented in the first phase. The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
-
-TODO: kann da jemand noch mehr zur planung schreiben?
-
+We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like NAT-punchthrough to allow players from behind different routers to play via the internet with each other or adding more variations and rules. The additional rules will be available to the user of the device the server runs on before game start, such that we can dynamically change the way the game works.\\
+Specifically, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other client's IP address and ports, through which they can communicate as if they were within the same subnet, as already implemented in the first phase (See ~\rfig{nat}). The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.\\
+\begin{figure}[h]
+	\centering
+    \includegraphics[width=\columnwidth]{NATholepunching.pdf}
+    \lfig{nat}
+    \vspace{-5mm} % use negative white space to fix too large gaps
+	\caption{NAT traversal}
+\end{figure}
+\\
+First of all, we implement a simple server-client setup and define the format and the messages that should be provided as an interface between the client and the server.~\cite{messaging} At the same time, we can start implementing the user interface and writing this proposal.\\
+In a second step, once the basic communication between server and client works and the exact behaviour of the two parts has been defined, we implement the serverside game logic and the previously defined messaging functionality.
+We will make it so that the server does most of the computations and only sends the client its state, containing the players hand, the number of cards other players are holding and the most recently played cards. The client receives also a list of possible actions, from which it can choose one without having any clientside support for them, except for the user interface. This allows us to later add gamemodes and rules with ease, because we will only need to change a few classes.
+We are also trying to keep the classes themselves very modular to make updating them - e.g. by adding further messages - just as simple.\\
+Once the game is in a working state with a few rules such as an additional card like the one where the player can choose a color or the well-known "+2" card from UNO, we will decide whether we need to focus on bugfixing, cleaning up code, implementing a LUS or adding more rule options. Adding a LUS might impose additional difficulties because some mobile carriers might use symmetric NATs. If these difficulties arise, we will probably resort to only implementing NAT-traversal for the other (easier) types of NATs.\\
+\newline
+\newline
 TODO: wer macht eine Grafik als überblich zum aufbau und vielleicht noch eine zum UI?
 
 
@@ -185,7 +202,8 @@ OUR PART:
 
 TODO:Josua beschreibst du das "system setup"?
 TODO:jeder der "external libraries, hardware etc." benutz bitte diejenigen beschreiben
-
+\\
+Our App runs on Android devices with at least Android 5.0 installed. We use the local wireless connection to communicate between devices. One devices acts as a server and waits for the clients to connect. 
 
 \section{Work Packages}
 Breakdown the work to subtasks to meet the project requirements.
@@ -205,11 +223,13 @@ There work will be broken down into the following subtasks:
 TODO: müsste man den WPs noch andere namen als nummern geben?
 TODO: jeder beschreibt das WP für das er verantworlich ist. dürft meine beschreibungen gerne löschen ;)
 \begin{itemize}
-        \item {\bf WP1}: Use the smartphone as a Server:   
-        \item {\bf WP2}: Server for hole punching:   
-        \item {\bf WP3}: Logic of the Clients: 
-        \item {\bf WP4}: User Interface: 
-        \item {\bf WP5}:  Modell (Interface zwischen client-server): TODO: ist das wirklich ein Package?
+        \item {\bf WP1}: Define Client-Server Communication:   
+        \item {\bf WP2}: Dynamic Message Parser:   
+        \item {\bf WP3}: Client UI: 
+        \item {\bf WP4}: Server Game Logic: 
+        \item {\bf WP5}: logic messaging comm:
+        \item {\bf WP6}: client server comm impl:
+        \item {\bf WP7}: :
 \end{itemize}
 
 \section{Milestones}
@@ -219,13 +239,15 @@ Clearly state how the work packages will be distributed among the team members.
 
 
 OUR PART:
+
+
 We think it is important to have someone who has an overview of the whole project, therefore we assigned a project manager. For the implementation of the application we made two groups, one for the server side and one for the client side. There is one person responsible for the organisation and delegation of the work to other people for both server and client side. These two people also have to set an API to make the two parts work together in the application.
 
 As project manager and organizing the structure of the project: Josua
 
-Server: Responsable for organisation and also helps implementing: Eric, helps with implementation: Fabian
+Server: Responsible for organisation and also helps implementing: Eric, helps with implementation: Fabian
 
-Client: Responsable for organisation and also helps implementing: Chris, helps with implementation: Clemens
+Client: Responsible for organisation and also helps implementing: Chris, helps with implementation: Clemens
 
 UI and Logo: Chris
 
