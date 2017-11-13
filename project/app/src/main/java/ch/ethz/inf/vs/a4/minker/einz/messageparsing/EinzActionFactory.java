@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardActi
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 public class EinzActionFactory {
@@ -68,9 +69,33 @@ public class EinzActionFactory {
         return this.dictionary.get(e.getBody().getClass());
     }
 
-    public EinzAction<EinzPlayCardMessageBody> generateEinzAction(EinzMessage<EinzPlayCardMessageBody> message, @Nullable String issuedByPlayer){ // using type of message to determine action. Using overloading for this
-        return new EinzPlayCardAction(sInterface, message, issuedByPlayer);
+    /**
+     * This can fail in <b>so</b> many ways
+     * @param message some Message that is the key to the Action
+     * @param issuedBy the username who issued this action or null if irrelevant and unknown
+     * @return the action, or null if this messagetype was not registered or it failed for some other reason
+     */
+    public EinzAction generateEinzAction(EinzMessage message, @Nullable String issuedBy){
+        try {
+            EinzAction ret = getMapping(message).getDeclaredConstructor(ServerFunctionDefinition.class, message.getClass(), String.class).newInstance(sInterface, message, issuedBy);
+            Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
+            return ret;
+        } catch (InstantiationException e) {
+            Log.e("ActionFactory", "Failed to generate Mapping: "+e.getMessage());
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            Log.e("ActionFactory", "Failed to generate Mapping: "+e.getMessage());
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            Log.e("ActionFactory", "Failed to generate Mapping: "+e.getMessage());
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            Log.e("ActionFactory", "Failed to generate Mapping: "+e.getMessage());
+            e.printStackTrace();
+        }
+        Log.e("ActionFactory", "failed to map to an action");
+        return null;
     }
 
-    // TODO: implement for all other actions, including default if bad message
+    // TODO: register Actions
 }

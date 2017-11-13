@@ -4,6 +4,8 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,8 +29,8 @@ public class EinzServerClientHandler implements Runnable{
 
 
     private ServerFunctionDefinition serverInterface; // used to call EinzActions
-    private EinzParserFactory einzParserFactory = new EinzParserFactory(); // reuse factories instead of recreating every time
-    private EinzActionFactory einzActionFactory = new EinzActionFactory(serverInterface);
+    private EinzParserFactory einzParserFactory; // reuse factories instead of recreating every time
+    private EinzActionFactory einzActionFactory;
 
     // identify this connection by its user as soon as this is available
     private String connectedUser; // TODO: set connectedUser on register
@@ -37,6 +39,9 @@ public class EinzServerClientHandler implements Runnable{
         Log.d("EinzServerThread", "started");
         this.socket = clientSocket;
         this.serverInterface = serverFunctionDefinition;
+        this.einzParserFactory = new EinzParserFactory();
+        this.einzActionFactory = new EinzActionFactory(serverInterface);
+
         this.papi = papi;
         papi.incNumClients();
 
@@ -119,6 +124,7 @@ public class EinzServerClientHandler implements Runnable{
         }
     }
 
+    /*
     private void parseMessage(String message){
         // check if valid JSON Object
         JSONObject msg = null;
@@ -149,15 +155,28 @@ public class EinzServerClientHandler implements Runnable{
 
         Log.d("EinzServerThread/parse","YOU'RE STILL USING THE OLD PARSE FUNCTION.");
     }
+    */
 
-    private void parseMessageNew(String message){ // TODO: if message is register/deregister, make sure register/deregister is called
+    private void parseMessage(String message){ // TODO: if message is register/deregister, make sure register/deregister is called
         try {
             EinzParser einzParser = this.einzParserFactory.generateEinzParser(message);
-            EinzMessage einzMessage = einzParser.parse(message);
+            EinzMessage einzMessage = einzParser.parse(message); // TODO: implement parser, especially for when message is not valid
+
+            //<Debug>
+            /*EinzMessage einzMessage = new EinzMessage(
+                    new EinzMessageHeader("test", "more test"),
+                    new EinzPlayCardMessageBody()
+            );
+            this.einzActionFactory.registerMapping(einzMessage.getBody().getClass(), EinzPlayCardAction.class);*/
+            //</Debug>
+
             EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, connectedUser);
-            einzAction.run();
+            // if action was not registered yet, it will be null
+            if(einzAction != null) {
+                einzAction.run();
+            }
         } catch (JSONException e) {
-            Log.e("EinzServerThread/parse", "JSON Error in parseMessageNew");
+            Log.e("EinzServerThread/parse", "JSON Error in parseMessage");
             e.printStackTrace();
         }
 

@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
+import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -22,6 +23,7 @@ public class EinzPlayCardAction extends EinzAction<EinzPlayCardMessageBody> { //
      */
     @Override
     public void run() {
+        Log.d("EinzPlayCardAction", "run()");
         this.sInterface.play(this.messagebody.getCard(), new Player(
                     this.issuedByPlayer,
                     null

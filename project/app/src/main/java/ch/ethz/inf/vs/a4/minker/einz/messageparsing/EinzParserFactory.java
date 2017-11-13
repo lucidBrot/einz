@@ -57,7 +57,7 @@ public class EinzParserFactory {
      */
     private EinzParser getMatchingParser(String messagegroup){
 
-        switch(messagegroup){ // TODO: add all messagegroups to mapping
+        switch(messagegroup){ // TODO: add all messagegroups to mapping, and do so with a dictionary from messagegroup to parser instead
             case "registration":
                 return new EinzRegistrationParser();
             default:
