@@ -1,7 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,7 +24,14 @@ public class EinzServerClientHandler implements Runnable{
     public final Object socketReadLock;
     private InputStream inp;
     private BufferedReader brinp;
+
+
     private ServerFunctionDefinition serverInterface; // used to call EinzActions
+    private EinzParserFactory einzParserFactory = new EinzParserFactory(); // reuse factories instead of recreating every time
+    private EinzActionFactory einzActionFactory = new EinzActionFactory(serverInterface);
+
+    // identify this connection by its user as soon as this is available
+    private Player connectedUser; // TODO: set connectedUser on register
 
     public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi, ServerFunctionDefinition serverFunctionDefinition) {
         Log.d("EinzServerThread", "started");
@@ -135,5 +144,26 @@ public class EinzServerClientHandler implements Runnable{
                 //e.printStackTrace();
             }
         }
+    }
+
+    private void parseMessageNew(String message){
+        try {
+            EinzParser einzParser = this.einzParserFactory.generateEinzParser(message);
+            EinzMessage einzMessage = einzParser.parse(message);
+            EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage);
+            einzAction.run(connectedUser);
+        } catch (JSONException e) {
+            Log.e("EinzServerThread/parse", "JSON Error in parseMessageNew");
+            e.printStackTrace();
+        }
+
+    }
+
+    public Player getConnectedUser() {
+        return connectedUser;
+    }
+
+    public void setConnectedUser(Player connectedUser) {
+        this.connectedUser = connectedUser;
     }
 }

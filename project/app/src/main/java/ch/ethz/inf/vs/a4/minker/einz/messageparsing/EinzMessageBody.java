@@ -5,4 +5,5 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
  * Any extension of this class can be used for a specific EinzParser's return value
  */
 public abstract class EinzMessageBody {
+
 }
