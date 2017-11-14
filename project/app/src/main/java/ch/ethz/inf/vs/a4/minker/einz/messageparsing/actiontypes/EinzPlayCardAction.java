@@ -12,7 +12,7 @@ import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
 public class EinzPlayCardAction extends EinzAction<EinzPlayCardMessageBody> { // require the Type of messagebody to fit to this class here
     private EinzPlayCardMessageBody messagebody;
 
-    public EinzPlayCardAction(ServerFunctionDefinition sInterface, EinzMessage<EinzPlayCardMessageBody> params, String issuedByPlayer) {
+    public EinzPlayCardAction(ServerFunctionDefinition sInterface, EinzMessage params, String issuedByPlayer) {
         super(sInterface, params, issuedByPlayer);
         this.messagebody = (EinzPlayCardMessageBody) this.message.getBody();
     }
