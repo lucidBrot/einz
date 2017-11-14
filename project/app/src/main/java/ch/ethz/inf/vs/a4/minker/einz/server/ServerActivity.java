@@ -20,6 +20,7 @@ import java.net.SocketException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This Activity starts the server and manages the Serverside UI
@@ -85,7 +86,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         if(wifiMgr.isWifiEnabled()) {
             WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
             int ip = wifiInfo.getIpAddress();
-            String wifiIpAddress = String.format("%d.%d.%d.%d",
+            String wifiIpAddress = String.format(Locale.US, "%d.%d.%d.%d",
                     (ip & 0xff),
                     (ip >> 8 & 0xff),
                     (ip >> 16 & 0xff),
