@@ -1,10 +1,9 @@
 Ignore this if you are not Eric
 
 TODO:
-	clienthandlerthread synchronized send interface
 	send messages to player
 	einzserver: pass thread on initialize so that other class can create mapping from username to thread
-	Use dictionary in parsers where it can be registered. Register parsers from server and actions from serverlogic.
+	Register parsers from server and actions from serverlogic.
 	use parseMessageNew in clienthandlerthread
 	implement all types of parsers and messages, and test them
 	stop crashing when listening twice for client
