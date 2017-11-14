@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
@@ -30,22 +31,24 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
     private ServerFunctionDefinition serverFunctionDefinition; // interface to server logic
+    protected final Context applicationContext;
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
      */
-    public ThreadedEinzServer(int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
+    public ThreadedEinzServer(Context applicationContext, int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
         clientHandlerThreads = new ArrayList<Thread>();
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverFunctionDefinition = serverFunctionDefinition;
+        this.applicationContext = applicationContext;
     }
 
     /**
      * Listen on any one free port. Dispatch an EinzServerThread for every Connection
      */
-    public ThreadedEinzServer(ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
-        this(0, serverActivityCallbackInterface, serverFunctionDefinition);
+    public ThreadedEinzServer(Context applicationContext, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
+        this(applicationContext,0, serverActivityCallbackInterface, serverFunctionDefinition);
     }
 
     @Override

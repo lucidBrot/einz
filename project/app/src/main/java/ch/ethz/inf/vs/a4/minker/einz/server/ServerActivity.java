@@ -45,7 +45,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
 
         serverLogicInterface = new ServerFunction(); // Fabians Part
 
-        server = new ThreadedEinzServer(8080,this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
+        server = new ThreadedEinzServer(this.getApplicationContext(),8080,this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
         serverThread = new Thread(server);
         // run server to listen to clients only when button pressed
 

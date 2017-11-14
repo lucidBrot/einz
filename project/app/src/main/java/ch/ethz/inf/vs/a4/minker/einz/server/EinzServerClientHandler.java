@@ -6,11 +6,14 @@ import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
 
 /**
@@ -37,10 +40,25 @@ public class EinzServerClientHandler implements Runnable{
 
     public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi, ServerFunctionDefinition serverFunctionDefinition) {
         Log.d("EinzServerThread", "started");
+
+        //<debug>
+        Class c = EinzRegistrationParser.class; String mg = "registration";
+        JSONObject container = new JSONObject();
+        try {
+            container.put("test", c);
+            Log.d("DEBUG", container.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // D/DEBUG: {"test":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"}
+        //</debug>
+
         this.socket = clientSocket;
         this.serverInterface = serverFunctionDefinition;
         this.einzParserFactory = new EinzParserFactory();
         this.einzActionFactory = new EinzActionFactory(serverInterface);
+        // TODO: initialize ParserFactory by registering all Messagegroup->Parser mappings
+        //registerParserMappings();
 
         this.papi = papi;
         papi.incNumClients();
@@ -61,6 +79,41 @@ public class EinzServerClientHandler implements Runnable{
             return;
         }
     }
+
+    /**
+     * Load the resource file containing an Array of Pair<String messagegroup, Class<\? extends EinzParser>
+     *     @param rawResourceFile e.g. R.raw.serverDefaultParserMappings
+     *                            This file should be formatted as a JSONObject containing a JSONArray "parsermappings" of JSONObjects of the form
+     *                            {"messagegroup":"some thing", "mapstoparser":{...}}
+     *                            where {...} stands for the JSON representation of the EinzParser class
+     *     @throws JSONException if some of the JSON is not as expected
+     *     @throws InvalidResourceFormatException if the mapping objects themselves are not valid. Contains more details in extended message
+     */
+    private void registerParserMappings(int rawResourceFile) throws JSONException, InvalidResourceFormatException {
+        InputStream jsonStream = papi.applicationContext.getResources().openRawResource(rawResourceFile);
+        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
+        JSONArray array = jsonObject.getJSONArray("parsermappings");
+        int size = array.length();
+        // register each object
+        for(int i=0; i<size; i++){
+            JSONObject pair = array.getJSONObject(i);
+            Object o =pair.get("mapstoparser");
+            if(! (o instanceof Class)) {
+                throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" is not of type Class");
+            }
+
+            Class<? extends EinzParser> parserclass = (Class<? extends EinzParser>) o; // TODO: how to handle unchecked generic casts?
+            this.einzParserFactory.registerMessagegroup(pair.getString("messagegroup"), parserclass);
+        }
+    }
+
+    // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
+    // utility function
+    private String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
 
     // source: https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server
 
