@@ -121,7 +121,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                         interrupt();
                     }
                     JSONObject myJSONObject = new JSONObject();
-                    String message = "test message";
+                    String message;
                     try {
                         myJSONObject.put("messagetype", "debug message");
                         myJSONObject.accumulate("val", 1);
@@ -132,7 +132,8 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                         e.printStackTrace();
                     }
 
-                    tc.sendMessage(message);
+                    //tc.sendMessage(message); // everything above here might be useless xD
+                    tc.sendMessage(tc.debug_getRegisterMessage());
                 }
             };
             m.start(); // send message

@@ -1,0 +1,5 @@
+{
+	"parsermappings":[
+		{"messagegroup":"registration","mapstoparser":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"}
+	]
+}

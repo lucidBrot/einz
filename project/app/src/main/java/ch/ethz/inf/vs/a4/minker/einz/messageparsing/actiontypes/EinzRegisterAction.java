@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
+import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -16,6 +17,6 @@ public class EinzRegisterAction extends EinzAction{
      */
     @Override
     public void run() {
-
+        Log.d("Action/Register", "was run");
     }
 }

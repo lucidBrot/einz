@@ -18,6 +18,10 @@ public class EinzParserFactory {
 
     private HashMap<String, Class<? extends EinzParser>> dictionary; // Map "messagegroup" to the class of some EinzParser
 
+    public EinzParserFactory(){
+        this.dictionary = new HashMap<>();
+    }
+
     /**
      * Might return null if message is not a valid JSONObject or not a valid message
      * @param message String representation of a message as specified in protocols/documentation_Messages.md

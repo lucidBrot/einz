@@ -2,9 +2,12 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzRegisterAction;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser;
 import org.json.JSONArray;
@@ -41,27 +44,32 @@ public class EinzServerClientHandler implements Runnable{
     public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi, ServerFunctionDefinition serverFunctionDefinition) {
         Log.d("EinzServerThread", "started");
 
-        //<debug>
-        Class c = EinzRegistrationParser.class; String mg = "registration";
-        JSONObject container = new JSONObject();
-        try {
-            container.put("test", c);
-            Log.d("DEBUG", container.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        // D/DEBUG: {"test":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"}
-        //</debug>
+        this.papi = papi;
+        papi.incNumClients();
+
+        debug_printJSONRepresentationOf(EinzRegistrationParser.class);
 
         this.socket = clientSocket;
         this.serverInterface = serverFunctionDefinition;
         this.einzParserFactory = new EinzParserFactory();
         this.einzActionFactory = new EinzActionFactory(serverInterface);
         // TODO: initialize ParserFactory by registering all Messagegroup->Parser mappings
-        //registerParserMappings();
+        try {
+            registerParserMappings(R.raw.parserfactoryinitialisation);
+        } catch (JSONException e) {
+            Log.e("EZCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file.");
+            e.printStackTrace();
+        } catch (InvalidResourceFormatException e) {
+            Log.e("EZCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file. InvalidResourceFormatException: "+e.getExtendedMessage());
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            Log.e("EZCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file because at least one class wasnt defined: "+e.getMessage());
+            e.printStackTrace();
+        }
 
-        this.papi = papi;
-        papi.incNumClients();
+        // TODO: initialize ActionFactory by registering all Message->Action mappings
+        registerActionMappings();
+
 
         socketWriteLock = new Object();
         socketReadLock = new Object();
@@ -81,15 +89,32 @@ public class EinzServerClientHandler implements Runnable{
     }
 
     /**
+     * For debug purposes only, should not have side effects at all.
+     * @param o
+     */
+    private void debug_printJSONRepresentationOf(Object o){
+        //<debug>
+        JSONObject container = new JSONObject();
+        try {
+            container.put("your thing:", o);
+            Log.d("DEBUG", container.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        // D/DEBUG: {"test":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"}
+        //</debug>
+    }
+
+    /**
      * Load the resource file containing an Array of Pair<String messagegroup, Class<\? extends EinzParser>
      *     @param rawResourceFile e.g. R.raw.serverDefaultParserMappings
      *                            This file should be formatted as a JSONObject containing a JSONArray "parsermappings" of JSONObjects of the form
      *                            {"messagegroup":"some thing", "mapstoparser":{...}}
-     *                            where {...} stands for the JSON representation of the EinzParser class
+     *                            where {...} stands for the JSON representation of the EinzParser class, e.g. <i>class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser</i>
      *     @throws JSONException if some of the JSON is not as expected
      *     @throws InvalidResourceFormatException if the mapping objects themselves are not valid. Contains more details in extended message
      */
-    private void registerParserMappings(int rawResourceFile) throws JSONException, InvalidResourceFormatException {
+    private void registerParserMappings(int rawResourceFile) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
         InputStream jsonStream = papi.applicationContext.getResources().openRawResource(rawResourceFile);
         JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
         JSONArray array = jsonObject.getJSONArray("parsermappings");
@@ -97,13 +122,22 @@ public class EinzServerClientHandler implements Runnable{
         // register each object
         for(int i=0; i<size; i++){
             JSONObject pair = array.getJSONObject(i);
-            Object o =pair.get("mapstoparser");
-            if(! (o instanceof Class)) {
-                throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" is not of type Class");
+            String s =pair.getString("mapstoparser");
+            String prefix = "class ";
+            if(!s.startsWith(prefix)){
+                throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" does not start with class ");
+            } else {
+                String substring = s.substring(prefix.length()); // classname without prefix
+                Class o = Class.forName(substring);
+                if (!(EinzParser.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
+                    throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" is not of type Class");
+                } else {
+                    // everything is fine, do stuff
+                    @SuppressWarnings("unchecked") // I checked this with above tests
+                    Class<? extends EinzParser> parserclass = (Class<? extends EinzParser>) o;
+                    this.einzParserFactory.registerMessagegroup(pair.getString("messagegroup"), parserclass);
+                }
             }
-
-            Class<? extends EinzParser> parserclass = (Class<? extends EinzParser>) o; // TODO: how to handle unchecked generic casts?
-            this.einzParserFactory.registerMessagegroup(pair.getString("messagegroup"), parserclass);
         }
     }
 
@@ -114,6 +148,9 @@ public class EinzServerClientHandler implements Runnable{
         return s.hasNext() ? s.next() : "";
     }
 
+    private void registerActionMappings(){
+        this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzRegisterAction.class); // DEBUG purely. not actually useful
+    }
 
     // source: https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server
 

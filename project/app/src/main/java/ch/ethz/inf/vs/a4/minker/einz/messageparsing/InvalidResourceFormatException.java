@@ -7,6 +7,7 @@ public class InvalidResourceFormatException extends Exception {
     public InvalidResourceFormatException(){
         super();
         this.extendedmessage = getMessage();
+        if(this.extendedmessage==null) this.extendedmessage = "";
     }
 
     /**
