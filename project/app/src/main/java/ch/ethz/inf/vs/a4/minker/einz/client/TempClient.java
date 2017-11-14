@@ -42,7 +42,7 @@ public class TempClient {
         if (mBufferOut != null && !mBufferOut.checkError()) {
             mBufferOut.println(message);
             mBufferOut.flush();
-            Log.d("TempClient", "sent message");
+            Log.d("TempClient", "completed sending message");
         }
     }
 

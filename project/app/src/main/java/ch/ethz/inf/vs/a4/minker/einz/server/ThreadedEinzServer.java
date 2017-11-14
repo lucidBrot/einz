@@ -140,6 +140,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             //</Debug>
         }
 
+        boolean firstconnection = true;
         while (!shouldStopSpinning){
 
             try {
@@ -158,6 +159,11 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             Thread thread = new Thread(ez);
             clientHandlerThreads.add(thread);
             thread.start(); // start new thread for this client.
+
+            if(firstconnection){
+                //TODO: set admin
+            }
+            firstconnection = false;
 
         }
         return true;

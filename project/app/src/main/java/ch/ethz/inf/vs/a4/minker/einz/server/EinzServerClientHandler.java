@@ -97,7 +97,7 @@ public class EinzServerClientHandler implements Runnable{
         JSONObject container = new JSONObject();
         try {
             container.put("your thing:", o);
-            Log.d("DEBUG", container.toString());
+            Log.d("EZCH/DEBUG", "printJSONRepresentationOF() : "+ container.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
