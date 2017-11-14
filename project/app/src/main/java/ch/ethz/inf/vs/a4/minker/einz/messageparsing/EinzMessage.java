@@ -4,8 +4,8 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
  * Immutable container of an {@link EinzMessageHeader} and an {@link EinzMessageBody}
  */
 public class EinzMessage {
-    private EinzMessageHeader header;
-    private EinzMessageBody body;
+    private final EinzMessageHeader header;
+    private final EinzMessageBody body;
 
     /**
      * Create a <i>EinzMessage</i> Object that consists of a Header and a Body
