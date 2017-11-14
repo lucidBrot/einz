@@ -15,6 +15,7 @@ public class EinzActionFactory {
     private HashMap<Class<? extends EinzMessageBody>, Class<? extends EinzAction>> dictionary; // mapping Message types to Action types
     // this Map is using the MessageBody because a) this is what distinguishes the messages and b) the generic type cannot really be gotten at runtime.
     // .getClass and .class only return EinzMessage, without the generic type
+    // The key is EinzMessageBody and not just the messagtype because like this we could add further header info and create new EinzMessages based on them
 
     public EinzActionFactory(ServerFunctionDefinition serverFunctionDefinition){
         this.sInterface = serverFunctionDefinition;
