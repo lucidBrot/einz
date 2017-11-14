@@ -24,3 +24,17 @@ This parserObject's method will then return some function which shall be called.
 Both of those classes may take the dictionary/mapping as parameter or define it as abstract, so that the server and the client will have to initialize this themselves. Each once only.
 
 Advantage: if something must be changed, it can be changed in the Parser or the Action, which is only at one place in the code.
+
+## Concurrency and Multithreading
+
+Immer neuen state senden egal ob erfolg oder nicht, weil serverside immer was passiert ist.
+
+Writelock & readlock
+Wenn nur reads ->nacher neuen state senden obwohl alter requestet ist i.o. weil gleich.
+Wenn writes von einer späteren message aber vor diesem getstate -> möchte zwischenzustand auch senden, also writes nur erlauben wenn schon state in History gespeichert. (History limitieren auf #players*2 states, mehr kann ein spieler eh nicht verpassen bis er wieder dran ist) Counter bei serverinternem stateobject um sie zu unterscheiden.
+-> Client UI kann ablauf wie gewohnt darstellen, einfach schneller
+
+WriteState nur möglich wenn eigene stack version == neuste version + 1
+
+Für UI: bei jeder karte im stack mitschicken woher sie kommt für animation
+-> könnte auch neuesten state senden und UI arbeitet stash ab. Aber was wenn man aufnehmen würde vom stash?
