@@ -66,9 +66,9 @@ public class EinzActionFactory {
      * @return null if mapping does not exist, else the Class you want // TODO: Default Action?
      */
     public Class<? extends EinzAction> getMapping(EinzMessage e){
-        Log.d("DEBUG", "e.getBody().getClass() "+e.getBody().getClass());
+        Log.d("ActionFactory", "Getting mapping for body type "+e.getBody().getClass());
         Class temp = this.dictionary.get(e.getBody().getClass());
-        if(temp == null) {Log.d("EinzActionFactory", "Mapping was requested but not registered before");}
+        if(temp == null) {Log.d("ActionFactory", "Mapping was requested but not registered before");}
         return temp;
     }
 

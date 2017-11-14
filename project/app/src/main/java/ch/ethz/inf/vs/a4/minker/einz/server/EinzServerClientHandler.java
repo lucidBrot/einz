@@ -42,7 +42,7 @@ public class EinzServerClientHandler implements Runnable{
     private String connectedUser; // TODO: set connectedUser on register
 
     public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi, ServerFunctionDefinition serverFunctionDefinition) {
-        Log.d("EinzServerThread", "started");
+        Log.d("ESCH", "started new instance");
 
         this.papi = papi;
         papi.incNumClients();
@@ -57,13 +57,13 @@ public class EinzServerClientHandler implements Runnable{
         try {
             registerParserMappings(R.raw.parserfactoryinitialisation);
         } catch (JSONException e) {
-            Log.e("EZCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file.");
+            Log.e("ESCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file.");
             e.printStackTrace();
         } catch (InvalidResourceFormatException e) {
-            Log.e("EZCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file. InvalidResourceFormatException: "+e.getExtendedMessage());
+            Log.e("ESCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file. InvalidResourceFormatException: "+e.getExtendedMessage());
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            Log.e("EZCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file because at least one class wasnt defined: "+e.getMessage());
+            Log.e("ESCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file because at least one class wasnt defined: "+e.getMessage());
             e.printStackTrace();
         }
 
@@ -82,7 +82,7 @@ public class EinzServerClientHandler implements Runnable{
             brinp = new BufferedReader(new InputStreamReader(inp));
             out = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
-            Log.e("EinzServerThread", "Failed to initialize run(). Aborting");
+            Log.e("ESCH", "Failed to initialize run(). Aborting");
             e.printStackTrace();
             return;
         }
@@ -97,7 +97,7 @@ public class EinzServerClientHandler implements Runnable{
         JSONObject container = new JSONObject();
         try {
             container.put("your thing:", o);
-            Log.d("EZCH/DEBUG", "printJSONRepresentationOF() : "+ container.toString());
+            Log.d("ESCH/DEBUG", "printJSONRepresentationOF() : "+ container.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -156,7 +156,7 @@ public class EinzServerClientHandler implements Runnable{
 
     @Override
     public void run() {
-        Log.d("EinzServerThread", "run() was called. Listening for messages");
+        ///Log.d("ESCH", "run() was called. Listening for messages");
 
         String line; // TODO: don't just echo the same thing back
         spin = true;
@@ -168,10 +168,10 @@ public class EinzServerClientHandler implements Runnable{
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
                     socket.close();
                     papi.decNumClients();
-                    Log.d("EinzServerThread", "closed clientSocket");
+                    Log.d("ESCH", "closed clientSocket");
                     return;
                 } else {
-                    Log.d("EinzServerThread", "received line: "+line);
+                    Log.d("ESCH", "received line: "+line);
                     parseMessage(line);
                     /* synchronized (socketWriteLock) {
                         out.writeBytes(line + "\r\n");
@@ -181,7 +181,7 @@ public class EinzServerClientHandler implements Runnable{
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e("EinzServerThread", "Something Failed");
+                Log.e("ESCH", "Something Failed");
                 return;
             }
         }

@@ -28,16 +28,8 @@ public class EinzPlayCardMessageBody extends EinzMessageBody{
         return dryrun;
     }
 
-    public void setDryrun(String dryrun) {
-        this.dryrun = dryrun;
-    }
-
     public Card getCard() {
         return card;
-    }
-
-    public void setCard(Card card) {
-        this.card = card;
     }
 
 }

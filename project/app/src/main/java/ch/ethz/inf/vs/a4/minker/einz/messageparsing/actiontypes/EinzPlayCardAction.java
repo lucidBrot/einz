@@ -23,7 +23,7 @@ public class EinzPlayCardAction extends EinzAction<EinzPlayCardMessageBody> { //
      */
     @Override
     public void run() {
-        Log.d("EinzPlayCardAction", "run()");
+        ///Log.d("EinzPlayCardAction", "run()");
         this.sInterface.play(this.messagebody.getCard(), new Player(
                     this.issuedByPlayer,
                     null

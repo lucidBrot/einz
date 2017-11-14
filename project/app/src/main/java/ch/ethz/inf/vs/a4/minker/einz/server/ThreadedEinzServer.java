@@ -61,7 +61,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * @return false if launching the server failed, true otherwise
      */
     private boolean launch(){
-        Log.d("EinzServer/launch","launching Server on "+PORT);
+        Log.d("EinzServer/launch","\nlaunching Server on "+PORT);
         serverSocket = null;
         Socket socket = null;
 
@@ -89,7 +89,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
         //DEBUG: Simulate a message from a client
         if(DEBUG_ONE_MSG){
-            Log.d("ThreadedEinzServer", "DEBUG_ONE_MSG: Will simulate a message from a client");
+            Log.d("EinzServer", "DEBUG_ONE_MSG: Will simulate a message from a client");
             DEBUG_ONE_MSG = false;
             //<DEBUG>
             final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
@@ -103,7 +103,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 public void run() {
                     // DEBUG: start client
                     // temporary. please do not use in real code
-                    Log.d("EinzServer/debug", "simulating client");
+                    Log.d("EinzServer->TempClient", "simulating client");
 
                     tc.run();
                 }
@@ -112,7 +112,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             Thread m = new Thread(){
                 @Override
                 public void run() {
-                    Log.d("TempClient", "calling sendMessage");
+                    ///Log.d("TempClient", "calling sendMessage");
                     try {
                         sleep(600); // wait until server hopefully runs
                     } catch (InterruptedException e) {
@@ -120,19 +120,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                         Log.e("TempClient", "Sleeping Failed");
                         interrupt();
                     }
-                    JSONObject myJSONObject = new JSONObject();
-                    String message;
-                    try {
-                        myJSONObject.put("messagetype", "debug message");
-                        myJSONObject.accumulate("val", 1);
-                        myJSONObject.accumulate("val", 2);
-                        message = myJSONObject.toString();
-                        Log.d("TempClient", "set message to JSON: "+message);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
 
-                    //tc.sendMessage(message); // everything above here might be useless xD
                     tc.sendMessage(tc.debug_getRegisterMessage());
                 }
             };
@@ -145,9 +133,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
             try {
                 socket = serverSocket.accept();
-                Log.d("EinzServer/launch", "new connection");
+                Log.d("EinzServer/launch", "new connection from "+socket.getInetAddress());
             } catch (SocketException e){
-                Log.d("EinzServer/launch", "stopping accepting connections");
+                if(shouldStopSpinning)
+                    Log.d("EinzServer/launch", "stopping accepting connections");
+                else
+                    Log.d("EinzServer/launch","SocketException but shouldStopSpinning is false");
                 return false;
             } catch (IOException e) {
                 Log.e("EinzServer/launch", "IOException while calling serverSocket.accept().");
@@ -176,7 +167,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     /**
      * @param shouldStopSpinning true if the server should stop waiting for incoming connections
      */
-    public void stopSpinning(boolean shouldStopSpinning) {
+    public void stopListeningForIncomingConnections(boolean shouldStopSpinning) {
         this.shouldStopSpinning = shouldStopSpinning;
 
         if(shouldStopSpinning){
