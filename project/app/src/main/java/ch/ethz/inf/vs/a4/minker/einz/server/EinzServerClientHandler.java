@@ -172,12 +172,8 @@ public class EinzServerClientHandler implements Runnable{
                     return;
                 } else {
                     Log.d("ESCH", "received line: "+line);
-                    parseMessage(line);
-                    /* synchronized (socketWriteLock) {
-                        out.writeBytes(line + "\r\n");
-                        out.flush();
-                    } */
-                    sendMessage(line + "\r\n");
+                    runAction(parseMessage(line));
+                    sendMessage(line + "\r\n"); // echo back the same packet
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -214,40 +210,13 @@ public class EinzServerClientHandler implements Runnable{
         }
     }
 
-    /*
-    private void parseMessage(String message){
-        // check if valid JSON Object
-        JSONObject msg = null;
-        try {
-            msg = new JSONObject(message);
-        } catch (JSONException e) {
-            // not a valid JSON Object
-            Log.w("EinzServerThread/parse", "Received message that isn't a JSON Object: "+message);
-        }
 
-        if (msg != null){ // if JSON
-            try {
-                switch (msg.getString("messagetype")){
-                    case "play card":
-                        break;
-                    case "debug message":
-                        Log.d("EinzServerThread/parse", "Received debug message");
-                        Log.d("EinzServerThread/parse", "\twith values "+msg.getJSONArray("val").toString());
-                        break;
-                    default:
-                        Log.w("EinzServerThread/parse", "Received JSON message without messagetype as String");
-                }
-            } catch (JSONException e) {
-                Log.w("EinzServerThread/parse", "Valid JSON but invalid messagetype");
-                //e.printStackTrace();
-            }
-        }
-
-        Log.d("EinzServerThread/parse","YOU'RE STILL USING THE OLD PARSE FUNCTION.");
-    }
-    */
-
-    private void parseMessage(String message){ // TODO: if message is register/deregister, make sure register/deregister is called
+    /**
+     * Passes the message String into a parser, then translates the resulting EinzMessage into an action
+     * @param message
+     * @return might be null, e.g. if no action was registered yet.
+     */
+    private EinzAction parseMessage(String message){ // TODO: if message is register/deregister, make sure register/deregister is called
         try {
             EinzParser einzParser = this.einzParserFactory.generateEinzParser(message);
             EinzMessage einzMessage = einzParser.parse(message); // TODO: implement parser, especially for when message is not valid
@@ -261,15 +230,24 @@ public class EinzServerClientHandler implements Runnable{
             //</Debug>
 
             EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, connectedUser);
-            // if action was not registered yet, it will be null
-            if(einzAction != null) {
-                einzAction.run();
-            }
+            return einzAction;
         } catch (JSONException e) {
             Log.e("EinzServerThread/parse", "JSON Error in parseMessage");
             e.printStackTrace();
         }
+        return null;
+    }
 
+    /**
+     * runs einzAction if it is not null. Else, does nothing
+     */
+    private void runAction(EinzAction einzAction){
+        // if action was not registered yet, it will be null
+        if(einzAction != null) {
+            einzAction.run();
+        } else {
+            Log.i("ESCH/runAction", "Action was null");
+        }
     }
 
     public String getConnectedUser() {
