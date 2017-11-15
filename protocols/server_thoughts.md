@@ -36,6 +36,32 @@ For the latter case, we need a system-state specific timout counter. For the for
 
 Periodic keepalive packets have the advantage of being independent of the rest of the game. ACKs have the advantage of only generating additional traffic when neccessary: We don't neccessarily care about a client being not connected as long as we have nothing to tell him. This would mean that we need to send ACKs on every message received that will be followed by a client-side action, e.g. after receiving a new state, before the player chooses what to do (because user interaction means delay).
 
+To make implementation easier and cleaner, we would probably send an ACK after every incoming message though. For this, the sending of any non-ACK message would trigger a countdown timer within which the ACK needs to come in. These ACKs would probably not need to specify for which message they are, because TCP gives us ordering.
+
+On the other hand, periodic keepalive packets would remain quite simple and detached from the rest of the server unless a client times out. This could be implemented in a single thread, while the ACKs would need interaction with the Messagepassing. I prefer the approach with keepalive packets, so we can completely hide and decouple them from the rest of the server.
+They would have to be sent quite often though.
+
+We could also just be happy with the timeouts the gamestate hands out, but then we wouldn't know if it's the player or the network which is slow.
+
+My preferred action would be to have server- and clientside one additional thread which just sends a keepalive packet every 400 ms. Assuming a slow network connection of 1000ms ping, we can set the timeout to (network delay + network delay on way back + 400 ms if we have just recently received the last keepalive packet) = 2400 ms until we decide that the client is not responding.
+We could also send the keepalive packet as response to a previous keepalive packet. Then we would estimate a maximum of 2*p for the way and no period time, because the peer should react almost instantly, as networking is way slower than calculating. (here, p stands for the maximum ping time to the server that we will allow) This way, we can tell after 2 seconds that a client has disconnected (for p=1000ms), instead of after the timeout until which a card would have had to be played (30 seconds or so). Also, we know whether it is the client or the player who is not reacting.
+
+**Implementation**
+Instead of calling the Message handling action, we capture `keepalive` packets directly after the call to `socket.readLine()` . If it is a keepalive packet, we directly respond. It is not worth handling this in a new thread, as responding is probably faster than creating a new thread, and a new thread might introduce new concurrency problems.
+The keepalive message should be registered in the ParserFactory and ActionFactory, for consistency. This would allow the Serverlogic to register an alternative Action for keepalive packets if neccessary.
+
+```json
+{
+  "header":{
+    "messagegroup":"networking",
+    "messagetype":"keepalive"
+  },
+  "body":{  }
+}
+```
+
+
+
 ## Concurrency and Multithreading
 
 Immer neuen state senden egal ob erfolg oder nicht, weil serverside immer was passiert ist.
