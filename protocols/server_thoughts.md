@@ -15,7 +15,7 @@ The UI has to be updated from the main thread. The UI thread can be explicitely 
 ## Sources
 [Example TCP Server](https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server)
 
-## Messaging
+## Message Parsing
 
 Implement a Class that contains a Dictionary which maps messagetypes to ParserObjects. Every ParserObject might offer multiple functions, but those are the same for every messagetype. E.g. in other context parseBody and parseHeader.
 
@@ -24,6 +24,17 @@ This parserObject's method will then return some function which shall be called.
 Both of those classes may take the dictionary/mapping as parameter or define it as abstract, so that the server and the client will have to initialize this themselves. Each once only.
 
 Advantage: if something must be changed, it can be changed in the Parser or the Action, which is only at one place in the code.
+
+## Connectivity timeouts
+
+We want to notice
+
+* if a client stops responding or loses internet connection
+* if a client is still connected but did not play in time
+
+For the latter case, we need a system-state specific timout counter. For the former, we need to either be periodically sending keepalive packets to test network connection or to ack on every message receive.
+
+Periodic keepalive packets have the advantage of being independent of the rest of the game. ACKs have the advantage of only generating additional traffic when neccessary: We don't neccessarily care about a client being not connected as long as we have nothing to tell him. This would mean that we need to send ACKs on every message received that will be followed by a client-side action, e.g. after receiving a new state, before the player chooses what to do (because user interaction means delay).
 
 ## Concurrency and Multithreading
 
