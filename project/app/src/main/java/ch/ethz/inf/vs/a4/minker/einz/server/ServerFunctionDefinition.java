@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.CardColors;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 
@@ -65,7 +66,7 @@ public interface ServerFunctionDefinition {
         //player  p plays a card with the given wish
         //for a changeColor or changeColorPlusFour wish has to be red, yellow, blue or green
         //returns whether the card is playable (and therefore played) or not
-        public boolean play(Card card, Player p, String wish);
+        public boolean play(Card card, Player p, CardColors wish);
 
         //returns the top card from the drawpile to be drawn and removes it from the drawpile and adds it to player p's hand
         //this should be called when it's player p's turn to play and he can't play any cards from hand
