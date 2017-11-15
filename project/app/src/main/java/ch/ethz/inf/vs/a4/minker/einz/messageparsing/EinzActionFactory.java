@@ -35,7 +35,7 @@ public class EinzActionFactory {
      * register a mapping from a messagetype to an action. Because the message's type can only be gotten via its body, you need to pass the class of the body.
      * If the entry already exists, this will replace it. (If you want to execute both the old and the new action, you need to pass that as one action)
      */
-    public void registerMapping(Class<? extends EinzMessageBody> bodyclass, Class<? extends EinzAction> actionclass){ // TODO: implement EinzActionCombination ?
+    public void registerMapping(Class<? extends EinzMessageBody> bodyclass, Class<? extends EinzAction> actionclass){
         this.dictionary.put(bodyclass, actionclass);
     }
 
@@ -100,5 +100,5 @@ public class EinzActionFactory {
         return null;
     }
 
-    // TODO: register Actions
+    // TODO: register all Actions from serverLogic.initialize()
 }

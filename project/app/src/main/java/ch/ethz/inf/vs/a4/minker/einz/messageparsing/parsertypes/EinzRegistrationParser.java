@@ -38,7 +38,7 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         }
          */
         EinzMessageHeader emh = new EinzMessageHeader("registration", "register");
-        EinzMessageBody emb = new EinzJsonMessageBody(message.getJSONObject("body")); // TODO: does it make sense to use JSON for body instead of parsing everything individually?
+        EinzMessageBody emb = new EinzJsonMessageBody(message.getJSONObject("body")); // TODO: EinzRegisterMessageBody
         EinzMessage einzMessage = new EinzMessage(emh, emb);
         return einzMessage;
     }
@@ -58,7 +58,7 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         }
          */
         EinzMessageHeader emh = new EinzMessageHeader("registration", "RegisterResponse");
-        EinzMessageBody emb = new EinzJsonMessageBody(message.getJSONObject("body"));
+        EinzMessageBody emb = new EinzJsonMessageBody(message.getJSONObject("body")); // TODO: EinzRegisterResponseMessageBody
         EinzMessage einzMessage = new EinzMessage(emh, emb);
         return einzMessage;
     }

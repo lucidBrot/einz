@@ -158,7 +158,7 @@ public class EinzServerClientHandler implements Runnable{
     public void run() {
         ///Log.d("ESCH", "run() was called. Listening for messages");
 
-        String line; // TODO: don't just echo the same thing back
+        String line;
         spin = true;
         while (spin) {
             try {
@@ -180,6 +180,18 @@ public class EinzServerClientHandler implements Runnable{
                 Log.e("ESCH", "Something Failed");
                 return;
             }
+        }
+    }
+
+    /**
+     * runs einzAction if it is not null. Else, does nothing
+     */
+    private void runAction(EinzAction einzAction){
+        // if action was not registered yet, it will be null
+        if(einzAction != null) {
+            einzAction.run();
+        } else {
+            Log.i("ESCH/runAction", "Action was null");
         }
     }
 
@@ -230,24 +242,17 @@ public class EinzServerClientHandler implements Runnable{
             //</Debug>
 
             EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, connectedUser);
-            return einzAction;
+            // if action was not registered yet, it will be null
+            if(einzAction != null) {
+                einzAction.run();
+            } else {
+                Log.d("ESCH", "Action was not yet registered");
+            }
         } catch (JSONException e) {
             Log.e("EinzServerThread/parse", "JSON Error in parseMessage");
             e.printStackTrace();
         }
-        return null;
-    }
 
-    /**
-     * runs einzAction if it is not null. Else, does nothing
-     */
-    private void runAction(EinzAction einzAction){
-        // if action was not registered yet, it will be null
-        if(einzAction != null) {
-            einzAction.run();
-        } else {
-            Log.i("ESCH/runAction", "Action was null");
-        }
     }
 
     public String getConnectedUser() {
