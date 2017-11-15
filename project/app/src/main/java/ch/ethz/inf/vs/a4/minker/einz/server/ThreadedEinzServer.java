@@ -211,7 +211,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     }
 
     /**
-     * sends a (usually JSON-encoded, one-line) message to user. If the message does not end with "\r\n", that will be appended.
+     * sends a (usually JSON-encoded, one-line) message to user specified by username. If the message does not end with "\r\n", that will be appended.
      * @param username target registered user as String
      * @param message JSON-encoded message as String
      * @throws UserNotRegisteredException if username is not registered

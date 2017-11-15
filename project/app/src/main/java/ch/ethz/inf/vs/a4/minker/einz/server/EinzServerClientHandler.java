@@ -26,7 +26,7 @@ public class EinzServerClientHandler implements Runnable{
     public Socket socket;
 
     public boolean spin = false;
-    private ThreadedEinzServer papi;
+    private ThreadedEinzServer parentEinzServer;
     private DataOutputStream out = null;
     public final Object socketWriteLock; // lock onto this for writing
     public final Object socketReadLock;
@@ -41,11 +41,18 @@ public class EinzServerClientHandler implements Runnable{
     // identify this connection by its user as soon as this is available
     private String connectedUser; // TODO: set connectedUser on register
 
-    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer papi, ServerFunctionDefinition serverFunctionDefinition) {
+    /**
+     * Listens on {@param clientSocket} for incoming messages and provides an interface {@link ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler#sendMessage(String)} for sending to the client associated with this socket.
+     * Stores the username of the connected user as it is registered in {@link this.connectedUser}
+     * @param clientSocket socket to which a client connected
+     * @param parentEinzServer the EinzServer instance creating this thread
+     * @param serverFunctionDefinition the implementation of the interface to run the actions in.
+     */
+    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer parentEinzServer, ServerFunctionDefinition serverFunctionDefinition) {
         Log.d("ESCH", "started new instance");
 
-        this.papi = papi;
-        papi.incNumClients();
+        this.parentEinzServer = parentEinzServer;
+        parentEinzServer.incNumClients();
 
         debug_printJSONRepresentationOf(EinzRegistrationParser.class);
 
@@ -116,7 +123,7 @@ public class EinzServerClientHandler implements Runnable{
      *     @throws InvalidResourceFormatException if the mapping objects themselves are not valid. Contains more details in extended message
      */
     private void registerParserMappings(int rawResourceFile) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
-        InputStream jsonStream = papi.applicationContext.getResources().openRawResource(rawResourceFile);
+        InputStream jsonStream = parentEinzServer.applicationContext.getResources().openRawResource(rawResourceFile);
         JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
         JSONArray array = jsonObject.getJSONArray("parsermappings");
         int size = array.length();
@@ -166,7 +173,7 @@ public class EinzServerClientHandler implements Runnable{
                 line = readSocketLine();
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
                     socket.close();
-                    papi.decNumClients();
+                    parentEinzServer.decNumClients();
                     Log.d("ESCH", "closed clientSocket");
                     return;
                 } else {
