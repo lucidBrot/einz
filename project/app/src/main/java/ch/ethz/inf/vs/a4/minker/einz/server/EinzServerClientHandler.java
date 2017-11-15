@@ -53,6 +53,7 @@ public class EinzServerClientHandler implements Runnable{
         this.serverInterface = serverFunctionDefinition;
         this.einzParserFactory = new EinzParserFactory();
         this.einzActionFactory = new EinzActionFactory(serverInterface);
+
         // TODO: initialize ParserFactory by registering all Messagegroup->Parser mappings
         try {
             registerParserMappings(R.raw.parserfactoryinitialisation);
@@ -162,9 +163,7 @@ public class EinzServerClientHandler implements Runnable{
         spin = true;
         while (spin) {
             try {
-                synchronized (socketReadLock) {
-                    line = brinp.readLine();
-                }
+                line = readSocketLine();
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
                     socket.close();
                     papi.decNumClients();
@@ -219,6 +218,16 @@ public class EinzServerClientHandler implements Runnable{
                 Log.e("EinzServerThread","sendMessage: failed because of IOException 2 "+e.getMessage());
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * reads synchronizedly from socket
+     * @return the line
+     */
+    private String readSocketLine() throws IOException {
+        synchronized (socketReadLock) {
+            return brinp.readLine();
         }
     }
 
