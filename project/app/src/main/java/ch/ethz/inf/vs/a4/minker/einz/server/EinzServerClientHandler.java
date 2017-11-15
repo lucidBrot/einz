@@ -228,7 +228,7 @@ public class EinzServerClientHandler implements Runnable{
      * @param message
      * @return might be null, e.g. if no action was registered yet.
      */
-    private EinzAction parseMessage(String message){ // TODO: if message is register/deregister, make sure register/deregister is called
+    private EinzAction parseMessage(String message){
         try {
             EinzParser einzParser = this.einzParserFactory.generateEinzParser(message);
             EinzMessage einzMessage = einzParser.parse(message); // TODO: implement parser, especially for when message is not valid
@@ -242,17 +242,12 @@ public class EinzServerClientHandler implements Runnable{
             //</Debug>
 
             EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, connectedUser);
-            // if action was not registered yet, it will be null
-            if(einzAction != null) {
-                einzAction.run();
-            } else {
-                Log.d("ESCH", "Action was not yet registered");
-            }
+            return einzAction;
         } catch (JSONException e) {
             Log.e("EinzServerThread/parse", "JSON Error in parseMessage");
             e.printStackTrace();
         }
-
+        return null;
     }
 
     public String getConnectedUser() {
