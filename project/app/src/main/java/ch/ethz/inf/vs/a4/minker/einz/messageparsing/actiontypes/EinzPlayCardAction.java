@@ -9,12 +9,10 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMes
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
 
-public class EinzPlayCardAction extends EinzAction<EinzPlayCardMessageBody> { // require the Type of messagebody to fit to this class here
-    private EinzPlayCardMessageBody messagebody;
+public class EinzPlayCardAction extends EinzAction { // require the Type of messagebody to fit to this class here
 
     public EinzPlayCardAction(ServerFunctionDefinition sInterface, EinzMessage params, String issuedByPlayer) {
         super(sInterface, params, issuedByPlayer);
-        this.messagebody = (EinzPlayCardMessageBody) this.message.getBody();
     }
 
 
@@ -24,9 +22,9 @@ public class EinzPlayCardAction extends EinzAction<EinzPlayCardMessageBody> { //
     @Override
     public void run() {
         Log.d("EinzPlayCardAction", "run()");
-        this.sInterface.play(this.messagebody.getCard(), new Player(
-                    this.issuedByPlayer,
-                    null
+        this.getsInterface().play(((EinzPlayCardMessageBody) this.getMessage().getBody()).getCard(), new Player(
+                    "",
+                    ""
             )); // TODO: update this when the interface has updated
     }
 }
