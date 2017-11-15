@@ -217,6 +217,16 @@ Once the game is in a working state with a few rules such as an additional card 
 
 So how exactly will we enable dynamic rules? The UI will feature settings on the device which acts as the server. These will mostly be checkboxes or multiple-choice dropdown menus. This means that we will not feature user-designed rules. However, we intend to make use of the efforts we put into the extensibility of our codebase.\\
 
+We designed the User Interface for the standard scenario from starting the app to start playing to look like the following: The first screen (1) is for the player to choose, whether he wants to start a new game or join an already existing game. If he decides to start a new one, he will start the server in an android thread in the background. He will be prompted to enter his username and decide whether he wants to play or observe/spectate the game. If he presses the "Start Server" Button in (2) after filling out the missing information, he will connect himself as an admin to the previously started server running in the background of his device. After that he will be forwarded to an activity (3), with the necessary information for others to connect and a list of already connected players/observers. By pressing the settings button he will be taken to (4) and it's here where further settings and rules of the server and game can be changed. A client that joins a game will go through a similar process. He has to start by filling out his name, the host ip and port and whether he want's to act as a player or a spectator (5). Once the player connects to the server he will see a list of other players/observers, but not be able to kick them or change any settings, as this is left for the host/admin (9). When the host starts the game everyone will see the activity in which the game can be played and either see a standard view with his hand, the topmost card, all connected players and the amount of cards in each hand (6) or he will see the view of the spectator(7). Players will be able to place any by the server as placable declared card or draw cards from the heap. Spectators will see the public gamestate, but not any specific cards in any hand, they will also not be able to interact in the game. The usecase for this option, is that you could place a larger andoid device (tabled, phablet) in the middle of a table to get the "classic cardgame feel" while still playing on mobile devices. \\
+\begin{figure}[h]
+	\centering
+    \includegraphics[width=\columnwidth]{Artboard.png}
+    \lfig{nat}
+    \vspace{-5mm} % use negative white space to fix too large gaps
+	\caption{User Interface}
+\end{figure}
+\\
+
 Regarding the difficulty of working in a larger team than most of us are used to, we intend to simplify the cooperation by using git~\cite{github} and trello~\cite{trello}. We have also appointed a Team Lead whose task it is to distribute the work so that everybody can contribute meaningfully to the Project yet also learn something while doing so.\\
 
 To demonstrate our application in the end, we will need at least a working WiFi network and maybe internet as well, depending on how much of the NAT traversal we will have implemented.
