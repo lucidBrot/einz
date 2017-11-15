@@ -158,7 +158,7 @@ public class EinzServerClientHandler implements Runnable{
     public void run() {
         Log.d("EinzServerThread", "run() was called. Listening for messages");
 
-        String line; // TODO: don't just echo the same thing back
+        String line;
         spin = true;
         while (spin) {
             try {
@@ -247,7 +247,7 @@ public class EinzServerClientHandler implements Runnable{
     }
     */
 
-    private void parseMessage(String message){ // TODO: if message is register/deregister, make sure register/deregister is called
+    private void parseMessage(String message){
         try {
             EinzParser einzParser = this.einzParserFactory.generateEinzParser(message);
             EinzMessage einzMessage = einzParser.parse(message); // TODO: implement parser, especially for when message is not valid
@@ -264,6 +264,8 @@ public class EinzServerClientHandler implements Runnable{
             // if action was not registered yet, it will be null
             if(einzAction != null) {
                 einzAction.run();
+            } else {
+                Log.d("ESCH", "Action was not yet registered");
             }
         } catch (JSONException e) {
             Log.e("EinzServerThread/parse", "JSON Error in parseMessage");
