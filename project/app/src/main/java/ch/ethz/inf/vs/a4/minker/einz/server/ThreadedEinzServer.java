@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import android.content.Context;
 import android.util.Log;
+import android.util.Pair;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import org.json.JSONException;
@@ -11,6 +13,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Waits for incoming TCP connections, handles each in a separate Thread, dispatches an EinzServerThread for every client
@@ -23,26 +26,29 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private ServerSocket serverSocket;
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
     private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
+    private HashMap<String, Pair<EinzServerClientHandler, Thread>> registeredClientHandlers; // list of only the registered clients, accessible by username
     public GameState gameState;
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
     private ServerFunctionDefinition serverFunctionDefinition; // interface to server logic
+    protected final Context applicationContext;
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
      */
-    public ThreadedEinzServer(int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
+    public ThreadedEinzServer(Context applicationContext, int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
         clientHandlerThreads = new ArrayList<Thread>();
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverFunctionDefinition = serverFunctionDefinition;
+        this.applicationContext = applicationContext;
     }
 
     /**
      * Listen on any one free port. Dispatch an EinzServerThread for every Connection
      */
-    public ThreadedEinzServer(ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
-        this(0, serverActivityCallbackInterface, serverFunctionDefinition);
+    public ThreadedEinzServer(Context applicationContext, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
+        this(applicationContext,0, serverActivityCallbackInterface, serverFunctionDefinition);
     }
 
     @Override
@@ -115,7 +121,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                         interrupt();
                     }
                     JSONObject myJSONObject = new JSONObject();
-                    String message = "test message";
+                    String message;
                     try {
                         myJSONObject.put("messagetype", "debug message");
                         myJSONObject.accumulate("val", 1);
@@ -126,13 +132,15 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                         e.printStackTrace();
                     }
 
-                    tc.sendMessage(message);
+                    //tc.sendMessage(message); // everything above here might be useless xD
+                    tc.sendMessage(tc.debug_getRegisterMessage());
                 }
             };
             m.start(); // send message
             //</Debug>
         }
 
+        boolean firstconnection = true;
         while (!shouldStopSpinning){
 
             try {
@@ -151,6 +159,11 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             Thread thread = new Thread(ez);
             clientHandlerThreads.add(thread);
             thread.start(); // start new thread for this client.
+
+            if(firstconnection){
+                //TODO: set admin
+            }
+            firstconnection = false;
 
         }
         return true;
@@ -204,5 +217,43 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     public void decNumClients(){
         this.numClients--;
         serverActivityCallbackInterface.updateNumClientsUI(numClients);
+    }
+
+    /**
+     * sends a (usually JSON-encoded, one-line) message to user. If the message does not end with "\r\n", that will be appended.
+     * @param username target registered user as String
+     * @param message JSON-encoded message as String
+     * @throws UserNotRegisteredException if username is not registered
+     */
+    public void sendMessageToUser(String username, String message) throws UserNotRegisteredException {
+        Pair pair = registeredClientHandlers.get(username);
+        if(!message.endsWith("\r\n")){ // TODO: check if contains newline and if yes, abort
+            message += "\r\n";
+        }
+        if (pair == null) {
+            throw new UserNotRegisteredException("Cannot send message to not registered username");
+        }else{
+            ((EinzServerClientHandler) pair.first).sendMessage(message);
+        }
+
+    }
+
+    /**
+     * To be called by EinzServerClientHandler when user registers.
+     * If the entry for username already exists, it will be replaced
+     * @param username key
+     * @param einzServerClientHandler value: the client handler
+     * @param thread value: The thread which contains the einzServerClientHandler
+     */
+    public void registerUser(String username, EinzServerClientHandler einzServerClientHandler, Thread thread){
+        registeredClientHandlers.put(username, Pair.create(einzServerClientHandler,thread));
+    }
+
+    /**
+     * To be called by EinzServerClientHandler when user deregisters
+     * @param username
+     */
+    public void deregisterUser(String username){
+        registeredClientHandlers.remove(username);
     }
 }

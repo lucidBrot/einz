@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.junit.Test;
@@ -11,6 +12,7 @@ import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
+import static android.support.test.InstrumentationRegistry.getContext;
 import static junit.framework.Assert.assertEquals;
 
 /**
@@ -39,7 +41,7 @@ public class ServerFunctionTests {
             }
         };
         ServerFunction serverFunction = new ServerFunction();
-        ThreadedEinzServer dummyTES = new ThreadedEinzServer(1000, dummySACI, serverFunction);
+        ThreadedEinzServer dummyTES = new ThreadedEinzServer(getContext(), 1000, dummySACI, serverFunction);
         serverFunction.server = dummyTES;
         dummyTES.gameState = gameState;
 
@@ -60,7 +62,7 @@ public class ServerFunctionTests {
             }
         };
         ServerFunction serverFunction = new ServerFunction();
-        ThreadedEinzServer dummyTES = new ThreadedEinzServer(1000, dummySACI, serverFunction);
+        ThreadedEinzServer dummyTES = new ThreadedEinzServer(getContext(), 1000, dummySACI, serverFunction);
         serverFunction.server = dummyTES;
         dummyTES.gameState = gameState;
 
@@ -139,7 +141,7 @@ public class ServerFunctionTests {
             }
         };
         ServerFunction serverFunction = new ServerFunction();
-        ThreadedEinzServer dummyTES = new ThreadedEinzServer(1000, dummySACI, serverFunction);
+        ThreadedEinzServer dummyTES = new ThreadedEinzServer(getContext(), 1000, dummySACI, serverFunction);
         serverFunction.server = dummyTES;
         dummyTES.gameState = gameState;
 

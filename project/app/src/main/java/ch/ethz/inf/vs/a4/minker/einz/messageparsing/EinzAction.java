@@ -10,15 +10,16 @@ public abstract class EinzAction<MESSAGEBODYTYPE  extends EinzMessageBody> {
 
     /**
      * executes the action in the current thread
-     * @param täter The player who is requesting the change, as this is never included in the message itself
      */
-    public abstract void run(Player täter);
+    public abstract void run();
 
     protected ServerFunctionDefinition sInterface;
-    protected EinzMessage<MESSAGEBODYTYPE> message; // This has a specific messagebody in every subclass
+    protected EinzMessage message; // This has a specific messagebody in every subclass
+    protected String issuedByPlayer; // CAN BE NULL if user is not registered or not known and irrelevant
 
-    public EinzAction(ServerFunctionDefinition sInterface, EinzMessage<MESSAGEBODYTYPE> params){
+    public EinzAction(ServerFunctionDefinition sInterface, EinzMessage params, String issuedByPlayer){
         this.sInterface = sInterface;
         this.message = params;
+        this.issuedByPlayer = issuedByPlayer;
     }
 }

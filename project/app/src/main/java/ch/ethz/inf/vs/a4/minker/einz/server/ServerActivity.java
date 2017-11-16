@@ -20,13 +20,18 @@ import java.net.SocketException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This Activity starts the server and manages the Serverside UI
  */
 public class ServerActivity extends AppCompatActivity implements View.OnClickListener, ServerActivityCallbackInterface {
 
-    private ThreadedEinzServer server;
+    public static ThreadedEinzServer getServer() {
+        return server;
+    }
+
+    private static ThreadedEinzServer server; //static because there should be only one
     private Thread serverThread;
     private ServerFunctionDefinition serverLogicInterface;
 
@@ -40,7 +45,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
 
         serverLogicInterface = new ServerFunction(); // Fabians Part
 
-        server = new ThreadedEinzServer(8080,this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
+        server = new ThreadedEinzServer(this.getApplicationContext(),8080,this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
         serverThread = new Thread(server);
         // run server to listen to clients only when button pressed
 
@@ -81,7 +86,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         if(wifiMgr.isWifiEnabled()) {
             WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
             int ip = wifiInfo.getIpAddress();
-            String wifiIpAddress = String.format("%d.%d.%d.%d",
+            String wifiIpAddress = String.format(Locale.US, "%d.%d.%d.%d",
                     (ip & 0xff),
                     (ip >> 8 & 0xff),
                     (ip >> 16 & 0xff),

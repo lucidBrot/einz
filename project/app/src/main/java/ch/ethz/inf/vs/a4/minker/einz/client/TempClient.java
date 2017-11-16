@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -40,7 +42,7 @@ public class TempClient {
         if (mBufferOut != null && !mBufferOut.checkError()) {
             mBufferOut.println(message);
             mBufferOut.flush();
-            Log.d("TempClient", "sent message");
+            Log.d("TempClient", "completed sending message");
         }
     }
 
@@ -120,6 +122,39 @@ public class TempClient {
     //class at on asynckTask doInBackground
     public interface OnMessageReceived {
         public void messageReceived(String message);
+    }
+
+    public String debug_getRegisterMessage(){
+        /*
+        {
+          "header":{
+            "messagegroup":"registration",
+            "messagetype":"Register"
+          },
+          "body":{
+            "username":"roger",
+            "role":"player"
+          }
+        }
+         */
+        try {
+            String s = (new JSONObject("{\n" +
+                    "          \"header\":{\n" +
+                    "            \"messagegroup\":\"registration\",\n" +
+                    "            \"messagetype\":\"Register\"\n" +
+                    "          },\n" +
+                    "          \"body\":{\n" +
+                    "            \"username\":\"roger\",\n" +
+                    "            \"role\":\"player\"\n" +
+                    "          }\n" +
+                    "        }")).toString();
+            return s;
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("TempClient/dGetRegMsg", "failed to create registration message");
+            return "empty message :(";
+        }
+
     }
 
 }

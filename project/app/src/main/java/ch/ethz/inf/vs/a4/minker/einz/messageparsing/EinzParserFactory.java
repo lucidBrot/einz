@@ -5,6 +5,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistration
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Dictionary;
 import java.util.HashMap;
 
@@ -14,6 +15,12 @@ import java.util.HashMap;
  * This simplifies maintaining the code because to change one messagegroup, you only have to change that EinzParser
  */
 public class EinzParserFactory {
+
+    private HashMap<String, Class<? extends EinzParser>> dictionary; // Map "messagegroup" to the class of some EinzParser
+
+    public EinzParserFactory(){
+        this.dictionary = new HashMap<>();
+    }
 
     /**
      * Might return null if message is not a valid JSONObject or not a valid message
@@ -49,22 +56,62 @@ public class EinzParserFactory {
     }
 
     /**
-     * This function is basically a mapping from the messagegroup to the corresponding parser
+     * This function is basically a mapping from the messagegroup to the corresponding parser.
+     * The parser is a new instance but it can be reused by you.
      * @param messagegroup can be one of the following:
      *                     "registration"
      *                     none of the above -> returns a default parser
+     *
      * @return Some EinzParser specific to the messagegroup
      */
     private EinzParser getMatchingParser(String messagegroup){
 
-        switch(messagegroup){ // TODO: add all messagegroups to mapping
-            case "registration":
-                return new EinzRegistrationParser();
-            default:
-                Log.d("EinzParserFactory","No matching Parsertype for messagegroup "+messagegroup);
-                // TODO: return null or defaultparser ?
-                break;
+        return getMappedInstance(messagegroup);
+    }
+
+    /**
+     *
+     * @param messagegroup String identifier for message group
+     * @return a subclass of EinzParser or null if no mapping registered
+     */
+    private Class<? extends EinzParser> getMapping(String messagegroup){
+        return this.dictionary.get(messagegroup);
+    }
+
+    /**
+     * Get EinzParser for this messagegroup
+     * @param messagegroup String identifier for message group
+     * @return null if failed or parser not registered
+     */
+    private EinzParser getMappedInstance(String messagegroup){
+        try {
+            Class<? extends EinzParser> c = getMapping(messagegroup);
+            if(c==null)
+                return null;
+
+            return getMapping(messagegroup).getDeclaredConstructor().newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            Log.e("EinzParserFactory", "Failed to instantiate mapped Parser");
+            e.printStackTrace();
         }
+        Log.e("EinzParserFactory", "Failed to instantiate mapped Parser");
         return null;
+    }
+
+    /**
+     * @param messagegroup The key. A String that is contained as messagegroup in the Message header
+     * @param parserclass The value. The Class of some EinzParser
+     */
+    public void registerMessagegroup(String messagegroup, Class<? extends EinzParser> parserclass){
+        this.dictionary.put(messagegroup, parserclass);
+    }
+
+    /**
+     * @param messagegroup The messagegroup whose mapping should be removed from the internal dictionary.
+     */
+    public void deregisterMessagegroup(String messagegroup){ // TODO: what does this do if the messagegroup wasn't registered?
+        this.dictionary.remove(messagegroup);
     }
 }

@@ -14,6 +14,7 @@ public class Card implements ICardDefinition {
         this.type = type;
         this.color = color;
         this.wish = CardColors.NONE;
+        //TODO: Set ID according to Josua
     }
 
     //type determines what kind of card you play. This can be "zero", "one", "plusTwo", ...
@@ -23,4 +24,6 @@ public class Card implements ICardDefinition {
     //when playing certain cards, you can choose something (e.g. a color)
     //with all other cards, this field is ignored
     public CardColors wish;
+    public String ID;
+
 }
