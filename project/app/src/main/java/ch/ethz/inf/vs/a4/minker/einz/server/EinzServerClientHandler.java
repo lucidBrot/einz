@@ -183,10 +183,23 @@ public class EinzServerClientHandler implements Runnable{
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.e("ESCH", "Something Failed");
+                Log.e("ESCH", "Something Failed. Probably the client disconnected without warning. Or maybe the socket is closed.");
+                // TODO: inform that user has left if he was registered. and stop thread
+                this.stopThread();
+                this.onClientDisconnected();
                 return;
             }
         }
+    }
+
+    // TODO: implement this method
+    private void stopThread() {
+        Log.d("ESCH/stopThread", "NOT YET IMPLEMENTED!");
+    }
+
+    // TODO implement this method
+    private void onClientDisconnected(){
+        Log.d("ESCH/clientDisconnected", "NOT YET IMPLEMENTED");
     }
 
     /**
@@ -218,12 +231,18 @@ public class EinzServerClientHandler implements Runnable{
             } catch (IOException e) {
                 Log.e("EinzServerThread","sendMessage: failed because of IOException "+e.getMessage());
                 e.printStackTrace();
+
+                this.onClientDisconnected();
+                this.stopThread(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
             }
             try {
                 out.flush();
             } catch (IOException e) {
                 Log.e("EinzServerThread","sendMessage: failed because of IOException 2 "+e.getMessage());
                 e.printStackTrace();
+
+                this.onClientDisconnected();
+                this.stopThread(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
             }
         }
     }

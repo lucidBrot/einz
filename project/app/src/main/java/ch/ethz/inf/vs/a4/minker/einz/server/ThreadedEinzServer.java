@@ -142,6 +142,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                     Log.d("EinzServer/launch","SocketException but shouldStopSpinning is false");
                 return false;
             } catch (IOException e) {
+                // connection seems to have done weird things. Nevermind, just try again after logging
                 Log.e("EinzServer/launch", "IOException while calling serverSocket.accept().");
                 e.printStackTrace();
                 return false;
@@ -177,6 +178,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 serverSocket.close();
             } catch (IOException e) {
                 Log.e("EinzServer/stopServer", "Tried to close socket. Failed.");
+                // probably because it lost connection but still has buffer to flush. Don't care, just finish that
                 e.printStackTrace();
             }
         }
