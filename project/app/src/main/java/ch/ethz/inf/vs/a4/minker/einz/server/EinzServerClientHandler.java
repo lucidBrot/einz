@@ -5,6 +5,7 @@ import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzRegisterAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
@@ -59,7 +60,7 @@ public class EinzServerClientHandler implements Runnable{
         this.socket = clientSocket;
         this.serverInterface = serverFunctionDefinition;
         this.einzParserFactory = new EinzParserFactory();
-        this.einzActionFactory = new EinzActionFactory(serverInterface);
+        this.einzActionFactory = new EinzActionFactory(serverInterface, this.parentEinzServer.getServerManager());
 
         // TODO: initialize ParserFactory by registering all Messagegroup->Parser mappings
         try {
@@ -157,7 +158,7 @@ public class EinzServerClientHandler implements Runnable{
     }
 
     private void registerActionMappings(){
-        this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzRegisterAction.class); // DEBUG purely. not actually useful
+        this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzFinishRegistrationPhaseAction.class); // DEBUG purely. not actually useful
     }
 
     // source: https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server

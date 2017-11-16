@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
 import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
 
 /**
@@ -16,11 +17,13 @@ public abstract class EinzAction {
     private final ServerFunctionDefinition sInterface;
     private final EinzMessage message; // This has a specific messagebody in every subclass
     private final String issuedByPlayer; // CAN BE NULL if user is not registered or not known and irrelevant
+    private final EinzServerManager serverManager;
 
-    public EinzAction(ServerFunctionDefinition sInterface, EinzMessage params, String issuedByPlayer){
+    public EinzAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer){
         this.sInterface = sInterface;
         this.message = params;
         this.issuedByPlayer = issuedByPlayer;
+        this.serverManager = serverManager;
     }
 
     public ServerFunctionDefinition getsInterface() {
@@ -33,5 +36,9 @@ public abstract class EinzAction {
 
     public String getIssuedByPlayer() {
         return issuedByPlayer;
+    }
+
+    public EinzServerManager getServerManager() {
+        return serverManager;
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import android.util.Pair;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
+import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import org.json.JSONException;
@@ -15,6 +16,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Waits for incoming TCP connections, handles each in a separate Thread, dispatches an EinzServerThread for every client
@@ -27,22 +29,33 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private ServerSocket serverSocket;
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
     private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
+
+    public HashMap<String, Pair<EinzServerClientHandler, Thread>> getRegisteredClientHandlers() {
+        return registeredClientHandlers;
+    }
+
+    public void setRegisteredClientHandlers(HashMap<String, Pair<EinzServerClientHandler, Thread>> registeredClientHandlers) {
+        this.registeredClientHandlers = registeredClientHandlers;
+    }
+
     private HashMap<String, Pair<EinzServerClientHandler, Thread>> registeredClientHandlers; // list of only the registered clients, accessible by username
-    public ServerFunction serverFunction;
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
-    private ServerFunctionDefinition serverFunctionDefinition; // interface to server logic
+    protected ServerFunctionDefinition serverFunctionDefinition; // interface to server logic
     protected final Context applicationContext;
+    private final EinzServerManager serverManager;
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
      */
     public ThreadedEinzServer(Context applicationContext, int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
-        clientHandlerThreads = new ArrayList<Thread>();
+        this.clientHandlerThreads = new ArrayList<Thread>();
+        this.registeredClientHandlers = new HashMap<>();
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverFunctionDefinition = serverFunctionDefinition;
         this.applicationContext = applicationContext;
+        this.serverManager = new EinzServerManager(this);
     }
 
     /**
@@ -251,7 +264,9 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * @param thread value: The thread which contains the einzServerClientHandler
      */
     public void registerUser(String username, EinzServerClientHandler einzServerClientHandler, Thread thread){
-        registeredClientHandlers.put(username, Pair.create(einzServerClientHandler,thread));
+        synchronized (registeredClientHandlers) {
+            registeredClientHandlers.put(username, Pair.create(einzServerClientHandler, thread));
+        }
     }
 
     /**
@@ -259,10 +274,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * @param username
      */
     public void deregisterUser(String username){
-        registeredClientHandlers.remove(username);
+        synchronized (registeredClientHandlers) {
+            registeredClientHandlers.remove(username);
+        }
     }
 
-    public void finishRegistrationPhaseAndStartGame(){
-        //
+    public EinzServerManager getServerManager() {
+        return serverManager;
     }
 }

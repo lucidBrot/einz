@@ -4,6 +4,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
 
 import java.lang.reflect.InvocationTargetException;
@@ -16,10 +17,16 @@ public class EinzActionFactory {
     // this Map is using the MessageBody because a) this is what distinguishes the messages and b) the generic type cannot really be gotten at runtime.
     // .getClass and .class only return EinzMessage, without the generic type
     // The key is EinzMessageBody and not just the messagtype because like this we could add further header info and create new EinzMessages based on them
+    private EinzServerManager sManager;
 
-    public EinzActionFactory(ServerFunctionDefinition serverFunctionDefinition){
+    /**
+     * @param serverFunctionDefinition provides game logic actions
+     * @param serverManager provides framework actions
+     */
+    public EinzActionFactory(ServerFunctionDefinition serverFunctionDefinition, EinzServerManager serverManager){
         this.sInterface = serverFunctionDefinition;
         this.dictionary = new HashMap<Class<? extends EinzMessageBody>, Class<? extends EinzAction>>();
+        this.sManager = serverManager;
 
         //<Debug>
         /*
@@ -80,7 +87,7 @@ public class EinzActionFactory {
      */
     public EinzAction generateEinzAction(EinzMessage message, @Nullable String issuedBy){
         try {
-            EinzAction ret = getMapping(message).getDeclaredConstructor(ServerFunctionDefinition.class, message.getClass(), String.class).newInstance(sInterface, message, issuedBy);
+            EinzAction ret = getMapping(message).getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class).newInstance(sInterface, sManager, message, issuedBy);
             Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
             return ret;
         } catch (InstantiationException e) {
