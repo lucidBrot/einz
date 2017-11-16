@@ -9,6 +9,8 @@
 \usepackage{subfigure}
 \usepackage{enumitem}
 \usepackage{url}
+\usepackage{listings}
+\usepackage{hyperref}
 
 
 \usepackage{color}
@@ -177,7 +179,7 @@ Obvious difficulties awaiting us include the coordination of a team consisting o
 Also, we intend to create an easily extensible codebase so that we can first build the base game and in a second phase add further rules without much effort. This poses difficulties on its own as we have to learn coding patterns such as using factories to make the program code more modular.\\
 Technical problems will probably be the selection of one device as the server, smooth and clean communication between the clients and the server, and implementing concurrency within the server. Selecting which device will be the server could be done by communicating P2P and choosing the device with the smallest IMEI, or just by letting the users choose.\\
 
-For the usual difficulties in networking like message ordering and making sure the peers actually get the messages, we will rely on TCP.
+For the usual difficulties in networking like message ordering and making sure the peers actually get the messages, we will rely on TCP using the \verb|Socket| class~\cite{socketdoc}. There remains the problem of realizing it when the connection breaks unexpectedly, especially because we might have times where we don't need to send messages at all for multiple seconds.
 
 
 \section{System Overview}
@@ -198,8 +200,10 @@ explain the figures in the text where you reference them.
 \end{figure}
 
 OUR PART:
-We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like NAT-punchthrough to allow players from behind different routers to play via the internet with each other or adding more variations and rules. The additional rules will be available to the user of the device the server runs on before game start, such that we can dynamically change the way the game works.\\
-Specifically, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other client's IP address and ports, through which they can communicate as if they were within the same subnet, as already implemented in the first phase (See ~\rfig{nat}). The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
+We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like NAT-punchthrough to allow players from behind different routers to play via the internet with each other or adding more variations and rules. The baseline functionality of the game is a playable version of UNO where only the most basic cards are featured. Further cards will be implemented as rules, e.g. the rule "We feature a +2 card". The additional rules will be available to the user of the device the server runs on before game start, such that we can dynamically change the way the game works. This does not mean that we intend to allow the user to define their own rules - just that they can choose which rules should be applied.\\
+So how exactly will we enable dynamic rules? The UI will feature settings on the server device. These will mostly be checkboxes or multiple-choice dropdown menus. This means that we will not feature user-designed rules. However, we intend to make use of the efforts we put into the extensibility of our codebase by adding the ideas we had during our first meeting~\cite{firstprotocol} if we have enough time to do so.\\
+
+Assuming we find enough time after adding enough rules to make the game interesting and decide to do NAT traversal, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other client's IP address and ports, through which they can communicate as if they were within the same subnet, as already implemented in the first phase (See~\rfig{nat}). The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
 Because of this, we will need a local WiFi in order to demonstrate our app.\\
 \begin{figure}[h]
 	\centering
@@ -208,14 +212,36 @@ Because of this, we will need a local WiFi in order to demonstrate our app.\\
     \vspace{-5mm} % use negative white space to fix too large gaps
 	\caption{NAT traversal}
 \end{figure}
-\\
-First of all, we implement a simple server-client setup and define the format and the messages that should be provided as an interface between the client and the server.~\cite{messaging} At the same time, we can start implementing the user interface and writing this proposal.\\
-In a second step, once the basic communication between server and client works and the exact behaviour of the two parts has been defined, we implement the serverside game logic and the previously defined messaging functionality.
-We will make it so that the server does most of the computations and only sends the client its state, containing the players hand, the number of cards other players are holding and the most recently played cards. The client receives also a list of possible actions, from which it can choose one without having any clientside support for them, except for the user interface. This allows us to later add gamemodes and rules with ease, because we will only need to change a few classes.
-We are also trying to keep the classes themselves very modular to make updating them - e.g. by adding further messages - just as simple.\\
-Once the game is in a working state with a few rules such as an additional card like the one where the player can choose a color or the well-known "+2" card from UNO, we will decide whether we need to focus on bugfixing, cleaning up code, implementing a LUS or adding more rule options. Adding a LUS might impose additional difficulties because some mobile carriers might use symmetric NATs. If these difficulties arise, we will probably resort to only implementing NAT-traversal for the other (easier) types of NATs.\\
+\subsection{DETAILED OVERVIEW}
+\begin{figure}
+\begin{verbatim}
+{
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"Register"
+  },
+  "body":{
+    "username":"roger",
+    "role":"player"
+  }
+}
+\end{verbatim}
+\caption{Example: Request to register user}
+\lfig{regmsg}
+\end{figure}
 
-So how exactly will we enable dynamic rules? The UI will feature settings on the device which acts as the server. These will mostly be checkboxes or multiple-choice dropdown menus. This means that we will not feature user-designed rules. However, we intend to make use of the efforts we put into the extensibility of our codebase.\\
+First of all, we implement a simple server-client setup and define the format and the messages that should be provided as an interface between the client and the server.~\cite{messaging} At the same time, we can start implementing the user interface and writing this proposal.\\
+See~\rfig{regmsg} for an example of how our messages will be structured. We encode all our messages in JSON and split them into a header which is uniform over all messages, and a body which is message-specific in content. To parse these messages, we implement factories to make the code modular.\\
+That is, the \verb|ParserFactory| use the \verb|messagegroup| to create a \verb|Parser| object specific to the kind of message. Which \verb|Parser| to choose is decided via a dynamically registered mapping, which means that we can reuse the code on both the server and the client side, and that we have minimal effort if we need to change or add some type of message.\\
+For example, say that we need to add a timestamp to the \verb|Register| message for some reason. Chances are that we also need to update the format of the response to this request, which for this reason has the same \verb|messagegroup|. All of this can be done by changing only the \verb|Parser| for this specific messagegroup.\\
+Similarly, the \verb|Parser| instance uses an \verb|ActionFactory| and the \verb|messagetype| to actually turn the specific message into an executable method.\\
+If you're interested in the most current specifications of the messages, see our github page~\cite{github}. There will at some point also be specified how we handle loss of connection, probably using our own implementation of keepalive packets.\\
+\\
+In a second step, once the basic communication between server and client works and the exact behaviour of the two parts has been defined, we finish implementing the serverside game logic and start using the previously defined messaging functionality.
+We will make it so that the server does most of the computations and only sends the client its state, containing the players hand, the number of cards other players are holding and the most recently played cards. The client receives also a list of possible actions, from which it can choose one without having any clientside support for them, except for the user interface. This allows us to later add gamemodes and rules with ease, because we will only need to change a few classes.\\
+%TODO: add state diagram?
+We are also trying to keep the classes themselves very modular to make updating them - e.g. by adding further rules - just as simple.\\
+Once the game is in a working state with a few rules such as an additional card like the one where the player can choose a color or the well-known "+2" card from UNO, we will decide whether we need to focus on bugfixing, cleaning up code, implementing a LUS for NAT-traversal~\rfig{nat} or adding more rule options. Adding a LUS might impose additional difficulties because some mobile carriers might use symmetric NATs. If these difficulties arise, we will probably resort to only implementing NAT-traversal for the other (easier) types of NATs.\\
 
 We designed the User Interface for the standard scenario from starting the app to start playing to look like the following: The first screen (1) is for the player to choose, whether he wants to start a new game or join an already existing game. If he decides to start a new one, he will start the server in an android thread in the background. He will be prompted to enter his username and decide whether he wants to play or observe/spectate the game. If he presses the "Start Server" Button in (2) after filling out the missing information, he will connect himself as an admin to the previously started server running in the background of his device. After that he will be forwarded to an activity (3), with the necessary information for others to connect and a list of already connected players/observers. By pressing the settings button he will be taken to (4) and it's here where further settings and rules of the server and game can be changed. A client that joins a game will go through a similar process. He has to start by filling out his name, the host ip and port and whether he want's to act as a player or a spectator (5). Once the player connects to the server he will see a list of other players/observers, but not be able to kick them or change any settings, as this is left for the host/admin (9). When the host starts the game everyone will see the activity in which the game can be played and either see a standard view with his hand, the topmost card, all connected players and the amount of cards in each hand (6) or he will see the view of the spectator(7). Players will be able to place any by the server as placable declared card or draw cards from the heap. Spectators will see the public gamestate, but not any specific cards in any hand, they will also not be able to interact in the game. The usecase for this option, is that you could place a larger andoid device (tabled, phablet) in the middle of a table to get the "classic cardgame feel" while still playing on mobile devices. \\
 \begin{figure}[h]
