@@ -4,6 +4,8 @@ How the Einz Server and Client are supposed to communicate.
 
 Work in progress, not yet approved by team lead. Do not implement yet.
 
+See the handwritten notes pdf for a messy state diagram until somebody creates a beautiful one.
+
 ***
 
 The IP of the sender should never be needed, as the TCP connection already provides this.
@@ -12,9 +14,11 @@ The username of the client will be stored serverside for convenience, no need to
 
 Every String is case-sensitive!
 
+The first client to connect will be **admin**
+
 ***
 
-**STILL TO SPECIFY** : [`card`](#drawxcards)  , [`style`](#showmessage)  , [`state`](#getstate) 
+**STILL TO SPECIFY** (IF EVER USED) : [`style`](#showtoast), [`rules`](#rules)
 
 ## General Form of Message
 
@@ -43,54 +47,54 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 **specified messagegroups**
 
-* ping
+* networking
 
-  > [Ping](#ping--pong), Pong
+  > [Ping](#ping--pong), Pong, [Keepalive](#keepalive)
 
 
 * registration
 
-  > [Register](#register), RegisterResponse, [UnregisterRequest](#unregister), UnregisterResponse
+  > [Register](#register), [RegisterSuccess](#registersuccess), [RegisterFailure](#registerfailure), [UpdateLobbyList](#updatelobbylist) [UnregisterRequest](#unregister), [UnregisterResponse](#unregisterresponse), [Kick](#kick)
 
 
-* rules
+* startgame
 
-  > [SendRules](#sendrules), [RulesInitialized](#sendrules)
-
-
-* startGame
-
-  > [StartGame](#startgame)
+  > [SpecifyRules](#specifyRules), [StartGame](#startgame), [InitGame](#initgame)
 
 
 * draw
 
-  > [DrawXCards](#drawxcards), [HandOutCard](#handoutcard), ([DrawCard](#drawcard))
+  > [DrawCards](#drawcards), [DrawCardsResponse](#drawcardsresponse)
 
 
 * stateinfo
 
-  > [WhoseTurn](#whoseturn), [GetState](#getstate), GetStateResponse
+  > [SendState](#sendstate), [GetState](#getstate) 
 
 
 * playcard
 
-  > [PlayCard](#playcard), PlayCardResponse, [CardPlayed](#cardplayed), [InvalidCardPlayed](#invalidcardplayed)
+  > [PlayCard](#playcard), [PlayCardResponse](#playcardresponse)
 
 
 * toast
 
-  > [ShowMessage](#showmessage), [SendMessage](#sendmessage), [BroadcastMessage](#broadcastmessage)
-
-
-* playerFinished
-
-  > [PlayerFinished](#playerfinished)
+  > [ShowToast](#showtoast)
 
 
 * endGame
 
-  > [GameOver](#gameover)
+  > [PlayerFinished](#playerfinished), [EndGame](#endgame)
+
+
+
+
+**specified content** 
+
++ [state](#state)
++ [card](#card)
++ [possible actions](#possibleactions)
+
 ## Ping / Pong
 
 Request a simple answer from the other to make sure they're still there or to measure the delay.
@@ -98,7 +102,7 @@ Request a simple answer from the other to make sure they're still there or to me
 
 The **Server & Client** should both support sending both message types
 
-##### Request
+##### Ping
 
 ```JSON
 {
@@ -112,7 +116,7 @@ The **Server & Client** should both support sending both message types
 }
 ```
 
-##### Response
+##### Pong
 
 ```JSON
 {
@@ -133,7 +137,11 @@ Similar to ping, but respond to receiving the keepalive packet by sending it bac
 Implemented by **server** and **client**.
 
 If no keepalive packet is received within some timeout, the connection is considered broken.
-`timeout` specified by the server.
+`timeout` specified by the server in ms.
+
+The reason for this packet is that we cannot know whether a client disconnected unless we send to it. In the worst case, this would mean that we patiently wait some 30 seconds for a client to play, and only once we decide that this was too long and tell it that we disconnected it, we notice. To circumvent this, we send a keepalive packet back and forth and can thus make use of the `socket.setTimeout`, which only reacts to data packets, not to the tcp-internal keepalive packets.
+
+Implementing this packet is easily uncoupled from the rest of the packets and is thus a TODO for later.
 
 ```json
 {
@@ -147,14 +155,16 @@ If no keepalive packet is received within some timeout, the connection is consid
 }
 ```
 
-
+***
 
 ## Register
 
 Request to play on this server, or to spectate.
 `username` : *String* 
 
-> should be unique. If it is not, `success` will be *false* and `reason` will be *"not unique"*
+> should be unique. If it is not `reason` in [RegisterFailure](#registerfailure) will be *"not unique"*
+>
+> should NOT be the empty string *""* or *"server"*
 
 `success` : *String* 
 
@@ -165,9 +175,7 @@ Request to play on this server, or to spectate.
 
 > *"player"* or *"spectator"* 
 
-The **Client** sends this and Server only reacts to it
-
-##### Request
+The **Client** sends this and Server only reacts to it. The Server's reaction is either RegisterSuccess or RegisterFailure, followed by an information to all players with the [updated lobby list](#updatelobbylist).
 
 ```JSON
 {
@@ -177,44 +185,95 @@ The **Client** sends this and Server only reacts to it
   },
   "body":{
     "username":"roger",
-    "role":"player"
+    "role":"player",
   }
 }
 ```
 
-##### Response
+##RegisterSuccess
+
+If the client requests the same role multiple times, the request will still succeed. If the client requests different roles, one is chosen arbitrarily by the server. Therefore, the packet sent from the server contains the role the client was given.
+
+```json
+{
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"RegisterSuccess"
+  },
+  "body":{
+    "username":"roger",
+    "role":"spectator",
+  }
+}
+```
+
+## UpdateLobbyList
+
+The **server** broadcasts the new List of Players and Spectators to the clients whenever a new one connects. The first client thus only receives a list with itself and knows that it is admin.
+
+It is not important for the client to know spectators and the admin, but it might be useful for the UI if we want to show that.
+
+`lobbylist` : *JSONArray of JSONObjects*
+
+> An unordered list of players and spectators, consisting of their username and their role
+
+`admin` : *String*
+
+> The username of the admin
+
+```json
+{
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"UpdateLobbyList"
+  },
+  "body":{
+    "lobbylist":[
+      {"roger":"player"},
+      {"chris":"player"},
+      {"table":"spectator"}
+    ],
+    "admin":"roger"
+  }
+}
+```
+
+## RegisterFailure
 
 With our current goals, this should most often return *"true"* and is thus like an ACK. Also return which role was assigned in case the client requested both for some weird reason. If the client requests the same role multiple times, `success` will still be true if the client is still registered as this role and false if it has a different role or is unregistered.
 
-If the client is not registered, `role` should have a return value of *"null"*.
+If the client has not been registered. This may be because of an invalid username as specified under [Register](#register) or for some other reason. This message specifies also what role the user requested and what username he provided.
 
 `reason` : *String* 
 
-> if not `success` , can be one of the following options
+> can be one of the following options
 >
-> + *"not unique"* if the same username was already registered by a different IP
-> + "already registered" if the same IP already has registered a username
-> + *"invalid"* if the username is the empty string. This is reserved for the server as username. Or if the username contains invalid characters.
+> + *"not unique"* if the same username was already registered
+> + *"already registered"* if the same connection already has registered a username
+> + *"invalid"* if the username is the empty string or *"server"*. Or if the username contains invalid characters. One invalid character is the Tilde, which is reserved to identify non-username-strings
+> + *"lobby full"* if the server decided to fixate the number of players or spectators and the game has not yet started (otherwise, the server wouldn't react at all).
 
 ```JSON
 {
   "header":{
     "messagegroup":"registration",
-    "messagetype":"RegisterResponse"
+    "messagetype":"RegisterFailure"
   },
   "body":{
-    "success":"true",
-    "role":"spectator",
-    "reason":"this can be anything if success was true"
+    "role":"player",
+    "username":"server",
+    "reason":"invalid"
   }
 }
 ```
 
-## Unregister
+## UnregisterRequest
 
 The **Client** requests to leave the game and close the connection.
 
-##### Request
+`username`: *String*
+
+> The user who wants to leave. If this is not the username of the sender, this will fail silently.
 
 ```Json
 {
@@ -228,16 +287,18 @@ The **Client** requests to leave the game and close the connection.
 }
 ```
 
-We don't need to wait for the Server to respond. The Server will probably handle these leaves similarly to connection timeouts.
+We don't need to wait for the Server to respond. The Server logic will probably handle these leaves similarly to connection timeouts.
 
-However, the **Server** might decide to kick a player. For these purposes, the Response exists.
+However, the **Server** might decide to [kick](#kick) a player. For these purposes, [the Response](#unregisterplayer) exists.
 Also, the other Clients need to know about leaves.
 
-##### Response
+##UnregisterResponse
 
-`kicked` : *String*
+Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client.
 
-> whether the client was kicked or asked to leave. *"false"* in the latter case, *"true"* if kicked.
+`reason` : *String*
+
+> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server.
 
 ```Json
 {
@@ -247,25 +308,94 @@ Also, the other Clients need to know about leaves.
   },
   "body":{
     "username":"that random dude who we didn't want",
-    "kicked":"true"
+    "reason":"true"
   }
 }
-
 ```
 
-## <a name="sendrules"></a>SendRules / RulesInitialized
+## Kick
 
-Informs the Client which rules will be used. The rules themselves might have to be implemented client-side as well.
+The player who started the server, from now on referred to as admin, may decide to kick a player from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin.
+
+```json
+{
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"Kick"
+  },
+  "body":{
+    "username":"that random dude who we didn't want",
+  }
+}
+```
+
+***
+
+## SpecifyRules
+
+The **admin client** informs the server what rules it chose. The rule is only passed by identifier, because both the client and the server already need to know all rules that can be used.
+
+Since every rule might have dynamic parameters, they are all stored as JSONObject where only their name is guaranteed to be available.
+
+`ruleset` : *JSONOBject containing non-uniform JSONObjects*
+
+> The identifier of the JSONObject is also the identifier of the [rule](#rule)
+
+```json
+{
+  "header":{
+    "messagegroup":"startgame",
+    "messagetype":"SpecifyRules"
+  },
+  "body":{
+    "ruleset":{
+        "startWithXCards":{
+          "x":"7"
+        },
+       "instantWinOnCardXPlayed":{
+          "cardcolor":"green",
+          "cardnum":"3"
+       },
+      "exodia":{},
+      "handicap":{"arr":[{"chris":"100"},{"roger":"-10"}]}
+	}
+  }
+}
+```
+
+## StartGame
+
+The **admin client** informs the server that it should start the game and stop listening to new connections.
+
+```json
+{
+  "header":{
+    "messagegroup":"startgame",
+    "messagetype":"startGame"
+  },
+	"body":{}
+}
+```
+
+## InitGame
+
+Informs the Client which rules will be used (by identifier), 
 `ruleset` is a (not specifically sorted) JSONObject of rules. Every rule contains a `rulename` JSONObject and further details specific to the rule.
 
-The **Server** sends this to the Client. The Client responds with the response once it's ready.
+Also sends all player names, ordered by turn-order
 
-##### Request
+The **Server** sends this to the Client. No response from the Client required.
+
+`turn-order` : *JSONArray of usernames as Strings* 
+
+`ruleset` : *JSONOBject containing non-uniform JSONObjects*
+
+> The identifier of the JSONObject is also the identifier of the [rule](#rule)
 
 ```Json
 {
   "header":{
-    "messagegroup":"rules",
+    "messagegroup":"startgame",
     "messagetype":"SendRules"
   },
   "body":{
@@ -276,128 +406,99 @@ The **Server** sends this to the Client. The Client responds with the response o
        "instantWinOnCardXPlayed":{
           "cardcolor":"green",
           "cardnum":"3"
-       }
-    }
+       },
+      "exodia":{},
+      "handicap":{"arr":[{"chris":"100"},{"roger":"-10"}]}
+	},
+    "turn-order":[
+      "sisisilvia",
+      "faeglas",
+      "baclemen"
+    ]
   }
 }
 ```
 
 Note that the example rules here were spontaneously written and might not be specified.
 
-##### Response
+***
 
-Once a client has initialized based on the ruleset, it should inform the server that it's ready.
-If rules were unknown or not completely specified, they are specified for debug purposes, though the server should never use rules that the clients don't know.
-If everything is as it's supposed to be, this is simply a signal for the server that this client is ready to receive [**StartGame**](#startgame).
-`invalid rules` : *JSONArray*
+## DrawCards
 
-> Unsorted list of which rules were invalid or unknown
+Request to draw new cards. The Server will return as many cards as the minimum of cards drawable that is not 0, or 0 as a sign of failure.
 
-```Json
-{
-  "header":{
-    "messagegroup":"rules",
-    "messagetype":"RulesInitialized"
-  },
-  "body":{
-    "invalid rules":["instantWinOnCardXPlayed", "';DROP DATABASE usernames"] 
-  }
-}
-```
-
-## StartGame
-
-Inform the clients that the game is about to start and they are allowed to request cards. This will be sent after [**sendRules**](#sendrules).
-
-The **Server** sends this.
-
-##### Request
-
-```json
-{
-  "header":{
-    "messagegroup":"startGame",
-    "messagetype":"StartGame"
-  },
-  "body":{
-    
-  }
-}
-```
-
-##### Response
-
-No response from the clients is needed, as their next step will be to demand cards.
-
-## DrawXCards
-
-Request *x* new cards.
-`X` : *int*
-
-The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later using [**HandOutCard**](#handoutcard) `x` times . The response contains how many these will be.
-`will give` : *int*, can be 0
-
-##### Request
+The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later using [**DrawCardsResponse**](#drawcardsresponse).
 
 ```json
 {
   "header":{
     "messagegroup":"draw",
-    "messagetype":"DrawXCards"
+    "messagetype":"DrawCards"
   },
   "body":{
-    "x":"3"
   }
 }
 ```
 
-##### Response
+##DrawCardsResponse
+
+`cards` : *JSONArray of JSONObjects*
+
+> The drawn cards, setup so that the UI will know where they came from in order to animate if it wants to
+>
+> ```json
+> {
+>   "ID":"cardID1337",
+>   "origin":"stack"
+> }
+> ```
+>
+> `origin` can be 
+>
+> + *~stack* if the card had previously been played and was now drawn from the stack
+> + *~talon* if the card had not been drawn yet and was now drawn from the talon
+> + some username if the card was in a users hand
+> + *~unspecified* or simply not set if not specified
+>
+> Not that the tilde is not allowed within usernames, so this is clear specification
+>
+> The [card](#card) does not have to be unique.
+
+The **server** sends this request and will follow up with a complete [sendState](#sendstate) 
 
 ```Json
 {
   "header":{
     "messagegroup":"draw",
-    "messagetype":"DrawXCardsResponse"
+    "messagetype":"DrawCardsResponse"
   },
   "body":{
-    "will give":"2"
+    "cards":[
+      {"ID":"cardID1","origin":"talon"},
+      {"ID":"cardID3","origin":"talon"},
+      {"ID":"cardID1","origin":"talon"}
+    ]
   }
 }
 ```
 
-## DrawCard
-
-Just use  [**DrawXCards**](#drawxcards) with `x="1"`
-
-## WhoseTurn
-
-The **Server** informs each Client whenever somebodys' turn starts. The Client can thus find out whether it's its turn.
-
-##### Request
-
-```Json
-{
-  "header":{
-    "messagegroup":"stateinfo",
-    "messagetype":"WhoseTurn"
-  },
-  "body":{
-    "username":"Donald Trump"
-  }
-}
-```
+***
 
 ## PlayCard
 
-The **Client** can request to play a card. If `dry-run` is false, the Server will play the card if it is valid and otherwise return a failure message. So the client should wait to handle the response before doing anything else.
-If `dry-run` is true, the Server will only answer whether the move is valid but not play the card.
+The **Client** can request to play a card. The Server will play the card if it is valid and return a success/failure message. After that, it will send you the new state and if success to everybody else as well.
 
 `card` : *JSONObject*
 
-> The specifics of the card are not yet defined (10.11.2017)
-> If the card is invalid, the Server should answer with [**InvalidCardPlayed**](#invalidcardplayed).
+> Only the card ID is needed. Still, we use a JSONObject for the card to make this more easily extensible.
+>
+> ```json
+> {
+>   "ID":"cardID1337"
+> }
+> ```
 
-##### Request
+
 
 ```Json
 {
@@ -406,32 +507,20 @@ If `dry-run` is true, the Server will only answer whether the move is valid but 
     "messagetype":"PlayCard"
   },
   "body":{
-    "dry-run":"true",
     "card":{
-      "color":"green",
-      "num":"1337"
+      "ID":"cardID1337"
     }
   }
 }
 ```
 
-Note that the contents of card are yet to be specified as of 11.11.2017.
+## PlayCardResponse
 
-##### Response
+This is sent by the **server** to specify whether a play was valid and has been played, or not.
 
-As always the booleans are also stored as strings to allow easier extensibility. When coding, you have to make sure anyways that the input is of the correct type.
+`success` : *String*
 
-`play valid` : *boolean*
-
-> true if the card can be played. If `dry-run` is *false*, then this means the card will be played and the server will soon send [**CardPlayed**](#cardplayed) to all clients.
-
-`dry-run` : *boolean*
-
-> the same value as the received `dry-run`
-
-`your turn` : *boolean*
-
-> Whether the play is not only valid but it's also the clients turn
+> *"true"* or *"false"*
 
 ```Json
 {
@@ -440,67 +529,18 @@ As always the booleans are also stored as strings to allow easier extensibility.
     "messagetype":"PlaycardResponse"
   },
   "body":{
-    "dry-run":"true",
-    "play valid":"true",
-    "your turn":"true"
+	"success":"true"
   }
 }
 ```
 
-## CardPlayed
-
-Usually broadcasted from the **Server** to all Clients if a valid play was made.
-
-`card` : *JSONObject* 
-
-> To be specified
-
-`player` : *String* 
-
-> Who played the card
-
-```Json
-{
-  "header":{
-    "messagegroup":"playcard",
-    "messagetype":"CardPlayed"
-  },
-  "body":{
-    "card":{
-      "some info":"to be specified",
-      "color":"green"
-    },
-    "player":"владимир путин"
-  }
-}
-```
-
-## InvalidCardPlayed
-
-Response from the **Server** if a [**PlayCard**](#playcard) request was invalid.
-`reason` : *String* 
-
-> Not yet defined, for debugging purposes.
-
-```Json
-{
-  "header":{
-    "messagegroup":"playcard",
-    "messagetype":"InvalidCardPlayed"
-  },
-  "body":{
-    "reason":"bad coding skills and an inexistent card"
-  }
-}
-```
+***
 
 ## GetState
 
-The **Client** requests to know its own canonical state. This involves their current hand and the already played cards, also called the stack.
+The **Client** requests to know its own canonical [state](#state). This involves their current hand and the already played cards, also called the stack, as well as the number of cards the other players are holding.
 
-The response might also be sent without being requested - e.g. after a player finished his turn.
-
-##### Request
+The [response](#sendstate) will usually also be sent without being requested - e.g. after a player finished his turn.
 
 ```Json
 {
@@ -514,83 +554,52 @@ The response might also be sent without being requested - e.g. after a player fi
 }
 ```
 
-##### Response
+##SendState
 
-`hand` : Array of *JSONObjects*
+The **server** sends this after being asked via [GetState](#getstate) or when appropriate, i.e. some player did something or the state changed for some other reason.
 
-> A List of Cards that the Client should have in their hand.
-
-`stack` : Array of *JSONObjects*
-
-> A List of the already played cards, the card at index 0 being the oldest card on the stack
-
-`playerinfo` : *JSONArray* of *JSONObjects* 
-
-> Contains number of cards the other players hold and maybe further info.
->
-> One JSONObject for each player
+See the specification of [state](#state) for information about the formatting.
 
 ```Json
 {
   "header":{
     "messagegroup":"stateinfo",
-    "messagetype":"GetStateResponse"
+    "messagetype":"SendState"
   },
   "body":{
-    "hand":[
-      {"color":"blue", "value":"7"},
-      {"color":"black", "special":"play Vitas"}
-    ],
-    "stack":[
-      {"color":"blue", "num":"3"},
-      {"color":"blue", "num":"4"},
-      {"color":"red", "num":"4"}
-    ],
-    "playerinfo":[
-      {
-        "name":"roger",
-      	"turn-order":"1",
-      	"number of cards":"7"
+    "globalstate":{
+      "numcardsinhand":{
+        "Eric":"3",
+        "Rip":"100",
+        "Ric":"2"
       },
-      {
-	"name":"clemi",
-        "turn-order":"2",
-        "number of cards": "5"
-      }
-    ],
-    "whoseturn":"clemi"
-  }
-}
-```
-
-## HandOutCard
-
-The **Server** hands out 1 card to a client.
-
-`card` : *JSONObject* 
-
-> The card that is handed to the client
-
-```Json
-{
-  "header":{
-    "messagegroup":"draw",
-    "messagetype":"HandOutCard"
-  },
-  "body":{
-    "card":{
-      "color":"green",
-      "num":"twelve"
+      "stack":[
+        {"ID":"cardID01", "origin":"~talon"},
+        {"ID":"cardID1337", "origin":"Rip"}
+      ],
+      "whoseturn":"Ric",
+      "drawxcardsmin":"2"
+    },
+    "playerstate":{
+      "hand":[
+        {"ID":"cardID03", "origin":"Eric"}
+      ],
+      "possibleactions":
+        [
+        "leaveGame", "drawCards", "playCard"
+        ]
     }
   }
 }
 ```
 
-Note that the format of the card is yet to be defined (10.11.2017)
+***
 
-## ShowMessage
+## ShowToast
 
-Send some `message` that should be displayed to the clientside user.
+Mostly for debugging.
+
+Send some `toast` that should be displayed to the clientside user.
 
 `style` : *JSONObject* 
 
@@ -604,81 +613,173 @@ Send some `message` that should be displayed to the clientside user.
 {
   "header":{
     "messagegroup":"toast",
-    "messagetype":"ShowMessage"
+    "messagetype":"ShowToast"
   },
   "body":{
-    "messagetype":"ShowMessage",
-    "message":"сука блиать",
+    "toast":"сука блиать",
     "from":"josua",
     "style":{"some":"JSONOBJECT"}
   }
 }
 ```
 
-## SendMessage
-
-The **Client** requests the server to send [**ShowMessage**](#showmessage) to `target` username
-
-```Json
-{
-  "header":{
-    "messagegroup":"toast",
-    "messagetype":"SendMessage"
-  },
-  "body":{
-    "messagetype":"SendMessage",
-    "target":"roger",
-    "message":"my message"
-  }
-}
-```
-
-## BroadcastMessage
-
-The **Client** requests the server to send [**ShowMessage**](#showmessage) to all clients, including itself.
-
-```json
-{
-  "header":{
-    "messagegroup":"toast",
-    "messagetype":"BroadcastMessage"
-  },
-  "body":{
-    "message":"my message"
-  }
-}
-```
+***
 
 ## PlayerFinished
 
-The **Server** informs the clients that one Player has finished the game. E.g. by having played all cards. Optionally, depending on rules, there is `more` information included or `points`. If not, they should be *null*.
+The **Server** informs the clients that one Player has finished the game. E.g. by having played all cards. 
 
-```Json
-{
-  "header":{
-    "messagegroup":"playerFinished",
-    "messagetype":"PlayerFinished"
-  },
-  "body":{
-    "username":"roger",
-    "points":"1",
-    "more":{
-      "a":"b"
-    }
-  }
-}
-```
-
-## GameOver
-
-The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points.
+After this, the server will remove the player from the turn order list and let it spectate until [end of game](#endgame)
 
 ```Json
 {
   "header":{
     "messagegroup":"endGame",
-    "messagetype":"GameOver"
+    "messagetype":"PlayerFinished"
   },
-  "body":{}
+  "body":{
+    "username":"roger",
+  }
 }
 ```
+
+## EndGame
+
+The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, but `points` is not neccessary, depending on the ruleset.
+
+`ranking` : *JSONArray of Players*
+
+> The Players are of the form
+>
+> ```json
+> {
+>   "username":{
+>     "points":"12"
+>   }
+> }
+> ```
+
+```Json
+{
+	"header": {
+		"messagegroup": "endGame",
+		"messagetype": "GameOver"
+	},
+	"body": {}
+}
+```
+
+***
+
+## State
+
+The state is defined as containing the global state and the personal player state.
+
+`numcardsinhand`  : *String* to *String* JSONObject
+
+> Global State: how many cards which player has
+
+`stack` : *JSONArray of [cards](#card)*
+
+> Global State: ordered List of cards. Can contain x cards | x ∈ [0,∞[
+
+`whoseturn` : *String* 
+
+> Global State: the username whose turn it is
+
+`drawxcardsmin` : *String* 
+
+> Global State: the user whose turn it is will draw at least this number of cards if he decides to draw
+
+
+
+`hand` : *JSONArray of [cards](#cards)*
+
+> Player State: This player's hand cards.
+>
+> The cards contain origin, though not really needed because the client can usually figure out where the new handcards came from by looking at [PlayCardResponse](#playcardresponse)
+
+`possibleactions` :*JSONArray of Strings*
+
+> Player State: Unordered. What [actions](#possibleactions) this player can choose from.
+
+```json
+{
+  "globalstate":{
+    "numcardsinhand":{
+      "Eric":"3",
+      "Rip":"100",
+      "Ric":"2"
+    },
+    "stack":[
+      {"ID":"cardID01", "origin":"~talon"},
+      {"ID":"cardID1337", "origin":"Rip"}
+    ],
+    "whoseturn":"Ric",
+    "drawxcardsmin":"2"
+  },
+  "playerstate":{
+    "hand":[
+      {"ID":"cardID03", "origin":"Eric"}
+    ],
+    "possibleactions":
+      [
+      "leaveGame", "drawCards", "playCard"
+      ]
+  }
+}
+```
+
+## Card
+
+The drawn cards, setup so that the UI will know where they came from in order to animate if it wants to
+
+```json
+{
+  "ID":"cardID1337",
+  "origin":"stack"
+}
+```
+
+`origin` can be 
+
+- *~stack* if the card had previously been played and was now drawn from the stack
+- *~talon* if the card had not been drawn yet and was now drawn from the talon
+- some username if the card was in a users hand
+- *~unspecified* or simply not set if not specified
+
+Not that the tilde is not allowed within usernames, so this is clear specification
+
+The [card](#card) does not have to be unique, there may be multiple copies of the same card in play.
+
+## PossibleActions
+
+Action-IDs the client can choose from and should support:
+
++ "leaveGame"
+
+  > Inform the server that we want to disconnect
+  > [UnregisterRequest](#unregisterrequest)
+
++ "drawCards"
+
+  > Inform the server that we want to draw cards
+  > [DrawCards](#drawcards)
+
++ "kickPlayer" (username)
+
+  > Inform the server that we want to kick a player
+  > [Kick](#kick)
+
++ "playCard" (cardID)
+
+  > Inform the server which card we would like to play
+  > [PlayCard](#PlayCard)
+
+
+
+Possibly in the future supported: "transferServer"
+
+## Rules
+
+All we know as of 16.11.2017 is that Rules should have an identifier String.
