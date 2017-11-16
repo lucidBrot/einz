@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
-import ch.ethz.inf.vs.a4.minker.einz.ICardDefinition;
-
 /**
  * Created by Fabian on 11.11.2017.
  */

@@ -1,18 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Stack;
-
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardAttributeList;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
-
-import static ch.ethz.inf.vs.a4.minker.einz.CardAttributeList.intToColor;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -49,26 +40,9 @@ public class GameState {
     -each players gets a starting hand of 7 cards
     -the top card from the drawPile gets put onto the (empty) playPile and is used as the starting card
      */
-        //go over the cards and add them to the deck twice each
-        for (CardTypes ct: CardTypes.values()) {
-            if (ct != CardTypes.CHANGECOLOR && ct != CardTypes.CHANGECOLORPLUSFOUR) {
-                for (CardColors cc : CardColors.values()) {
-                    if (cc != CardColors.NONE) {
-                        Card card = new Card(ct, cc);
-                        drawPile.push(card);
-                        drawPile.push(card);
-                    }
-                }
-            } else {
-                for (int i = 0; i < 4; i++) {
-                    Card card = new Card(ct, CardColors.NONE);
-                    drawPile.push(card);
-                }
-            }
-        }
-        Collections.shuffle(drawPile);
-        addPlayer("1000", "Peter");
-        addPlayer("1200", "Paul");
+        newStandartDeck();
+        addPlayer("Peter");
+        addPlayer("Paul");
         for (int i=0; i < players.size(); i++){
             for (int j=0; j < 7; j++) {
                 drawOneCard(players.get(i));
@@ -87,23 +61,7 @@ public class GameState {
 
     //This is the constructor that gets used when calling serverFunction.startStandartGame
     public GameState (ArrayList<Player> newPlayers){
-        for (CardTypes ct: CardTypes.values()) {
-            if (ct != CardTypes.CHANGECOLOR && ct != CardTypes.CHANGECOLORPLUSFOUR) {
-                for (CardColors cc : CardColors.values()) {
-                    if (cc != CardColors.NONE) {
-                        Card card = new Card(ct, cc);
-                        drawPile.push(card);
-                        drawPile.push(card);
-                    }
-                }
-            } else {
-                for (int i = 0; i < 4; i++) {
-                    Card card = new Card(ct, CardColors.NONE);
-                    drawPile.push(card);
-                }
-            }
-        }
-        Collections.shuffle(drawPile);
+        newStandartDeck();
         for (int i = 0; i < newPlayers.size(); i++){
             addPlayer(newPlayers.get(i));
         }
@@ -166,10 +124,13 @@ public class GameState {
     }
 
     public Card drawOneCard(Player p){
-        Card result = drawPile.pop();
-        p.Hand.ensureCapacity(p.Hand.size() + 1);
-        p.Hand.add(result);
-        return result;
+        if (drawPile.size() < 1) {
+            newStandartDeck();
+        }
+            Card result = drawPile.pop();
+            p.Hand.ensureCapacity(p.Hand.size() + 1);
+            p.Hand.add(result);
+            return result;
     }
 
     public ArrayList<Card> playedCards(int x) {
@@ -210,38 +171,38 @@ public class GameState {
 
     //adds a player to the game at the end, so players that get added last also play last
     //allows multiple people to have the same name (as long as they have different IPs
-    public void addPlayer (String IP, String name){
-        boolean newIP = true;
+    public void addPlayer (String name){
+        boolean newName = true;
         for (int i = 0; i < players.size(); i++){
-            if (players.get(i).IP.equals(IP)){
-                newIP = false;
+            if (players.get(i).name.equals(name)){
+                newName = false;
                 break;
             }
         }
-        if (newIP) {
-            Player p = new Player(name, IP);
+        if (newName) {
+            Player p = new Player(name);
             players.ensureCapacity(players.size() + 1);
             players.add(p);
         }
     }
 
     public void addPlayer (Player p){
-        boolean newIP = true;
+        boolean newName = true;
         for (int i = 0; i < players.size(); i++){
-            if (players.get(i).IP.equals(p.IP)){
-                newIP = false;
+            if (players.get(i).name.equals(p.name)){
+                newName = false;
                 break;
             }
         }
-        if (newIP) {
+        if (newName) {
             players.ensureCapacity(players.size() + 1);
             players.add(p);
         }
     }
 
-    public void removePlayer(String IP){
+    public void removePlayer(String name){
         for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).IP.equals(IP)) {
+            if (players.get(i).name.equals(name)) {
                 players.remove(i);
             }
         }
@@ -253,5 +214,26 @@ public class GameState {
 
     public void playerWon(Player p){
        // players.remove(p);
+    }
+
+    public void newStandartDeck(){
+        //go over the cards and add them to the deck twice each
+        for (CardTypes ct: CardTypes.values()) {
+            if (ct != CardTypes.CHANGECOLOR && ct != CardTypes.CHANGECOLORPLUSFOUR) {
+                for (CardColors cc : CardColors.values()) {
+                    if (cc != CardColors.NONE) {
+                        Card card = new Card(ct, cc);
+                        drawPile.push(card);
+                        drawPile.push(card);
+                    }
+                }
+            } else {
+                for (int i = 0; i < 4; i++) {
+                    Card card = new Card(ct, CardColors.NONE);
+                    drawPile.push(card);
+                }
+            }
+        }
+        Collections.shuffle(drawPile);
     }
 }

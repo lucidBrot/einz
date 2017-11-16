@@ -28,7 +28,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
     private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
     private HashMap<String, Pair<EinzServerClientHandler, Thread>> registeredClientHandlers; // list of only the registered clients, accessible by username
-    public GameState gameState;
+    public ServerFunction serverFunction;
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
     private ServerFunctionDefinition serverFunctionDefinition; // interface to server logic

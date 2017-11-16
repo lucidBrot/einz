@@ -8,14 +8,12 @@ import java.util.ArrayList;
 
 public class Player implements PlayerDefinition {
 
-    public Player(String name, String IP){
+    public Player(String name){
         this.name = name;
-        this.IP = IP;
         this.Hand = new ArrayList<>();
     }
 
     public String name;
-    public String IP;
     public ArrayList<Card> Hand; //Changed from Hashset since i need to be able to have the same card twice in hand
 
 }

@@ -58,6 +58,9 @@ public interface ServerFunctionDefinition {
         // since we haven't specified yet what options should be available, this int does nothing at the moment
         public GameState startGame(ArrayList<Player> players, HashMap<Card, Integer> deck, int rules);
 
+        //initialises a new game with standart cards and rules with the given players
+        public GameState startStandartGame(ArrayList<Player> players);
+
         //player p plays a card
         //This automatically sets the activePlayer to the next player to play after p laid his card
         //returns whether the card is playable (and therefore played) or not

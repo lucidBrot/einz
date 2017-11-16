@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import ch.ethz.inf.vs.a4.minker.einz.CardAttributeList;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardColors;
 import ch.ethz.inf.vs.a4.minker.einz.CardTypes;
@@ -18,11 +17,11 @@ import ch.ethz.inf.vs.a4.minker.einz.Player;
 public class ServerFunction implements ServerFunctionDefinition {
 
     //reference to the server thread containing the global state object
-    public ThreadedEinzServer server;
+    public GameState gameState;
 
     //Constructor
-    public ServerFunction(ThreadedEinzServer TES){
-        server = TES;
+    public ServerFunction(GameState gs){
+        gameState = gs;
     }
     public ServerFunction(){
         //Does not initialise server!
@@ -34,18 +33,18 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //look at the top card of the playpile on the table
     public Card topCard(){
-        return server.gameState.playPiletopCard();
+        return gameState.playPiletopCard();
     };
 
     //returns the top x cards from the pile of played cards if at least x cards lie on the pile of played cards
     //returns the full pile of played cards otherwise
     public ArrayList<Card> playedCards (int x){
-        return server.gameState.playedCards(x);
+        return gameState.playedCards(x);
     };
 
     //returns the player whos turn it currently is
     public Player activePlayer(){
-        return server.gameState.getActivePlayer();
+        return gameState.getActivePlayer();
     };
 
     //checks if a card can be played
@@ -55,7 +54,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         boolean pTurn = false, cardLegit = false;
         Card bottomCard = topCard();
 
-        if (server.gameState.getThreatenedCards() == 1) {
+        if (gameState.getThreatenedCards() == 1) {
             //Thesse are the regular rules
             cardLegit = normalPlayRules(bottomCard, card);
         } else {
@@ -76,13 +75,13 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //returns the number of cards a player needs to draw if he can't play anything
     public int cardsToDraw(){
-        return server.gameState.getThreatenedCards();
+        return gameState.getThreatenedCards();
     }
 
     //returns if the active player has already drawn his one card because he was not able to play anything
     //(doesn't include if the player has drawn cards from card effects)
     public boolean hasDrawn(){
-        return server.gameState.getHasDrawn();
+        return gameState.getHasDrawn();
     }
 
     //(II) Functions that change things in the game
@@ -105,7 +104,7 @@ public class ServerFunction implements ServerFunctionDefinition {
     //playing a card
     public boolean play(Card card, Player p){
         if (isPlayable(card, p)){
-            server.gameState.playCardFromHand(card, p);
+            gameState.playCardFromHand(card, p);
             cardEffect(card);
             return true;
         } else {
@@ -126,8 +125,8 @@ public class ServerFunction implements ServerFunctionDefinition {
     //returns the top card from the drawpile to be drawn and removes it from the drawpile and adds it to player p's hand
     //this should be called when it's a players turn and he can't play any cards from hand
     public Card drawOneCard(Player p){
-        server.gameState.setHasDrawn(true);
-        return server.gameState.drawOneCard(p);
+        gameState.setHasDrawn(true);
+        return gameState.drawOneCard(p);
     }
 
     //returns the top x cards from the drawpile to be drawn and ramoves them from the drawpile and adds them to player p's hand
@@ -135,9 +134,9 @@ public class ServerFunction implements ServerFunctionDefinition {
     public HashSet<Card> drawXCards(int x, Player p){
         HashSet result = new HashSet();
         for (int i = 0; i < x; i++){
-            result.add(server.gameState.drawOneCard(p));
+            result.add(gameState.drawOneCard(p));
         }
-        server.gameState.resetThreatenedCards();
+        gameState.resetThreatenedCards();
         return result;
     }
 
@@ -163,27 +162,27 @@ public class ServerFunction implements ServerFunctionDefinition {
     public void cardEffect(Card card){
         switch (card.type){
             case PLUSTWO:
-                if (server.gameState.getThreatenedCards() == 1){
-                    server.gameState.increaseThreatenedCards(1);
+                if (gameState.getThreatenedCards() == 1){
+                    gameState.increaseThreatenedCards(1);
                 } else {
-                    server.gameState.increaseThreatenedCards(2);
+                    gameState.increaseThreatenedCards(2);
                 }
                 break;
             case CHANGECOLORPLUSFOUR:
-                if (server.gameState.getThreatenedCards() == 1){
-                    server.gameState.increaseThreatenedCards(3);
+                if (gameState.getThreatenedCards() == 1){
+                    gameState.increaseThreatenedCards(3);
                 } else {
-                    server.gameState.increaseThreatenedCards(4);
+                    gameState.increaseThreatenedCards(4);
                 }
                 break;
             case STOP:
-                server.gameState.nextPlayer();
+                gameState.nextPlayer();
                 break;
             case SWITCHORDER:
-                server.gameState.switchOrder();
+                gameState.switchOrder();
                 break;
         }
-        server.gameState.nextPlayer();
+        gameState.nextPlayer();
     }
 
     public boolean normalPlayRules(Card bottomCard, Card topCard){

@@ -27,23 +27,13 @@ public class ServerFunctionTests {
 
         assertEquals(gameState.getPlayers().size(), 2);
         assertEquals(gameState.getThreatenedCards(), 1);
-        assertEquals("1000", gameState.getActivePlayer().IP);
 
     }
 
     @Test
     public void drawTest() {
         GameState gameState = new GameState();
-        ServerActivityCallbackInterface dummySACI = new ServerActivityCallbackInterface() {
-            @Override
-            public void updateNumClientsUI(int num) {
-
-            }
-        };
-        ServerFunction serverFunction = new ServerFunction();
-        ThreadedEinzServer dummyTES = new ThreadedEinzServer(getContext(), 1000, dummySACI, serverFunction);
-        serverFunction.server = dummyTES;
-        dummyTES.gameState = gameState;
+        ServerFunction serverFunction = new ServerFunction(gameState);
 
         serverFunction.drawXCards(27, gameState.getPlayers().get(0));
         serverFunction.drawXCards(54, gameState.getPlayers().get(1));
@@ -55,16 +45,7 @@ public class ServerFunctionTests {
     @Test
     public void playTest() {
         GameState gameState = new GameState();
-        ServerActivityCallbackInterface dummySACI = new ServerActivityCallbackInterface() {
-            @Override
-            public void updateNumClientsUI(int num) {
-
-            }
-        };
-        ServerFunction serverFunction = new ServerFunction();
-        ThreadedEinzServer dummyTES = new ThreadedEinzServer(getContext(), 1000, dummySACI, serverFunction);
-        serverFunction.server = dummyTES;
-        dummyTES.gameState = gameState;
+        ServerFunction serverFunction = new ServerFunction(gameState);
 
 
         int count[] = new int[2];
@@ -129,29 +110,19 @@ public class ServerFunctionTests {
     @Test
     public void playTestWith4Players(){
         ArrayList<Player> mplayers = new ArrayList<>(4);
-        mplayers.add(new Player("Donald","1000"));
-        mplayers.add(new Player("Tick","2000"));
-        mplayers.add(new Player("Trick","3000"));
-        mplayers.add(new Player("Track","4000"));
+        mplayers.add(new Player("Donald"));
+        mplayers.add(new Player("Tick"));
+        mplayers.add(new Player("Trick"));
+        mplayers.add(new Player("Track"));
         GameState gameState = new GameState(mplayers);
-        ServerActivityCallbackInterface dummySACI = new ServerActivityCallbackInterface() {
-            @Override
-            public void updateNumClientsUI(int num) {
-
-            }
-        };
-        ServerFunction serverFunction = new ServerFunction();
-        ThreadedEinzServer dummyTES = new ThreadedEinzServer(getContext(), 1000, dummySACI, serverFunction);
-        serverFunction.server = dummyTES;
-        dummyTES.gameState = gameState;
-
+        ServerFunction serverFunction = new ServerFunction(gameState);
         int count[] = new int[4];
         count[0] = 7;
         count[1] = 7;
         count[2] = 7;
         count[3] = 7;
         int APN;
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 200; i++) {
             boolean hasPlayed = false;
             Player p = gameState.getActivePlayer();
             String logString = p.name+": ";
@@ -198,7 +169,7 @@ public class ServerFunctionTests {
             } else {
                 if (serverFunction.hasWon(p)){
                     serverFunction.endGame();
-                    i = 50;
+                    i = 200;
                 }
             }
         }
@@ -209,5 +180,11 @@ public class ServerFunctionTests {
         assertEquals(count[3], gameState.getPlayers().get(3).Hand.size());
 
 
+    }
+
+    @Test
+    public void drawTooManyCards(){
+        ServerFunction serverFunction = new ServerFunction();
+        ThreadedEinzServer dummyTES = new ThreadedEinzServer(null, 1000, null, serverFunction);
     }
 }
