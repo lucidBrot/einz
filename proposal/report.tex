@@ -300,17 +300,19 @@ TODO: müsste man den WPs noch andere namen als nummern geben?
 TODO: jeder beschreibt das WP für das er verantworlich ist. dürft meine beschreibungen gerne löschen ;)
 \begin{itemize}
         \item {\bf WP1}: Define Client-Server Communication\\
-        We define the protocol that the client and the server use to communicate. Once we agreed on a message exchange protocol the developement of the server and the client can be done separately.
+        We define the protocol that the client and the server use to communicate. Once we agreed on a message exchange protocol, the developement of the server and the client can be done separately.
         \item {\bf WP2}: Server Game Logic\\
-        
+        Implement the game logic without thinking about the networking part or multithreading
            
         \item {\bf WP3}: Client\\
 	Implement functions for client to display the current state of the game according to the data received from the server and interact with the UI and the Server.
 	\item {\bf WP4}: Application UI\\
 	Make a UI like previously described for all the different Activities.
 Add resourced for them all to have the same style.
-        \item {\bf WP5}: Dynamic Message Parser
-        \item {\bf WP6}: Implement Client Server Protocol
+        \item {\bf WP5}: Dynamic Message Parser\\
+	Implement a reusable parsing system that maps the incoming messages to executable methods as described earlier.
+        \item {\bf WP6}: Implement Client Server Protocol\\
+	Register parsers and actions for every type of message specified. The server could implement this in multiple threads and has thus to call the actions in a safe way. Similarly, but single-threaded, on the client.
 \end{itemize}
 
 \section{Milestones}
