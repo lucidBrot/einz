@@ -163,7 +163,7 @@ The **Client** sends this and Server only reacts to it
 
 ##### Response
 
-With our current goals, this should always return *"true"* and is thus like an ACK. Also return which role was assigned in case the client requested both for some weird reason. If the client requests the same role multiple times, `success` will still be true if the client is still registered as this role and false if it has a different role or is unregistered.
+With our current goals, this should most often return *"true"* and is thus like an ACK. Also return which role was assigned in case the client requested both for some weird reason. If the client requests the same role multiple times, `success` will still be true if the client is still registered as this role and false if it has a different role or is unregistered.
 
 If the client is not registered, `role` should have a return value of *"null"*.
 
