@@ -1,4 +1,4 @@
-# JSON INTERFACE DOCUMENTATION
+# JSON MESSAGING INTERFACE DOCUMENTATION
 
 How the Einz Server and Client are supposed to communicate.
 
