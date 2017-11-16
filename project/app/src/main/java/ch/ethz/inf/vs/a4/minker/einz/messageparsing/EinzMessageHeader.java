@@ -1,5 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class EinzMessageHeader {
 
     public String messagegroup;
@@ -14,5 +17,16 @@ public class EinzMessageHeader {
     public EinzMessageHeader(String messagegroup, String messagetype){
         this.messagegroup = messagegroup;
         this.messagetype = messagetype;
+    }
+
+    /**
+     * @return this header encoded as JSONObject, ready to be included into a message like "header":{this return}
+     * @throws JSONException
+     */
+    public JSONObject toJSON() throws JSONException {
+        JSONObject jsonHeader = new JSONObject();
+        jsonHeader.put("messagegroup", this.messagegroup);
+        jsonHeader.put("messagetype", this.messagetype);
+        return jsonHeader;
     }
 }

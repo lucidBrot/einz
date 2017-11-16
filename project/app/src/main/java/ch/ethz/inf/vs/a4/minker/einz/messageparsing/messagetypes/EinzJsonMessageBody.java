@@ -18,4 +18,12 @@ public class EinzJsonMessageBody extends EinzMessageBody {
     public JSONObject getBody() {
         return body;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public JSONObject toJSON() {
+        return this.body;
+    }
 }
