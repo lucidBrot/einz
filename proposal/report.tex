@@ -165,9 +165,9 @@ Because of this, we will need a local WiFi in order to demonstrate our app.\\
 \begin{figure}[h]
 	\centering
     \includegraphics[width=\columnwidth]{NATholepunching.pdf}
-    \lfig{nat}
     \vspace{-5mm} % use negative white space to fix too large gaps
-	\caption{NAT traversal}
+	\caption{NAT-traversal}
+    \lfig{nat}
 \end{figure}
 \subsection{DETAILED OVERVIEW}
 \begin{figure}
@@ -187,7 +187,7 @@ Because of this, we will need a local WiFi in order to demonstrate our app.\\
 \lfig{regmsg}
 \end{figure}
 
-First of all, we implement a simple server-client setup and define the format and the messages that should be provided as an interface between the client and the server.~\cite{messaging} At the same time, we can start implementing the user interface and writing this proposal.\\
+First of all, we implement a simple server-client setup and define the format and the messages that should be provided as an interface between the client and the server.(See our first~\cite{messaging} and second~\cite{messaging2} draft) At the same time, we can start implementing the user interface and writing this proposal.\\
 See~\rfig{regmsg} for an example of how our messages will be structured. We encode all our messages in JSON and split them into a header which is uniform over all messages, and a body which is message-specific in content. To parse these messages, we implement factories to make the code modular.\\
 That is, the \verb|ParserFactory| use the \verb|messagegroup| to create a \verb|Parser| object specific to the kind of message. Which \verb|Parser| to choose is decided via a dynamically registered mapping, which means that we can reuse the code on both the server and the client side, and that we have minimal effort if we need to change or add some type of message.\\
 For example, say that we need to add a timestamp to the \verb|Register| message for some reason. Chances are that we also need to update the format of the response to this request, which for this reason has the same \verb|messagegroup|. All of this can be done by changing only the \verb|Parser| for this specific messagegroup.\\
