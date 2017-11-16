@@ -261,4 +261,8 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     public void deregisterUser(String username){
         registeredClientHandlers.remove(username);
     }
+
+    public void finishRegistrationPhaseAndStartGame(){
+        //
+    }
 }
