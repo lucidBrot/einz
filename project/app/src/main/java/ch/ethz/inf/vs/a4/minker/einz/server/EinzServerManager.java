@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
 import android.util.Pair;
+import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzActionFactory;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
@@ -39,7 +40,8 @@ public class EinzServerManager {
                 // TODO: send that info to clients
             }
             Log.d("Manager/finishRegPhase", "Players: "+players.toString());
-            server.serverFunctionDefinition.startStandartGame(players); // DEBUG
+            GameState gameState = server.serverFunctionDefinition.startStandartGame(players); // DEBUG
+            Log.d("Manager/finishRegPhase", "Now what do I do with the gamestate "+gameState.toString()+" ?");
         }
     }
 
