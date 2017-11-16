@@ -10,8 +10,8 @@
 \usepackage{enumitem}
 \usepackage{url}
 \usepackage{listings}
-\usepackage{hyperref}
-
+%\usepackage{hyperref} % hyperref for links
+\PassOptionsToPackage{pdfpagelabels=false}{hyperref} % the sig-alternate.tex breaks hyperref, this should fix it again and get rid of the warning
 
 \usepackage{color}
 \definecolor{orange}{rgb}{1,0.5,0}
@@ -204,9 +204,9 @@ We designed the User Interface for the standard scenario from starting the app t
 \begin{figure}[h]
 	\centering
     \includegraphics[width=\columnwidth]{Artboard.png}
-    \lfig{nat}
     \vspace{-5mm} % use negative white space to fix too large gaps
 	\caption{User Interface}
+	    \lfig{artboard}
 \end{figure}
 \\
 
