@@ -142,37 +142,11 @@
 \maketitle
 
 \begin{abstract}
-This proposal should conclude the initial planning phase. This is where you choose a project, set your goals,
-clarify your ideas, and find the materials you will need. 
-Concisely state 
-\textit{(a)}~System overview
-\textit{(b)}~software and hardware you intend to use in this project,
-\textit{(c)}~expected deliveries of this project.
-
-OUR PART:
 We chose to create an android application which allows to play the game "einz" which is very similar to the popluar UNO cardgame. The goal is to be able to play this game with friends wherever you are, as long as you have an android smartphone and access to the same local area network.
 For this purpose we will create an android application which is able to take the role of server and client at the same time. The device of one of the players is used as the server for the game which saves the state of the game and is responsible for synchronization. In this way, there is no extra server needed, except for the lookup of the players in case that they are not in the same LAN.
 \end{abstract}
 
 \section{Introduction}
-
-Introduction to the problem you are working on, why is it important and
-what makes it challenging to solve, spell out the distributed systems challenges and how you plan to tackle them. 
-State the technical problem you intend to solve. Indicate how it might be useful. This can be brief; it is just
-an introduction to the next section.
-
-Use this section as well for background information, particularly if your project is building on
-previous work. If it is doing that, you need to refer to the work, describe it,
-and say how you are extending it. What are the new ideas?
-
-Use references such as books~\cite{hello}, papers~\cite{REST}, or specifications~\cite{RFC2616} whenever available.
-Web-sites for documentation~\cite{devServices}, tutorials, etc., are a special case.
-In a thesis, you would put them as footnotes.
-At this stage, however, you will only have a few ``real references'',
-so we put the Web-sites into the bibliography.
-Cite every source you used throughout the project.\\
-
-OUR PART:
 We build a distributed game similar to the known card game "UNO" by Mattel~\cite{unoshop}. Because you might often find yourself wanting to play a game with friends - e.g. while you are waiting for the next train - but without a set of cards to play it, therefore it would be useful to always carry the cards on you. We make this easy by implementing a similar game on the phone as a native application.\\
 
 Obvious difficulties awaiting us include the coordination of a team consisting of six people, each with different skillsets and time available.
@@ -183,23 +157,6 @@ For the usual difficulties in networking like message ordering and making sure t
 
 
 \section{System Overview}
-
-This is the core of the proposal.
-It is where you spell out your technical plan and explain the project design.
-Expected evaluation/demonstration issues would also be addressed in this section.
-Use helpful figures such as~\rfig{example} and~\rfig{system-overview},
-explain the figures in the text where you reference them. 
-
-
-\begin{figure}[h]
-	\centering
-    \includegraphics[width=\columnwidth]{example}
-    \lfig{example}
-    \vspace{-5mm} % use negative white space to fix too large gaps
-\caption{Only include useful figures. Do not simply copy something from a Web.}
-\end{figure}
-
-OUR PART:
 We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like NAT-punchthrough to allow players from behind different routers to play via the internet with each other or adding more variations and rules. The baseline functionality of the game is a playable version of UNO where only the most basic cards are featured. Further cards will be implemented as rules, e.g. the rule "We feature a +2 card". The additional rules will be available to the user of the device the server runs on before game start, such that we can dynamically change the way the game works. This does not mean that we intend to allow the user to define their own rules - just that they can choose which rules should be applied.\\
 So how exactly will we enable dynamic rules? The UI will feature settings on the server device. These will mostly be checkboxes or multiple-choice dropdown menus. This means that we will not feature user-designed rules. However, we intend to make use of the efforts we put into the extensibility of our codebase by adding the ideas we had during our first meeting~\cite{firstprotocol} if we have enough time to do so.\\
 
@@ -258,46 +215,15 @@ Regarding the difficulty of working in a larger team than most of us are used to
 To demonstrate our application in the end, we will need at least a working WiFi network and maybe internet as well, depending on how much of the NAT traversal we will have implemented.
 \newline
 \newline
-TODO: wer macht eine Grafik als überblich zum aufbau und vielleicht noch eine zum UI?
 
 
 \section{Requirements}
-Describe system setup, components, external libraries, hardware etc.
-
-
-\begin{figure}[h]
-	\centering
-    \includegraphics[width=\columnwidth]{overview.jpg}
-    \lfig{system-overview}
-    \vspace{-5mm} % use negative white space to fix too large gaps
-	\caption{System Overview~\cite{estimote}}
-\end{figure}
-
-OUR PART:
-
-TODO:Josua beschreibst du das "system setup"?
-TODO:jeder der "external libraries, hardware etc." benutz bitte diejenigen beschreiben
-\\
 Our App runs on Android devices with at least Android 5.0 installed. We use the local wireless connection to communicate between the devices. One device will act as a server and waits for the clients to connect. Once every player is connected the user that started the server can start the game.
 
 
 \section{Work Packages}
-Breakdown the work to subtasks to meet the project requirements.
-Define and describe these tasks.
-
-\begin{itemize}
-        \item {\bf WP1}:  XYZ  \ldots    
-        \item {\bf WP2}: Set and Configuring Backend Serve  \ldots    
-        \item {\bf WP3}: Integration  \ldots 
-         \item {\bf WPx}:  \ldots 
-\end{itemize}
- 
-Stick to a concise, scientific writing style. 
-
-OUR PART:
 There work will be broken down into the following subtasks:
-TODO: müsste man den WPs noch andere namen als nummern geben?
-TODO: jeder beschreibt das WP für das er verantworlich ist. dürft meine beschreibungen gerne löschen ;)
+
 \begin{itemize}
         \item {\bf WP1}: Define Client-Server Communication\\
         We define the protocol that the client and the server use to communicate. Once we agreed on a message exchange protocol, the developement of the server and the client can be done separately.
@@ -316,11 +242,6 @@ Add resourced for them all to have the same style.
 \end{itemize}
 
 \section{Milestones}
-The milestones section provides a work plan for carrying out the project.
-This is your schedule for getting the project done.
-Clearly state how the work packages will be distributed among the team members. 
-
-OUR PART:
 
 \subsection{Milestone 1}
 \begin{itemize}
