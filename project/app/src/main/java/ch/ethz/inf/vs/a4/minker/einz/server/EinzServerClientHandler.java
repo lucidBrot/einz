@@ -124,6 +124,7 @@ public class EinzServerClientHandler implements Runnable{
      *     @throws InvalidResourceFormatException if the mapping objects themselves are not valid. Contains more details in extended message
      */
     private void registerParserMappings(int rawResourceFile) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        // TODO: move loading from JSON to a method of the Factory
         InputStream jsonStream = parentEinzServer.applicationContext.getResources().openRawResource(rawResourceFile);
         JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
         JSONArray array = jsonObject.getJSONArray("parsermappings");
@@ -158,7 +159,9 @@ public class EinzServerClientHandler implements Runnable{
     }
 
     private void registerActionMappings(){
-        this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzFinishRegistrationPhaseAction.class); // DEBUG purely. not actually useful
+        this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzFinishRegistrationPhaseAction.class); // DEBUG purely. not actually useful// TODO: remove debug mappings
+        this.parentEinzServer.getServerManager().registerNetworkingActions(this.einzActionFactory);
+        this.parentEinzServer.getServerManager().registerGameLogicActions(this.einzActionFactory);
     }
 
     // source: https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server

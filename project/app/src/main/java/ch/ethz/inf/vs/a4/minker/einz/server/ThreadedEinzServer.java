@@ -53,9 +53,9 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         this.clientHandlerThreads = new ArrayList<Thread>();
         this.registeredClientHandlers = new HashMap<>();
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
-        this.serverFunctionDefinition = serverFunctionDefinition;
+        this.serverManager = new EinzServerManager(this, serverFunctionDefinition);
+        this.getServerManager().setServerFunctionInterface(serverFunctionDefinition);
         this.applicationContext = applicationContext;
-        this.serverManager = new EinzServerManager(this);
     }
 
     /**
@@ -161,7 +161,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
 
-            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.serverFunctionDefinition);
+            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface());
             Thread thread = new Thread(ez);
             clientHandlerThreads.add(thread);
             thread.start(); // start new thread for this client.

@@ -19,10 +19,11 @@ import java.util.Map;
 public class EinzServerManager {
 
     private final ThreadedEinzServer server;
+    private ServerFunctionDefinition serverFunctionInterface;
 
-    public EinzServerManager(ThreadedEinzServer whotomanage){
+    public EinzServerManager(ThreadedEinzServer whotomanage, ServerFunctionDefinition serverFunctionInterface){
         this.server = whotomanage;
-        registerActions();
+        this.serverFunctionInterface = serverFunctionInterface;
     }
     protected String adminUsername;
     protected ArrayList<String> getConnectedUsers(){
@@ -40,13 +41,25 @@ public class EinzServerManager {
                 // TODO: send that info to clients
             }
             Log.d("Manager/finishRegPhase", "Players: "+players.toString());
-            GameState gameState = server.serverFunctionDefinition.startStandartGame(players); // DEBUG
+            GameState gameState = getServerFunctionInterface().startStandartGame(players); // DEBUG
             Log.d("Manager/finishRegPhase", "Now what do I do with the gamestate "+gameState.toString()+" ?");
         }
     }
 
-    private void registerActions(){ //TODO: think about this
+    public void registerNetworkingActions(EinzActionFactory actionFactory){ //TODO: register networking actions, maybe from json file
 
+    }
+
+    public void registerGameLogicActions(EinzActionFactory actionFactory){ //TODO: register actions for game logic. from different json file
+
+    }
+
+    public ServerFunctionDefinition getServerFunctionInterface() {
+        return serverFunctionInterface;
+    }
+
+    public void setServerFunctionInterface(ServerFunctionDefinition serverFunctionInterface) {
+        this.serverFunctionInterface = serverFunctionInterface;
     }
 
     // TODO: register players
