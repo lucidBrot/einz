@@ -30,6 +30,7 @@ public class EinzServerManager {
     private ServerFunctionDefinition serverFunctionInterface;
 
     // These files are used to initialize the ActionFactories and ParserFactories of the EinzServerClientHandler threads
+    // TODO: test the initialization of the factories once we have enough messages
     private final int networkingParserFile = R.raw.initialnetworkingparsermappings; // the networking parser shall be loaded from here
     private final int gameLogicParserFile = R.raw.initialgamelogicparsermappings; // the gamelogic parser shall be loaded from here
     private final int networkingActionFile = R.raw.initialnetworkingactionmappings; // the mapping from messagebodytype to action

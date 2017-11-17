@@ -166,11 +166,6 @@ Request to play on this server, or to spectate.
 >
 > should NOT be the empty string *""* or *"server"*
 
-`success` : *String* 
-
-> Can be *"true"*, *"false"* (or later be further extended. E.g. *banned* )
-> *"true"* means the client is allowed to stay on this server
-
 `role` : *String*
 
 > *"player"* or *"spectator"* 

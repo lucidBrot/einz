@@ -19,5 +19,6 @@ public class EinzRegisterAction extends EinzAction{
     @Override
     public void run() {
         Log.d("Action/Register", "was run");
+        this.//TODO: store connected player in servermanager
     }
 }

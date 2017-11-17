@@ -9,7 +9,7 @@ import org.json.JSONObject;
  * Spoiler alert: it is retarded
  */
 public class EinzJsonMessageBody extends EinzMessageBody {
-    private JSONObject body;
+    private final JSONObject body;
 
     public EinzJsonMessageBody(JSONObject body){
         this.body = body;
