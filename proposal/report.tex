@@ -236,15 +236,15 @@ Once the game is in a working state with a few rules such as an additional card 
 
 If we find enough time after adding enough rules to make the game interesting - we probably will not - and decide to do NAT traversal, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the servers's IP address and ports, through which they can communicate the same way as we implemented in the first phase (And vice-versa. See~\rfig{nat}). The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
 
-Adding a LUS might impose additional difficulties because some mobile carriers might use symmetric NATs.~\cite{natwiki}If these difficulties arise, we will probably resort to only implementing NAT-traversal for the other (easier) types of NATs.
+Adding a LUS might impose additional difficulties because some mobile carriers might use symmetric NATs.~\cite{natwiki}If these difficulties arise, we will probably resort to only implementing NAT-traversal for the other (easier) types of NATs, if any.
 
 \section{Requirements}
-The app will run on Android devices that run at least Android 5.0, which correspond to the API-level 21. We use the local wireless connection to communicate between the devices. Thus we need the permissions \verb|INTERNET| and \verb|ACCESS_WIFI_STATE|
+The app will run on Android devices that run at least Android 5.0, which corresponds to the API-level 21. We use the local wireless connection to communicate between the devices. Thus we need the permissions \verb|INTERNET| and \verb|ACCESS_WIFI_STATE|.
 
 Since this is a multi-player game we also need more than one device that are able to communicate through the local WiFi with each other for the game to run.
 
 \section{Work Packages}
-There work will be broken down into the following subtasks:
+Our project broken down into subtasks:
 
 \begin{itemize}
 	
@@ -252,36 +252,36 @@ There work will be broken down into the following subtasks:
         We define the protocol that the client and the server use to communicate. Once we agreed on a message exchange protocol, the development of the server and the client can be done separately.
         
         \item {\bf WP2}: Design and implement Game Model\\
-        Implement the data-structure and objects used by both client and server. This means classes like gamestate, card and rules
+        Implement the data-structure and objects used by both client and server. This means classes like \verb|GameState|, \verb|Card|and \verb|Rule|.
         
         \item {\bf WP3}: Server Game Logic\\
-        Implement the game logic without thinking about the networking part or multi-threading
+        Implement the game logic without thinking about the networking part or multi-threading, apart from clearly denoting which functionalities are thread-safe.
         
         \item {\bf WP4}: Dynamic Message Parser\\
-		Implement a reusable parsing system that maps the incoming messages to executable methods as described in the System Overview.
+	Implement a reusable parsing system that maps incoming messages to executable methods as described in the System Overview. WP5 and WP6 will reuse this code.
            
         \item {\bf WP5}: Client Communication Backend\\
-		Implement message parsing on the client side
+	Implement message parsing and sending on the client side.
 		
-		\item {\bf WP6}: Server Backend\\
-		Implement message parsing in the server side
+	\item {\bf WP6}: Server Backend\\
+	Implement message parsing on the server side.
 		
-		\item {\bf WP7}: Implement Client Server Protocol\\
-		Register parsers and actions for every type of message specified. The server could implement this in multiple threads and has thus to call the actions in a safe way.
+	\item {\bf WP7}: Implement Client Server Protocol\\
+	Register parsers and actions for every type of message specified. The server could implement this in multiple threads and has thus to call the actions in a safe way.
 		
-		\item {\bf WP8}: Connect Server-logic to Messaging\\
-		Messages should be parsed and the corresponding action should be executed. The logic calls back to the messaging part to inform the clients about updates in the game-state.
-		\item {\bf WP9}: Application UI\\
-		Make a UI like previously described for all the different Activities. Add resourced for them all to have the same style.
+	\item {\bf WP8}: Connect Server-logic to Messaging\\
+	Messages should be parsed and the corresponding action should be executed. The logic calls back to the messaging part to inform the clients about updates in the game-state.
+	\item {\bf WP9}: Application UI\\
+	Make a UI like previously described for all the different Activities. Add resources for them to all have the same style.
 		
-		\item {\bf WP10}: Polish the Game and Bugfixes\\
-		Optimize the user experiences and fix all those nasty bugs.
+	\item {\bf WP10}: Polish the Game and Bugfixes\\
+	Optimize the user experiences and fix all those nasty bugs.
 		
-		\item {\bf WP11}: Implement Additional Rules:\\
-		Rules to make each game individual.
+	\item {\bf WP11}: Implement Additional Rules:\\
+	Rules to make each game individual.
 		
-		\item {\bf Optinal WP}: If there is time implement additional goals\\
-        Only if we really have the time. We can implement the ideas we had in section "Additional Possible Goals"
+	\item {\bf Optinal WP}: If there is time implement additional goals\\
+        Only if we really have the time. We can implement the ideas we had in the section "Additional Possible Goals"
         
 \end{itemize}
 
@@ -326,15 +326,15 @@ Implement additional rules and test and polish the game.
 	\item WP10 - Everyone
 	\item WP11 - Everyone
 \end{itemize}
-Due: 17.12.2017
+Due: 17.12.2017\medskip
 
-Before we start to code, we first write a specification for the interfaces to prevent a big mess. For the implementation we see two areas where we assign our team members to: the server and the client. Also someone is something like the tech-lead and keeps an overview about the entire process.
+Before we start to code, we first write a specification for the interfaces to prevent a big mess. For the implementation we see two areas where we assign our team members to: the server and the client. Also someone is designated as tech-lead and keeps an overview about the entire process.\smallskip
 
-For the server we assign Eric and Fabian and Silva
+\noindent Responsible for the server are Eric, Fabian and Silva.
 
-For the client we assign Christian and Clemens.
+\noindent Responsible for the client are Christian and Clemens.
 
-Josua tries to keep an eye over the whole project.
+\noindent Josua reigns over order and chaos of the whole project.
 
 
 
