@@ -144,7 +144,7 @@
 \maketitle
 
 \begin{abstract}
-We chose to create an android application which allows to play the game "einz" which is very similar to the popluar UNO cardgame. The goal is to be able to play this game with friends wherever you are, as long as you have an android smartphone and access to the same local area network.
+We chose to create an android application which allows to play the game "einz" which is very similar to the popular UNO cardgame. The goal is to be able to play this game with friends wherever you are and with the rules you are used to, as long as you have an android smartphone and access to the same local area network.
 
 For this purpose we will create an android application which is able to take the role of server and client at the same time. The device of one of the players is used as the server for the game which saves the state of the game and is responsible for synchronization. In this way, there is no extra server needed.
 \end{abstract}
@@ -155,9 +155,7 @@ We build a distributed game similar to the known card game "UNO" by Mattel~\cite
 Obvious difficulties awaiting us include the coordination of a team consisting of six people, each with different skillsets and time available.
 Also, we intend to create an easily extensible codebase so that we can first build the base game and in a second phase add further rules without much effort. This poses difficulties on its own as we have to learn coding patterns such as using factories to make the program code more modular.
 
-Technical problems will probably be the selection of one device as the server, smooth and clean communication between the clients and the server, and implementing concurrency within the server. Selecting which device will be the server could be done by communicating P2P and choosing the device with the smallest IMEI, or just by letting the users choose.
-
-For the usual difficulties in networking like message ordering and making sure the peers actually get the messages, we will rely on TCP using the \verb|Socket| class~\cite{socketdoc}. There remains the problem of realizing it when the connection breaks unexpectedly, especially because we might have times where we don't need to send messages at all for multiple seconds.
+Technical problems will probably be the smooth and clean communication between the clients and the server and implementing concurrency within the server itself. For the networking difficulties like message ordering and making sure the peers actually get the messages, we will rely on TCP using the \verb|Socket| class~\cite{socketdoc}. There remains the problem of noticing if a client looses connection unexpectedly, especially because we might have times where we don't need to send messages at all for multiple seconds for example if it's not a players turn. We have to experiment with that problem and probably add a ping messages that check that the connection is still alive.
 
 
 \section{System Overview}
@@ -195,15 +193,10 @@ If you're interested in the most current specifications of the messages, see our
 
 In a second step, once the basic communication between server and client is completed and the exact behaviour of the two parts has been defined, we finish implementing the server-side game logic and start using the previously defined messaging functionality.
 
-We plan that the server does most of the computations and only sends the client its state, containing the players hand, the number of cards other players are holding and the most recently played cards. The client receives also a list of possible actions
+We plan that the server does most of the computations and only sends the client its state, containing the players hand, the number of cards other players are holding and the most recently played cards. The client receives also a list of possible actions that are possible to do. For example informs the server the client which cards are playable. The client can now choose a action from the list and send a request to the server afterwards. The server will handle the request and check if it is a valid request. If it is he will inform all clients about the updated state.
 
+Sending the actions to the client allows us later on to add game-modes and rules with ease and grants us high flexibility with using the rules. We only have to change a few files, to add new stuff.
 
-TODO::
-
-
-This allows us to later add gamemodes and rules with ease, because we will only need to change a few classes.
-
-%TODO: add state diagram?
 We are also trying to keep the classes themselves very modular to keep updating them - e.g. by adding further rules - just as simple.
 
 \subsection{User Interface}
@@ -225,20 +218,13 @@ When the host starts the game everyone will see the activity in which the game c
 Spectators will see the public game-state, but not any specific cards in any hand. Also they will not be able to interact with the game in any way. The use-case for this option, is that you could place a - possibly larger - android device (tabled, phablet) in the middle of a table to get the "classic cardgame feel" with a physical representation of the discard pile while still playing on mobile devices. 
 
 \subsection{Dynamic Rules}
-So how exactly will we enable dynamic rules? The UI will feature settings on the server device. These will mostly be checkboxes or multiple-choice dropdown menus. This means that we will not feature user-designed rules. However, we intend to make use of the efforts we put into the extensibility of our codebase by adding the ideas we had during our first meeting~\cite{firstprotocol} if we have enough time to do so.
+Since every group plays UNO with different rules we want to provide them the possibility to play with the rules they are used to. We will feature a setting-screen for the admin where he can specify the rules for the next game. These will mostly be checkboxes or multiple-choice dropdown menus. This means that we will not feature user-designed rules. However, we intend to make use of the efforts we put into the extensibility of our codebase by adding the ideas we had during our first meeting~\cite{firstprotocol} if we have enough time to do so.
 
 \subsection{Organizing}
-
-Regarding the difficulty of working in a larger team than most of us are used to, we intend to simplify the cooperation by using git~\cite{github} and trello~\cite{trello}. We have also appointed a Team Lead whose task it is to distribute the work so that everybody can contribute meaningfully to the Project yet also learn something while doing so.
-
-To demonstrate our application in the end, we will need at least a working WiFi network and maybe internet as well, depending on how much of the NAT traversal we will have implemented.
+Working in a larger team and manage it is new to us. We try to help us by using git with github~\cite{github} and trello~\cite{trello} to manage the tasks. We have also appointed a Team Lead whose task it is to distribute the work so that everybody can contribute meaningfully to the Project yet also learn something while doing so. 
 
 \subsection{Additional Possible Goals}
 Once the game is in a working state with a few rules such as an additional card like the one where the player can choose a color or the well-known "+2" card from UNO, we will decide whether we need to focus on bug-fixing, cleaning up code, implementing a lookup-server (LUS) for NAT-traversal~\rfig{nat} or adding more rule options. 
-
-If we find enough time after adding enough rules to make the game interesting - we probably won't have - and decide to do NAT traversal, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other servers's IP address and ports, through which they can communicate the same way as we implemented in the first phase (See~\rfig{nat}). The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
-
-Adding a LUS might impose additional difficulties because some mobile carriers might use symmetric NATs. If these difficulties arise, we will probably resort to only implementing NAT-traversal for the other (easier) types of NATs.
 
 \begin{figure}[!htbp]
 	\centering
@@ -248,8 +234,14 @@ Adding a LUS might impose additional difficulties because some mobile carriers m
 	\lfig{nat}
 \end{figure}
 
+If we find enough time after adding enough rules to make the game interesting - we probably won't have - and decide to do NAT traversal, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other servers's IP address and ports, through which they can communicate the same way as we implemented in the first phase (See~\rfig{nat}). The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
+
+Adding a LUS might impose additional difficulties because some mobile carriers might use symmetric NATs. If these difficulties arise, we will probably resort to only implementing NAT-traversal for the other (easier) types of NATs.
+
 \section{Requirements}
-The app will run on Android devices that run at least Android 5.0, which corespond to the API-level 21. We use the local wireless connection to communicate between the devices. Thus we need the permissions \verb|INTERNET| and \verb|ACCESS_WIFI_STATE|
+The app will run on Android devices that run at least Android 5.0, which correspond to the API-level 21. We use the local wireless connection to communicate between the devices. Thus we need the permissions \verb|INTERNET| and \verb|ACCESS_WIFI_STATE|
+
+Since this is a multi-player game we also need more than one device that are able to communicate through the local WiFi with each other for the game to run.
 
 \section{Work Packages}
 There work will be broken down into the following subtasks:
@@ -266,80 +258,85 @@ There work will be broken down into the following subtasks:
         Implement the game logic without thinking about the networking part or multi-threading
         
         \item {\bf WP4}: Dynamic Message Parser\\
-		Implement a reusable parsing system that maps the incoming messages to executable methods as described in \#TODO ref\#.
+		Implement a reusable parsing system that maps the incoming messages to executable methods as described in the System Overview.
            
-        \item {\bf WP5}: Client Backend\\
-		Implement functions for client to display the current state of the game according to the data received from the server and interact with the UI and the Server.
+        \item {\bf WP5}: Client Communication Backend\\
+		Implement message parsing on the client side
 		
 		\item {\bf WP6}: Server Backend\\
-		Implement functions for client to display the current state of the game according to the data received from the server and interact with the UI and the Server.
+		Implement message parsing in the server side
 		
 		\item {\bf WP7}: Implement Client Server Protocol\\
-		Register parsers and actions for every type of message specified. The server could implement this in multiple threads and has thus to call the actions in a safe way. Similarly, but single-threaded, on the client.	
+		Register parsers and actions for every type of message specified. The server could implement this in multiple threads and has thus to call the actions in a safe way.
 		
-		\item {\bf WP8}: Connect Serverlogic to Messaging	
+		\item {\bf WP8}: Connect Server-logic to Messaging\\
+		Messages should be parsed and the corresponding action should be executed. The logic calls back to the messaging part to inform the clients about updates in the game-state. 
 		
 		\item {\bf WP9}: Application UI\\
 		Make a UI like previously described for all the different Activities. Add resourced for them all to have the same style.
 		
-		\item {\bf WP10}: Polish the Game and Bugfixes
+		\item {\bf WP10}: Polish the Game and Bugfixes\\
+		Optimize the user experiences and fix all those nasty bugs.
 		
-		\item {\bf WP11}: Implement Additional Rules:
+		\item {\bf WP11}: Implement Additional Rules:\\
+		Rules to make each game individual.
 		
-		\item {\bf Optinal WP}: If there is time implement additional goals 
-        
+		\item {\bf Optinal WP}: If there is time implement additional goals\\
+        Only if we really have the time. We can implement the ideas we had in section "Additional Possible Goals"
         
 \end{itemize}
 
 \section{Milestones}
 
 \subsection{Milestone 1: Specification}
+Specify the interfaces and get ready for implementation
 \begin{itemize}
-	\item WP1
-	\item WP2
+	\item WP1 - Eric, Fabian, Josua
+	\item WP2 - Josua
 \end{itemize}
 Due: 19.11.2017
 
 \subsection{Milestone 2: Fundamental}
+Laying the foundation for the client-server messaging on both the client and the server
 \begin{itemize}
-	\item WP4
-	\item WP5
-	\item WP6
+	\item WP4 - Eric
+	\item WP5 - Christian, Clemens
+	\item WP6 - Eric, Silvia
 \end{itemize}
 Due: 26.11.2017
 	
 \subsection{Milestone 3: Messaging}
+Implement and test the previous specified messaging protocol
 \begin{itemize}
-	\item WP7
+	\item WP7 - Eric, Silvia
 \end{itemize}
 Due: 30.11.2017
 
 \subsection{Milestone 4: Base Game}
+Getting the game to work in a basic fashion
 \begin{itemize}
-	\item WP3
-	\item WP8
-	\item WP9
+	\item WP3 - Fabian
+	\item WP8 - Eric , Fabian
+	\item WP9 - Christian
 \end{itemize}
 Due: 7.12.2017
 
 \subsection{Milestone 5: Final Game}
+Implement additional rules and test and polish the game.
 \begin{itemize}
-	\item WP10
-	\item WP11
+	\item WP10 - Everyone
+	\item WP11 - Everyone
 \end{itemize}
 Due: 17.12.2017
 
-We think it is important to have someone who has an overview of the whole project, therefore we assigned a project manager. For the implementation of the application we made two groups, one for the server side and one for the client side. There is one person responsible for the organisation and delegation of the work to other people for both server and client side. These two people also have to set an API to make the two parts work together in the application.
+Before we start to code, we first write a specification for the interfaces to prevent a big mess. For the implementation we see two areas where we assign our team members to: the server and the client. Also someone is something like the tech-lead and keeps an overview about the entire process.
 
-As project manager and organizing the structure of the project: Josua
+For the server we assign Eric and Fabian and Silva
 
-Server: Responsible for organisation and also helps implementing: Eric, helps with implementation: Fabian
+For the client we assign Christian and Clemens.
 
-Client: Responsible for organisation and also helps implementing: Chris, helps with implementation: Clemens
+Josua tries to keep an eye over the whole project.
 
-UI and Logo: Chris
-
-First responsable for writing the proposal, then helps implementing where there is need: Silvia
 
 
 % The following two commands are all you need in the
