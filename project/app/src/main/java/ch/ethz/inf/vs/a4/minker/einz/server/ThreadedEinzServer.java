@@ -30,15 +30,6 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
     private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
 
-    public HashMap<String, Pair<EinzServerClientHandler, Thread>> getRegisteredClientHandlers() {
-        return registeredClientHandlers;
-    }
-
-    public void setRegisteredClientHandlers(HashMap<String, Pair<EinzServerClientHandler, Thread>> registeredClientHandlers) {
-        this.registeredClientHandlers = registeredClientHandlers;
-    }
-
-    private HashMap<String, Pair<EinzServerClientHandler, Thread>> registeredClientHandlers; // list of only the registered clients, accessible by username
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
     protected ServerFunctionDefinition serverFunctionDefinition; // interface to server logic
@@ -51,11 +42,10 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     public ThreadedEinzServer(Context applicationContext, int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
         this.clientHandlerThreads = new ArrayList<Thread>();
-        this.registeredClientHandlers = new HashMap<>();
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
-        this.serverFunctionDefinition = serverFunctionDefinition;
+        this.serverManager = new EinzServerManager(this, serverFunctionDefinition);
+        this.getServerManager().setServerFunctionInterface(serverFunctionDefinition);
         this.applicationContext = applicationContext;
-        this.serverManager = new EinzServerManager(this);
     }
 
     /**
@@ -161,7 +151,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
 
-            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.serverFunctionDefinition);
+            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface());
             Thread thread = new Thread(ez);
             clientHandlerThreads.add(thread);
             thread.start(); // start new thread for this client.
@@ -233,14 +223,14 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * @throws UserNotRegisteredException if username is not registered
      */
     public void sendMessageToUser(String username, String message) throws UserNotRegisteredException {
-        Pair pair = registeredClientHandlers.get(username);
+        EinzServerClientHandler ez = getServerManager().registeredClientHandlers.get(username);
         if(!message.endsWith("\r\n")){ // TODO: check if contains newline and if yes, abort
             message += "\r\n";
         }
-        if (pair == null) {
+        if (ez == null) {
             throw new UserNotRegisteredException("Cannot send message to not registered username");
         }else{
-            ((EinzServerClientHandler) pair.first).sendMessage(message);
+            ((EinzServerClientHandler) ez).sendMessage(message);
         }
 
     }
@@ -256,28 +246,29 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         this.sendMessageToUser(username, message.toJSON().toString());
     }
 
-    /**
-     * To be called by EinzServerClientHandler when user registers.
-     * If the entry for username already exists, it will be replaced
-     * @param username key
-     * @param einzServerClientHandler value: the client handler
-     * @param thread value: The thread which contains the einzServerClientHandler
-     */
-    public void registerUser(String username, EinzServerClientHandler einzServerClientHandler, Thread thread){
-        synchronized (registeredClientHandlers) {
-            registeredClientHandlers.put(username, Pair.create(einzServerClientHandler, thread));
-        }
-    }
-
-    /**
-     * To be called by EinzServerClientHandler when user deregisters
-     * @param username
-     */
-    public void deregisterUser(String username){
-        synchronized (registeredClientHandlers) {
-            registeredClientHandlers.remove(username);
-        }
-    }
+//    /**
+//     * To be called by EinzServerClientHandler when user registers.
+//     * If the entry for username already exists, it will be replaced
+//     * This is only for connection management
+//     * @param username key
+//     * @param einzServerClientHandler value: the client handler
+//     * @param thread value: The thread which contains the einzServerClientHandler
+//     */
+//    public void registerUser(String username, EinzServerClientHandler einzServerClientHandler, Thread thread){
+//        synchronized (registeredClientHandlers) {
+//            registeredClientHandlers.put(username, Pair.create(einzServerClientHandler, thread));
+//        }
+//    }
+//
+//    /**
+//     * To be called by EinzServerClientHandler when user deregisters
+//     * @param username
+//     */
+//    public void deregisterUser(String username){
+//        synchronized (registeredClientHandlers) {
+//            registeredClientHandlers.remove(username);
+//        }
+//    }
 
     public EinzServerManager getServerManager() {
         return serverManager;

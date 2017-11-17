@@ -22,7 +22,11 @@ public class EinzPlayCardMessageBody extends EinzMessageBody{
     }
      */
 
-    private Card card;
+    private final Card card;
+
+    public EinzPlayCardMessageBody(Card card){
+        this.card = card;
+    }
 
     public Card getCard() {
         return card;

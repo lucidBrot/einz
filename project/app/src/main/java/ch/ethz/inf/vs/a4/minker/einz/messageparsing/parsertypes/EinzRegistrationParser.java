@@ -1,10 +1,11 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,14 +17,56 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         switch(messagetype){
             case "Register":
                 return parseRegister(message);
-            case "RegisterResponse":
-                return parseRegisterResponse(message);
+            case "UnregisterRequest":
+                return parseUnregisterRequest(message);
+            case "Kick":
+                return parseKick(message); // TODO: parse Kick
+            // The following functions should never be received as server, feel free to implement them here though, chris
+            /*
+            case "RegisterFailure":
+                return parseRegisterFailure(message);
+            case "UpdateLobbyList":
+                return parseUpdateLobbyList(message);
+            case "UnregisterResponse":
+                return parseUnregisterResponse(message):
+            case "RegisterSuccess":
+                return parseRegisterSuccess(message);
+            */
             default:
                 Log.d("EinzRegistrationParser","Not a valid messagetype "+messagetype+" for EinzRegistrationParser");
                 return null;
         }
     }
 
+    private EinzMessage parseKick(JSONObject message) { // TODO : implement all those cases
+        return null;
+    }
+
+    private EinzMessage parseUnregisterRequest(JSONObject message) throws JSONException {
+        /*
+          {
+          "header":{
+            "messagegroup":"registration",
+            "messagetype":"UnregisterRequest"
+          },
+          "body":{
+            "username":"roger"
+          }
+         */
+        EinzMessageHeader emh = new EinzMessageHeader("registration", "UnregisterRequest");
+        JSONObject body = message.getJSONObject("body");
+        String username = body.getString("username");
+        EinzMessageBody emb = new EinzUnregisterRequestMessageBody(username);
+        EinzMessage einzMessage = new EinzMessage(emh, emb);
+        return einzMessage;
+    }
+
+    /**
+     * Serverside parsing when receiving a messagetype <i>Register</i>
+     * @param message
+     * @return
+     * @throws JSONException
+     */
     private EinzMessage parseRegister (JSONObject message) throws JSONException {
         /*
         {
@@ -38,12 +81,22 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         }
          */
         EinzMessageHeader emh = new EinzMessageHeader("registration", "register");
-        EinzMessageBody emb = new EinzJsonMessageBody(message.getJSONObject("body")); // TODO: EinzRegisterMessageBody
+        String username, role;
+        JSONObject body = message.getJSONObject("body");
+        username = body.getString("username");
+        role = body.getString("role");
+        EinzMessageBody emb = new EinzRegisterMessageBody(username, role);
         EinzMessage einzMessage = new EinzMessage(emh, emb);
         return einzMessage;
     }
 
-    private EinzMessage parseRegisterResponse(JSONObject message) throws JSONException {
+    /**
+     * Clientside
+     * @param message
+     * @return
+     * @throws JSONException
+     */
+    private EinzMessage parseRegisterSuccess(JSONObject message) throws JSONException {
         /*
         {
           "header":{
@@ -58,8 +111,6 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         }
          */
         EinzMessageHeader emh = new EinzMessageHeader("registration", "RegisterResponse");
-        EinzMessageBody emb = new EinzJsonMessageBody(message.getJSONObject("body")); // TODO: EinzRegisterResponseMessageBody
-        EinzMessage einzMessage = new EinzMessage(emh, emb);
-        return einzMessage;
+        return null;
     }
 }
