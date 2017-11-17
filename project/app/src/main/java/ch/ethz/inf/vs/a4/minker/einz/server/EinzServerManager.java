@@ -27,7 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * Stores Configuration of {@link ThreadedEinzServer} that is not suited for the communications-only part, because it has to do with the content of the messages,
  * But is also not really relevant to the serverlogic
- * This also registers and handles mappings that serverlogic does not handle // TODO: register these actions maybe here, maybe in every thread
+ * This also registers and handles mappings that serverlogic does not handle. Initial Mappings are loaded from resources
  */
 public class EinzServerManager {
 
@@ -49,9 +49,13 @@ public class EinzServerManager {
         this.registeredClientHandlers = new ConcurrentHashMap<>();
         this.serverFunctionInterface = serverFunctionInterface;
     }
-    protected String adminUsername;
-    protected ArrayList<String> getConnectedUsers(){
-        return null; // TODO: move connected array from parent to here, as well as other settings
+    protected String adminUsername; // TODO: store admin
+
+    /**
+     * @return List of registered users.
+     */
+    protected ArrayList<String> getConnectedUsers(){ //TODO: remove users on disconnect
+        return new ArrayList<>(this.registeredClientHandlers.keySet());
     }
 
     public void finishRegistrationPhaseAndStartGame(){ // TODO: disable writing to registeredClientHandlers if game started. Make everything synchronized

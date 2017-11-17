@@ -174,12 +174,12 @@ public class EinzServerClientHandler implements Runnable{
         }
     }
 
-    // TODO: implement this method
+    // TODO: implement stopClientHandler
     private void stopThread() {
         Log.d("ESCH/stopThread", "NOT YET IMPLEMENTED!");
     }
 
-    // TODO implement this method
+    // TODO implement onClientDisconnected
     private void onClientDisconnected(){
         Log.d("ESCH/clientDisconnected", "NOT YET IMPLEMENTED");
     }
