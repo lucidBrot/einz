@@ -4,7 +4,7 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzUnregisterRequestMessageBody.EinzUnregisterRequestMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
