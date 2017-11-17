@@ -1,7 +1,7 @@
 {
 	"actionmappings":[
 		{
-			"messagebodyclass":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody",
+			"messagebodyclass":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody",
 			"mapstoaction":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzRegisterAction"
 		}
 	]

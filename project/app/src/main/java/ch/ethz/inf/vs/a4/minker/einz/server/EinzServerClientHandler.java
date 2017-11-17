@@ -60,7 +60,7 @@ public class EinzServerClientHandler implements Runnable{
         this.socket = clientSocket;
         this.serverInterface = serverFunctionDefinition;
         this.einzParserFactory = new EinzParserFactory();
-        this.einzActionFactory = new EinzActionFactory(serverInterface, this.parentEinzServer.getServerManager());
+        this.einzActionFactory = new EinzActionFactory(serverInterface, this.parentEinzServer.getServerManager(), this);
 
         // TODO: initialize ParserFactory by registering all Messagegroup->Parser mappings
         try {

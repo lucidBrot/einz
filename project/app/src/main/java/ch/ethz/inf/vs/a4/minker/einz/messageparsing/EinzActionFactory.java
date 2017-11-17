@@ -23,14 +23,17 @@ public class EinzActionFactory {
     // The key is EinzMessageBody and not just the messagtype because like this we could add further header info and create new EinzMessages based on them
     private EinzServerManager sManager;
 
+    private EinzServerClientHandler clientHandler;
+
     /**
      * @param serverFunctionDefinition provides game logic actions
      * @param serverManager provides framework actions
      */
-    public EinzActionFactory(ServerFunctionDefinition serverFunctionDefinition, EinzServerManager serverManager){
+    public EinzActionFactory(ServerFunctionDefinition serverFunctionDefinition, EinzServerManager serverManager, EinzServerClientHandler clientHandler){
         this.sInterface = serverFunctionDefinition;
         this.dictionary = new HashMap<Class<? extends EinzMessageBody>, Class<? extends EinzAction>>();
         this.sManager = serverManager;
+        this.clientHandler = clientHandler;
 
         //<Debug>
         /*
@@ -99,7 +102,7 @@ public class EinzActionFactory {
             return null;
         }
         try {
-            EinzAction ret = getMapping(message).getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy);
+            EinzAction ret = getMapping(message).getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
             Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
             return ret;
         } catch (InstantiationException e) {
