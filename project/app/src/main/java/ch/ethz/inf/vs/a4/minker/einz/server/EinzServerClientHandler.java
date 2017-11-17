@@ -64,7 +64,7 @@ public class EinzServerClientHandler implements Runnable{
 
         // TODO: initialize ParserFactory by registering all Messagegroup->Parser mappings
         try {
-            registerParserMappings(R.raw.parserfactoryinitialisation);
+            registerParserMappings();
         } catch (JSONException e) {
             Log.e("ESCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file.");
             e.printStackTrace();
@@ -114,54 +114,26 @@ public class EinzServerClientHandler implements Runnable{
         //</debug>
     }
 
+
     /**
-     * Load the resource file containing an Array of Pair<String messagegroup, Class<\? extends EinzParser>
-     *     @param rawResourceFile e.g. R.raw.serverDefaultParserMappings
-     *                            This file should be formatted as a JSONObject containing a JSONArray "parsermappings" of JSONObjects of the form
-     *                            {"messagegroup":"some thing", "mapstoparser":{...}}
-     *                            where {...} stands for the JSON representation of the EinzParser class, e.g. <i>class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser</i>
-     *     @throws JSONException if some of the JSON is not as expected
-     *     @throws InvalidResourceFormatException if the mapping objects themselves are not valid. Contains more details in extended message
+     * load ParserMappings for networking and for gamelogic from file set up in {@link EinzServerManager}
+     * @throws JSONException
+     * @throws InvalidResourceFormatException
+     * @throws ClassNotFoundException
      */
-    private void registerParserMappings(int rawResourceFile) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
-        // TODO: move loading from JSON to a method of the Factory
-        InputStream jsonStream = parentEinzServer.applicationContext.getResources().openRawResource(rawResourceFile);
-        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
-        JSONArray array = jsonObject.getJSONArray("parsermappings");
-        int size = array.length();
-        // register each object
-        for(int i=0; i<size; i++){
-            JSONObject pair = array.getJSONObject(i);
-            String s =pair.getString("mapstoparser");
-            String prefix = "class ";
-            if(!s.startsWith(prefix)){
-                throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" does not start with class ");
-            } else {
-                String substring = s.substring(prefix.length()); // classname without prefix
-                Class o = Class.forName(substring);
-                if (!(EinzParser.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
-                    throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" is not of type Class");
-                } else {
-                    // everything is fine, do stuff
-                    @SuppressWarnings("unchecked") // I checked this with above tests
-                    Class<? extends EinzParser> parserclass = (Class<? extends EinzParser>) o;
-                    this.einzParserFactory.registerMessagegroup(pair.getString("messagegroup"), parserclass);
-                }
-            }
-        }
+    private void registerParserMappings() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        this.parentEinzServer.getServerManager().loadAndRegisterNetworkingParsers(this.einzParserFactory);
+        this.parentEinzServer.getServerManager().loadAndRegisterGameLogicParsers(this.einzParserFactory);
     }
 
-    // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
-    // utility function
-    private String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
 
+    /**
+     * load ActionMappings for networking and for gamelogic from file set up in {@link EinzServerManager}
+     */
     private void registerActionMappings(){
         this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzFinishRegistrationPhaseAction.class); // DEBUG purely. not actually useful// TODO: remove debug mappings
-        this.parentEinzServer.getServerManager().registerNetworkingActions(this.einzActionFactory);
-        this.parentEinzServer.getServerManager().registerGameLogicActions(this.einzActionFactory);
+        this.parentEinzServer.getServerManager().loadAndRegisterNetworkingActions(this.einzActionFactory);
+        this.parentEinzServer.getServerManager().loadAndRegisterGameLogicActions(this.einzActionFactory);
     }
 
     // source: https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server

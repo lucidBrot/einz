@@ -4,12 +4,20 @@ import android.util.Log;
 import android.util.Pair;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzActionFactory;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParserFactory;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.InvalidResourceFormatException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * Stores Configuration of {@link ThreadedEinzServer} that is not suited for the communications-only part, because it has to do with the content of the messages,
@@ -20,6 +28,10 @@ public class EinzServerManager {
 
     private final ThreadedEinzServer server;
     private ServerFunctionDefinition serverFunctionInterface;
+
+    // TODO: update files, document somewhere
+    private final int networkingParserFile = R.raw.initialnetworkingparsermappings; // the networking parser shall be loaded from here
+    private final int gameLogicParserFile = R.raw.initialgamelogicparsermappings; // the gamelogic parser shall be loaded from here
 
     public EinzServerManager(ThreadedEinzServer whotomanage, ServerFunctionDefinition serverFunctionInterface){
         this.server = whotomanage;
@@ -41,17 +53,46 @@ public class EinzServerManager {
                 // TODO: send that info to clients
             }
             Log.d("Manager/finishRegPhase", "Players: "+players.toString());
-            GameState gameState = getServerFunctionInterface().startStandartGame(players); // DEBUG
-            Log.d("Manager/finishRegPhase", "Now what do I do with the gamestate "+gameState.toString()+" ?");
+            GameState gameState = getServerFunctionInterface().startStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+
         }
     }
 
-    public void registerNetworkingActions(EinzActionFactory actionFactory){ //TODO: register networking actions, maybe from json file
+    public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory){ //TODO: register networking actions, maybe from json file
 
     }
 
-    public void registerGameLogicActions(EinzActionFactory actionFactory){ //TODO: register actions for game logic. from different json file
+    public void loadAndRegisterGameLogicActions(EinzActionFactory actionFactory){ //TODO: register actions for game logic. from different json file
 
+    }
+
+
+    /**
+     * Load the resource file containing an Array of Pair<String messagegroup, Class<\? extends EinzParser>
+     *     The rawResourceFile is set in {@link EinzServerManager#networkingParserFile} e.g. R.raw.serverDefaultParserMappings
+     *                            This file should be formatted as a JSONObject containing a JSONArray "parsermappings" of JSONObjects of the form
+     *                            {"messagegroup":"some thing", "mapstoparser":{...}}
+     *                            where {...} stands for the JSON representation of the EinzParser class, e.g. <i>class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser</i>
+     *     @throws JSONException if some of the JSON is not as expected
+     *     @throws InvalidResourceFormatException if the mapping objects themselves are not valid. Contains more details in extended message
+     */
+    public void loadAndRegisterNetworkingParsers(EinzParserFactory parserFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        InputStream jsonStream = server.applicationContext.getResources().openRawResource(this.networkingParserFile);
+        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
+        parserFactory.loadMappingsFromJson(jsonObject);
+    }
+
+    public void loadAndRegisterGameLogicParsers(EinzParserFactory parserFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        InputStream jsonStream = server.applicationContext.getResources().openRawResource(this.gameLogicParserFile);
+        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
+        parserFactory.loadMappingsFromJson(jsonObject);
+    }
+
+    // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
+    // utility function
+    private String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 
     public ServerFunctionDefinition getServerFunctionInterface() {

@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -113,5 +114,44 @@ public class EinzParserFactory {
      */
     public void deregisterMessagegroup(String messagegroup){ // TODO: what does this do if the messagegroup wasn't registered?
         this.dictionary.remove(messagegroup);
+    }
+
+    /**
+     * Loads every mapping in the JSONObject and store it in this Factories' dictionary
+     * @param messageToParsermappings
+     *      a JSONObject of format
+     * {
+     * "parsermappings":[
+     *   {"messagegroup":"registration","mapstoparser":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"}
+     *   {"messagegroup":"draw","mapstoparser":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzDrawParser"}
+     *  ]
+     * }
+     * @throws JSONException If the JSONObject is not valid. i.e. it does not contain the "parsermappings" and "messagegroup"s within them.
+     * @throws InvalidResourceFormatException If the JSON does not start with the prefix "class ". I might add other reasons later
+     * @throws ClassNotFoundException If the stored class mapping in the json file does not exist
+     */
+    public void loadMappingsFromJson(JSONObject messageToParsermappings) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        JSONArray array = messageToParsermappings.getJSONArray("parsermappings");
+        int size = array.length();
+        // register each object
+        for(int i=0; i<size; i++){
+            JSONObject pair = array.getJSONObject(i);
+            String s =pair.getString("mapstoparser");
+            String prefix = "class ";
+            if(!s.startsWith(prefix)){
+                throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" does not start with class ");
+            } else {
+                String substring = s.substring(prefix.length()); // classname without prefix
+                Class o = Class.forName(substring);
+                if (!(EinzParser.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
+                    throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" is not of type Class");
+                } else {
+                    // everything is fine, do stuff
+                    @SuppressWarnings("unchecked") // I checked this with above tests
+                            Class<? extends EinzParser> parserclass = (Class<? extends EinzParser>) o;
+                    this.registerMessagegroup(pair.getString("messagegroup"), parserclass);
+                }
+            }
+        }
     }
 }
