@@ -1,7 +1,7 @@
 % This is based on "sig-alternate.tex" V1.9 April 2009
 % This file should be compiled with V2.4 of "sig-alternate.cls" April 2009
 %
-\documentclass{report}
+\documentclass{sig-alternate}
 
 \usepackage[english]{babel}
 \usepackage{graphicx}
@@ -10,6 +10,7 @@
 \usepackage{enumitem}
 \usepackage{url}
 \usepackage{listings}
+\usepackage{bookmark}
 \usepackage{hyperref} % hyperref for links
 %\PassOptionsToPackage{pdfpagelabels=false}{hyperref} % the sig-alternate.tex breaks hyperref, this should fix it again and get rid of the warning
 
@@ -163,7 +164,7 @@ For the usual difficulties in networking like message ordering and making sure t
 We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like additional rules for the game. The baseline functionality of the game is a playable version of UNO where only the most basic cards are featured. Further cards will be implemented as rules, e.g. the rule "We feature a +2 card". The additional rules will be available to the user of the device the server runs on before game start, such that we can dynamically change the way the game works. This does not mean that we intend to allow the user to define their own rules - just that they can choose which rules should be applied.
 
 \subsection{Server Client Messaging}
-\begin{figure}
+\begin{figure}[!htbp]
 \begin{verbatim}
 {
   "header":{
@@ -207,7 +208,7 @@ We are also trying to keep the classes themselves very modular to keep updating 
 
 \subsection{User Interface}
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 	\centering
     \includegraphics[width=\columnwidth]{Artboard.png}
     \vspace{-5mm} % use negative white space to fix too large gaps
@@ -239,7 +240,7 @@ If we find enough time after adding enough rules to make the game interesting - 
 
 Adding a LUS might impose additional difficulties because some mobile carriers might use symmetric NATs. If these difficulties arise, we will probably resort to only implementing NAT-traversal for the other (easier) types of NATs.
 
-\begin{figure}[h]
+\begin{figure}[!htbp]
 	\centering
     \includegraphics[width=\columnwidth]{NATholepunching.pdf}
     \vspace{-5mm} % use negative white space to fix too large gaps
