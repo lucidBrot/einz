@@ -93,6 +93,10 @@ public class EinzActionFactory {
      * @return the action, or null if this messagetype was not registered or it failed for some other reason
      */
     public EinzAction generateEinzAction(EinzMessage message, @Nullable String issuedBy){
+        if(message == null){
+            Log.e("ActionFactory", "Message was null.");
+            return null;
+        }
         try {
             EinzAction ret = getMapping(message).getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class).newInstance(sInterface, sManager, message, issuedBy);
             Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
@@ -131,7 +135,7 @@ public class EinzActionFactory {
      * @throws ClassNotFoundException If the stored class mapping in the json file does not exist
      */
     public void loadMappingsFromJson(JSONObject messageToParsermappings) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
-        JSONArray array = messageToParsermappings.getJSONArray("messagebodyclass");
+        JSONArray array = messageToParsermappings.getJSONArray("actionmappings");
         int size = array.length();
         // register each object
         for (int i = 0; i < size; i++) {
@@ -142,6 +146,7 @@ public class EinzActionFactory {
                 throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"mapstoaction\" does not start with class ");
             } else {
                 String substring = s.substring(prefix.length()); // classname without prefix
+                Log.d("ActionFactory","substring to get class of : "+substring);
                 Class o = Class.forName(substring);
                 if (!(EinzAction.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
                     throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"mapstoaction\" is not of type Class");
@@ -153,7 +158,7 @@ public class EinzActionFactory {
                     // for the dictionary, we need the key also as a class
                     substring = pair.getString("messagebodyclass").substring(prefix.length());
                     if(!s.startsWith(prefix)){
-                        throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"messagebodyclass\" is not of type Class");
+                        throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"actionmappings\" is not of type Class");
                     } else {
                         Class q = Class.forName(substring);
                         // everything is fine, do stuff

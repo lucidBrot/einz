@@ -38,6 +38,10 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         }
     }
 
+    private EinzMessage parseKick(JSONObject message) { // TODO : implement all those cases
+        return null;
+    }
+
     private EinzMessage parseUnregisterRequest(JSONObject message) throws JSONException {
         /*
           {

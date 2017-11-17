@@ -16,8 +16,13 @@ import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Stores Configuration of {@link ThreadedEinzServer} that is not suited for the communications-only part, because it has to do with the content of the messages,
@@ -36,8 +41,12 @@ public class EinzServerManager {
     private final int networkingActionFile = R.raw.initialnetworkingactionmappings; // the mapping from messagebodytype to action
     private final int gameLogicActionFile = R.raw.initialgamelogicactionmappings; // same, but for game logic instead
 
+    public ConcurrentHashMap<String, EinzServerClientHandler> registeredClientHandlers; // list of only the registered clients, accessible by username
+    // used to keep track of currently registered usernames
+
     public EinzServerManager(ThreadedEinzServer whotomanage, ServerFunctionDefinition serverFunctionInterface){
         this.server = whotomanage;
+        this.registeredClientHandlers = new ConcurrentHashMap<>();
         this.serverFunctionInterface = serverFunctionInterface;
     }
     protected String adminUsername;
@@ -49,16 +58,14 @@ public class EinzServerManager {
         Log.d("Manager", "finishing registrationphase.");
         server.stopListeningForIncomingConnections(true);
         ArrayList<Player> players = new ArrayList<>();
-        synchronized (server.getRegisteredClientHandlers()) {
-            for(Map.Entry entry : this.server.getRegisteredClientHandlers().entrySet()){
-                Pair<EinzServerClientHandler, Thread> pair = (Pair) entry.getValue();
-                players.add(new Player((String) entry.getKey()));
-                // TODO: send that info to clients
-            }
-            Log.d("Manager/finishRegPhase", "Players: "+players.toString());
-            GameState gameState = getServerFunctionInterface().startStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
-
+        for(Map.Entry entry : registeredClientHandlers.entrySet()){
+            EinzServerClientHandler handler = (EinzServerClientHandler) entry.getValue();
+            players.add(new Player((String) entry.getKey()));
+            // TODO: send that info to clients
         }
+        Log.d("Manager/finishRegPhase", "Players: "+players.toString());
+        GameState gameState = getServerFunctionInterface().startStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+
     }
 
     public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException { //TODO: register networking actions, maybe from json file
@@ -110,5 +117,14 @@ public class EinzServerManager {
         this.serverFunctionInterface = serverFunctionInterface;
     }
 
-    // TODO: register players
+    /**
+     * Threadsafe because of ConcurrentHashMap
+     * @param username
+     * @param handler
+     */
+    public void registerUser(String username, EinzServerClientHandler handler){
+        registeredClientHandlers.put(username,handler);
+        Log.d("serverManager/reg", "registered "+username);
+    }
+
 }
