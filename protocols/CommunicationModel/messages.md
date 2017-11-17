@@ -750,6 +750,8 @@ The drawn cards, setup so that the UI will know where they came from in order to
 
 Not that the tilde is not allowed within usernames, so this is clear specification
 
+`ID` is an identifier to find the corresponding card in the resources / local memory.
+
 The [card](#card) does not have to be unique, there may be multiple copies of the same card in play.
 
 ## PossibleActions
@@ -783,3 +785,5 @@ Possibly in the future supported: "transferServer"
 ## Rules
 
 All we know as of 16.11.2017 is that Rules should have an identifier String.
+
+It would probably make sense to include some compatibility notes for use with other rules.
