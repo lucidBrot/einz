@@ -29,9 +29,11 @@ public class EinzServerManager {
     private final ThreadedEinzServer server;
     private ServerFunctionDefinition serverFunctionInterface;
 
-    // TODO: update files, document somewhere
+    // These files are used to initialize the ActionFactories and ParserFactories of the EinzServerClientHandler threads
     private final int networkingParserFile = R.raw.initialnetworkingparsermappings; // the networking parser shall be loaded from here
     private final int gameLogicParserFile = R.raw.initialgamelogicparsermappings; // the gamelogic parser shall be loaded from here
+    private final int networkingActionFile = R.raw.initialnetworkingactionmappings; // the mapping from messagebodytype to action
+    private final int gameLogicActionFile = R.raw.initialgamelogicactionmappings; // same, but for game logic instead
 
     public EinzServerManager(ThreadedEinzServer whotomanage, ServerFunctionDefinition serverFunctionInterface){
         this.server = whotomanage;
@@ -58,12 +60,16 @@ public class EinzServerManager {
         }
     }
 
-    public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory){ //TODO: register networking actions, maybe from json file
-        actionFactory.loadMappingsFromJson();
+    public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException { //TODO: register networking actions, maybe from json file
+        InputStream jsonStream = server.applicationContext.getResources().openRawResource(this.networkingActionFile);
+        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
+        actionFactory.loadMappingsFromJson(jsonObject);
     }
 
-    public void loadAndRegisterGameLogicActions(EinzActionFactory actionFactory){ //TODO: register actions for game logic. from different json file
-        actionFactory.loadMappingsFromJson();
+    public void loadAndRegisterGameLogicActions(EinzActionFactory actionFactory) throws InvalidResourceFormatException, JSONException, ClassNotFoundException { //TODO: register actions for game logic. from different json file
+        InputStream jsonStream = server.applicationContext.getResources().openRawResource(this.gameLogicActionFile);
+        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
+        actionFactory.loadMappingsFromJson(jsonObject);
     }
 
 

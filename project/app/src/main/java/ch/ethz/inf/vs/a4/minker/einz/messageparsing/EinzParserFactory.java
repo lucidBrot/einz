@@ -122,7 +122,7 @@ public class EinzParserFactory {
      *      a JSONObject of format
      * {
      * "parsermappings":[
-     *   {"messagegroup":"registration","mapstoparser":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"}
+     *   {"messagegroup":"registration","mapstoparser":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"},
      *   {"messagegroup":"draw","mapstoparser":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzDrawParser"}
      *  ]
      * }

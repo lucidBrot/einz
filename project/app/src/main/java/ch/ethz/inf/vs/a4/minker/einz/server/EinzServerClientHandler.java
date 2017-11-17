@@ -29,8 +29,8 @@ public class EinzServerClientHandler implements Runnable{
     public boolean spin = false;
     private ThreadedEinzServer parentEinzServer;
     private DataOutputStream out = null;
-    public final Object socketWriteLock; // lock onto this for writing
-    public final Object socketReadLock;
+    public final Object socketWriteLock = new Object(); // lock onto this for writing
+    public final Object socketReadLock = new Object();
     private InputStream inp;
     private BufferedReader brinp;
 
@@ -77,11 +77,18 @@ public class EinzServerClientHandler implements Runnable{
         }
 
         // TODO: initialize ActionFactory by registering all Message->Action mappings
-        registerActionMappings();
-
-
-        socketWriteLock = new Object();
-        socketReadLock = new Object();
+        try {
+            registerActionMappings();
+        } catch (InvalidResourceFormatException e) {
+            Log.e("ESCH/rActionMappings", "failed to initialize ActionFactory by loading from resource file.");
+            e.printStackTrace();
+        } catch (JSONException e) {
+            Log.e("ESCH/rActionMappings", "failed to initialize ActionFactory by loading from resource file. InvalidResourceFormatException");
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            Log.e("ESCH/rActionMappings", "failed to initialize ActionFactory by loading from resource file. ActionMappings");
+            e.printStackTrace();
+        }
 
         // initialize socket stuff
         inp = null;
@@ -93,7 +100,6 @@ public class EinzServerClientHandler implements Runnable{
         } catch (IOException e) {
             Log.e("ESCH", "Failed to initialize run(). Aborting");
             e.printStackTrace();
-            return;
         }
     }
 
@@ -130,7 +136,7 @@ public class EinzServerClientHandler implements Runnable{
     /**
      * load ActionMappings for networking and for gamelogic from file set up in {@link EinzServerManager}
      */
-    private void registerActionMappings(){
+    private void registerActionMappings() throws InvalidResourceFormatException, JSONException, ClassNotFoundException {
         this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzFinishRegistrationPhaseAction.class); // DEBUG purely. not actually useful// TODO: remove debug mappings
         this.parentEinzServer.getServerManager().loadAndRegisterNetworkingActions(this.einzActionFactory);
         this.parentEinzServer.getServerManager().loadAndRegisterGameLogicActions(this.einzActionFactory);

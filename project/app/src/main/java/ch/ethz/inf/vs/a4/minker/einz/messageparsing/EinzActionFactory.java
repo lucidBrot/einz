@@ -120,7 +120,7 @@ public class EinzActionFactory {
      *      a JSONObject of format
      * {
      * "actionmappings":[
-     *   {"messagebodyclass":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzJsonMessageBody","mapstoaction":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegisterAction"}
+     *   {"messagebodyclass":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzJsonMessageBody","mapstoaction":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegisterAction"},
      *   {"messagebodyclass":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzPlayCardActionMessageBody","mapstoaction":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzDrawCardsAction"}
      *  ]
      * }
