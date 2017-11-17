@@ -155,11 +155,11 @@ We build a distributed game similar to the known card game "UNO" by Mattel~\cite
 Obvious difficulties awaiting us include the coordination of a team consisting of six people, each with different skillsets and time available.
 Also, we intend to create an easily extensible codebase so that we can first build the base game and in a second phase add further rules without much effort. This poses difficulties on its own as we have to learn coding patterns such as using factories to make the program code more modular.
 
-Technical problems will probably be the smooth and clean communication between the clients and the server and implementing concurrency within the server itself. For the networking difficulties like message ordering and making sure the peers actually get the messages, we will rely on TCP using the \verb|Socket| class~\cite{socketdoc}. There remains the problem of noticing if a client looses connection unexpectedly, especially because we might have times where we don't need to send messages at all for multiple seconds for example if it's not a players turn. We have to experiment with that problem and probably add a ping messages that check that the connection is still alive.
+Technical problems will probably be the smooth and clean communication between the clients and the server and implementing concurrency within the server itself. For the networking difficulties like message ordering and making sure the peers actually get the messages, we will rely on TCP using the \verb|Socket| class~\cite{socketdoc}. There remains the problem of noticing if a client looses connection unexpectedly, especially because we might have times where we don't need to send messages at all for multiple seconds for example if it's not a players turn. We have to experiment with that problem and probably add a ping message that checks that the connection is still alive.
 
 
 \section{System Overview}
-We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like additional rules for the game. The baseline functionality of the game is a playable version of UNO where only the most basic cards are featured. Further cards will be implemented as rules, e.g. the rule "We feature a +2 card". The additional rules will be available to the user of the device the server runs on before game start, such that we can dynamically change the way the game works. This does not mean that we intend to allow the user to define their own rules - just that they can choose which rules should be applied.
+We propose a modular approach, building first the baseline functionality of the game, followed by further improvements like additional rules for the game. The baseline functionality of the game is a playable version of UNO where only the most basic cards are featured. Further cards will be implemented as rules, e.g. the rule "We feature a +2 card". The additional rules will be available to the user of the device the server runs on before the game starts, such that we can dynamically change the way the game works. This does not mean that we intend to allow the user to define their own rules - just that they can choose which rules should be applied.
 
 \subsection{Server Client Messaging}
 \begin{figure}[!htbp]
@@ -193,9 +193,9 @@ If you're interested in the most current specifications of the messages, see our
 
 In a second step, once the basic communication between server and client is completed and the exact behaviour of the two parts has been defined, we finish implementing the server-side game logic and start using the previously defined messaging functionality.
 
-We plan that the server does most of the computations and only sends the client its state, containing the players hand, the number of cards other players are holding and the most recently played cards. The client receives also a list of possible actions that are possible to do. For example informs the server the client which cards are playable. The client can now choose a action from the list and send a request to the server afterwards. The server will handle the request and check if it is a valid request. If it is he will inform all clients about the updated state.
+We plan that the server does most of the computations and only sends the client its state, containing the players hand, the number of cards other players are holding and the most recently played cards. The client receives also a list of possible actions that he is able to do. For example the server informs the client which cards are playable. The client can now choose an action from the list and send a request to the server afterwards. The server will handle the request and check if it is a valid request. If it is he will inform all clients about the updated state.
 
-Sending the actions to the client allows us later on to add game-modes and rules with ease and grants us high flexibility with using the rules. We only have to change a few files, to add new stuff.
+Sending the actions to the client allows us later on to add game-modes and rules with ease and grants us high flexibility with using the rules. We only have to change a few files to add new stuff.
 
 We are also trying to keep the classes themselves very modular to keep updating them - e.g. by adding further rules - just as simple.
 
@@ -234,7 +234,7 @@ Once the game is in a working state with a few rules such as an additional card 
 	\lfig{nat}
 \end{figure}
 
-If we find enough time after adding enough rules to make the game interesting - we probably won't have - and decide to do NAT traversal, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other servers's IP address and ports, through which they can communicate the same way as we implemented in the first phase (See~\rfig{nat}). The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
+If we find enough time after adding enough rules to make the game interesting - we probably will not - and decide to do NAT traversal, we would set up a Lookup-server that is reachable for all clients and thus allow the routers to setup forwarding on ports that we know. The LUS can then inform every client about the other servers's IP address and ports, through which they can communicate the same way as we implemented in the first phase (See~\rfig{nat}). The gameserver on one phone will have the option to choose whether to use the LUS or only accept players from within the same LAN.
 
 Adding a LUS might impose additional difficulties because some mobile carriers might use symmetric NATs. If these difficulties arise, we will probably resort to only implementing NAT-traversal for the other (easier) types of NATs.
 
