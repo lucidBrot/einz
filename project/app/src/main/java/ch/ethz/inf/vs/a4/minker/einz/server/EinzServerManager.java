@@ -59,11 +59,11 @@ public class EinzServerManager {
     }
 
     public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory){ //TODO: register networking actions, maybe from json file
-
+        actionFactory.loadMappingsFromJson();
     }
 
     public void loadAndRegisterGameLogicActions(EinzActionFactory actionFactory){ //TODO: register actions for game logic. from different json file
-
+        actionFactory.loadMappingsFromJson();
     }
 
 
