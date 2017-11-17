@@ -126,7 +126,7 @@ public class EinzParserFactory {
      *   {"messagegroup":"draw","mapstoparser":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzDrawParser"}
      *  ]
      * }
-     * @throws JSONException If the JSONObject is not valid. i.e. it does not contain the "parsermappings" and "messagegroup"s within them.
+     * @throws JSONException If the JSONObject is not valid. i.e. it does not contain the "parsermappings" and "messagegroups"s within them.
      * @throws InvalidResourceFormatException If the JSON does not start with the prefix "class ". I might add other reasons later
      * @throws ClassNotFoundException If the stored class mapping in the json file does not exist
      */
