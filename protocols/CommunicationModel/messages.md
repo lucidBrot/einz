@@ -303,7 +303,7 @@ Sent by the **server** to all clients, including the one who was unregistered. A
   },
   "body":{
     "username":"that random dude who we didn't want",
-    "reason":"true"
+    "reason":"kicked"
   }
 }
 ```
@@ -642,7 +642,7 @@ After this, the server will remove the player from the turn order list and let i
 
 The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, sorted based on the points and the specified rules.
 
-points: *JSONArray of Players*
+points: *JSONObject of Players and points*
 
 ```Json
 {
@@ -651,10 +651,10 @@ points: *JSONArray of Players*
 		"messagetype": "GameOver"
 	},
   "body": {
-    "points":[
+    "points":{
       "roger":"17",
       "chris":"3"
-    ]
+    }
   }
 }
 ```
