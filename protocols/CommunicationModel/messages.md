@@ -84,7 +84,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * endGame
 
-  > [PlayerFinished](#playerfinished), [EndGame](#endgame)
+  > [PlayerFinished](#playerfinished), [GameOver](#gameover)
 
 
 
@@ -303,7 +303,7 @@ Sent by the **server** to all clients, including the one who was unregistered. A
   },
   "body":{
     "username":"that random dude who we didn't want",
-    "reason":"true"
+    "reason":"kicked"
   }
 }
 ```
@@ -638,21 +638,11 @@ After this, the server will remove the player from the turn order list and let i
 }
 ```
 
-## EndGame
+## GameOver
 
-The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, but `points` is not neccessary, depending on the ruleset.
+The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, sorted based on the points and the specified rules.
 
-`ranking` : *JSONArray of Players*
-
-> The Players are of the form
->
-> ```json
-> {
->   "username":{
->     "points":"12"
->   }
-> }
-> ```
+points: *JSONObject of Players and points*
 
 ```Json
 {
@@ -660,7 +650,12 @@ The **Server** informs the clients that the game is over and they can show the a
 		"messagegroup": "endGame",
 		"messagetype": "GameOver"
 	},
-	"body": {}
+  "body": {
+    "points":{
+      "roger":"17",
+      "chris":"3"
+    }
+  }
 }
 ```
 
