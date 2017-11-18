@@ -6,7 +6,22 @@ import org.json.JSONObject;
 
 public class EinzRegisterFailureMessageBody extends EinzMessageBody{
 
-    private final String role, username, reason;
+    private final String role;
+
+    public String getRole() {
+        return role;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    private final String username;
+    private final String reason;
 
     public EinzRegisterFailureMessageBody(String role, String username, String reason){
         /*{
