@@ -84,7 +84,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * endGame
 
-  > [PlayerFinished](#playerfinished), [EndGame](#endgame)
+  > [PlayerFinished](#playerfinished), [GameOver](#gameover)
 
 
 
@@ -638,7 +638,7 @@ After this, the server will remove the player from the turn order list and let i
 }
 ```
 
-## EndGame
+## GameOver
 
 The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, but `points` is not neccessary, depending on the ruleset.
 
@@ -660,7 +660,12 @@ The **Server** informs the clients that the game is over and they can show the a
 		"messagegroup": "endGame",
 		"messagetype": "GameOver"
 	},
-	"body": {}
+  "body": {
+    "ranking":[
+      "roger":{"points":"17"},
+      "chris":{"points":"3", "something else because of other ruleset":"penguin"}
+    ]
+  }
 }
 ```
 
