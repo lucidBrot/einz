@@ -72,7 +72,8 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         switch(view.getId()){
             case R.id.btn_s_listen_for_clients:
                 // start server
-                serverThread.start(); // TODO: stop server on back button
+                if(serverThread.getState() == Thread.State.NEW) //https://developer.android.com/reference/java/lang/Thread.State.html#RUNNABLE
+                    serverThread.start(); // TODO: stop server on back button
                 break;
             case R.id.btn_s_start_game_initialization:
                 // TODO: start game
