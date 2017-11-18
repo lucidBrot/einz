@@ -28,11 +28,11 @@ public class EinzRegisterAction extends EinzAction{
     }
 
     /**
-     * executes the action in the current thread
+     * executes the action in the current thread.
+     * That is, it registers the User for this clientHandler and then triggers a response
      */
     @Override
     public void run() {
-        Log.d("Action/Register", "was run");
-        getServerManager().registerUser(this.body.getUsername(), getEinzServerClientHandler());
+        getServerManager().registerUser(this.body.getUsername(), getEinzServerClientHandler()); // TODO: response on register
     }
 }

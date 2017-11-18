@@ -5,10 +5,7 @@ import android.util.Pair;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.R;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzActionFactory;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParserFactory;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.InvalidResourceFormatException;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
 import org.json.JSONException;
@@ -123,12 +120,27 @@ public class EinzServerManager {
 
     /**
      * Threadsafe because of ConcurrentHashMap
+     * Returns an EinzMessage which could be used as reponse to the client. This Message is either of Type RegisterSuccess or RegisterFailure
+     * Not yet fully implemented.
      * @param username
      * @param handler
      */
-    public void registerUser(String username, EinzServerClientHandler handler){
-        registeredClientHandlers.put(username,handler);
-        Log.d("serverManager/reg", "registered "+username);
+    public EinzMessage registerUser(String username, EinzServerClientHandler handler){
+        EinzServerClientHandler res = registeredClientHandlers.putIfAbsent(username,handler);
+        // res is null if it was not set before this call, else it is the previous value
+        boolean success = (res == null || res.equals(handler)); // success only if nobody was registered or itself was already registered (for this username)
+        Log.d("serverManager/reg", "registered "+username+". Success: "+success);
+        EinzMessage response;
+        // TODO: Response on Register
+        /*
+        if(success){
+            EinzMessageHeader header = new EinzMessageHeader("registration", "registerSuccess");
+            EinzRegisterSuccessMessageBody body = new EinzRegisterSuccessMessageBody();
+            response = new EinzMessage<EinzRegisterSuccessMessageBody>();
+        } else {
+
+        }*/
+        return null;
     }
 
 }
