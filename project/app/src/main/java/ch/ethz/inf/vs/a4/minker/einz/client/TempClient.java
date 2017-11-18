@@ -1,6 +1,10 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -137,18 +141,14 @@ public class TempClient {
           }
         }
          */
+
+
         try {
-            String s = (new JSONObject("{\n" +
-                    "          \"header\":{\n" +
-                    "            \"messagegroup\":\"registration\",\n" +
-                    "            \"messagetype\":\"Register\"\n" +
-                    "          },\n" +
-                    "          \"body\":{\n" +
-                    "            \"username\":\"roger\",\n" +
-                    "            \"role\":\"player\"\n" +
-                    "          }\n" +
-                    "        }")).toString();
-            return s;
+            EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
+            EinzRegisterMessageBody body = new EinzRegisterMessageBody("roger", "player lol");
+            EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
+            Log.d("tempClient/getRegMsg","message.toString() : "+message.toString()+",\n message.toJSON().toString() : "+message.toJSON().toString());
+            return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
             Log.e("TempClient/dGetRegMsg", "failed to create registration message");
