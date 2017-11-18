@@ -9,17 +9,16 @@ public class EinzPlayCardMessageBody extends EinzMessageBody{
 
     /*
     {
-      "header":{
-        "messagegroup":"playcard",
-        "messagetype":"PlayCard"
-      },
-      "body":{
-        "card":{
-          "color":"green",
-          "num":"1337"
-        }
-      }
+  "header":{
+    "messagegroup":"playcard",
+    "messagetype":"PlayCard"
+  },
+  "body":{
+    "card":{
+      "ID":"cardID1337"
     }
+  }
+}
      */
 
     private final Card card;
@@ -38,7 +37,10 @@ public class EinzPlayCardMessageBody extends EinzMessageBody{
     @Override
     public JSONObject toJSON() throws JSONException {
         JSONObject jsonbody = new JSONObject();
-        jsonbody.put("card", this.getCard());
+        Card card = getCard();
+        JSONObject IDJSON = new JSONObject();
+        IDJSON.put("ID", card.ID);
+        jsonbody.put("card", IDJSON);
         return jsonbody;
     }
 }
