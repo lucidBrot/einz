@@ -5,6 +5,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import org.json.JSONException;
@@ -22,10 +23,10 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
                 return parseUnregisterRequest(message);
             case "Kick":
                 return parseKick(message); // TODO: parse all those cases
-            // The following functions should never be received as server, feel free to implement them here though, chris
-            /*
+            // The following functions should never be received as server, only as client
             case "RegisterFailure":
                 return parseRegisterFailure(message);
+            /*
             case "UpdateLobbyList":
                 return parseUpdateLobbyList(message);
             case "UnregisterResponse":
@@ -37,6 +38,16 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
                 Log.d("EinzRegistrationParser","Not a valid messagetype "+messagetype+" for EinzRegistrationParser");
                 return null;
         }
+    }
+
+    private EinzMessage<EinzRegisterFailureMessageBody> parseRegisterFailure(JSONObject message) throws JSONException {
+        JSONObject body = message.getJSONObject("body");
+        return new EinzMessage<>(
+                new EinzMessageHeader("registration", "RegisterFailure"),
+                new EinzRegisterFailureMessageBody(
+                        body.getString("role"), body.getString("username"), body.getString("reason")
+                )
+        );
     }
 
     private EinzMessage parseKick(JSONObject message) throws JSONException {
