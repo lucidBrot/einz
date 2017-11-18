@@ -185,7 +185,7 @@ The **Client** sends this and Server only reacts to it. The Server's reaction is
 }
 ```
 
-## RegisterSuccess
+##RegisterSuccess
 
 If the client requests the same role multiple times, the request will still succeed. If the client requests different roles, one is chosen arbitrarily by the server. Therefore, the packet sent from the server contains the role the client was given.
 
@@ -287,7 +287,7 @@ We don't need to wait for the Server to respond. The Server logic will probably 
 However, the **Server** might decide to [kick](#kick) a player. For these purposes, [the Response](#unregisterplayer) exists.
 Also, the other Clients need to know about leaves.
 
-## UnregisterResponse
+##UnregisterResponse
 
 Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client.
 
@@ -435,7 +435,7 @@ The **Client** sends this request. The Server checks whether the Client is allow
 }
 ```
 
-## DrawCardsResponse
+##DrawCardsResponse
 
 `cards` : *JSONArray of JSONObjects*
 
@@ -549,7 +549,7 @@ The [response](#sendstate) will usually also be sent without being requested - e
 }
 ```
 
-## SendState
+##SendState
 
 The **server** sends this after being asked via [GetState](#getstate) or when appropriate, i.e. some player did something or the state changed for some other reason.
 
@@ -640,19 +640,9 @@ After this, the server will remove the player from the turn order list and let i
 
 ## GameOver
 
-The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, but `points` is not neccessary, depending on the ruleset.
+The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, sorted based on the points and the specified rules.
 
-`ranking` : *JSONArray of Players*
-
-> The Players are of the form
->
-> ```json
-> {
->   "username":{
->     "points":"12"
->   }
-> }
-> ```
+points: *JSONArray of Players*
 
 ```Json
 {
@@ -661,9 +651,9 @@ The **Server** informs the clients that the game is over and they can show the a
 		"messagetype": "GameOver"
 	},
   "body": {
-    "ranking":[
-      "roger":{"points":"17"},
-      "chris":{"points":"3", "something else because of other ruleset":"penguin"}
+    "points":[
+      "roger":"17",
+      "chris":"3"
     ]
   }
 }
