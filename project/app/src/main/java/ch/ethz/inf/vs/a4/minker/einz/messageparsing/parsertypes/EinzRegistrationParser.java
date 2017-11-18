@@ -4,6 +4,7 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import org.json.JSONException;
@@ -20,7 +21,7 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
             case "UnregisterRequest":
                 return parseUnregisterRequest(message);
             case "Kick":
-                return parseKick(message); // TODO: parse Kick
+                return parseKick(message); // TODO: parse all those cases
             // The following functions should never be received as server, feel free to implement them here though, chris
             /*
             case "RegisterFailure":
@@ -38,8 +39,19 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         }
     }
 
-    private EinzMessage parseKick(JSONObject message) { // TODO : implement all those cases
-        return null;
+    private EinzMessage parseKick(JSONObject message) throws JSONException {
+        /*{
+          "header":{
+            "messagegroup":"registration",
+            "messagetype":"Kick"
+          },
+          "body":{
+            "username":"that random dude who we didn't want",
+          }
+        }*/
+        return (new EinzMessage(
+                new EinzMessageHeader("registration", "Kick"),
+                new EinzKickMessageBody(message.getJSONObject("body").getString("username"))) );
     }
 
     private EinzMessage parseUnregisterRequest(JSONObject message) throws JSONException {

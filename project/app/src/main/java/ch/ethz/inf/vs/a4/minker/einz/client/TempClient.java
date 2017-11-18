@@ -147,7 +147,7 @@ public class TempClient {
             EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
             EinzRegisterMessageBody body = new EinzRegisterMessageBody("roger", "player lol");
             EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
-            Log.d("tempClient/getRegMsg","message.toString() : "+message.toString()+",\n message.toJSON().toString() : "+message.toJSON().toString());
+            Log.d("tempClient/getRegMsg","message.toString() : "+message.toString()+",\nmessage.toJSON().toString() : "+message.toJSON().toString());
             return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();

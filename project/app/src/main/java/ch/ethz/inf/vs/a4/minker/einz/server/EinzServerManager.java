@@ -130,6 +130,10 @@ public class EinzServerManager {
         // res is null if it was not set before this call, else it is the previous value
         boolean success = (res == null || res.equals(handler)); // success only if nobody was registered or itself was already registered (for this username)
         Log.d("serverManager/reg", "registered "+username+". Success: "+success);
+
+        // set admin to this user if he was the first connection and registered successfully
+        if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
+
         EinzMessage response;
         // TODO: Response on Register
         /*

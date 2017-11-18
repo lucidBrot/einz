@@ -26,7 +26,9 @@ import java.util.concurrent.locks.Lock;
 public class EinzServerClientHandler implements Runnable{
     public Socket socket;
 
-    public boolean spin = false;
+    private boolean spin = false;
+    private boolean firstConnectionOnServer = false; // whether this user should be considered admin
+
     private ThreadedEinzServer parentEinzServer;
     private DataOutputStream out = null;
     public final Object socketWriteLock = new Object(); // lock onto this for writing
@@ -49,11 +51,12 @@ public class EinzServerClientHandler implements Runnable{
      * @param parentEinzServer the EinzServer instance creating this thread
      * @param serverFunctionDefinition the implementation of the interface to run the actions in.
      */
-    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer parentEinzServer, ServerFunctionDefinition serverFunctionDefinition) {
+    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer parentEinzServer, ServerFunctionDefinition serverFunctionDefinition, boolean firstConnectionOnServer) {
         Log.d("ESCH", "started new instance");
 
         this.parentEinzServer = parentEinzServer;
         parentEinzServer.incNumClients();
+        this.firstConnectionOnServer = firstConnectionOnServer;
 
         debug_printJSONRepresentationOf(EinzRegistrationParser.class);
 
@@ -111,7 +114,7 @@ public class EinzServerClientHandler implements Runnable{
         //<debug>
         JSONObject container = new JSONObject();
         try {
-            container.put("your thing:", o);
+            container.put("your Object:", o);
             Log.d("ESCH/DEBUG", "printJSONRepresentationOF() : "+ container.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -273,5 +276,9 @@ public class EinzServerClientHandler implements Runnable{
 
     public void setConnectedUser(String connectedUser) {
         this.connectedUser = connectedUser;
+    }
+
+    public boolean isFirstConnectionOnServer() {
+        return firstConnectionOnServer;
     }
 }
