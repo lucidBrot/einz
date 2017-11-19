@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSpecifyRulesMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,6 +32,12 @@ public class EinzStartGameParser extends EinzParser {
                 Log.d("EinzStartGameParser","Not a valid messagetype "+messagetype+" for EinzRegistrationParser");
                 return null;
         }
+    }
+
+    private EinzMessage<EinzStartGameMessageBody> parseStartGame() {
+        EinzMessageHeader header = new EinzMessageHeader("startgame", "StartGame");
+        EinzStartGameMessageBody body = new EinzStartGameMessageBody();
+        return new EinzMessage<>(header, body);
     }
 
     private EinzMessage<EinzSpecifyRulesMessageBody> parseSpecifyRules(JSONObject message) throws JSONException {
