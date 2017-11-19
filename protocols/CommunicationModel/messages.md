@@ -54,7 +54,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * registration
 
-  > [Register](#register), [RegisterSuccess](#registersuccess), [RegisterFailure](#registerfailure), [UpdateLobbyList](#updatelobbylist) [UnregisterRequest](#unregister), [UnregisterResponse](#unregisterresponse), [Kick](#kick)
+  > [Register](#register), [RegisterSuccess](#registersuccess), [RegisterFailure](#registerfailure), [UpdateLobbyList](#updatelobbylist), [UnregisterRequest](#unregister), [UnregisterResponse](#unregisterresponse), [Kick](#kick), [KickFailure](#kickfailure) 
 
 
 * startgame
