@@ -28,7 +28,6 @@ If the body is changed, we only have to modify the Parser in the code. If the he
 All Strings and Booleans should be stored as String to allow further extensibility and should be handled like Strings in the code. Same for Int.
 
 The header must always contain `messagegroup` and `messagetype`. The body may vary.
-`messagegroup` is camelCase, `messagetype` is PascalCase, to make it easier to visually distinguish them.
 
   ```json
   {
@@ -366,7 +365,7 @@ The **admin client** informs the server that it should start the game and stop l
 {
   "header":{
     "messagegroup":"startgame",
-    "messagetype":"startGame"
+    "messagetype":"StartGame"
   },
 	"body":{}
 }
