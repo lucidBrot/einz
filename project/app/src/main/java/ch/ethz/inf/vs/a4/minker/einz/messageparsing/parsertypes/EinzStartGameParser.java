@@ -5,8 +5,10 @@ import ch.ethz.inf.vs.a4.minker.einz.Rule;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSpecifyRulesMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,16 +27,37 @@ public class EinzStartGameParser extends EinzParser {
             case "SpecifyRules":
                 return parseSpecifyRules(message);
             case "StartGame":
-                return parseStartGame();
+                return parseStartGame(message);
             case "InitGame":
-                return parseInitGame();
+                return parseInitGame(message);
             default:
                 Log.d("EinzStartGameParser","Not a valid messagetype "+messagetype+" for EinzRegistrationParser");
                 return null;
         }
     }
 
-    private EinzMessage<EinzStartGameMessageBody> parseStartGame() {
+    private EinzMessage<EinzInitGameMessageBody> parseInitGame(JSONObject message) throws JSONException {
+        EinzMessageHeader mheader = new EinzMessageHeader("startgame", "InitGame");
+        ArrayList<Rule> ruleset=new ArrayList<>();
+        JSONObject body = message.getJSONObject("body");
+        JSONObject jruleset = body.getJSONObject("ruleset");
+        for(int i = 0; i<jruleset.names().length(); i++) {
+            Rule rule = new Rule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
+            ruleset.add(rule);
+        }
+        JSONArray jturnOrder = body.getJSONArray("turn-order");
+        ArrayList<String> turnOrder = new ArrayList<>();
+        for(int i = 0; i<jturnOrder.length(); i++){
+            turnOrder.add(jturnOrder.getString(i));
+        }
+
+        EinzInitGameMessageBody mbody = new EinzInitGameMessageBody(ruleset, turnOrder);
+
+        return new EinzMessage<>(mheader, mbody);
+    }
+
+    // ignores its input because this message has no body (currently)
+    private EinzMessage<EinzStartGameMessageBody> parseStartGame(JSONObject message) {
         EinzMessageHeader header = new EinzMessageHeader("startgame", "StartGame");
         EinzStartGameMessageBody body = new EinzStartGameMessageBody();
         return new EinzMessage<>(header, body);
