@@ -1,10 +1,16 @@
 \BOOKMARK [1][-]{section.1}{Introduction}{}% 1
 \BOOKMARK [1][-]{section.2}{System Overview}{}% 2
-\BOOKMARK [2][-]{subsection.2.1}{DETAILED OVERVIEW}{section.2}% 3
-\BOOKMARK [1][-]{section.3}{Requirements}{}% 4
-\BOOKMARK [1][-]{section.4}{Work Packages}{}% 5
-\BOOKMARK [1][-]{section.5}{Milestones}{}% 6
-\BOOKMARK [2][-]{subsection.5.1}{Milestone 1}{section.5}% 7
-\BOOKMARK [2][-]{subsection.5.2}{Milestone 2}{section.5}% 8
-\BOOKMARK [2][-]{subsection.5.3}{Milestone 3}{section.5}% 9
-\BOOKMARK [1][-]{section.6}{References}{}% 10
+\BOOKMARK [2][-]{subsection.2.1}{Server Client Messaging}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{User Interface}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Dynamic Rules}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Organizing}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.5}{Additional Possible Goals}{section.2}% 7
+\BOOKMARK [1][-]{section.3}{Requirements}{}% 8
+\BOOKMARK [1][-]{section.4}{Work Packages}{}% 9
+\BOOKMARK [1][-]{section.5}{Milestones}{}% 10
+\BOOKMARK [2][-]{subsection.5.1}{Milestone 1: Specification}{section.5}% 11
+\BOOKMARK [2][-]{subsection.5.2}{Milestone 2: Fundamental}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.3}{Milestone 3: Messaging}{section.5}% 13
+\BOOKMARK [2][-]{subsection.5.4}{Milestone 4: Base Game}{section.5}% 14
+\BOOKMARK [2][-]{subsection.5.5}{Milestone 5: Final Game}{section.5}% 15
+\BOOKMARK [1][-]{section.6}{References}{}% 16
