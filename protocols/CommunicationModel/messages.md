@@ -390,7 +390,7 @@ The **Server** sends this to the Client. No response from the Client required.
 {
   "header":{
     "messagegroup":"startgame",
-    "messagetype":"SendRules"
+    "messagetype":"InitGame"
   },
   "body":{
     "ruleset":{
