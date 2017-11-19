@@ -18,7 +18,10 @@ public class EinzRegisterMessageBody extends EinzMessageBody {
 
     @Override
     public JSONObject toJSON() throws JSONException {
-        return null;
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("username", username);
+        jsonBody.put("role", role);
+        return jsonBody;
     }
 
     public String getUsername() {

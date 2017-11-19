@@ -26,7 +26,9 @@ import java.util.concurrent.locks.Lock;
 public class EinzServerClientHandler implements Runnable{
     public Socket socket;
 
-    public boolean spin = false;
+    private boolean spin = false;
+    private boolean firstConnectionOnServer = false; // whether this user should be considered admin
+
     private ThreadedEinzServer parentEinzServer;
     private DataOutputStream out = null;
     public final Object socketWriteLock = new Object(); // lock onto this for writing
@@ -49,11 +51,12 @@ public class EinzServerClientHandler implements Runnable{
      * @param parentEinzServer the EinzServer instance creating this thread
      * @param serverFunctionDefinition the implementation of the interface to run the actions in.
      */
-    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer parentEinzServer, ServerFunctionDefinition serverFunctionDefinition) {
+    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer parentEinzServer, ServerFunctionDefinition serverFunctionDefinition, boolean firstConnectionOnServer) {
         Log.d("ESCH", "started new instance");
 
         this.parentEinzServer = parentEinzServer;
         parentEinzServer.incNumClients();
+        this.firstConnectionOnServer = firstConnectionOnServer;
 
         debug_printJSONRepresentationOf(EinzRegistrationParser.class);
 
@@ -111,7 +114,7 @@ public class EinzServerClientHandler implements Runnable{
         //<debug>
         JSONObject container = new JSONObject();
         try {
-            container.put("your thing:", o);
+            container.put("your Object:", o);
             Log.d("ESCH/DEBUG", "printJSONRepresentationOF() : "+ container.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -230,6 +233,41 @@ public class EinzServerClientHandler implements Runnable{
     }
 
     /**
+     * Same as the other sendMessage, but transforms JSON to String for you.<br/>
+     * <b>appends \r\n at the end if there is no \n at the end</b>
+     * Threadsafe ✔ <br/>
+     * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
+     * @see #sendMessage(String)
+     * @param message
+     */
+    public void sendMessage(JSONObject message){
+        String msg = message.toString();
+        if(!msg.endsWith("\n")){
+            msg += "\r\n";
+        }
+        sendMessage(msg);
+    }
+
+    /**
+     * Same as the other sendMessage, but transforms EinzMessage to JSON to String for you.<br>
+     * <b>appends \r\n at the end if there is no \n at the end</b>
+     * Threadsafe ✔<br>
+     * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
+     * @see #sendMessage(JSONObject)
+     * @see #sendMessage(String)
+     * @param message
+     */
+    public void sendMessage(EinzMessage message){
+        try {
+            sendMessage(message.toJSON());
+        } catch (JSONException e) {
+            Log.e("ESCH/sendMsg", "You sent an EinzMessage which could not be translated toJSON().");
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * reads synchronizedly from socket
      * @return the line
      */
@@ -273,5 +311,9 @@ public class EinzServerClientHandler implements Runnable{
 
     public void setConnectedUser(String connectedUser) {
         this.connectedUser = connectedUser;
+    }
+
+    public boolean isFirstConnectionOnServer() {
+        return firstConnectionOnServer;
     }
 }
