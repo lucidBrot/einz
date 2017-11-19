@@ -22,8 +22,7 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
             case "UnregisterRequest":
                 return parseUnregisterRequest(message);
             case "Kick":
-                return parseKick(message); // TODO: parse all those cases
-            // TODO: add actions for all those cases
+                return parseKick(message);
             // The following functions should never be received as server, only as client
             case "RegisterFailure":
                 return parseRegisterFailure(message);

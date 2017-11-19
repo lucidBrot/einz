@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import org.json.JSONObject;
+
 /**
  * Created by Fabian on 11.11.2017.
  */
@@ -32,5 +34,9 @@ public class Card implements ICardDefinition {
     public CardColors wish;
     public String ID;
     public String origin;
+
+    public JSONObject toJSON(){ // TODO: implement toJSON
+        return null;
+    }
 
 }
