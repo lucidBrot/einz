@@ -289,7 +289,7 @@ Also, the other Clients need to know about leaves.
 
 ##UnregisterResponse
 
-Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client.
+Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client. This might happen even after the game has started and will then be treated similarly to a client losing connection.
 
 `reason` : *String*
 
@@ -310,7 +310,9 @@ Sent by the **server** to all clients, including the one who was unregistered. A
 
 ## Kick
 
-The player who started the server, from now on referred to as admin, may decide to kick a player from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin.
+The player who started the server, from now on referred to as admin, may decide to kick a player or spectator from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin. The admin is informed about the outcome, either by a broadcast of [UnregisterResponses](#unregisterresponse) to all clients or by a [KickFailure](#kickfailure) to only the admin.
+
+This request might also be sent during the game.
 
 ```json
 {
@@ -320,6 +322,28 @@ The player who started the server, from now on referred to as admin, may decide 
   },
   "body":{
     "username":"that random dude who we didn't want",
+  }
+}
+```
+
+## KickFailure
+
+The **server** informs the admin that [kicking](#kick) did not work. If the client who requested the kick was not the admin, it informs that client that it is not allowed to kick.
+
+`reason` : *String*
+
+> * *"not allowed"* : you are not allowed to kick people
+> * "not found" : this player or spectator is not registered
+
+```json
+{
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"KickFailure"
+  },
+  "body":{
+    "username":"the user that you wanted to kick",
+    "reason":"why you failed"
   }
 }
 ```
