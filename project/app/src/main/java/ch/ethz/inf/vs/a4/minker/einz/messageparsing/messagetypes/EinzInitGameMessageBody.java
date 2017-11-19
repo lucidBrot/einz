@@ -18,6 +18,14 @@ public class EinzInitGameMessageBody extends EinzMessageBody{
         this.turnOrder = turnOrder;
     }
 
+    public ArrayList<Rule> getRuleset() {
+        return ruleset;
+    }
+
+    public ArrayList<String> getTurnOrder() {
+        return turnOrder;
+    }
+
     /**
      * @return the body as JSONobject, ready to be included as "body":{this returned Object} in a message
      */

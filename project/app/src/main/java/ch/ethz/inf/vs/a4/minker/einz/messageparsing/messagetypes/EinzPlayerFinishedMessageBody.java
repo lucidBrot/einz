@@ -11,7 +11,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 
 public class EinzPlayerFinishedMessageBody extends EinzMessageBody {
 
-    private String username;
+    private final String username;
 
     public EinzPlayerFinishedMessageBody(String username) {
         this.username = username;
@@ -19,10 +19,6 @@ public class EinzPlayerFinishedMessageBody extends EinzMessageBody {
 
     public String getUsername() {
         return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     @Override

@@ -18,6 +18,10 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
         this.ruleset = ruleset;
     }
 
+    public ArrayList<Rule> getRuleset() {
+        return ruleset;
+    }
+
     /**
      * @return the body as JSONobject, ready to be included as "body":{this returned Object} in a message
      */

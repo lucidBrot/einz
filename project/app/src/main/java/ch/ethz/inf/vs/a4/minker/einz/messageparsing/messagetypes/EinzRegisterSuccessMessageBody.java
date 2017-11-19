@@ -27,6 +27,14 @@ public class EinzRegisterSuccessMessageBody extends EinzMessageBody {
         this.role = role;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
     /**
      * @return the body as JSONobject, ready to be included as "body":{this returned Object} in a message
      */

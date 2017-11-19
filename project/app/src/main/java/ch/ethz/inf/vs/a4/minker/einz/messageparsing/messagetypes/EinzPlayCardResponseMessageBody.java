@@ -11,7 +11,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 
 public class EinzPlayCardResponseMessageBody extends EinzMessageBody {
 
-    private String success;
+    private final String success;
 
     public EinzPlayCardResponseMessageBody(String success) {
         this.success = success;
@@ -21,9 +21,6 @@ public class EinzPlayCardResponseMessageBody extends EinzMessageBody {
         return success;
     }
 
-    public void setSuccess(String success) {
-        this.success = success;
-    }
 
     @Override
     public JSONObject toJSON() throws JSONException {

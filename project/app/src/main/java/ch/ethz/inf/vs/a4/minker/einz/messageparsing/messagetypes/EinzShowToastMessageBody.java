@@ -14,9 +14,9 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 
 public class EinzShowToastMessageBody extends EinzMessageBody {
 
-    private String toast;
-    private String from;
-    private HashMap<String, String> style;
+    private final String toast;
+    private final String from;
+    private final HashMap<String, String> style;
 
     public EinzShowToastMessageBody(String toast, String from, HashMap<String, String> style) {
         this.toast = toast;
@@ -28,24 +28,12 @@ public class EinzShowToastMessageBody extends EinzMessageBody {
         return toast;
     }
 
-    public void setToast(String toast) {
-        this.toast = toast;
-    }
-
     public String getFrom() {
         return from;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
     public HashMap<String, String> getStyle() {
         return style;
-    }
-
-    public void setStyle(HashMap<String, String> style) {
-        this.style = style;
     }
 
     @Override

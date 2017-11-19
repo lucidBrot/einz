@@ -17,23 +17,15 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
 
 public class EinzSendStateMessageBody extends EinzMessageBody {
 
-    private GlobalState globalstate;
-    private PlayerState playerstate;
+    private final GlobalState globalstate;
+    private final PlayerState playerstate;
 
     public GlobalState getGlobalstate() {
         return globalstate;
     }
 
-    public void setGlobalState(GlobalState globalstate) {
-        this.globalstate = globalstate;
-    }
-
     public PlayerState getPlayerState() {
         return playerstate;
-    }
-
-    public void setPlayerState(PlayerState playerstate) {
-        this.playerstate = playerstate;
     }
 
     public EinzSendStateMessageBody(GlobalState globalstate, PlayerState playerstate){
