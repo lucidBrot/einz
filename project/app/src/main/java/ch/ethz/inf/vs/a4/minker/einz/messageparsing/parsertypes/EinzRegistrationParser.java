@@ -32,10 +32,20 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
                 return parseUnregisterResponse(message);
             case "RegisterSuccess":
                 return parseRegisterSuccess(message);
+            case "KickFailure":
+                return parseKickFailure(message);
             default:
                 Log.d("EinzRegistrationParser","Not a valid messagetype "+messagetype+" for EinzRegistrationParser");
                 return null;
         }
+    }
+
+    private EinzMessage parseKickFailure(JSONObject message) throws JSONException {
+        JSONObject body = message.getJSONObject("body");
+        String username = body.getString("username");
+        String reason = body.getString("reason");
+        return new EinzMessage<>(new EinzMessageHeader("registration", "KickFailure"),
+                new EinzKickFailureMessageBody(username, reason));
     }
 
     private EinzMessage parseUnregisterResponse(JSONObject message) throws JSONException {
