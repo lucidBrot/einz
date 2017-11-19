@@ -4,6 +4,7 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
@@ -33,6 +34,10 @@ public class EinzRegisterAction extends EinzAction{
      */
     @Override
     public void run() {
-        getServerManager().registerUser(this.body.getUsername(), getEinzServerClientHandler()); // TODO: response on register
+        // register user
+        EinzMessage response = getServerManager().registerUser(this.body.getUsername(), this.body.getRole(), getEinzServerClientHandler());
+        // send response
+        getEinzServerClientHandler().sendMessage(response);
+
     }
 }

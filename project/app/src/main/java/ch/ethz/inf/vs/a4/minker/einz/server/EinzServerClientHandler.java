@@ -233,6 +233,41 @@ public class EinzServerClientHandler implements Runnable{
     }
 
     /**
+     * Same as the other sendMessage, but transforms JSON to String for you.<br/>
+     * <b>appends \r\n at the end if there is no \n at the end</b>
+     * Threadsafe ✔ <br/>
+     * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
+     * @see #sendMessage(String)
+     * @param message
+     */
+    public void sendMessage(JSONObject message){
+        String msg = message.toString();
+        if(!msg.endsWith("\n")){
+            msg += "\r\n";
+        }
+        sendMessage(msg);
+    }
+
+    /**
+     * Same as the other sendMessage, but transforms EinzMessage to JSON to String for you.<br>
+     * <b>appends \r\n at the end if there is no \n at the end</b>
+     * Threadsafe ✔<br>
+     * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
+     * @see #sendMessage(JSONObject)
+     * @see #sendMessage(String)
+     * @param message
+     */
+    public void sendMessage(EinzMessage message){
+        try {
+            sendMessage(message.toJSON());
+        } catch (JSONException e) {
+            Log.e("ESCH/sendMsg", "You sent an EinzMessage which could not be translated toJSON().");
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * reads synchronizedly from socket
      * @return the line
      */

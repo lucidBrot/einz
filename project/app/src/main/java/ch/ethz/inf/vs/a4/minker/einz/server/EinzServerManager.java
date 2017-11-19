@@ -8,6 +8,8 @@ import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -120,12 +122,12 @@ public class EinzServerManager {
 
     /**
      * Threadsafe because of ConcurrentHashMap
-     * Returns an EinzMessage which could be used as reponse to the client. This Message is either of Type RegisterSuccess or RegisterFailure
+     * Returns (as a freebie) an EinzMessage which could be used as reponse to the client. This Message is either of Type RegisterSuccess or RegisterFailure
      * Not yet fully implemented.
      * @param username
      * @param handler
      */
-    public EinzMessage registerUser(String username, EinzServerClientHandler handler){
+    public EinzMessage registerUser(String username, String role, EinzServerClientHandler handler){ // TODO: differentiate between roles and manage different reasons
         EinzServerClientHandler res = registeredClientHandlers.putIfAbsent(username,handler);
         // res is null if it was not set before this call, else it is the previous value
         boolean success = (res == null || res.equals(handler)); // success only if nobody was registered or itself was already registered (for this username)
@@ -134,17 +136,18 @@ public class EinzServerManager {
         // set admin to this user if he was the first connection and registered successfully
         if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
 
-        EinzMessage response;
+        EinzMessage response = null;
         // TODO: Response on Register
-        /*
         if(success){
-            EinzMessageHeader header = new EinzMessageHeader("registration", "registerSuccess");
-            EinzRegisterSuccessMessageBody body = new EinzRegisterSuccessMessageBody();
-            response = new EinzMessage<EinzRegisterSuccessMessageBody>();
+            EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
+            EinzRegisterSuccessMessageBody body = new EinzRegisterSuccessMessageBody(username, role);
+            response = new EinzMessage<EinzRegisterSuccessMessageBody>(header, body);
         } else {
-
-        }*/
-        return null;
+            EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterFailure");
+            EinzRegisterFailureMessageBody body = new EinzRegisterFailureMessageBody(role, username, "don't know lol #DEBUG4LIEF");
+            response = new EinzMessage<EinzRegisterFailureMessageBody>(header, body);
+        }
+        return response;
     }
 
 }
