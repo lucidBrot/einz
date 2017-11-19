@@ -382,7 +382,7 @@ The **Server** sends this to the Client. No response from the Client required.
 
 `turn-order` : *JSONArray of usernames as Strings* 
 
-`ruleset` : *JSONOBject containing non-uniform JSONObjects*
+`ruleset` : *JSONObject containing non-uniform JSONObjects*
 
 > The identifier of the JSONObject is also the identifier of the [rule](#rule)
 
