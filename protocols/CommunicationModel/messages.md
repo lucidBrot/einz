@@ -28,6 +28,7 @@ If the body is changed, we only have to modify the Parser in the code. If the he
 All Strings and Booleans should be stored as String to allow further extensibility and should be handled like Strings in the code. Same for Int.
 
 The header must always contain `messagegroup` and `messagetype`. The body may vary.
+`messagegroup` is camelCase, `messagetype` is PascalCase, to make it easier to visually distinguish them.
 
   ```json
   {
@@ -63,7 +64,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * draw
 
-  > [DrawCards](#drawcards), [DrawCardsSuccess](#drawcardssuccess), [DrawCardsFailure](#drawcardsfailure)
+  > [DrawCards](#drawcards), [DrawCardsResponse](#drawcardsresponse)
 
 
 * stateinfo
@@ -288,7 +289,7 @@ Also, the other Clients need to know about leaves.
 
 ##UnregisterResponse
 
-Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client.
+Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client. This might happen even after the game has started and will then be treated similarly to a client losing connection.
 
 `reason` : *String*
 
@@ -309,7 +310,9 @@ Sent by the **server** to all clients, including the one who was unregistered. A
 
 ## Kick
 
-The player who started the server, from now on referred to as admin, may decide to kick a player from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin.
+The player who started the server, from now on referred to as admin, may decide to kick a player or spectator from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin. The admin is informed about the outcome, either by a broadcast of [UnregisterResponses](#unregisterresponse) to all clients or by a [KickFailure](#kickfailure) to only the admin.
+
+This request might also be sent during the game.
 
 ```json
 {
@@ -319,6 +322,28 @@ The player who started the server, from now on referred to as admin, may decide 
   },
   "body":{
     "username":"that random dude who we didn't want",
+  }
+}
+```
+
+## KickFailure
+
+The **server** informs the admin that [kicking](#kick) did not work. If the client who requested the kick was not the admin, it informs that client that it is not allowed to kick.
+
+`reason` : *String*
+
+> * *"not allowed"* : you are not allowed to kick people
+> * "not found" : this player or spectator is not registered
+
+```json
+{
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"KickFailure"
+  },
+  "body":{
+    "username":"the user that you wanted to kick",
+    "reason":"why you failed"
   }
 }
 ```
@@ -365,7 +390,7 @@ The **admin client** informs the server that it should start the game and stop l
 {
   "header":{
     "messagegroup":"startgame",
-    "messagetype":"StartGame"
+    "messagetype":"startGame"
   },
 	"body":{}
 }
@@ -382,7 +407,7 @@ The **Server** sends this to the Client. No response from the Client required.
 
 `turn-order` : *JSONArray of usernames as Strings* 
 
-`ruleset` : *JSONObject containing non-uniform JSONObjects*
+`ruleset` : *JSONOBject containing non-uniform JSONObjects*
 
 > The identifier of the JSONObject is also the identifier of the [rule](#rule)
 
@@ -390,7 +415,7 @@ The **Server** sends this to the Client. No response from the Client required.
 {
   "header":{
     "messagegroup":"startgame",
-    "messagetype":"InitGame"
+    "messagetype":"SendRules"
   },
   "body":{
     "ruleset":{
@@ -419,9 +444,9 @@ Note that the example rules here were spontaneously written and might not be spe
 
 ## DrawCards
 
-Request to draw new cards. The Server will return as many cards as the minimum of cards drawable that is usually not 0.
+Request to draw new cards. The Server will return as many cards as the minimum of cards drawable that is not 0, or 0 as a sign of failure.
 
-The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later using [**DrawCardsSuccess**](#drawcardssuccess) or [DrawCardsFailure](#drawcardsfailure).
+The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later using [**DrawCardsResponse**](#drawcardsresponse).
 
 ```json
 {
@@ -434,7 +459,7 @@ The **Client** sends this request. The Server checks whether the Client is allow
 }
 ```
 
-##DrawCardsSuccess
+##DrawCardsResponse
 
 `cards` : *JSONArray of JSONObjects*
 
@@ -464,7 +489,7 @@ The **server** sends this request and will follow up with a complete [sendState]
 {
   "header":{
     "messagegroup":"draw",
-    "messagetype":"DrawCardsSuccess"
+    "messagetype":"DrawCardsResponse"
   },
   "body":{
     "cards":[
@@ -472,32 +497,6 @@ The **server** sends this request and will follow up with a complete [sendState]
       {"ID":"cardID3","origin":"talon"},
       {"ID":"cardID1","origin":"talon"}
     ]
-  }
-}
-```
-
-
-
-## DrawCardsFailure
-
-A simple response by the **server** if drawing cards failed for some reason.
-
-`reason` : *String* 
-
-> Possible reasons currently are
->
-> + *"state changed"*
-> + *"unauthorized request"* if the request was not allowed in the first place
-> + *"invalid request"* if the format of the request is problematic
-
-```json
-{
-  "header":{
-    "messagegroup":"draw",
-    "messagetype":"DrawCardsFailure"
-  },
-  "body":{
-    "reason":"state changed"
   }
 }
 ```
