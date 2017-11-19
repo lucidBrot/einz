@@ -6,7 +6,8 @@ import org.json.JSONObject;
 
 public class EinzUnregisterResponseMessageBody extends EinzMessageBody {
 
-    private final String username, reason;
+    private final String username;
+    private final String reason;
 
     public EinzUnregisterResponseMessageBody(String username, String reason){
         this.username = username;
@@ -19,8 +20,10 @@ public class EinzUnregisterResponseMessageBody extends EinzMessageBody {
      */
     @Override
     public JSONObject toJSON() throws JSONException {
-        return new JSONObject("{\"username\":\""+this.username+"\"," +
-                "\"reason\":\""+this.reason+"\"}");
+        JSONObject body = new JSONObject();
+        body.put("username", username);
+        body.put("reason", reason);
+        return body;
     }
 
     public String getReason() {
