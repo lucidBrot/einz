@@ -63,7 +63,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * draw
 
-  > [DrawCards](#drawcards), [DrawCardsResponse](#drawcardsresponse)
+  > [DrawCards](#drawcards), [DrawCardsSuccess](#drawcardssuccess), [DrawCardsFailure](#drawcardsfailure)
 
 
 * stateinfo
@@ -419,9 +419,9 @@ Note that the example rules here were spontaneously written and might not be spe
 
 ## DrawCards
 
-Request to draw new cards. The Server will return as many cards as the minimum of cards drawable that is not 0, or 0 as a sign of failure.
+Request to draw new cards. The Server will return as many cards as the minimum of cards drawable that is usually not 0.
 
-The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later using [**DrawCardsResponse**](#drawcardsresponse).
+The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later using [**DrawCardsSuccess**](#drawcardssuccess) or [DrawCardsFailure](#drawcardsfailure).
 
 ```json
 {
@@ -434,7 +434,7 @@ The **Client** sends this request. The Server checks whether the Client is allow
 }
 ```
 
-##DrawCardsResponse
+##DrawCardsSuccess
 
 `cards` : *JSONArray of JSONObjects*
 
@@ -464,7 +464,7 @@ The **server** sends this request and will follow up with a complete [sendState]
 {
   "header":{
     "messagegroup":"draw",
-    "messagetype":"DrawCardsResponse"
+    "messagetype":"DrawCardsSuccess"
   },
   "body":{
     "cards":[
@@ -472,6 +472,32 @@ The **server** sends this request and will follow up with a complete [sendState]
       {"ID":"cardID3","origin":"talon"},
       {"ID":"cardID1","origin":"talon"}
     ]
+  }
+}
+```
+
+
+
+## DrawCardsFailure
+
+A simple response by the **server** if drawing cards failed for some reason.
+
+`reason` : *String* 
+
+> Possible reasons currently are
+>
+> + *"state changed"*
+> + *"unauthorized request"* if the request was not allowed in the first place
+> + *"invalid request"* if the format of the request is problematic
+
+```json
+{
+  "header":{
+    "messagegroup":"draw",
+    "messagetype":"DrawCardsFailure"
+  },
+  "body":{
+    "reason":"state changed"
   }
 }
 ```
