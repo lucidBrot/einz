@@ -53,7 +53,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         @SuppressWarnings("deprecation") // https://stackoverflow.com/a/20846328/2550406
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        if(ip.equals("0.0.0.0") || ip.equals("") || ip==null || ip.equals("null")){
+        if(ip.equals("0.0.0.0") || ip.equals("") || ip.equals("null")){
             // not connected via WIFI, use something else
             try {
                 ip=getLocalIpAddress(); // use the code of some stackoverflow dude.
