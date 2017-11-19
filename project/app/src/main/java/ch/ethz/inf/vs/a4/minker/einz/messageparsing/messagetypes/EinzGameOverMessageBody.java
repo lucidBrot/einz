@@ -14,7 +14,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 
 public class EinzGameOverMessageBody extends EinzMessageBody {
 
-    private HashMap<String, String> points;
+    private final HashMap<String, String> points;
 
     public EinzGameOverMessageBody(HashMap<String, String> points) {
         this.points = points;
@@ -22,10 +22,6 @@ public class EinzGameOverMessageBody extends EinzMessageBody {
 
     public HashMap<String, String> getPoints() {
         return points;
-    }
-
-    public void setPoints(HashMap<String, String> points) {
-        this.points = points;
     }
 
 

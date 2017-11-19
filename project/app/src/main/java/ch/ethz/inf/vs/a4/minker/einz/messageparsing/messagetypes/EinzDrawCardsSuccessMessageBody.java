@@ -8,12 +8,16 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class EinzDrawCardsResponseMessageBody extends EinzMessageBody {
+public class EinzDrawCardsSuccessMessageBody extends EinzMessageBody {
 
     private final ArrayList<Card> cards;
 
-    public EinzDrawCardsResponseMessageBody(ArrayList<Card> cards) {
+    public EinzDrawCardsSuccessMessageBody(ArrayList<Card> cards) {
         this.cards = cards;
+    }
+
+    public ArrayList<Card> getCards() {
+        return cards;
     }
 
     /**
