@@ -53,7 +53,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         @SuppressWarnings("deprecation") // https://stackoverflow.com/a/20846328/2550406
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        if(ip.equals("0.0.0.0") || ip.equals("") || ip==null || ip.equals("null")){
+        if(ip.equals("0.0.0.0") || ip.equals("") || ip.equals("null")){
             // not connected via WIFI, use something else
             try {
                 ip=getLocalIpAddress(); // use the code of some stackoverflow dude.
@@ -72,7 +72,8 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         switch(view.getId()){
             case R.id.btn_s_listen_for_clients:
                 // start server
-                serverThread.start(); // TODO: stop server on back button
+                if(serverThread.getState() == Thread.State.NEW) //https://developer.android.com/reference/java/lang/Thread.State.html#RUNNABLE
+                    serverThread.start(); // TODO: stop server on back button
                 break;
             case R.id.btn_s_start_game_initialization:
                 // TODO: start game

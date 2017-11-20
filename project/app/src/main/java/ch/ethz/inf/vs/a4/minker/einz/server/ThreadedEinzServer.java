@@ -32,8 +32,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
-    protected ServerFunctionDefinition serverFunctionDefinition; // interface to server logic
-    protected final Context applicationContext;
+    final Context applicationContext;
     private final EinzServerManager serverManager;
 
     /**
@@ -151,15 +150,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
 
-            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface());
+            EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface(),firstconnection);
             Thread thread = new Thread(ez);
             clientHandlerThreads.add(thread);
             thread.start(); // start new thread for this client.
 
-            if(firstconnection){
-                //TODO: set admin
-            }
-            firstconnection = false;
+            firstconnection = false; // the first user has connected, all others cannot be admin
 
         }
         return true;

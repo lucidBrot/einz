@@ -5,12 +5,11 @@ import android.util.Pair;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.R;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzActionFactory;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParserFactory;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.InvalidResourceFormatException;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -123,12 +122,32 @@ public class EinzServerManager {
 
     /**
      * Threadsafe because of ConcurrentHashMap
+     * Returns (as a freebie) an EinzMessage which could be used as reponse to the client. This Message is either of Type RegisterSuccess or RegisterFailure
+     * Not yet fully implemented.
      * @param username
      * @param handler
      */
-    public void registerUser(String username, EinzServerClientHandler handler){
-        registeredClientHandlers.put(username,handler);
-        Log.d("serverManager/reg", "registered "+username);
+    public EinzMessage registerUser(String username, String role, EinzServerClientHandler handler){ // TODO: differentiate between roles and manage different reasons
+        EinzServerClientHandler res = registeredClientHandlers.putIfAbsent(username,handler);
+        // res is null if it was not set before this call, else it is the previous value
+        boolean success = (res == null || res.equals(handler)); // success only if nobody was registered or itself was already registered (for this username)
+        Log.d("serverManager/reg", "registered "+username+". Success: "+success);
+
+        // set admin to this user if he was the first connection and registered successfully
+        if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
+
+        EinzMessage response = null;
+        // TODO: Response on Register
+        if(success){
+            EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
+            EinzRegisterSuccessMessageBody body = new EinzRegisterSuccessMessageBody(username, role);
+            response = new EinzMessage<EinzRegisterSuccessMessageBody>(header, body);
+        } else {
+            EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterFailure");
+            EinzRegisterFailureMessageBody body = new EinzRegisterFailureMessageBody(role, username, "don't know lol #DEBUG4LIEF");
+            response = new EinzMessage<EinzRegisterFailureMessageBody>(header, body);
+        }
+        return response;
     }
 
 }

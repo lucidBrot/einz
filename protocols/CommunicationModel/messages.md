@@ -54,7 +54,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * registration
 
-  > [Register](#register), [RegisterSuccess](#registersuccess), [RegisterFailure](#registerfailure), [UpdateLobbyList](#updatelobbylist) [UnregisterRequest](#unregister), [UnregisterResponse](#unregisterresponse), [Kick](#kick)
+  > [Register](#register), [RegisterSuccess](#registersuccess), [RegisterFailure](#registerfailure), [UpdateLobbyList](#updatelobbylist), [UnregisterRequest](#unregister), [UnregisterResponse](#unregisterresponse), [Kick](#kick), [KickFailure](#kickfailure) 
 
 
 * startgame
@@ -84,7 +84,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * endGame
 
-  > [PlayerFinished](#playerfinished), [EndGame](#endgame)
+  > [PlayerFinished](#playerfinished), [GameOver](#gameover)
 
 
 
@@ -185,7 +185,7 @@ The **Client** sends this and Server only reacts to it. The Server's reaction is
 }
 ```
 
-## RegisterSuccess
+##RegisterSuccess
 
 If the client requests the same role multiple times, the request will still succeed. If the client requests different roles, one is chosen arbitrarily by the server. Therefore, the packet sent from the server contains the role the client was given.
 
@@ -287,9 +287,9 @@ We don't need to wait for the Server to respond. The Server logic will probably 
 However, the **Server** might decide to [kick](#kick) a player. For these purposes, [the Response](#unregisterplayer) exists.
 Also, the other Clients need to know about leaves.
 
-## UnregisterResponse
+##UnregisterResponse
 
-Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client.
+Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client. This might happen even after the game has started and will then be treated similarly to a client losing connection.
 
 `reason` : *String*
 
@@ -303,14 +303,16 @@ Sent by the **server** to all clients, including the one who was unregistered. A
   },
   "body":{
     "username":"that random dude who we didn't want",
-    "reason":"true"
+    "reason":"kicked"
   }
 }
 ```
 
 ## Kick
 
-The player who started the server, from now on referred to as admin, may decide to kick a player from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin.
+The player who started the server, from now on referred to as admin, may decide to kick a player or spectator from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin. The admin is informed about the outcome, either by a broadcast of [UnregisterResponses](#unregisterresponse) to all clients or by a [KickFailure](#kickfailure) to only the admin.
+
+This request might also be sent during the game.
 
 ```json
 {
@@ -320,6 +322,28 @@ The player who started the server, from now on referred to as admin, may decide 
   },
   "body":{
     "username":"that random dude who we didn't want",
+  }
+}
+```
+
+## KickFailure
+
+The **server** informs the admin that [kicking](#kick) did not work. If the client who requested the kick was not the admin, it informs that client that it is not allowed to kick.
+
+`reason` : *String*
+
+> * *"not allowed"* : you are not allowed to kick people
+> * "not found" : this player or spectator is not registered
+
+```json
+{
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"KickFailure"
+  },
+  "body":{
+    "username":"the user that you wanted to kick",
+    "reason":"why you failed"
   }
 }
 ```
@@ -435,7 +459,7 @@ The **Client** sends this request. The Server checks whether the Client is allow
 }
 ```
 
-## DrawCardsResponse
+##DrawCardsResponse
 
 `cards` : *JSONArray of JSONObjects*
 
@@ -549,7 +573,7 @@ The [response](#sendstate) will usually also be sent without being requested - e
 }
 ```
 
-## SendState
+##SendState
 
 The **server** sends this after being asked via [GetState](#getstate) or when appropriate, i.e. some player did something or the state changed for some other reason.
 
@@ -638,21 +662,11 @@ After this, the server will remove the player from the turn order list and let i
 }
 ```
 
-## EndGame
+## GameOver
 
-The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, but `points` is not neccessary, depending on the ruleset.
+The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, sorted based on the points and the specified rules.
 
-`ranking` : *JSONArray of Players*
-
-> The Players are of the form
->
-> ```json
-> {
->   "username":{
->     "points":"12"
->   }
-> }
-> ```
+points: *JSONObject of Players and points*
 
 ```Json
 {
@@ -660,7 +674,12 @@ The **Server** informs the clients that the game is over and they can show the a
 		"messagegroup": "endGame",
 		"messagetype": "GameOver"
 	},
-	"body": {}
+  "body": {
+    "points":{
+      "roger":"17",
+      "chris":"3"
+    }
+  }
 }
 ```
 
