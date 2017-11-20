@@ -142,6 +142,7 @@ public class EinzServerManager {
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
             EinzRegisterSuccessMessageBody body = new EinzRegisterSuccessMessageBody(username, role);
             response = new EinzMessage<EinzRegisterSuccessMessageBody>(header, body);
+            handler.setConnectedUser(username);
         } else {
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterFailure");
             EinzRegisterFailureMessageBody body = new EinzRegisterFailureMessageBody(role, username, "don't know lol #DEBUG4LIEF");
