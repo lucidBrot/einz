@@ -5,7 +5,10 @@ import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
@@ -38,6 +41,11 @@ public class EinzRegisterAction extends EinzAction{
         EinzMessage response = getServerManager().registerUser(this.body.getUsername(), this.body.getRole(), getEinzServerClientHandler());
         // send response
         getEinzServerClientHandler().sendMessage(response);
-
+        // if it was a successful register, inform all clients about the change
+        if(response.getBody() instanceof EinzRegisterSuccessMessageBody) {
+            EinzMessage<EinzUpdateLobbyListMessageBody> msg = getServerManager().generateUpdateLobbyListRequest();
+            getServerManager().broadcastMessageToAllPlayers(msg);
+            getServerManager().broadcastMessageToAllSpectators(msg);
+        }
     }
 }

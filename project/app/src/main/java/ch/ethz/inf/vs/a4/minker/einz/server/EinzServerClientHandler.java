@@ -158,17 +158,20 @@ public class EinzServerClientHandler implements Runnable{
             try {
                 socketLock.readLock().lock();
                 line = readSocketLine();
+                socketLock.readLock().unlock();
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
+                    socketLock.writeLock().lock();
                     socket.close();
+                    socketLock.writeLock().unlock();
                     parentEinzServer.decNumClients();
                     Log.d("ESCH", "closed clientSocket");
                     return;
                 } else {
                     Log.d("ESCH", "received line: "+line);
                     runAction(parseMessage(line));
-                    sendMessage(line + "\r\n"); // echo back the same packet
+                    sendMessage("Your Package was: "+line + "\r\n"); // echo back the same packet // TODO: don't echo back
                 }
-                socketLock.readLock().unlock();
+
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("ESCH", "Something Failed. Probably the client disconnected without warning. Or maybe the socket is closed.");
@@ -197,7 +200,7 @@ public class EinzServerClientHandler implements Runnable{
 
     }
 
-    // TODO implement onClientDisconnected
+    // TODO implement onClientDisconnected, make sure to call this from stopThreadPatiently and from deregister.
     private void onClientDisconnected(){
         Log.d("ESCH/clientDisconnected", "NOT YET IMPLEMENTED");
     }
@@ -221,11 +224,11 @@ public class EinzServerClientHandler implements Runnable{
      *                DO include it at the end of the package
      */
     public void sendMessage(String message) {
-        socketLock.readLock().lock();
+
         if(out==null){
             Log.e("EinzServerThread", "sendMessage: Not yet fully initialized. cannot send message.");
         }
-        socketLock.readLock().unlock();
+
         socketLock.writeLock().lock(); //synchronized
             // maybe need to append  + "\r\n" to message ?
             try {

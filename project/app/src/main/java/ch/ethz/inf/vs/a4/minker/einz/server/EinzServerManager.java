@@ -1,15 +1,11 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
-import android.util.Pair;
-import ch.ethz.inf.vs.a4.minker.einz.GameState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
-import ch.ethz.inf.vs.a4.minker.einz.R;
+import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,14 +15,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Stores Configuration of {@link ThreadedEinzServer} that is not suited for the communications-only part, because it has to do with the content of the messages,
- * But is also not really relevant to the serverlogic
- * This also registers and handles mappings that serverlogic does not handle. Initial Mappings are loaded from resources
+ * Stores Configuration of {@link ThreadedEinzServer} that is not suited for the communications-only part, because it has to do with the content of the messages,<br>
+ * But is also not really relevant to the serverlogic<br>
+ * This also registers and handles mappings that serverlogic does not handle. Initial Mappings are loaded from resources<br>
+ * This class contains broadcastToSpectators while the ThreadedEinzServer contains sendMessageToUsername. That is basically the
+ * difference between what belongs into this class and what into the server itself. Abstraction of game messaging vs pure messaging
  */
 public class EinzServerManager {
 
@@ -40,12 +35,14 @@ public class EinzServerManager {
     private final int networkingActionFile = R.raw.initialnetworkingactionmappings; // the mapping from messagebodytype to action
     private final int gameLogicActionFile = R.raw.initialgamelogicactionmappings; // same, but for game logic instead
 
-    public ConcurrentHashMap<String, EinzServerClientHandler> registeredClientHandlers; // list of only the registered clients, accessible by username
+    private ConcurrentHashMap<String, EinzServerClientHandler> registeredClientHandlers; // list of only the registered clients, accessible by username
     // used to keep track of currently registered usernames
+    private ConcurrentHashMap<String, String> registeredClientRoles; // mapping client usernames to roles
 
     public EinzServerManager(ThreadedEinzServer whotomanage, ServerFunctionDefinition serverFunctionInterface){
         this.server = whotomanage;
         this.registeredClientHandlers = new ConcurrentHashMap<>();
+        this.registeredClientRoles = new ConcurrentHashMap<>();
         this.serverFunctionInterface = serverFunctionInterface;
     }
     protected String adminUsername; // TODO: store admin
@@ -61,9 +58,15 @@ public class EinzServerManager {
         Log.d("Manager", "finishing registrationphase.");
         server.stopListeningForIncomingConnections(true);
         ArrayList<Player> players = new ArrayList<>();
-        for(Map.Entry entry : registeredClientHandlers.entrySet()){
+        ArrayList<Spectator> spectators = new ArrayList<>();
+        for(Map.Entry<String, EinzServerClientHandler> entry : registeredClientHandlers.entrySet()){
             EinzServerClientHandler handler = (EinzServerClientHandler) entry.getValue();
-            players.add(new Player((String) entry.getKey()));
+            String role = getRegisteredClientRoles().get(entry.getKey());
+            if ( role.toLowerCase().equals("player")) {
+                players.add(new Player((String) entry.getKey()));
+            } else if ( role.toLowerCase().equals("spectator")){
+                spectators.add(new Spectator((String) entry.getKey()));
+            }
             // TODO: send that info to clients
         }
         Log.d("Manager/finishRegPhase", "Players: "+players.toString());
@@ -128,13 +131,19 @@ public class EinzServerManager {
      * @param handler
      */
     public EinzMessage registerUser(String username, String role, EinzServerClientHandler handler){ // TODO: differentiate between roles and manage different reasons
-        EinzServerClientHandler res = registeredClientHandlers.putIfAbsent(username,handler);
+        EinzServerClientHandler res = getRegisteredClientHandlers().putIfAbsent(username,handler);
         // res is null if it was not set before this call, else it is the previous value
         boolean success = (res == null || res.equals(handler)); // success only if nobody was registered or itself was already registered (for this username)
         Log.d("serverManager/reg", "registered "+username+". Success: "+success);
 
         // set admin to this user if he was the first connection and registered successfully
         if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
+
+        if(success){
+            String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
+            if(BuildConfig.DEBUG && absent != null)
+                throw new RuntimeException(new java.lang.Exception("serverManager/reg: username was absent in registeredClientHandlers but not in registeredClientRoles!"));
+        }
 
         EinzMessage response = null;
 
@@ -151,4 +160,79 @@ public class EinzServerManager {
         return response;
     }
 
+    public EinzMessage<EinzUpdateLobbyListMessageBody> generateUpdateLobbyListRequest(){
+        EinzMessageHeader header = new EinzMessageHeader("registration", "UpdateLobbyList");
+        /*
+                {
+          "header":{
+            "messagegroup":"registration",
+            "messagetype":"UpdateLobbyList"
+          },
+          "body":{
+            "lobbylist":[
+              {"roger":"player"},
+              {"chris":"player"},
+              {"table":"spectator"}
+            ],
+            "admin":"roger"
+          }
+        }
+         */
+        ConcurrentHashMap<String, String> chm = getRegisteredClientRoles();
+        @SuppressWarnings("unchecked")
+        HashMap<String, String> localCopy = (HashMap<String, String>) new HashMap(chm);
+        EinzUpdateLobbyListMessageBody body = new EinzUpdateLobbyListMessageBody(localCopy, getAdminUsername());
+
+        return new EinzMessage<>(header, body);
+    }
+
+    public ConcurrentHashMap<String, String> getRegisteredClientRoles() {
+        return registeredClientRoles;
+    }
+
+    public ConcurrentHashMap<String, EinzServerClientHandler> getRegisteredClientHandlers() {
+        return registeredClientHandlers;
+    }
+
+    public String getAdminUsername() {
+        return adminUsername;
+    }
+
+    public void broadcastMessageToAllPlayers(EinzMessage message) {
+        Log.d("servMan/broadcastP", "broadcasting "+message.getBody().getClass().getSimpleName());
+        ConcurrentHashMap<String, EinzServerClientHandler> map = getRegisteredClientHandlers();
+        for(String username : getRegisteredClientRoles().keySet()){
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
+                continue;
+
+            try {
+                this.server.sendMessageToUser(username, message);
+            } catch (UserNotRegisteredException e) {
+                // this shouldn't happen
+                Log.e("servMan/broadcastP", "This shouldn't happen: failed to send message because user is unregistered.");
+                throw new RuntimeException(e);
+            } catch (JSONException e) {
+                Log.e("servMan/broadcastP", "Exception while translating message");
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void broadcastMessageToAllSpectators(EinzMessage message) {
+        for(String username : getRegisteredClientRoles().keySet()){
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
+                continue;
+
+            try {
+                this.server.sendMessageToUser(username, message);
+            } catch (UserNotRegisteredException e) {
+                // this shouldn't happen
+                Log.e("servMan/broadcastS", "This shouldn't happen: failed to send message because user is unregistered.");
+                e.printStackTrace();
+            } catch (JSONException e) {
+                Log.e("servMan/broadcastS", "Exception while translating message");
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }
