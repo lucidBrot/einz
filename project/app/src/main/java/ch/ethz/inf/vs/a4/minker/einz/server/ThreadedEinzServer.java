@@ -214,6 +214,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
     /**
      * sends a (usually JSON-encoded, one-line) message to user specified by username. If the message does not end with "\r\n", that will be appended.
+     * <br>Threadsafe ✔ Writelock on socket<br>
      * @param username target registered user as String
      * @param message JSON-encoded message as String
      * @throws UserNotRegisteredException if username is not registered
@@ -233,6 +234,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
     /**
      * Calls this.sendMessageToUser, but with the message transformed to a JSON string
+     * <br>Threadsafe ✔ Writelock on socket<br>
      * @param username to whom to send this message
      * @param message what to send
      * @throws UserNotRegisteredException if the user is not found
@@ -241,30 +243,6 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     public void sendMessageToUser(String username, EinzMessage message) throws UserNotRegisteredException, JSONException {
         this.sendMessageToUser(username, message.toJSON().toString());
     }
-
-//    /**
-//     * To be called by EinzServerClientHandler when user registers.
-//     * If the entry for username already exists, it will be replaced
-//     * This is only for connection management
-//     * @param username key
-//     * @param einzServerClientHandler value: the client handler
-//     * @param thread value: The thread which contains the einzServerClientHandler
-//     */
-//    public void registerUser(String username, EinzServerClientHandler einzServerClientHandler, Thread thread){
-//        synchronized (registeredClientHandlers) {
-//            registeredClientHandlers.put(username, Pair.create(einzServerClientHandler, thread));
-//        }
-//    }
-//
-//    /**
-//     * To be called by EinzServerClientHandler when user deregisters
-//     * @param username
-//     */
-//    public void deregisterUser(String username){
-//        synchronized (registeredClientHandlers) {
-//            registeredClientHandlers.remove(username);
-//        }
-//    }
 
     public EinzServerManager getServerManager() {
         return serverManager;

@@ -137,7 +137,7 @@ public class EinzServerManager {
         if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
 
         EinzMessage response = null;
-        // TODO: Response on Register
+
         if(success){
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
             EinzRegisterSuccessMessageBody body = new EinzRegisterSuccessMessageBody(username, role);

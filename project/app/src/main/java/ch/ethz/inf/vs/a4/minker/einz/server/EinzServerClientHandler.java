@@ -19,6 +19,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class handles one Connection per instance (thread)
@@ -31,8 +32,7 @@ public class EinzServerClientHandler implements Runnable{
 
     private ThreadedEinzServer parentEinzServer;
     private DataOutputStream out = null;
-    public final Object socketWriteLock = new Object(); // lock onto this for writing
-    public final Object socketReadLock = new Object();
+    public final ReentrantReadWriteLock socketLock = new ReentrantReadWriteLock();
     private InputStream inp;
     private BufferedReader brinp;
 
@@ -108,6 +108,7 @@ public class EinzServerClientHandler implements Runnable{
 
     /**
      * For debug purposes only, should not have side effects at all.
+     * Prints the class of the given object as JSON
      * @param o
      */
     private void debug_printJSONRepresentationOf(Object o){
@@ -126,6 +127,7 @@ public class EinzServerClientHandler implements Runnable{
 
     /**
      * load ParserMappings for networking and for gamelogic from file set up in {@link EinzServerManager}
+     * Should be fine to call without any synchronization as long as this thread is the only one using {@link #einzParserFactory}
      * @throws JSONException
      * @throws InvalidResourceFormatException
      * @throws ClassNotFoundException
@@ -201,15 +203,17 @@ public class EinzServerClientHandler implements Runnable{
 
     /**
      * sends the message to the client associated with this EinzServerClientHandler instance.
-     * Makes sure only one thread is concurrently writing to socket
+     * Threadsafety: Writelock on {@link #socketLock}
      * @param message the line to send. Do not include \r\n except as the end of your package (as we're reading a packet each line)
      *                DO include it at the end of the package
      */
     public void sendMessage(String message) {
+        socketLock.readLock().lock();
         if(out==null){
             Log.e("EinzServerThread", "sendMessage: Not yet fully initialized. cannot send message.");
         }
-        synchronized(socketWriteLock){
+        socketLock.readLock().lock();
+        socketLock.writeLock().lock(); //synchronized
             // maybe need to append  + "\r\n" to message ?
             try {
                 out.writeBytes(message);
@@ -229,7 +233,7 @@ public class EinzServerClientHandler implements Runnable{
                 this.onClientDisconnected();
                 this.stopThread(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
             }
-        }
+        socketLock.writeLock().unlock();
     }
 
     /**
@@ -268,13 +272,14 @@ public class EinzServerClientHandler implements Runnable{
     }
 
     /**
-     * reads synchronizedly from socket
+     * reads synchronously from socket
      * @return the line
      */
     private String readSocketLine() throws IOException {
-        synchronized (socketReadLock) {
-            return brinp.readLine();
-        }
+        socketLock.readLock().lock();
+            String ret = brinp.readLine();
+        socketLock.readLock().unlock();
+        return ret;
     }
 
 
