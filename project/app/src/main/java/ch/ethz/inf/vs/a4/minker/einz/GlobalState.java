@@ -30,6 +30,7 @@ public class GlobalState {
 
     private GlobalState(Collection<Card> drawPile, Stack<Card> discardPile) {
         this.discardPile = discardPile;
+        this.discardPile = discardPile;
         this.drawPile = new LinkedList<>(drawPile);
 
     }

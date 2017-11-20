@@ -6,7 +6,7 @@ import org.json.JSONObject;
  * Created by Fabian on 11.11.2017.
  */
 
-public class Card implements ICardDefinition {
+public class Card {
 
     public Card (CardTypes type, CardColors color){
         //This is used for cards which don't need the "wish" to function properly
