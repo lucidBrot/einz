@@ -194,9 +194,9 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * @throws UserNotRegisteredException if username is not registered
      */
     public void sendMessageToUser(String username, String message) throws UserNotRegisteredException {
-        this.sherLock.readLock().lock();
+        getServerManager().getUserListLock().readLock().lock();
         EinzServerClientHandler ez = getServerManager().getRegisteredClientHandlers().get(username);
-        this.sherLock.readLock().unlock();
+        getServerManager().getUserListLock().readLock().unlock();
         if(!message.endsWith("\r\n")){ // TODO: check if contains newline and if yes, abort
             message += "\r\n";
         }

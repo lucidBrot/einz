@@ -39,6 +39,11 @@ public class EinzServerManager {
     // used to keep track of currently registered usernames
     private ConcurrentHashMap<String, String> registeredClientRoles; // mapping client usernames to roles
     protected String adminUsername;
+
+    public ReentrantReadWriteLock getUserListLock() {
+        return userListLock;
+    }
+
     private ReentrantReadWriteLock userListLock = new ReentrantReadWriteLock(); // used for accessing any of the above to ensure consistency within them
         //Do not write to any of the above without locking. Do not read without read-locking if you're worried about inconsistencies
 
@@ -196,13 +201,12 @@ public class EinzServerManager {
                 }
 
             }
-
-            if(userListLock.writeLock().isHeldByCurrentThread())
-                userListLock.writeLock().unlock();
         }
 
+        if(userListLock.writeLock().isHeldByCurrentThread())
+            userListLock.writeLock().unlock();
+
         EinzMessage response = null;
-        Log.d("serverMan/reg", username+" came this far (admin="+adminUsername+").");
 
         if(success){
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
@@ -213,6 +217,7 @@ public class EinzServerManager {
             EinzRegisterFailureMessageBody body = new EinzRegisterFailureMessageBody(role, username, reason);
             response = new EinzMessage<EinzRegisterFailureMessageBody>(header, body);
         }
+        Log.d("serverMan/reg", username+" came this far [end of ServerMan/registerUser()] (admin="+adminUsername+").");
         return response;
     }
 
@@ -241,10 +246,10 @@ public class EinzServerManager {
             userListLock.readLock().lock();
             ConcurrentHashMap<String, String> clientRoles = getRegisteredClientRoles();
             ConcurrentHashMap<String, EinzServerClientHandler> clientHandlers = getRegisteredClientHandlers();
-            userListLock.readLock().unlock();
 
             String role = clientRoles.get(username);
             EinzServerClientHandler esch = clientHandlers.get(username);
+            userListLock.readLock().unlock();
 
             // inform all clients
             EinzUnregisterResponseMessageBody body = new EinzUnregisterResponseMessageBody(username, unregisterReason);
@@ -399,11 +404,8 @@ public class EinzServerManager {
 
     public void broadcastMessageToAllPlayers(EinzMessage message) {
         Log.d("servMan/broadcastP", "broadcasting "+message.getBody().getClass().getSimpleName());
-        ConcurrentHashMap<String, EinzServerClientHandler> map = getRegisteredClientHandlers();
+        userListLock.readLock().lock();
         for(String username : getRegisteredClientRoles().keySet()){
-            if(username.equals("clemï")){
-                boolean debug = true;
-            }
 
             if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
                 continue;
@@ -412,13 +414,16 @@ public class EinzServerManager {
                 this.server.sendMessageToUser(username, message);
             } catch (UserNotRegisteredException e) {
                 // this shouldn't happen
+                userListLock.readLock().unlock();
                 Log.e("servMan/broadcastP", "This shouldn't happen: failed to send message because user is unregistered.");
                 throw new RuntimeException(e);
             } catch (JSONException e) {
+                userListLock.readLock().unlock();
                 Log.e("servMan/broadcastP", "Exception while translating message");
                 throw new RuntimeException(e);
             }
         }
+        userListLock.readLock().unlock();
     }
 
     public void broadcastMessageToAllSpectators(EinzMessage message) {
