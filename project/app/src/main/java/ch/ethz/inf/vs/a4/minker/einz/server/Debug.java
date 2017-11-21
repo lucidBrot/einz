@@ -96,7 +96,7 @@ public class Debug {
                     interrupt();
                 }
 
-                tc.sendMessage(Debug.debug_getUnregisterMessage("silvia"));
+                //tc.sendMessage(Debug.debug_getUnregisterMessage("silvia"));
                 tc.sendMessage(Debug.debug_getRegisterMessage("clemi"));
                 try {
                     sleep(100);

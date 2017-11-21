@@ -188,7 +188,6 @@ public class EinzServerManager {
 
             if (success) {
                 handler.setConnectedUser(username); // tell the handler which user it is connected to
-                userListLock.writeLock().lock();
                 String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
                 userListLock.writeLock().unlock();
                 if (DEBUG && absent != null) { // assertion on android
@@ -197,10 +196,13 @@ public class EinzServerManager {
                 }
 
             }
-            userListLock.writeLock().unlock();
+
+            if(userListLock.writeLock().isHeldByCurrentThread())
+                userListLock.writeLock().unlock();
         }
 
         EinzMessage response = null;
+        Log.d("serverMan/reg", username+" came this far (admin="+adminUsername+").");
 
         if(success){
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
