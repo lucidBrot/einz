@@ -145,13 +145,13 @@ public class EinzServerClientHandler implements Runnable{
         spin = true;
         while (spin) {
             try {
-                socketLock.readLock().lock();
+                socketReadLock.lock();
                 line = readSocketLine();
-                socketLock.readLock().unlock();
+                socketReadLock.unlock();
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
-                    socketLock.writeLock().lock();
+                    socketWriteLock.lock();
                     socket.close();
-                    socketLock.writeLock().unlock();
+                    socketWriteLock.unlock();
                     parentEinzServer.decNumClients();
                     Log.d("ESCH", "closed clientSocket");
                     return;
@@ -182,7 +182,7 @@ public class EinzServerClientHandler implements Runnable{
 
 
         this.stopping = true;
-        socketLock.writeLock().lock();
+        socketWriteLock.lock();
         String usr = getLatestUser(); usr = (usr==null)?"has never been set":usr;
         Log.d("ESCH/stopThread", "STOPPING THREAD(user="+usr+") PATIENTLY!");
         this.spin = false;
@@ -193,6 +193,7 @@ public class EinzServerClientHandler implements Runnable{
             e.printStackTrace();
         }
         // what happens if other threads still want to write on this: probably IOException
+        socketWriteLock.unlock();
     }
 
     // TODO implement onClientDisconnected, make sure to call this from stopThreadPatiently and from deregister.
@@ -224,7 +225,7 @@ public class EinzServerClientHandler implements Runnable{
             Log.e("EinzServerThread", "sendMessage: Not yet fully initialized. cannot send message.");
         }
 
-        socketLock.writeLock().lock(); //synchronized
+        socketWriteLock.lock(); //synchronized
             // maybe need to append  + "\r\n" to message ?
             try {
                 out.writeBytes(message);
@@ -244,7 +245,7 @@ public class EinzServerClientHandler implements Runnable{
                 }
             }
 
-        socketLock.writeLock().unlock();
+        socketWriteLock.unlock();
     }
 
     /**
@@ -287,9 +288,9 @@ public class EinzServerClientHandler implements Runnable{
      * @return the line
      */
     private String readSocketLine() throws IOException {
-        socketLock.readLock().lock();
+        socketReadLock.lock();
             String ret = brinp.readLine();
-        socketLock.readLock().unlock();
+        socketReadLock.unlock();
         return ret;
     }
 
