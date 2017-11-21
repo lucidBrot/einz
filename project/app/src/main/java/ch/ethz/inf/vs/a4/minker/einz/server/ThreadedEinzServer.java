@@ -118,14 +118,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 e.printStackTrace();
                 return false;
             }
-            this.sherLock.readLock().lock(); // for firstconnection, so that it doesn't change and we get two admins
+            this.sherLock.writeLock().lock();// for firstconnection, so that it doesn't change and we get two admins
             EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface(),firstconnection);
             Thread thread = new Thread(ez);
-            this.sherLock.writeLock().lock();
             clientHandlerThreads.add(thread);
             firstconnection = false; // the first user has connected, all others cannot be admin
             this.sherLock.writeLock().unlock();
-            this.sherLock.readLock().unlock();
             thread.start(); // start new thread for this client.
 
         }
