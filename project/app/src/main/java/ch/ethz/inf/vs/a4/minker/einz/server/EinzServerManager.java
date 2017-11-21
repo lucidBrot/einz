@@ -442,4 +442,9 @@ public class EinzServerManager {
     public boolean isGamePhaseStarted() {
         return gamePhaseStarted;
     }
+
+
+    public ThreadedEinzServer getServer() {
+        return server;
+    }
 }

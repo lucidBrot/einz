@@ -96,8 +96,8 @@ public class Debug {
                     interrupt();
                 }
 
-                tc.sendMessage(Debug.debug_getRegisterMessage("clemï")+"\n");
-                tc.sendMessage(Debug.debug_getUnregisterMessage("clemï")+"\n");
+                tc.sendMessage(Debug.debug_getRegisterMessage("clemï"));
+                tc.sendMessage(Debug.debug_getUnregisterMessage("clemï"));
             }
         };
         m.start(); // send message
