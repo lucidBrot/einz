@@ -42,7 +42,8 @@ public class EinzServerClientHandler implements Runnable{
     private EinzActionFactory einzActionFactory;
 
     // identify this connection by its user as soon as this is available
-    private String connectedUser; // is set on register and never unset because when the client disconnects, this thread is stopped // TODO: stop thread on disconnect
+    private String connectedUser = null; // is set on register and never unset because when the client disconnects, this thread is stopped // TODO: stop thread on disconnect
+    // todo: set to null when unregistering player (and probably end thread afterwards)
 
     /**
      * Listens on {@param clientSocket} for incoming messages and provides an interface {@link ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler#sendMessage(String)} for sending to the client associated with this socket.

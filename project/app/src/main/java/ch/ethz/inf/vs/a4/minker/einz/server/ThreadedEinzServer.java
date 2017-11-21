@@ -115,7 +115,6 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             Thread m = new Thread(){
                 @Override
                 public void run() {
-                    ///Log.d("TempClient", "calling sendMessage");
                     try {
                         sleep(600); // wait until server hopefully runs
                     } catch (InterruptedException e) {

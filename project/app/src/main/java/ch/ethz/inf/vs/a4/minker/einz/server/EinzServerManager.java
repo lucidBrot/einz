@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static ch.ethz.inf.vs.a4.minker.einz.BuildConfig.DEBUG;
+
 /**
  * Stores Configuration of {@link ThreadedEinzServer} that is not suited for the communications-only part, because it has to do with the content of the messages,<br>
  * But is also not really relevant to the serverlogic<br>
@@ -123,6 +125,14 @@ public class EinzServerManager {
         this.serverFunctionInterface = serverFunctionInterface;
     }
 
+    private boolean isInvalidUsername(String username){
+        return (username.equals("") || username.equals("server"));
+    }
+
+    private boolean isLobbyFull(){
+        return false;
+    }
+
     /**
      * Threadsafe because of ConcurrentHashMap
      * Returns (as a freebie) an EinzMessage which could be used as reponse to the client. This Message is either of Type RegisterSuccess or RegisterFailure
@@ -130,19 +140,49 @@ public class EinzServerManager {
      * @param username
      * @param handler
      */
-    public EinzMessage registerUser(String username, String role, EinzServerClientHandler handler){ // TODO: differentiate between roles and manage different reasons
-        EinzServerClientHandler res = getRegisteredClientHandlers().putIfAbsent(username,handler);
-        // res is null if it was not set before this call, else it is the previous value
-        boolean success = (res == null || res.equals(handler)); // success only if nobody was registered or itself was already registered (for this username)
-        Log.d("serverManager/reg", "registered "+username+". Success: "+success);
+    public EinzMessage registerUser(String username, String role, EinzServerClientHandler handler){
 
-        // set admin to this user if he was the first connection and registered successfully
-        if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
+        String reason = "unknown";
+        boolean success = false;
+        filterFailureReasons:
+        {
+            if(handler.getConnectedUser()!=null && !handler.getConnectedUser().equals(username)){
+                reason = "already registered";
+                break filterFailureReasons; // don't even try registering, this client handler already is registered
+            }
 
-        if(success){
-            String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
-            if(BuildConfig.DEBUG && absent != null)
-                throw new RuntimeException(new java.lang.Exception("serverManager/reg: username was absent in registeredClientHandlers but not in registeredClientRoles!"));
+            if(isInvalidUsername(username)){
+                reason = "invalid";
+                break filterFailureReasons;
+            }
+
+            if(isLobbyFull()){
+                reason = "lobby full";
+                break filterFailureReasons;
+            }
+
+            EinzServerClientHandler res = getRegisteredClientHandlers().putIfAbsent(username, handler);
+            // res is null if it was not set before this call, else it is the previous value
+
+            if(res != null && res.equals(handler)){
+                reason = "already registered";
+                break filterFailureReasons;
+            }
+
+            success = (res == null); // success only if nobody was registered (for this username)
+            Log.d("serverManager/reg", "registered " + username + ". Success: " + success);
+
+
+
+            // set admin to this user if he was the first connection and registered successfully
+            if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
+
+            if (success) {
+                String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
+                if (DEBUG && absent != null)
+                    throw new RuntimeException(new java.lang.Exception("serverManager/reg: username was absent in registeredClientHandlers but not in registeredClientRoles!"));
+                handler.setConnectedUser(username); // tell the handler which user it is connected to
+            }
         }
 
         EinzMessage response = null;
@@ -154,7 +194,7 @@ public class EinzServerManager {
             handler.setConnectedUser(username);
         } else {
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterFailure");
-            EinzRegisterFailureMessageBody body = new EinzRegisterFailureMessageBody(role, username, "don't know lol #DEBUG4LIEF");
+            EinzRegisterFailureMessageBody body = new EinzRegisterFailureMessageBody(role, username, reason);
             response = new EinzMessage<EinzRegisterFailureMessageBody>(header, body);
         }
         return response;
