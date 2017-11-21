@@ -124,6 +124,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                     }
 
                     tc.sendMessage(tc.debug_getRegisterMessage());
+                    tc.sendMessage(tc.debug_getUnregisterMessage());
                 }
             };
             m.start(); // send message

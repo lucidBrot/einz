@@ -96,13 +96,19 @@ public class EinzActionFactory {
      * @param issuedBy the username who issued this action or null if irrelevant and unknown
      * @return the action, or null if this messagetype was not registered or it failed for some other reason
      */
+    @Nullable
     public EinzAction generateEinzAction(EinzMessage message, @Nullable String issuedBy){
         if(message == null){
             Log.e("ActionFactory", "Message was null.");
             return null;
         }
         try {
-            EinzAction ret = getMapping(message).getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
+            Class<? extends  EinzAction> mapping = getMapping(message);
+            if(mapping == null){
+                Log.w("ActionFactory", "generation of unregistered action was requested!");
+                return null;
+            }
+            EinzAction ret = mapping.getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
             Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
             return ret;
         } catch (InstantiationException e) {

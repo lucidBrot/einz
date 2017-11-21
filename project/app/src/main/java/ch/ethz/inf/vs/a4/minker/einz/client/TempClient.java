@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -148,7 +149,7 @@ public class TempClient {
             EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
             EinzRegisterMessageBody body = new EinzRegisterMessageBody("roger", "player");
             EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
-            Log.d("tempClient/getRegMsg","message.toString() : "+message.toString()+",\nmessage.toJSON().toString() : "+message.toJSON().toString());
+            Log.d("tempClient/dGetRegMsg","message.toString() : "+message.toString()+",\nmessage.toJSON().toString() : "+message.toJSON().toString());
             return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -156,6 +157,20 @@ public class TempClient {
             return "empty message :(";
         }
 
+    }
+
+    public String debug_getUnregisterMessage(){
+        try {
+            EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
+            EinzUnregisterRequestMessageBody body = new EinzUnregisterRequestMessageBody("roger");
+            EinzMessage<EinzUnregisterRequestMessageBody> message = new EinzMessage<>(header, body);
+            Log.d("tempClient/dGetUnRegMsg","message.toString() : "+message.toString()+",\nmessage.toJSON().toString() : "+message.toJSON().toString());
+            return message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("TempClient/dGetUnRegMsg", "failed to create registration message");
+            return "empty message :(";
+        }
     }
 
 }
