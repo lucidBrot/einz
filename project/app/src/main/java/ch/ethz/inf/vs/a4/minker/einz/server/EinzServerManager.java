@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static ch.ethz.inf.vs.a4.minker.einz.BuildConfig.DEBUG;
 
@@ -38,6 +40,9 @@ public class EinzServerManager {
     private ConcurrentHashMap<String, EinzServerClientHandler> registeredClientHandlers; // list of only the registered clients, accessible by username
     // used to keep track of currently registered usernames
     private ConcurrentHashMap<String, String> registeredClientRoles; // mapping client usernames to roles
+    protected String adminUsername;
+    private ReentrantReadWriteLock userListLock = new ReentrantReadWriteLock(); // used for accessing any of the above to ensure consistency within them
+        //Do not write to any of the above without locking. Do not read without read-locking if you're worried about inconsistencies
 
     public EinzServerManager(ThreadedEinzServer whotomanage, ServerFunctionDefinition serverFunctionInterface){
         this.server = whotomanage;
@@ -45,7 +50,6 @@ public class EinzServerManager {
         this.registeredClientRoles = new ConcurrentHashMap<>();
         this.serverFunctionInterface = serverFunctionInterface;
     }
-    protected String adminUsername; // TODO: store admin
 
     /**
      * @return List of registered users.
@@ -160,7 +164,9 @@ public class EinzServerManager {
                 break filterFailureReasons;
             }
 
+            userListLock.writeLock().lock();
             EinzServerClientHandler res = getRegisteredClientHandlers().putIfAbsent(username, handler);
+            userListLock.writeLock().unlock();
             // res is null if it was not set before this call, else it is the previous value
 
             if(res != null && res.equals(handler)){
@@ -177,7 +183,9 @@ public class EinzServerManager {
             if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
 
             if (success) {
+                userListLock.writeLock().lock();
                 String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
+                userListLock.writeLock().unlock();
                 if (DEBUG && absent != null)
                     throw new RuntimeException(new java.lang.Exception("serverManager/reg: username was absent in registeredClientHandlers but not in registeredClientRoles!"));
                 handler.setConnectedUser(username); // tell the handler which user it is connected to
@@ -204,6 +212,7 @@ public class EinzServerManager {
      *     <b>Broadcasts the message already!</b>
      *     Returns the response (different from the broadcast!)
      *     Make sure to check whether the user is allowed to kick somebody if you call this to kick. Also make sure to check that this user exists.
+     *     This implementation simply ignores race conditions within the server. Bugs are coming from here :)
      * @param username who to remove
      *
      * @return The message only for the client who issued the unregister/kick request. Ignore this return in case of a normal unregister<br>
@@ -218,14 +227,18 @@ public class EinzServerManager {
         }
 
         if(failureReason==null){
+            userListLock.readLock().lock();
             ConcurrentHashMap<String, String> clientRoles = getRegisteredClientRoles();
             ConcurrentHashMap<String, EinzServerClientHandler> clientHandlers = getRegisteredClientHandlers();
-                    // TODO: does getRegisteredClientRoles and getRegisteredClientHandlers introduce bugs because the state might change between accessing the two?
+            userListLock.readLock().unlock();
+
             String role = clientRoles.get(username);
             EinzServerClientHandler esch = clientHandlers.get(username);
             // unregister them
+            userListLock.writeLock().lock();
             getRegisteredClientRoles().remove(username);
             getRegisteredClientHandlers().remove(username);
+            userListLock.writeLock().unlock();
 
             // inform all clients
             EinzUnregisterResponseMessageBody body = new EinzUnregisterResponseMessageBody(username, unregisterReason);
@@ -255,6 +268,7 @@ public class EinzServerManager {
     }
 
     // TODO: kickUser -- including checking if they are allowed to kick and if the user exists.
+    
 
     public EinzMessage<EinzUpdateLobbyListMessageBody> generateUpdateLobbyListRequest(){
         EinzMessageHeader header = new EinzMessageHeader("registration", "UpdateLobbyList");
@@ -274,6 +288,7 @@ public class EinzServerManager {
           }
         }
          */
+        // Locking on userlistLock is not neccessary here because we only access one of these and concurrentHashMap guarantees an ok state
         ConcurrentHashMap<String, String> chm = getRegisteredClientRoles();
         @SuppressWarnings("unchecked")
         HashMap<String, String> localCopy = (HashMap<String, String>) new HashMap(chm);
@@ -282,14 +297,34 @@ public class EinzServerManager {
         return new EinzMessage<>(header, body);
     }
 
+    /**
+     * Locks onto {@link #userListLock} to ensure consistency
+     * Make sure to lock for writing on this
+     * @return
+     */
     public ConcurrentHashMap<String, String> getRegisteredClientRoles() {
-        return registeredClientRoles;
+        this.userListLock.readLock().lock();
+        ConcurrentHashMap<String, String> hm = registeredClientRoles;
+        this.userListLock.readLock().unlock();
+        return hm;
     }
 
+    /**
+     * Locks onto {@link #userListLock} to ensure consistency
+     * Make sure to lock for writing on this
+     * @return
+     */
     public ConcurrentHashMap<String, EinzServerClientHandler> getRegisteredClientHandlers() {
-        return registeredClientHandlers;
+        this.userListLock.readLock().lock();
+        ConcurrentHashMap<String, EinzServerClientHandler> hm = registeredClientHandlers;
+        this.userListLock.readLock().unlock();
+        return hm;
     }
 
+    /**
+     * locks onto {@link #userListLock} to ensure consistency
+     * @return
+     */
     public String getAdminUsername() {
         return adminUsername;
     }
