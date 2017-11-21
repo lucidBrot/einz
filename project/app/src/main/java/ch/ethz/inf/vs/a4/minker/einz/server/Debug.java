@@ -52,7 +52,7 @@ public class Debug {
             @Override
             public void run() {
                 try {
-                    sleep(1); // wait until server hopefully runs
+                    sleep(10); // wait until server hopefully runs
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Log.e("TempClient", "Sleeping Failed");
