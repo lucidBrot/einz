@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static ch.ethz.inf.vs.a4.minker.einz.BuildConfig.DEBUG;
@@ -34,10 +33,10 @@ public class EinzServerManager {
 
     // These files are used to initialize the ActionFactories and ParserFactories of the EinzServerClientHandler threads
     // TODO: test the initialization of the factories once we have enough messages
-    private final int networkingParserFile = R.raw.initialnetworkingparsermappings; // the networking parser shall be loaded from here
-    private final int gameLogicParserFile = R.raw.initialgamelogicparsermappings; // the gamelogic parser shall be loaded from here
-    private final int networkingActionFile = R.raw.initialnetworkingactionmappings; // the mapping from messagebodytype to action
-    private final int gameLogicActionFile = R.raw.initialgamelogicactionmappings; // same, but for game logic instead
+    private final int networkingParserFile = R.raw.initial_networking_parser_mappings; // the networking parser shall be loaded from here
+    private final int gameLogicParserFile = R.raw.initial_game_logic_parser_mappings; // the gamelogic parser shall be loaded from here
+    private final int networkingActionFile = R.raw.server_initial_networking_action_mappings; // the mapping from messagebodytype to action
+    private final int gameLogicActionFile = R.raw.server_initial_game_logic_action_mappings; // same, but for game logic instead
 
     private ConcurrentHashMap<String, EinzServerClientHandler> registeredClientHandlers; // list of only the registered clients, accessible by username
     // used to keep track of currently registered usernames
@@ -278,7 +277,6 @@ public class EinzServerManager {
      * @param userToKick
      * @param userWhoIssuedThisKick
      */
-    // TODO: kickUser -- including checking if they are allowed to kick and if the user exists.
     public void kickUser(String userToKick, String userWhoIssuedThisKick){
         userListLock.readLock().lock();
         EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);

@@ -59,7 +59,7 @@ public class EinzServerClientHandler implements Runnable{
         parentEinzServer.incNumClients();
         this.firstConnectionOnServer = firstConnectionOnServer;
 
-        debug_printJSONRepresentationOf(EinzRegistrationParser.class);
+        Debug.debug_printJSONRepresentationOf(EinzRegistrationParser.class);
 
         this.socket = clientSocket;
         this.serverInterface = serverFunctionDefinition;
@@ -107,23 +107,6 @@ public class EinzServerClientHandler implements Runnable{
         }
     }
 
-    /**
-     * For debug purposes only, should not have side effects at all.
-     * Prints the class of the given object as JSON
-     * @param o
-     */
-    private void debug_printJSONRepresentationOf(Object o){
-        //<debug>
-        JSONObject container = new JSONObject();
-        try {
-            container.put("your Object:", o);
-            Log.d("ESCH/DEBUG", "printJSONRepresentationOF() : "+ container.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        // D/DEBUG: {"test":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"}
-        //</debug>
-    }
 
 
     /**

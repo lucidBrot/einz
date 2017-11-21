@@ -106,6 +106,7 @@ public class EinzActionFactory {
             Class<? extends  EinzAction> mapping = getMapping(message);
             if(mapping == null){
                 Log.w("ActionFactory", "generation of unregistered action was requested!");
+                Log.d("ActionFactory", "The unregistered action was for "+message.toJSON().toString());
                 return null;
             }
             EinzAction ret = mapping.getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
@@ -123,6 +124,9 @@ public class EinzActionFactory {
         } catch (InvocationTargetException e) {
             Log.e("ActionFactory", "Failed to generate Mapping: "+e.getMessage());
             e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            // When printing the unregistered action fails. Whatever, don't care. Action is unregistered.
         }
         Log.e("ActionFactory", "failed to map to an action");
         return null;
