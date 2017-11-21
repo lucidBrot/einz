@@ -219,9 +219,9 @@ public class EinzServerManager {
     /**
      * Unregisters user and generates message to be broadcasted to inform clients that this user left. <br>
      *     <b>Broadcasts the message already!</b>
-     *     Returns the response (different from the broadcast!)
+     *     Returns the response (different from the broadcast!) or null
      *     Make sure to check whether the user is allowed to kick somebody if you call this to kick. Also make sure to check that this user exists.
-     *     This implementation simply ignores race conditions within the server. Bugs are coming from here :)
+     *     <br>This function (will) respond to the client who requested this. the return message is only to check for what happened. // TODO: UnregisterResponse and KickFailure
      * @param username who to remove
      *
      * @return The message only for the client who issued the unregister/kick request. Ignore this return in case of a normal unregister<br>
