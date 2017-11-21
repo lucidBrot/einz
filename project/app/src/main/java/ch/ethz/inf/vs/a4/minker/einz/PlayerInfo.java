@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by Fabian on 17.11.2017.
@@ -8,7 +9,5 @@ import java.util.ArrayList;
 
 public class PlayerInfo {
     ArrayList<String> handCards;
-    ArrayList<String> possibleActions;
-    //TODO: indicate which cards can be played
-    // not just if any cards can be played
+    HashSet<PlayerActions> possibleActions;
 }

@@ -56,7 +56,7 @@ public class GameState {
 
     //This is the constructor that gets used when calling serverFunction.startGame
     public GameState (ArrayList<Player> players, HashMap<Card, Integer> deck, int rules){
-        //TODO: Constructor
+        //TODO: Constructor (once rules are made)
     }
 
     //This is the constructor that gets used when calling serverFunction.startStandartGame
@@ -237,20 +237,6 @@ public class GameState {
         Collections.shuffle(drawPile);
     }
 
-    public void updatePlayerInfo(Player p) {
-        p.playerInfo.handCards.clear();
-        p.playerInfo.possibleActions.clear();
-        for (Card c : p.hand) {
-            p.playerInfo.handCards.add(c.ID);
-        }
-        if (!hasDrawn) {
-            p.playerInfo.possibleActions.add(PlayerActions.CANDRAW.action);
-        } else {
-            p.playerInfo.possibleActions.add(PlayerActions.ENDTURN.action);
-        }
-        //TODO: finish
-        //can i play cards? If yes, which ones? (isPlayable)
-    }
 
     // (III) Functions to check rules
 
@@ -314,5 +300,44 @@ public class GameState {
                 return false;
         }
     }
+
+    public void updatePlayerInfo(Player p) {
+        p.playerInfo.handCards.clear();
+        p.playerInfo.possibleActions.clear();
+        for (Card c : p.hand) {
+            p.playerInfo.handCards.add(c.ID);
+            if (isPlayable(c, p)){
+                p.playerInfo.possibleActions.add(PlayerActions.CANPLAY);
+            }
+        }
+        if (!hasDrawn) {
+            p.playerInfo.possibleActions.add(PlayerActions.CANDRAW);
+        } else {
+            p.playerInfo.possibleActions.add(PlayerActions.ENDTURN);
+        }
+    }
+
+    public boolean isPlayable (Card card, Player p) {
+        boolean pTurn = false, cardLegit = false;
+        Card bottomCard = playPiletopCard();
+        if (threatenedCards == 1) {
+            //These are the regular rules
+            cardLegit = normalPlayRules(bottomCard, card);
+        } else {
+            //These are the rules when an active plusTwo or changeColorPlusFour is in the middle
+            cardLegit = specialPlayRules(bottomCard, card);
+        }
+
+        if (getActivePlayer().equals(p)) {
+            pTurn = true;
+        }
+        if (cardLegit && pTurn) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //TODO: Spectators
 
 }

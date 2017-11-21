@@ -85,11 +85,14 @@ public interface ServerFunctionDefinition {
 
         //returns the top x cards from the drawpile to be drawn and ramoves them from the drawpile and adds them to player p's hand
         //this should be called when player p needs to draw cards because of effects from played cards
-        public HashSet<Card> drawXCards(int x, Player p);
+        public ArrayList<Card> drawXCards(int x, Player p);
 
         //Ends the running game
         //currently does nothing since the GameState shouldn't care what happens after the game?
         public void endGame();
+
+        //removes a player from the game and coninues the game without that player
+        public void removePlayer(String name);
 
 
 

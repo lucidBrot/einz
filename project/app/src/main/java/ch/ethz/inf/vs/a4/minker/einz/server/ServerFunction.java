@@ -9,6 +9,7 @@ import ch.ethz.inf.vs.a4.minker.einz.CardColors;
 import ch.ethz.inf.vs.a4.minker.einz.CardTypes;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.PlayerActions;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -58,28 +59,7 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //checks if a card can be played
     public boolean isPlayable (Card card, Player p){
-        //Here come all the fancy rules!
-        //So far, only the very basics are implemented
-        boolean pTurn = false, cardLegit = false;
-        Card bottomCard = topCard();
-
-        if (gameState.getThreatenedCards() == 1) {
-            //Thesse are the regular rules
-            cardLegit = gameState.normalPlayRules(bottomCard, card);
-        } else {
-            //These are the rules when an active plusTwo or changeColorPlusFour is in the middle
-            cardLegit = gameState.specialPlayRules(bottomCard, card);
-        }
-
-        if (activePlayer().equals(p)) {
-            pTurn = true;
-        }
-        if (cardLegit && pTurn) {
-            return true;
-        } else {
-            return false;
-        }
-
+        return gameState.isPlayable(card, p);
     }
 
     //returns the number of cards a player needs to draw if he can't play anything
@@ -156,8 +136,8 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //returns the top x cards from the drawpile to be drawn and ramoves them from the drawpile and adds them to player p's hand
     //this should be called when a player needs to draw cards because of effects from played cards
-    public HashSet<Card> drawXCards(int x, Player p){
-        HashSet result = new HashSet();
+    public ArrayList<Card> drawXCards(int x, Player p){
+        ArrayList result = new ArrayList();
         for (int i = 0; i < x; i++){
             result.add(gameState.drawOneCard(p));
         }
@@ -167,8 +147,21 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     //Ends the running game
     public void endGame(){
-        //TODO: Implement
-        //Maybe this isn't needed since the ServerFunction only keeps the GameState in a valid state but once the game ends
-        //this isn't necessary anymore
+        //TODO: Create list of all players that were there at the start of the game with their ranking
+    }
+
+    //removes a player from the game and continues the game without that player
+    public void removePlayer(String name){
+        for (Player p: gameState.getPlayers()){
+            if (p.name.equals((name))){
+                if (gameState.getActivePlayer().equals(p)){
+                    gameState.nextPlayer();
+                }
+                gameState.removePlayer(name);
+                if (gameState.getPlayers().size() < 2){
+                    endGame();
+                }
+            }
+        }
     }
 }

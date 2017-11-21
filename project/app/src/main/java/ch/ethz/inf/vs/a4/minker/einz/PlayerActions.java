@@ -5,7 +5,7 @@ package ch.ethz.inf.vs.a4.minker.einz;
  */
 
 public enum PlayerActions {
-    CANPLAY("canPlay"), //denotes weither a palyer can play at least one card
+    CANPLAY("canPlay"), //denotes whether a player can play at least one card
     CANDRAW("canDraw"),
     ENDTURN("endTurn");
 
