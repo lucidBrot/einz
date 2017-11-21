@@ -81,7 +81,6 @@ public class EinzServerManager {
         
         this.gamePhaseStarted = true;
         GameState gameState = getServerFunctionInterface().initialiseStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
-        GameState gameState = getServerFunctionInterface().startStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
 
     }
 
