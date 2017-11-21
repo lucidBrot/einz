@@ -5,6 +5,8 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,6 +45,7 @@ public class TempClient {
      * @param message text entered by client
      */
     public void sendMessage(String message) {
+        //if(message.endsWith("\n")){Log.d("TempClient", "message ends with newline");}
         if (mBufferOut != null && !mBufferOut.checkError()) {
             mBufferOut.println(message);
             mBufferOut.flush();
@@ -102,8 +105,6 @@ public class TempClient {
 
                 }
 
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
-
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
@@ -126,35 +127,6 @@ public class TempClient {
     //class at on asynckTask doInBackground
     public interface OnMessageReceived {
         public void messageReceived(String message);
-    }
-
-    public String debug_getRegisterMessage(){
-        /*
-        {
-          "header":{
-            "messagegroup":"registration",
-            "messagetype":"Register"
-          },
-          "body":{
-            "username":"roger",
-            "role":"player"
-          }
-        }
-         */
-
-
-        try {
-            EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
-            EinzRegisterMessageBody body = new EinzRegisterMessageBody("roger", "player lol");
-            EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
-            Log.d("tempClient/getRegMsg","message.toString() : "+message.toString()+",\nmessage.toJSON().toString() : "+message.toJSON().toString());
-            return message.toJSON().toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e("TempClient/dGetRegMsg", "failed to create registration message");
-            return "empty message :(";
-        }
-
     }
 
 }

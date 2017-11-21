@@ -1,54 +1,59 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
-import android.util.Pair;
-import ch.ethz.inf.vs.a4.minker.einz.GameState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
-import ch.ethz.inf.vs.a4.minker.einz.R;
+import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static ch.ethz.inf.vs.a4.minker.einz.BuildConfig.DEBUG;
+
 /**
- * Stores Configuration of {@link ThreadedEinzServer} that is not suited for the communications-only part, because it has to do with the content of the messages,
- * But is also not really relevant to the serverlogic
- * This also registers and handles mappings that serverlogic does not handle. Initial Mappings are loaded from resources
+ * Stores Configuration of {@link ThreadedEinzServer} that is not suited for the communications-only part, because it has to do with the content of the messages,<br>
+ * But is also not really relevant to the serverlogic<br>
+ * This also registers and handles mappings that serverlogic does not handle. Initial Mappings are loaded from resources<br>
+ * This class contains broadcastToSpectators while the ThreadedEinzServer contains sendMessageToUsername. That is basically the
+ * difference between what belongs into this class and what into the server itself. Abstraction of game messaging vs pure messaging
  */
 public class EinzServerManager {
 
     private final ThreadedEinzServer server;
     private ServerFunctionDefinition serverFunctionInterface;
+    private boolean gamePhaseStarted;
 
     // These files are used to initialize the ActionFactories and ParserFactories of the EinzServerClientHandler threads
     // TODO: test the initialization of the factories once we have enough messages
-    private final int networkingParserFile = R.raw.initialnetworkingparsermappings; // the networking parser shall be loaded from here
-    private final int gameLogicParserFile = R.raw.initialgamelogicparsermappings; // the gamelogic parser shall be loaded from here
-    private final int networkingActionFile = R.raw.initialnetworkingactionmappings; // the mapping from messagebodytype to action
-    private final int gameLogicActionFile = R.raw.initialgamelogicactionmappings; // same, but for game logic instead
+    private final int networkingParserFile = R.raw.initial_networking_parser_mappings; // the networking parser shall be loaded from here
+    private final int gameLogicParserFile = R.raw.initial_game_logic_parser_mappings; // the gamelogic parser shall be loaded from here
+    private final int networkingActionFile = R.raw.server_initial_networking_action_mappings; // the mapping from messagebodytype to action
+    private final int gameLogicActionFile = R.raw.server_initial_game_logic_action_mappings; // same, but for game logic instead
 
-    public ConcurrentHashMap<String, EinzServerClientHandler> registeredClientHandlers; // list of only the registered clients, accessible by username
+    private ConcurrentHashMap<String, EinzServerClientHandler> registeredClientHandlers; // list of only the registered clients, accessible by username
     // used to keep track of currently registered usernames
+    private ConcurrentHashMap<String, String> registeredClientRoles; // mapping client usernames to roles
+    protected String adminUsername;
+
+    public ReentrantReadWriteLock getUserListLock() {
+        return userListLock;
+    }
+
+    private ReentrantReadWriteLock userListLock = new ReentrantReadWriteLock(); // used for accessing any of the above to ensure consistency within them
+        //Do not write to any of the above without locking. Do not read without read-locking if you're worried about inconsistencies
 
     public EinzServerManager(ThreadedEinzServer whotomanage, ServerFunctionDefinition serverFunctionInterface){
         this.server = whotomanage;
         this.registeredClientHandlers = new ConcurrentHashMap<>();
+        this.registeredClientRoles = new ConcurrentHashMap<>();
         this.serverFunctionInterface = serverFunctionInterface;
+        this.gamePhaseStarted = false;
     }
-    protected String adminUsername; // TODO: store admin
 
     /**
      * @return List of registered users.
@@ -61,13 +66,22 @@ public class EinzServerManager {
         Log.d("Manager", "finishing registrationphase.");
         server.stopListeningForIncomingConnections(true);
         ArrayList<Player> players = new ArrayList<>();
-        for(Map.Entry entry : registeredClientHandlers.entrySet()){
+        ArrayList<Spectator> spectators = new ArrayList<>();
+        for(Map.Entry<String, EinzServerClientHandler> entry : registeredClientHandlers.entrySet()){
             EinzServerClientHandler handler = (EinzServerClientHandler) entry.getValue();
-            players.add(new Player((String) entry.getKey()));
+            String role = getRegisteredClientRoles().get(entry.getKey());
+            if ( role.toLowerCase().equals("player")) {
+                players.add(new Player((String) entry.getKey()));
+            } else if ( role.toLowerCase().equals("spectator")){
+                spectators.add(new Spectator((String) entry.getKey()));
+            }
             // TODO: send that info to clients
         }
         Log.d("Manager/finishRegPhase", "Players: "+players.toString());
+        
+        this.gamePhaseStarted = true;
         GameState gameState = getServerFunctionInterface().initialiseStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+        GameState gameState = getServerFunctionInterface().startStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
 
     }
 
@@ -120,6 +134,14 @@ public class EinzServerManager {
         this.serverFunctionInterface = serverFunctionInterface;
     }
 
+    private boolean isInvalidUsername(String username){
+        return (username.equals("") || username.equals("server"));
+    }
+
+    private boolean isLobbyFull(){
+        return false;
+    }
+
     /**
      * Threadsafe because of ConcurrentHashMap
      * Returns (as a freebie) an EinzMessage which could be used as reponse to the client. This Message is either of Type RegisterSuccess or RegisterFailure
@@ -127,27 +149,309 @@ public class EinzServerManager {
      * @param username
      * @param handler
      */
-    public EinzMessage registerUser(String username, String role, EinzServerClientHandler handler){ // TODO: differentiate between roles and manage different reasons
-        EinzServerClientHandler res = registeredClientHandlers.putIfAbsent(username,handler);
-        // res is null if it was not set before this call, else it is the previous value
-        boolean success = (res == null || res.equals(handler)); // success only if nobody was registered or itself was already registered (for this username)
-        Log.d("serverManager/reg", "registered "+username+". Success: "+success);
+    public EinzMessage registerUser(String username, String role, EinzServerClientHandler handler){
 
-        // set admin to this user if he was the first connection and registered successfully
-        if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
+        String reason = "unknown";
+        boolean success = false;
+        filterFailureReasons:
+        {
+            String connectedUser = handler.getConnectedUser();
+            if(connectedUser!=null && !connectedUser.equals(username)){
+                reason = "already registered";
+                break filterFailureReasons; // don't even try registering, this client handler already is registered
+            }
+
+            if(isInvalidUsername(username)){
+                reason = "invalid";
+                break filterFailureReasons;
+            }
+
+            if(isLobbyFull()){
+                reason = "lobby full";
+                break filterFailureReasons;
+            }
+
+            userListLock.writeLock().lock();
+            EinzServerClientHandler res = getRegisteredClientHandlers().putIfAbsent(username, handler);
+            // res is null if it was not set before this call, else it is the previous value
+
+            if(res != null && res.equals(handler)){
+                reason = "already registered";
+                break filterFailureReasons;
+            }
+
+            if(res != null && !res.equals(handler)){
+                reason = "not unique";
+                break filterFailureReasons;
+            }
+
+            success = (res == null); // success only if nobody was registered (for this username)
+            Log.d("serverManager/reg", "registered " + username + ". Success: " + success);
+
+
+
+            // set admin to this user if he was the first connection and registered successfully
+            if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
+
+            if (success) {
+                handler.setConnectedUser(username); // tell the handler which user it is connected to
+                String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
+                userListLock.writeLock().unlock();
+                if (DEBUG && absent != null) { // assertion on android
+                    userListLock.writeLock().unlock();
+                    throw new RuntimeException(new java.lang.Exception("serverManager/reg: username was absent in registeredClientHandlers but not in registeredClientRoles!"));
+                }
+
+            }
+        }
+
+        if(userListLock.writeLock().isHeldByCurrentThread())
+            userListLock.writeLock().unlock();
 
         EinzMessage response = null;
-        // TODO: Response on Register
+
         if(success){
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
             EinzRegisterSuccessMessageBody body = new EinzRegisterSuccessMessageBody(username, role);
             response = new EinzMessage<EinzRegisterSuccessMessageBody>(header, body);
         } else {
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterFailure");
-            EinzRegisterFailureMessageBody body = new EinzRegisterFailureMessageBody(role, username, "don't know lol #DEBUG4LIEF");
+            EinzRegisterFailureMessageBody body = new EinzRegisterFailureMessageBody(role, username, reason);
             response = new EinzMessage<EinzRegisterFailureMessageBody>(header, body);
         }
+        Log.d("serverMan/reg", username+" came this far [end of ServerMan/registerUser()] (admin="+adminUsername+").");
         return response;
     }
 
+    /**
+     * Unregisters user and generates message to be broadcasted to inform clients that this user left. <br>
+     *     <b>Broadcasts the message already!</b>
+     *     Returns the response (different from the broadcast!) or null
+     *     Make sure to check whether the user is allowed to kick somebody if you call this to kick. Also make sure to check that this user exists.
+     *     <br>This function (will) respond to the client who requested this. the return message is only to check for what happened. // TODO: UnregisterResponse and KickFailure
+     * @param username who to remove
+     *
+     * @return The message only for the client who issued the unregister/kick request. Ignore this return in case of a normal unregister<br>
+     *     <i>null</i> if there was no failure
+     */
+    @Nullable
+    public EinzMessage<EinzKickFailureMessageBody> unregisterUser(String username, String unregisterReason){
+        // TODO: removeUser from fabian
+        String failureReason = null;
+        EinzMessage<EinzUnregisterResponseMessageBody> einzMessage;
+
+        if(username==null || isInvalidUsername(username)){
+            failureReason = "invalid";
+        }
+
+        if(failureReason==null){
+            userListLock.readLock().lock();
+            ConcurrentHashMap<String, String> clientRoles = getRegisteredClientRoles();
+            ConcurrentHashMap<String, EinzServerClientHandler> clientHandlers = getRegisteredClientHandlers();
+
+            String role = clientRoles.get(username);
+            EinzServerClientHandler esch = clientHandlers.get(username);
+            userListLock.readLock().unlock();
+
+            // inform all clients
+            EinzUnregisterResponseMessageBody body = new EinzUnregisterResponseMessageBody(username, unregisterReason);
+            EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterResponse");
+            EinzMessage<EinzUnregisterResponseMessageBody> message = new EinzMessage<>(header, body);
+            broadcastMessageToAllPlayers(message);
+            broadcastMessageToAllSpectators(message);
+
+            // unregister them
+            userListLock.writeLock().lock();
+            getRegisteredClientRoles().remove(username);
+            getRegisteredClientHandlers().remove(username);
+            userListLock.writeLock().unlock();
+
+            // and stop the corresponding client
+            esch.setConnectedUser(null);
+            esch.stopThreadPatiently();
+            Log.d("servMan/unreg", "unregistered user "+username);
+
+        } else {
+            Log.d("servMan/unreg", "failed to unregister user "+username+" because "+failureReason);
+        }
+
+        EinzMessage<EinzKickFailureMessageBody> emz;
+        EinzMessageHeader header = new EinzMessageHeader("registration", "KickFailure");
+        // generate response
+        if(failureReason==null){
+            return null;
+        } else{
+            EinzKickFailureMessageBody body = new EinzKickFailureMessageBody(username, failureReason);
+            emz = new EinzMessage<>(
+                header, body
+            );
+            return emz;
+        }
+    }
+
+    /**
+     * Tests if user is allowed to perform this action and performs it
+     * @param userToKick
+     * @param userWhoIssuedThisKick
+     */
+    public void kickUser(String userToKick, String userWhoIssuedThisKick){
+        userListLock.readLock().lock();
+        EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);
+        boolean allowed = (getAdminUsername().equals(userWhoIssuedThisKick));
+        boolean userExists = (esch!=null);
+        boolean success;
+        EinzMessage<EinzKickFailureMessageBody> response;
+        if(userExists && allowed) {
+            response = unregisterUser(userToKick, "kicked");
+            if(response==null)//if success
+            {
+                userListLock.readLock().unlock();
+                return;
+            } else{
+                // failure. send to user.
+                try {
+                    server.sendMessageToUser(userWhoIssuedThisKick, response);
+                } catch (UserNotRegisteredException e) {
+                    e.printStackTrace();
+                    // User who issued this does not exist :(
+                    // Guess that means we don't answer them
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+                userListLock.readLock().unlock();
+                return;
+            }
+        } else {
+            // user doesn't exist or issuer is not admin
+            EinzKickFailureMessageBody ekfmb;
+            if(!allowed){
+                 ekfmb = new EinzKickFailureMessageBody(userToKick, "not allowed");
+            } else {
+                ekfmb = new EinzKickFailureMessageBody(userToKick, "not found");
+            }
+            EinzMessageHeader header = new EinzMessageHeader("registration", "KickFailure");
+            EinzMessage<EinzKickFailureMessageBody> message = new EinzMessage<>(header, ekfmb);
+            try {
+                server.sendMessageToUser(userWhoIssuedThisKick, message);
+            } catch (UserNotRegisteredException e) {
+                e.printStackTrace();
+                // don't send to user if user doesn't exist (anymore)
+            } catch (JSONException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        userListLock.readLock().unlock();
+    }
+
+    public EinzMessage<EinzUpdateLobbyListMessageBody> generateUpdateLobbyListRequest(){
+        EinzMessageHeader header = new EinzMessageHeader("registration", "UpdateLobbyList");
+        /*
+                {
+          "header":{
+            "messagegroup":"registration",
+            "messagetype":"UpdateLobbyList"
+          },
+          "body":{
+            "lobbylist":[
+              {"roger":"player"},
+              {"chris":"player"},
+              {"table":"spectator"}
+            ],
+            "admin":"roger"
+          }
+        }
+         */
+        // Locking on userlistLock is not neccessary here because we only access one of these and concurrentHashMap guarantees an ok state
+        ConcurrentHashMap<String, String> chm = getRegisteredClientRoles();
+        @SuppressWarnings("unchecked")
+        HashMap<String, String> localCopy = (HashMap<String, String>) new HashMap(chm);
+        EinzUpdateLobbyListMessageBody body = new EinzUpdateLobbyListMessageBody(localCopy, getAdminUsername());
+
+        return new EinzMessage<>(header, body);
+    }
+
+    /**
+     * Locks onto {@link #userListLock} to ensure consistency
+     * Make sure to lock for writing on this
+     * @return
+     */
+    public ConcurrentHashMap<String, String> getRegisteredClientRoles() {
+        this.userListLock.readLock().lock();
+        ConcurrentHashMap<String, String> hm = registeredClientRoles;
+        this.userListLock.readLock().unlock();
+        return hm;
+    }
+
+    /**
+     * Lock onto {@link #userListLock} to ensure consistency while reading this.
+     * Make sure to lock for writing on this.
+     * @return
+     */
+    public ConcurrentHashMap<String, EinzServerClientHandler> getRegisteredClientHandlers() {
+        this.userListLock.readLock().lock();
+        ConcurrentHashMap<String, EinzServerClientHandler> hm = registeredClientHandlers;
+        this.userListLock.readLock().unlock();
+        return hm;
+    }
+
+    /**
+     * locks onto {@link #userListLock} to ensure consistency
+     * @return
+     */
+    public String getAdminUsername() {
+        return adminUsername;
+    }
+
+    public void broadcastMessageToAllPlayers(EinzMessage message) {
+        Log.d("servMan/broadcastP", "broadcasting "+message.getBody().getClass().getSimpleName());
+        userListLock.readLock().lock();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
+                continue;
+
+            try {
+                this.server.sendMessageToUser(username, message);
+            } catch (UserNotRegisteredException e) {
+                // this shouldn't happen
+                userListLock.readLock().unlock();
+                Log.e("servMan/broadcastP", "This shouldn't happen: failed to send message because user is unregistered.");
+                throw new RuntimeException(e);
+            } catch (JSONException e) {
+                userListLock.readLock().unlock();
+                Log.e("servMan/broadcastP", "Exception while translating message");
+                throw new RuntimeException(e);
+            }
+        }
+        userListLock.readLock().unlock();
+    }
+
+    public void broadcastMessageToAllSpectators(EinzMessage message) {
+        for(String username : getRegisteredClientRoles().keySet()){
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
+                continue;
+
+            try {
+                this.server.sendMessageToUser(username, message);
+            } catch (UserNotRegisteredException e) {
+                // this shouldn't happen
+                Log.e("servMan/broadcastS", "This shouldn't happen: failed to send message because user is unregistered.");
+                e.printStackTrace();
+            } catch (JSONException e) {
+                Log.e("servMan/broadcastS", "Exception while translating message");
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public boolean isGamePhaseStarted() {
+        return gamePhaseStarted;
+    }
+
+
+    public ThreadedEinzServer getServer() {
+        return server;
+    }
 }

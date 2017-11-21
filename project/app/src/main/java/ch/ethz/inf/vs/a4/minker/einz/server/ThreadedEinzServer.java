@@ -17,6 +17,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Waits for incoming TCP connections, handles each in a separate Thread, dispatches an EinzServerThread for every client
@@ -34,6 +35,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
     final Context applicationContext;
     private final EinzServerManager serverManager;
+    private ReentrantReadWriteLock sherLock = new ReentrantReadWriteLock(); // locks everything here (not servermanager) i.e. glienthandlerhtreads, numClients and clienthandlerthreads
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
@@ -92,43 +94,10 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
         //DEBUG: Simulate a message from a client
         if(DEBUG_ONE_MSG){
-            Log.d("EinzServer", "DEBUG_ONE_MSG: Will simulate a message from a client");
+            Log.d("EinzServer", "DEBUG_ONE_MSG: Will simulate messages from a client");
             DEBUG_ONE_MSG = false;
-            //<DEBUG>
-            final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
-                @Override
-                public void messageReceived(String message) {
-                    Log.d("TempClient", "received message "+message);
-                }
-            });
-            Thread t = new Thread(){
-                @Override
-                public void run() {
-                    // DEBUG: start client
-                    // temporary. please do not use in real code
-                    Log.d("EinzServer->TempClient", "simulating client");
-
-                    tc.run();
-                }
-            };
-            t.start(); // start client stub for debug
-            Thread m = new Thread(){
-                @Override
-                public void run() {
-                    ///Log.d("TempClient", "calling sendMessage");
-                    try {
-                        sleep(600); // wait until server hopefully runs
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        Log.e("TempClient", "Sleeping Failed");
-                        interrupt();
-                    }
-
-                    tc.sendMessage(tc.debug_getRegisterMessage());
-                }
-            };
-            m.start(); // send message
-            //</Debug>
+            Debug.debug_simulateRegisterClient();
+            Debug.debug_simulateRegisterFollowedByUnregister();
         }
 
         boolean firstconnection = true;
@@ -136,7 +105,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
             try {
                 socket = serverSocket.accept();
-                Log.d("EinzServer/launch", "new connection from "+socket.getInetAddress());
+                Log.d("EinzServer/launch", "new connection from "+socket.getInetAddress()+":"+socket.getPort());
             } catch (SocketException e){
                 if(shouldStopSpinning)
                     Log.d("EinzServer/launch", "stopping accepting connections");
@@ -149,13 +118,13 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 e.printStackTrace();
                 return false;
             }
-
+            this.sherLock.writeLock().lock();// for firstconnection, so that it doesn't change and we get two admins
             EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface(),firstconnection);
             Thread thread = new Thread(ez);
             clientHandlerThreads.add(thread);
-            thread.start(); // start new thread for this client.
-
             firstconnection = false; // the first user has connected, all others cannot be admin
+            this.sherLock.writeLock().unlock();
+            thread.start(); // start new thread for this client.
 
         }
         return true;
@@ -203,23 +172,31 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     }
 
     public void incNumClients(){
+        this.sherLock.writeLock().lock();
         this.numClients++;
-        serverActivityCallbackInterface.updateNumClientsUI(numClients);
+        int temp = this.numClients;
+        serverActivityCallbackInterface.updateNumClientsUI(temp);
+        this.sherLock.writeLock().unlock();
     }
 
     public void decNumClients(){
+        this.sherLock.writeLock().lock();
         this.numClients--;
         serverActivityCallbackInterface.updateNumClientsUI(numClients);
+        this.sherLock.writeLock().unlock();
     }
 
     /**
      * sends a (usually JSON-encoded, one-line) message to user specified by username. If the message does not end with "\r\n", that will be appended.
+     * <br>Threadsafe ✔ Writelock on socket<br>
      * @param username target registered user as String
      * @param message JSON-encoded message as String
      * @throws UserNotRegisteredException if username is not registered
      */
     public void sendMessageToUser(String username, String message) throws UserNotRegisteredException {
-        EinzServerClientHandler ez = getServerManager().registeredClientHandlers.get(username);
+        getServerManager().getUserListLock().readLock().lock();
+        EinzServerClientHandler ez = getServerManager().getRegisteredClientHandlers().get(username);
+        getServerManager().getUserListLock().readLock().unlock();
         if(!message.endsWith("\r\n")){ // TODO: check if contains newline and if yes, abort
             message += "\r\n";
         }
@@ -233,6 +210,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
     /**
      * Calls this.sendMessageToUser, but with the message transformed to a JSON string
+     * <br>Threadsafe ✔ Writelock on socket<br>
      * @param username to whom to send this message
      * @param message what to send
      * @throws UserNotRegisteredException if the user is not found
@@ -241,30 +219,6 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     public void sendMessageToUser(String username, EinzMessage message) throws UserNotRegisteredException, JSONException {
         this.sendMessageToUser(username, message.toJSON().toString());
     }
-
-//    /**
-//     * To be called by EinzServerClientHandler when user registers.
-//     * If the entry for username already exists, it will be replaced
-//     * This is only for connection management
-//     * @param username key
-//     * @param einzServerClientHandler value: the client handler
-//     * @param thread value: The thread which contains the einzServerClientHandler
-//     */
-//    public void registerUser(String username, EinzServerClientHandler einzServerClientHandler, Thread thread){
-//        synchronized (registeredClientHandlers) {
-//            registeredClientHandlers.put(username, Pair.create(einzServerClientHandler, thread));
-//        }
-//    }
-//
-//    /**
-//     * To be called by EinzServerClientHandler when user deregisters
-//     * @param username
-//     */
-//    public void deregisterUser(String username){
-//        synchronized (registeredClientHandlers) {
-//            registeredClientHandlers.remove(username);
-//        }
-//    }
 
     public EinzServerManager getServerManager() {
         return serverManager;

@@ -8,6 +8,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzRegisterAction;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnregisterRequestAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser;
@@ -19,6 +20,8 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * This class handles one Connection per instance (thread)
@@ -27,12 +30,14 @@ public class EinzServerClientHandler implements Runnable{
     public Socket socket;
 
     private boolean spin = false;
+    private boolean stopping = false;
     private boolean firstConnectionOnServer = false; // whether this user should be considered admin
 
     private ThreadedEinzServer parentEinzServer;
     private DataOutputStream out = null;
-    public final Object socketWriteLock = new Object(); // lock onto this for writing
-    public final Object socketReadLock = new Object();
+    public ReentrantReadWriteLock socketLock;
+    private ReentrantLock socketReadLock = new ReentrantLock();
+    private ReentrantLock socketWriteLock = new ReentrantLock();
     private InputStream inp;
     private BufferedReader brinp;
 
@@ -42,7 +47,9 @@ public class EinzServerClientHandler implements Runnable{
     private EinzActionFactory einzActionFactory;
 
     // identify this connection by its user as soon as this is available
-    private String connectedUser; // TODO: set connectedUser on register
+    private String connectedUser = null; // is set on register and never unset because when the client disconnects, this thread is stopped // TODO: stop thread on disconnect
+    // todo: set to null when unregistering player (and probably end thread afterwards)
+    private String latestUser = null; // is only null if there was never a username
 
     /**
      * Listens on {@param clientSocket} for incoming messages and provides an interface {@link ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler#sendMessage(String)} for sending to the client associated with this socket.
@@ -58,9 +65,8 @@ public class EinzServerClientHandler implements Runnable{
         parentEinzServer.incNumClients();
         this.firstConnectionOnServer = firstConnectionOnServer;
 
-        debug_printJSONRepresentationOf(EinzRegistrationParser.class);
-
         this.socket = clientSocket;
+        this.socketLock = new ReentrantReadWriteLock(true);
         this.serverInterface = serverFunctionDefinition;
         this.einzParserFactory = new EinzParserFactory();
         this.einzActionFactory = new EinzActionFactory(serverInterface, this.parentEinzServer.getServerManager(), this);
@@ -106,26 +112,11 @@ public class EinzServerClientHandler implements Runnable{
         }
     }
 
-    /**
-     * For debug purposes only, should not have side effects at all.
-     * @param o
-     */
-    private void debug_printJSONRepresentationOf(Object o){
-        //<debug>
-        JSONObject container = new JSONObject();
-        try {
-            container.put("your Object:", o);
-            Log.d("ESCH/DEBUG", "printJSONRepresentationOF() : "+ container.toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        // D/DEBUG: {"test":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"}
-        //</debug>
-    }
 
 
     /**
      * load ParserMappings for networking and for gamelogic from file set up in {@link EinzServerManager}
+     * Should be fine to call without any synchronization as long as this thread is the only one using {@link #einzParserFactory}
      * @throws JSONException
      * @throws InvalidResourceFormatException
      * @throws ClassNotFoundException
@@ -149,40 +140,63 @@ public class EinzServerClientHandler implements Runnable{
 
     @Override
     public void run() {
-        ///Log.d("ESCH", "run() was called. Listening for messages");
 
         String line;
         spin = true;
         while (spin) {
             try {
+                socketReadLock.lock();
                 line = readSocketLine();
+                socketReadLock.unlock();
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
+                    socketWriteLock.lock();
                     socket.close();
+                    socketWriteLock.unlock();
                     parentEinzServer.decNumClients();
                     Log.d("ESCH", "closed clientSocket");
                     return;
                 } else {
                     Log.d("ESCH", "received line: "+line);
+                    sendMessage("Your Package was: "+line + "\r\n"); // echo back the same packet // TODO: don't echo back
                     runAction(parseMessage(line));
-                    sendMessage(line + "\r\n"); // echo back the same packet
+
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("ESCH", "Something Failed. Probably the client disconnected without warning. Or maybe the socket is closed.");
                 // TODO: inform that user has left if he was registered. and stop thread
-                this.stopThread();
                 this.onClientDisconnected();
+                this.stopThreadPatiently();
                 return;
             }
         }
     }
 
-    // TODO: implement stopClientHandler
-    private void stopThread() {
-        Log.d("ESCH/stopThread", "NOT YET IMPLEMENTED!");
+    /**
+     * Make thread stop listening for incoming connections and close the socket. All queued messages from other threads might be dismissed and have to catch the IOException.
+     */
+    public void stopThreadPatiently() {
+        if(stopping&&!spin) // all is being done already
+            return;
+
+
+        this.stopping = true;
+        socketWriteLock.lock();
+        String usr = getLatestUser(); usr = (usr==null)?"has never been set":usr;
+        Log.d("ESCH/stopThread", "STOPPING THREAD(user="+usr+") PATIENTLY!");
+        this.spin = false;
+        //close socket to avoid memory leak but don't care if it fails
+        try {
+            this.socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // what happens if other threads still want to write on this: probably IOException
+        socketWriteLock.unlock();
     }
 
-    // TODO implement onClientDisconnected
+    // TODO implement onClientDisconnected, make sure to call this from stopThreadPatiently and from deregister.
     private void onClientDisconnected(){
         Log.d("ESCH/clientDisconnected", "NOT YET IMPLEMENTED");
     }
@@ -200,36 +214,38 @@ public class EinzServerClientHandler implements Runnable{
     }
 
     /**
-     * sends the message to the client associated with this EinzServerClientHandler instance.
-     * Makes sure only one thread is concurrently writing to socket
+     * sends the message to the client associated with this EinzServerClientHandler instance.<br>
+     * Threadsafety: Writelock on {@link #socketWriteLock}<br>
      * @param message the line to send. Do not include \r\n except as the end of your package (as we're reading a packet each line)
      *                DO include it at the end of the package
      */
     public void sendMessage(String message) {
+
         if(out==null){
             Log.e("EinzServerThread", "sendMessage: Not yet fully initialized. cannot send message.");
         }
-        synchronized(socketWriteLock){
+
+        socketWriteLock.lock(); //synchronized
             // maybe need to append  + "\r\n" to message ?
             try {
                 out.writeBytes(message);
-            } catch (IOException e) {
-                Log.e("EinzServerThread","sendMessage: failed because of IOException "+e.getMessage());
-                e.printStackTrace();
-
-                this.onClientDisconnected();
-                this.stopThread(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
-            }
-            try {
                 out.flush();
             } catch (IOException e) {
-                Log.e("EinzServerThread","sendMessage: failed because of IOException 2 "+e.getMessage());
-                e.printStackTrace();
+                if(getConnectedUser()!=null) { // didn't realize that user disconnected
+                    Log.e("EinzServerThread", "sendMessage: failed because of IOException. Message was '" + message + "',\nIOException was: " + e.getMessage());
+                    e.printStackTrace();
 
-                this.onClientDisconnected();
-                this.stopThread(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
+                    this.onClientDisconnected();
+                    this.stopThreadPatiently(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
+                }else{
+                    // user disconnected on purpose. just ignore what he would receive and let this thread die
+                    if(!stopping){
+                        this.stopThreadPatiently();
+                    }
+                }
             }
-        }
+
+        socketWriteLock.unlock();
     }
 
     /**
@@ -268,13 +284,14 @@ public class EinzServerClientHandler implements Runnable{
     }
 
     /**
-     * reads synchronizedly from socket
+     * reads synchronously from socket
      * @return the line
      */
     private String readSocketLine() throws IOException {
-        synchronized (socketReadLock) {
-            return brinp.readLine();
-        }
+        socketReadLock.lock();
+            String ret = brinp.readLine();
+        socketReadLock.unlock();
+        return ret;
     }
 
 
@@ -296,10 +313,10 @@ public class EinzServerClientHandler implements Runnable{
             this.einzActionFactory.registerMapping(einzMessage.getBody().getClass(), EinzPlayCardAction.class);*/
             //</Debug>
 
-            EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, connectedUser);
+            EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, getConnectedUser());
             return einzAction;
         } catch (JSONException e) {
-            Log.e("EinzServerThread/parse", "JSON Error in parseMessage");
+            Log.e("ESCH/parse", "JSON Error in parseMessage");
             e.printStackTrace();
         }
         return null;
@@ -311,9 +328,27 @@ public class EinzServerClientHandler implements Runnable{
 
     public void setConnectedUser(String connectedUser) {
         this.connectedUser = connectedUser;
+        if(!(connectedUser==null)){
+            latestUser=connectedUser;
+        }
     }
 
     public boolean isFirstConnectionOnServer() {
         return firstConnectionOnServer;
+    }
+
+    /**
+     * @return the latest username associated with this thread. only null if there is none
+     */
+    public String getLatestUser() {
+        return latestUser;
+    }
+
+    public ReentrantLock getSocketReadLock() {
+        return socketReadLock;
+    }
+
+    public ReentrantLock getSocketWriteLock() {
+        return socketWriteLock;
     }
 }

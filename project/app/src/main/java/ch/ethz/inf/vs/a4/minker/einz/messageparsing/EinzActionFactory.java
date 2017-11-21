@@ -96,13 +96,20 @@ public class EinzActionFactory {
      * @param issuedBy the username who issued this action or null if irrelevant and unknown
      * @return the action, or null if this messagetype was not registered or it failed for some other reason
      */
+    @Nullable
     public EinzAction generateEinzAction(EinzMessage message, @Nullable String issuedBy){
         if(message == null){
             Log.e("ActionFactory", "Message was null.");
             return null;
         }
         try {
-            EinzAction ret = getMapping(message).getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
+            Class<? extends  EinzAction> mapping = getMapping(message);
+            if(mapping == null){
+                Log.w("ActionFactory", "generation of unregistered action was requested!");
+                Log.d("ActionFactory", "The unregistered action was for "+message.toJSON().toString());
+                return null;
+            }
+            EinzAction ret = mapping.getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
             Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
             return ret;
         } catch (InstantiationException e) {
@@ -117,6 +124,9 @@ public class EinzActionFactory {
         } catch (InvocationTargetException e) {
             Log.e("ActionFactory", "Failed to generate Mapping: "+e.getMessage());
             e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            // When printing the unregistered action fails. Whatever, don't care. Action is unregistered.
         }
         Log.e("ActionFactory", "failed to map to an action");
         return null;
@@ -150,7 +160,7 @@ public class EinzActionFactory {
                 throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"mapstoaction\" does not start with class ");
             } else {
                 String substring = s.substring(prefix.length()); // classname without prefix
-                Log.d("ActionFactory","substring to get class of : "+substring);
+                Log.d("ActionFactory/load","substring to get class of : "+substring);
                 Class o = Class.forName(substring);
                 if (!(EinzAction.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
                     throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"mapstoaction\" is not of type Class");
