@@ -34,7 +34,7 @@ public class Debug {
         final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
             @Override
             public void messageReceived(String message) {
-                Log.d("TempClient", "received message: "+message);
+                Log.d("TempClient1", "received message: "+message);
             }
         });
         Thread t = new Thread(){
@@ -55,7 +55,7 @@ public class Debug {
                     sleep(10); // wait until server hopefully runs
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    Log.e("TempClient", "Sleeping Failed");
+                    Log.e("TempClient1", "Sleeping Failed");
                     interrupt();
                 }
 
