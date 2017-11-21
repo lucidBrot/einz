@@ -47,6 +47,9 @@ public interface ServerFunctionDefinition {
         //(doesn't include if the player has drawn cards from card effects)
         public boolean hasDrawn();
 
+        //checks if a player has won the game (has 0 cards in hand)
+        public boolean hasWon(Player p);
+
     //(II) Functions that change things in the game
 
         //initialises a new game
@@ -56,10 +59,14 @@ public interface ServerFunctionDefinition {
         // in the HashMap, the Key determines the Card and the Mapped value determines how many times that card is put into the game
         //-the given set of rules with which the game is played represented as an int
         // since we haven't specified yet what options should be available, this int does nothing at the moment
-        public GameState startGame(ArrayList<Player> players, HashMap<Card, Integer> deck, int rules);
+        public GameState initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, int rules);
 
         //initialises a new game with standart cards and rules with the given players
-        public GameState startStandartGame(ArrayList<Player> players);
+        public GameState initialiseStandartGame(ArrayList<Player> players);
+
+        //sends all players the message that the game started
+        //sends all players the relevant information they need to have (defined in GlobalInfo and PlayerInfo)
+        public void startGame();
 
         //player p plays a card
         //This automatically sets the activePlayer to the next player to play after p laid his card
@@ -80,14 +87,12 @@ public interface ServerFunctionDefinition {
         //this should be called when player p needs to draw cards because of effects from played cards
         public HashSet<Card> drawXCards(int x, Player p);
 
-    // (III) Other Functions
-
-        //checks if a player has won the game (has 0 cards in hand)
-        public boolean hasWon(Player p);
-
         //Ends the running game
         //currently does nothing since the GameState shouldn't care what happens after the game?
         public void endGame();
+
+
+
 
 
 

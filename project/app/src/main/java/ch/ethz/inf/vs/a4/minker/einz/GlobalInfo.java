@@ -9,9 +9,9 @@ import java.util.HashMap;
 
 public class GlobalInfo {
     HashMap<Player,Integer> cardAmount;
-    ArrayList<Card> topOfPlayPile;
+    ArrayList<String> topOfPlayPile;
     //The players theoretically only need to know the
     // top card of the playPile but it's convenient being able to look through the top ~10 cards
-    Player activePlayer;
+    String activePlayerName;
     int cardsToDraw;
 }

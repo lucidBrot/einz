@@ -38,8 +38,8 @@ public class ServerFunctionTests {
         serverFunction.drawXCards(27, gameState.getPlayers().get(0));
         serverFunction.drawXCards(54, gameState.getPlayers().get(1));
 
-        assertEquals(27 + 7, gameState.getPlayers().get(0).Hand.size());
-        assertEquals(54 + 7, gameState.getPlayers().get(1).Hand.size());
+        assertEquals(27 + 7, gameState.getPlayers().get(0).hand.size());
+        assertEquals(54 + 7, gameState.getPlayers().get(1).hand.size());
     }
 
     @Test
@@ -57,7 +57,7 @@ public class ServerFunctionTests {
             boolean hasPlayed = false;
             Player p = gameState.getActivePlayer();
             String logString = p.name+": ";
-            for (Card card : p.Hand){
+            for (Card card : p.hand){
                 logString = logString + "("+card.color+","+card.type+","+card.wish+"), ";
             }
             logString.substring(0, logString.length()-2);
@@ -69,7 +69,7 @@ public class ServerFunctionTests {
             } else {
                 APN = 1;
             }
-            for (Card card : p.Hand) {
+            for (Card card : p.hand) {
                 if (serverFunction.isPlayable(card, p) && hasPlayed == false) {
                     if (card.type.equals(CardTypes.CHANGECOLORPLUSFOUR) ||
                             card.type.equals(CardTypes.CHANGECOLOR)){
@@ -101,8 +101,8 @@ public class ServerFunctionTests {
             }
         }
 
-        assertEquals(count[0], gameState.getPlayers().get(0).Hand.size());
-        assertEquals(count[1], gameState.getPlayers().get(1).Hand.size());
+        assertEquals(count[0], gameState.getPlayers().get(0).hand.size());
+        assertEquals(count[1], gameState.getPlayers().get(1).hand.size());
 
 
     }
@@ -126,7 +126,7 @@ public class ServerFunctionTests {
             boolean hasPlayed = false;
             Player p = gameState.getActivePlayer();
             String logString = p.name+": ";
-            for (Card card : p.Hand){
+            for (Card card : p.hand){
                 logString = logString + "("+card.color+","+card.type+","+card.wish+"), ";
             }
             logString.substring(0, logString.length()-2);
@@ -142,7 +142,7 @@ public class ServerFunctionTests {
             } else {
                 APN =3;
             }
-            for (Card card : p.Hand) {
+            for (Card card : p.hand) {
                 if (serverFunction.isPlayable(card, p) && hasPlayed == false) {
                     if (card.type.equals(CardTypes.CHANGECOLORPLUSFOUR) ||
                             card.type.equals(CardTypes.CHANGECOLOR)){
@@ -174,10 +174,10 @@ public class ServerFunctionTests {
             }
         }
 
-        assertEquals(count[0], gameState.getPlayers().get(0).Hand.size());
-        assertEquals(count[1], gameState.getPlayers().get(1).Hand.size());
-        assertEquals(count[2], gameState.getPlayers().get(2).Hand.size());
-        assertEquals(count[3], gameState.getPlayers().get(3).Hand.size());
+        assertEquals(count[0], gameState.getPlayers().get(0).hand.size());
+        assertEquals(count[1], gameState.getPlayers().get(1).hand.size());
+        assertEquals(count[2], gameState.getPlayers().get(2).hand.size());
+        assertEquals(count[3], gameState.getPlayers().get(3).hand.size());
 
 
     }
@@ -188,3 +188,4 @@ public class ServerFunctionTests {
         ThreadedEinzServer dummyTES = new ThreadedEinzServer(null, 1000, null, serverFunction);
     }
 }
+

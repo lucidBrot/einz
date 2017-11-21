@@ -7,6 +7,8 @@ import java.util.ArrayList;
  */
 
 public class PlayerInfo {
-    ArrayList<Card> handCards;
+    ArrayList<String> handCards;
     ArrayList<String> possibleActions;
+    //TODO: indicate which cards can be played
+    // not just if any cards can be played
 }

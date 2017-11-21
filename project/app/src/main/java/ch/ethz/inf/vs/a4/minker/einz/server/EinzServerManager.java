@@ -40,7 +40,7 @@ public class EinzServerManager {
                 // TODO: send that info to clients
             }
             Log.d("Manager/finishRegPhase", "Players: "+players.toString());
-            GameState gameState = server.serverFunctionDefinition.startStandartGame(players); // DEBUG
+            GameState gameState = server.serverFunctionDefinition.initialiseStandartGame(players); // DEBUG
             Log.d("Manager/finishRegPhase", "Now what do I do with the gamestate "+gameState.toString()+" ?");
         }
     }

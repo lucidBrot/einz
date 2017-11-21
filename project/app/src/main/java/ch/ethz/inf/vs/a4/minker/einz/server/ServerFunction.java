@@ -16,15 +16,24 @@ import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 public class ServerFunction implements ServerFunctionDefinition {
 
-    //reference to the server thread containing the global state object
+    //reference to the the global state object
     public GameState gameState;
 
+    //reference to the ThreadedEinzServer
+    public ThreadedEinzServer threadedEinzServer;
+
     //Constructor
+    public ServerFunction(GameState gs, ThreadedEinzServer tes){
+        gameState = gs;
+        threadedEinzServer = tes;
+    }
     public ServerFunction(GameState gs){
+        //Does not initialise server!
         gameState = gs;
     }
     public ServerFunction(){
-        //Does not initialise server!
+        //doesn't initialise anything!
+        //no guarantees that it works if you call this
     }
 
 
@@ -56,10 +65,10 @@ public class ServerFunction implements ServerFunctionDefinition {
 
         if (gameState.getThreatenedCards() == 1) {
             //Thesse are the regular rules
-            cardLegit = normalPlayRules(bottomCard, card);
+            cardLegit = gameState.normalPlayRules(bottomCard, card);
         } else {
             //These are the rules when an active plusTwo or changeColorPlusFour is in the middle
-            cardLegit = specialPlayRules(bottomCard, card);
+            cardLegit = gameState.specialPlayRules(bottomCard, card);
         }
 
         if (activePlayer().equals(p)) {
@@ -84,6 +93,15 @@ public class ServerFunction implements ServerFunctionDefinition {
         return gameState.getHasDrawn();
     }
 
+    //checks if a player has won the game (has 0 cards in hand)
+    public boolean hasWon(Player p){
+        if (p.hand.isEmpty()){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     //(II) Functions that change things in the game
 
     //initialises a new game
@@ -93,19 +111,26 @@ public class ServerFunction implements ServerFunctionDefinition {
     // in the HashMap, the Key determines the Card and the Mapped value determines how many times that card is put into the game
     //-the given set of rules with which the game is played represented as an int
     // since we haven't specified yet what options should be available, this int does nothing at the moment
-    public GameState startGame(ArrayList<Player> players, HashMap<Card, Integer> deck, int rules){
+    public GameState initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, int rules){
         return new GameState(players, deck, rules);
     }
 
-    public GameState startStandartGame(ArrayList<Player> players){
+    public GameState initialiseStandartGame(ArrayList<Player> players){
         return new GameState(players);
+    }
+
+    //sends all players the message that the game started
+    //sends all players the relevant information they need to have (defined in GlobalInfo and PlayerInfo)
+    public void startGame(){
+        //TODO: Implement
+
     }
 
     //playing a card
     public boolean play(Card card, Player p){
         if (isPlayable(card, p)){
             gameState.playCardFromHand(card, p);
-            cardEffect(card);
+            gameState.cardEffect(card);
             return true;
         } else {
             return false;
@@ -140,84 +165,10 @@ public class ServerFunction implements ServerFunctionDefinition {
         return result;
     }
 
-    // (III) Other Functions
-
-    //checks if a player has won the game (has 0 cards in hand)
-    public boolean hasWon(Player p){
-        if (p.Hand.isEmpty()){
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
     //Ends the running game
     public void endGame(){
         //TODO: Implement
         //Maybe this isn't needed since the ServerFunction only keeps the GameState in a valid state but once the game ends
         //this isn't necessary anymore
     }
-
-    public void cardEffect(Card card){
-        switch (card.type){
-            case PLUSTWO:
-                if (gameState.getThreatenedCards() == 1){
-                    gameState.increaseThreatenedCards(1);
-                } else {
-                    gameState.increaseThreatenedCards(2);
-                }
-                break;
-            case CHANGECOLORPLUSFOUR:
-                if (gameState.getThreatenedCards() == 1){
-                    gameState.increaseThreatenedCards(3);
-                } else {
-                    gameState.increaseThreatenedCards(4);
-                }
-                break;
-            case STOP:
-                gameState.nextPlayer();
-                break;
-            case SWITCHORDER:
-                gameState.switchOrder();
-                break;
-        }
-        gameState.nextPlayer();
-    }
-
-    public boolean normalPlayRules(Card bottomCard, Card topCard){
-        switch (topCard.type){
-            case CHANGECOLOR:
-            case CHANGECOLORPLUSFOUR:
-                return true;
-            default:
-                if (topCard.color == bottomCard.color ||
-                        topCard.type == bottomCard.type ||
-                        topCard.color == bottomCard.wish){
-                    return true;
-                } else {
-                    return false;
-                }
-        }
-    }
-
-    public boolean specialPlayRules(Card bottomCard, Card topCard){
-        switch (topCard.type){
-            case PLUSTWO:
-                if (bottomCard.type == CardTypes.PLUSTWO){
-                    return true;
-                } else {
-                    return false;
-                }
-            case CHANGECOLORPLUSFOUR:
-                if (bottomCard.type == CardTypes.CHANGECOLORPLUSFOUR){
-                    return true;
-                } else {
-                    return false;
-                }
-            default:
-                return false;
-        }
-    }
-
 }

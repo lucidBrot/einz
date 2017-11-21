@@ -128,8 +128,8 @@ public class GameState {
             newStandartDeck();
         }
             Card result = drawPile.pop();
-            p.Hand.ensureCapacity(p.Hand.size() + 1);
-            p.Hand.add(result);
+            p.hand.ensureCapacity(p.hand.size() + 1);
+            p.hand.add(result);
             return result;
     }
 
@@ -143,8 +143,8 @@ public class GameState {
     }
 
     public void playCardFromHand (Card card, Player p){
-        if (p.Hand.contains(card)){
-            p.Hand.remove(card);
+        if (p.hand.contains(card)){
+            p.hand.remove(card);
             playPile.ensureCapacity(playPile.size() + 1);
             playPile.add(card);
         }
@@ -236,4 +236,83 @@ public class GameState {
         }
         Collections.shuffle(drawPile);
     }
+
+    public void updatePlayerInfo(Player p) {
+        p.playerInfo.handCards.clear();
+        p.playerInfo.possibleActions.clear();
+        for (Card c : p.hand) {
+            p.playerInfo.handCards.add(c.ID);
+        }
+        if (!hasDrawn) {
+            p.playerInfo.possibleActions.add(PlayerActions.CANDRAW.action);
+        } else {
+            p.playerInfo.possibleActions.add(PlayerActions.ENDTURN.action);
+        }
+        //TODO: finish
+        //can i play cards? If yes, which ones? (isPlayable)
+    }
+
+    // (III) Functions to check rules
+
+    public void cardEffect(Card card){
+        switch (card.type){
+            case PLUSTWO:
+                if (threatenedCards == 1){
+                    increaseThreatenedCards(1);
+                } else {
+                    increaseThreatenedCards(2);
+                }
+                break;
+            case CHANGECOLORPLUSFOUR:
+                if (threatenedCards == 1){
+                    increaseThreatenedCards(3);
+                } else {
+                    increaseThreatenedCards(4);
+                }
+                break;
+            case STOP:
+                nextPlayer();
+                break;
+            case SWITCHORDER:
+                switchOrder();
+                break;
+        }
+        nextPlayer();
+    }
+
+    public boolean normalPlayRules(Card bottomCard, Card topCard){
+        switch (topCard.type){
+            case CHANGECOLOR:
+            case CHANGECOLORPLUSFOUR:
+                return true;
+            default:
+                if (topCard.color == bottomCard.color ||
+                        topCard.type == bottomCard.type ||
+                        topCard.color == bottomCard.wish){
+                    return true;
+                } else {
+                    return false;
+                }
+        }
+    }
+
+    public boolean specialPlayRules(Card bottomCard, Card topCard){
+        switch (topCard.type){
+            case PLUSTWO:
+                if (bottomCard.type == CardTypes.PLUSTWO){
+                    return true;
+                } else {
+                    return false;
+                }
+            case CHANGECOLORPLUSFOUR:
+                if (bottomCard.type == CardTypes.CHANGECOLORPLUSFOUR){
+                    return true;
+                } else {
+                    return false;
+                }
+            default:
+                return false;
+        }
+    }
+
 }
