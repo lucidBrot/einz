@@ -245,11 +245,6 @@ public class EinzServerManager {
 
             String role = clientRoles.get(username);
             EinzServerClientHandler esch = clientHandlers.get(username);
-            // unregister them
-            userListLock.writeLock().lock();
-            getRegisteredClientRoles().remove(username);
-            getRegisteredClientHandlers().remove(username);
-            userListLock.writeLock().unlock();
 
             // inform all clients
             EinzUnregisterResponseMessageBody body = new EinzUnregisterResponseMessageBody(username, unregisterReason);
@@ -258,10 +253,19 @@ public class EinzServerManager {
             broadcastMessageToAllPlayers(message);
             broadcastMessageToAllSpectators(message);
 
+            // unregister them
+            userListLock.writeLock().lock();
+            getRegisteredClientRoles().remove(username);
+            getRegisteredClientHandlers().remove(username);
+            userListLock.writeLock().unlock();
+
             // and stop the corresponding client
             esch.setConnectedUser(null);
             esch.stopThreadPatiently();
+            Log.d("servMan/unreg", "unregistered user "+username);
 
+        } else {
+            Log.d("servMan/unreg", "failed to unregister user "+username+" because "+failureReason);
         }
 
         EinzMessage<EinzKickFailureMessageBody> emz;
@@ -397,6 +401,10 @@ public class EinzServerManager {
         Log.d("servMan/broadcastP", "broadcasting "+message.getBody().getClass().getSimpleName());
         ConcurrentHashMap<String, EinzServerClientHandler> map = getRegisteredClientHandlers();
         for(String username : getRegisteredClientRoles().keySet()){
+            if(username.equals("clemï")){
+                boolean debug = true;
+            }
+
             if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
                 continue;
 

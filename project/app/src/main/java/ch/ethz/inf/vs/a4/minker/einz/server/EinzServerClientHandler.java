@@ -28,6 +28,7 @@ public class EinzServerClientHandler implements Runnable{
     public Socket socket;
 
     private boolean spin = false;
+    private boolean stopping = false;
     private boolean firstConnectionOnServer = false; // whether this user should be considered admin
 
     private ThreadedEinzServer parentEinzServer;
@@ -44,6 +45,7 @@ public class EinzServerClientHandler implements Runnable{
     // identify this connection by its user as soon as this is available
     private String connectedUser = null; // is set on register and never unset because when the client disconnects, this thread is stopped // TODO: stop thread on disconnect
     // todo: set to null when unregistering player (and probably end thread afterwards)
+    private String latestUser = null; // is only null if there was never a username
 
     /**
      * Listens on {@param clientSocket} for incoming messages and provides an interface {@link ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler#sendMessage(String)} for sending to the client associated with this socket.
@@ -152,8 +154,9 @@ public class EinzServerClientHandler implements Runnable{
                     return;
                 } else {
                     Log.d("ESCH", "received line: "+line);
-                    runAction(parseMessage(line));
                     sendMessage("Your Package was: "+line + "\r\n"); // echo back the same packet // TODO: don't echo back
+                    runAction(parseMessage(line));
+
                 }
 
             } catch (IOException e) {
@@ -171,8 +174,14 @@ public class EinzServerClientHandler implements Runnable{
      * Make thread stop listening for incoming connections and close the socket. All queued messages from other threads might be dismissed and have to catch the IOException.
      */
     public void stopThreadPatiently() {
+        if(stopping&&!spin) // all is being done already
+            return;
+
+
+        this.stopping = true;
         socketLock.writeLock().lock();
-        Log.d("ESCH/stopThread", "STOPPING THREAD PATIENTLY!");
+        String usr = getLatestUser(); usr = (usr==null)?"has never been set":usr;
+        Log.d("ESCH/stopThread", "STOPPING THREAD(user="+usr+") PATIENTLY!");
         this.spin = false;
         //close socket to avoid memory leak but don't care if it fails
         try {
@@ -181,7 +190,6 @@ public class EinzServerClientHandler implements Runnable{
             e.printStackTrace();
         }
         // what happens if other threads still want to write on this: probably IOException
-
     }
 
     // TODO implement onClientDisconnected, make sure to call this from stopThreadPatiently and from deregister.
@@ -219,11 +227,18 @@ public class EinzServerClientHandler implements Runnable{
                 out.writeBytes(message);
                 out.flush();
             } catch (IOException e) {
-                Log.e("EinzServerThread","sendMessage: failed because of IOException "+e.getMessage());
-                e.printStackTrace();
+                if(getConnectedUser()!=null) { // didn't realize that user disconnected
+                    Log.e("EinzServerThread", "sendMessage: failed because of IOException. Message was '" + message + "',\nIOException was: " + e.getMessage());
+                    e.printStackTrace();
 
-                this.onClientDisconnected();
-                this.stopThreadPatiently(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
+                    this.onClientDisconnected();
+                    this.stopThreadPatiently(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
+                }else{
+                    // user disconnected on purpose. just ignore what he would receive and let this thread die
+                    if(!stopping){
+                        this.stopThreadPatiently();
+                    }
+                }
             }
 
         socketLock.writeLock().unlock();
@@ -309,9 +324,19 @@ public class EinzServerClientHandler implements Runnable{
 
     public void setConnectedUser(String connectedUser) {
         this.connectedUser = connectedUser;
+        if(!(connectedUser==null)){
+            latestUser=connectedUser;
+        }
     }
 
     public boolean isFirstConnectionOnServer() {
         return firstConnectionOnServer;
+    }
+
+    /**
+     * @return the latest username associated with this thread. only null if there is none
+     */
+    public String getLatestUser() {
+        return latestUser;
     }
 }

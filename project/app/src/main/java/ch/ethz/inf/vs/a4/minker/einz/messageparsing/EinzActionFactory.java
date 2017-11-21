@@ -160,7 +160,7 @@ public class EinzActionFactory {
                 throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"mapstoaction\" does not start with class ");
             } else {
                 String substring = s.substring(prefix.length()); // classname without prefix
-                Log.d("ActionFactory","substring to get class of : "+substring);
+                Log.d("ActionFactory/load","substring to get class of : "+substring);
                 Class o = Class.forName(substring);
                 if (!(EinzAction.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
                     throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"mapstoaction\" is not of type Class");

@@ -52,14 +52,14 @@ public class Debug {
             @Override
             public void run() {
                 try {
-                    sleep(600); // wait until server hopefully runs
+                    sleep(1); // wait until server hopefully runs
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Log.e("TempClient", "Sleeping Failed");
                     interrupt();
                 }
 
-                tc.sendMessage(Debug.debug_getRegisterMessage("roger"));
+                tc.sendMessage(Debug.debug_getRegisterMessage("roger")+"\r");
             }
         };
         m.start(); // send message
@@ -96,8 +96,8 @@ public class Debug {
                     interrupt();
                 }
 
-                tc.sendMessage(Debug.debug_getRegisterMessage("clemï"));
-                tc.sendMessage(Debug.debug_getUnregisterMessage("clemï"));
+                tc.sendMessage(Debug.debug_getRegisterMessage("clemï")+"\n");
+                tc.sendMessage(Debug.debug_getUnregisterMessage("clemï")+"\n");
             }
         };
         m.start(); // send message
@@ -127,7 +127,7 @@ public class Debug {
             return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e("TempClient/dGetRegMsg", "failed to create registration message");
+            Log.e("TempClient/dGetRegMsg", "failed to create deregistration message");
             return "empty message :(";
         }
 
@@ -138,11 +138,11 @@ public class Debug {
             EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
             EinzUnregisterRequestMessageBody body = new EinzUnregisterRequestMessageBody(username);
             EinzMessage<EinzUnregisterRequestMessageBody> message = new EinzMessage<>(header, body);
-            Log.d("tempClient/dGetUnRegMsg","message.toString() : "+message.toString()+",\nmessage.toJSON().toString() : "+message.toJSON().toString());
+            Log.d("DEBUG/dGetUnRegMsg","message.toJSON().toString() : "+message.toJSON().toString());
             return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e("TempClient/dGetUnRegMsg", "failed to create registration message");
+            Log.e("DEBUG/dGetUnRegMsg", "failed to create registration message");
             return "empty message :(";
         }
     }

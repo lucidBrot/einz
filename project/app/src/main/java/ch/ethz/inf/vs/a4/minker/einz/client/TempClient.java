@@ -104,8 +104,6 @@ public class TempClient {
 
                 }
 
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
-
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
@@ -128,49 +126,6 @@ public class TempClient {
     //class at on asynckTask doInBackground
     public interface OnMessageReceived {
         public void messageReceived(String message);
-    }
-
-    public String debug_getRegisterMessage(){
-        /*
-        {
-          "header":{
-            "messagegroup":"registration",
-            "messagetype":"Register"
-          },
-          "body":{
-            "username":"roger",
-            "role":"player"
-          }
-        }
-         */
-
-
-        try {
-            EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
-            EinzRegisterMessageBody body = new EinzRegisterMessageBody("roger", "player");
-            EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
-            Log.d("tempClient/dGetRegMsg","message.toString() : "+message.toString()+",\nmessage.toJSON().toString() : "+message.toJSON().toString());
-            return message.toJSON().toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e("TempClient/dGetRegMsg", "failed to create registration message");
-            return "empty message :(";
-        }
-
-    }
-
-    public String debug_getUnregisterMessage(){
-        try {
-            EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
-            EinzUnregisterRequestMessageBody body = new EinzUnregisterRequestMessageBody("roger");
-            EinzMessage<EinzUnregisterRequestMessageBody> message = new EinzMessage<>(header, body);
-            Log.d("tempClient/dGetUnRegMsg","message.toString() : "+message.toString()+",\nmessage.toJSON().toString() : "+message.toJSON().toString());
-            return message.toJSON().toString();
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e("TempClient/dGetUnRegMsg", "failed to create registration message");
-            return "empty message :(";
-        }
     }
 
 }

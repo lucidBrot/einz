@@ -47,6 +47,7 @@ public class EinzUnregisterRequestAction extends EinzAction {
 
         } else {
             // user is not allowed to do this, just don't react
+            Log.w("UnregReqAction","-----------------------------------------------------------------------------------------------------");
         }
     }
 }
