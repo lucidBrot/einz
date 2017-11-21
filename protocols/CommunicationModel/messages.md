@@ -54,7 +54,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * registration
 
-  > [Register](#register), [RegisterSuccess](#registersuccess), [RegisterFailure](#registerfailure), [UpdateLobbyList](#updatelobbylist) [UnregisterRequest](#unregister), [UnregisterResponse](#unregisterresponse), [Kick](#kick)
+  > [Register](#register), [RegisterSuccess](#registersuccess), [RegisterFailure](#registerfailure), [UpdateLobbyList](#updatelobbylist), [UnregisterRequest](#unregister), [UnregisterResponse](#unregisterresponse), [Kick](#kick), [KickFailure](#kickfailure) 
 
 
 * startgame
@@ -84,7 +84,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * endGame
 
-  > [PlayerFinished](#playerfinished), [EndGame](#endgame)
+  > [PlayerFinished](#playerfinished), [GameOver](#gameover)
 
 
 
@@ -165,11 +165,6 @@ Request to play on this server, or to spectate.
 > should be unique. If it is not `reason` in [RegisterFailure](#registerfailure) will be *"not unique"*
 >
 > should NOT be the empty string *""* or *"server"*
-
-`success` : *String* 
-
-> Can be *"true"*, *"false"* (or later be further extended. E.g. *banned* )
-> *"true"* means the client is allowed to stay on this server
 
 `role` : *String*
 
@@ -294,7 +289,7 @@ Also, the other Clients need to know about leaves.
 
 ##UnregisterResponse
 
-Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client.
+Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client. This might happen even after the game has started and will then be treated similarly to a client losing connection.
 
 `reason` : *String*
 
@@ -308,14 +303,16 @@ Sent by the **server** to all clients, including the one who was unregistered. A
   },
   "body":{
     "username":"that random dude who we didn't want",
-    "reason":"true"
+    "reason":"kicked"
   }
 }
 ```
 
 ## Kick
 
-The player who started the server, from now on referred to as admin, may decide to kick a player from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin.
+The player who started the server, from now on referred to as admin, may decide to kick a player or spectator from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin. The admin is informed about the outcome, either by a broadcast of [UnregisterResponses](#unregisterresponse) to all clients or by a [KickFailure](#kickfailure) to only the admin.
+
+This request might also be sent during the game.
 
 ```json
 {
@@ -325,6 +322,28 @@ The player who started the server, from now on referred to as admin, may decide 
   },
   "body":{
     "username":"that random dude who we didn't want",
+  }
+}
+```
+
+## KickFailure
+
+The **server** informs the admin that [kicking](#kick) did not work. If the client who requested the kick was not the admin, it informs that client that it is not allowed to kick.
+
+`reason` : *String*
+
+> * *"not allowed"* : you are not allowed to kick people
+> * "not found" : this player or spectator is not registered
+
+```json
+{
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"KickFailure"
+  },
+  "body":{
+    "username":"the user that you wanted to kick",
+    "reason":"why you failed"
   }
 }
 ```
@@ -643,21 +662,11 @@ After this, the server will remove the player from the turn order list and let i
 }
 ```
 
-## EndGame
+## GameOver
 
-The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, but `points` is not neccessary, depending on the ruleset.
+The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, sorted based on the points and the specified rules.
 
-`ranking` : *JSONArray of Players*
-
-> The Players are of the form
->
-> ```json
-> {
->   "username":{
->     "points":"12"
->   }
-> }
-> ```
+points: *JSONObject of Players and points*
 
 ```Json
 {
@@ -665,7 +674,12 @@ The **Server** informs the clients that the game is over and they can show the a
 		"messagegroup": "endGame",
 		"messagetype": "GameOver"
 	},
-	"body": {}
+  "body": {
+    "points":{
+      "roger":"17",
+      "chris":"3"
+    }
+  }
 }
 ```
 

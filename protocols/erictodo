@@ -1,0 +1,6 @@
+Ignore this if you are not Eric
+
+TODO:
+	implement all types of parsers and messages, and test them
+	stop crashing when listening twice for client
+	stop server gracefully

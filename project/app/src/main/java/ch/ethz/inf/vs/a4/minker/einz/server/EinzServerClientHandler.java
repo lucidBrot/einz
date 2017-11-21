@@ -26,11 +26,13 @@ import java.util.concurrent.locks.Lock;
 public class EinzServerClientHandler implements Runnable{
     public Socket socket;
 
-    public boolean spin = false;
+    private boolean spin = false;
+    private boolean firstConnectionOnServer = false; // whether this user should be considered admin
+
     private ThreadedEinzServer parentEinzServer;
     private DataOutputStream out = null;
-    public final Object socketWriteLock; // lock onto this for writing
-    public final Object socketReadLock;
+    public final Object socketWriteLock = new Object(); // lock onto this for writing
+    public final Object socketReadLock = new Object();
     private InputStream inp;
     private BufferedReader brinp;
 
@@ -49,22 +51,23 @@ public class EinzServerClientHandler implements Runnable{
      * @param parentEinzServer the EinzServer instance creating this thread
      * @param serverFunctionDefinition the implementation of the interface to run the actions in.
      */
-    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer parentEinzServer, ServerFunctionDefinition serverFunctionDefinition) {
+    public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer parentEinzServer, ServerFunctionDefinition serverFunctionDefinition, boolean firstConnectionOnServer) {
         Log.d("ESCH", "started new instance");
 
         this.parentEinzServer = parentEinzServer;
         parentEinzServer.incNumClients();
+        this.firstConnectionOnServer = firstConnectionOnServer;
 
         debug_printJSONRepresentationOf(EinzRegistrationParser.class);
 
         this.socket = clientSocket;
         this.serverInterface = serverFunctionDefinition;
         this.einzParserFactory = new EinzParserFactory();
-        this.einzActionFactory = new EinzActionFactory(serverInterface, this.parentEinzServer.getServerManager());
+        this.einzActionFactory = new EinzActionFactory(serverInterface, this.parentEinzServer.getServerManager(), this);
 
         // TODO: initialize ParserFactory by registering all Messagegroup->Parser mappings
         try {
-            registerParserMappings(R.raw.parserfactoryinitialisation);
+            registerParserMappings();
         } catch (JSONException e) {
             Log.e("ESCH/rParserMappings", "failed to initialize ParserFactory by loading from resource file.");
             e.printStackTrace();
@@ -77,11 +80,18 @@ public class EinzServerClientHandler implements Runnable{
         }
 
         // TODO: initialize ActionFactory by registering all Message->Action mappings
-        registerActionMappings();
-
-
-        socketWriteLock = new Object();
-        socketReadLock = new Object();
+        try {
+            registerActionMappings();
+        } catch (InvalidResourceFormatException e) {
+            Log.e("ESCH/rActionMappings", "failed to initialize ActionFactory by loading from resource file.");
+            e.printStackTrace();
+        } catch (JSONException e) {
+            Log.e("ESCH/rActionMappings", "failed to initialize ActionFactory by loading from resource file. InvalidResourceFormatException");
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            Log.e("ESCH/rActionMappings", "failed to initialize ActionFactory by loading from resource file. ActionMappings");
+            e.printStackTrace();
+        }
 
         // initialize socket stuff
         inp = null;
@@ -93,7 +103,6 @@ public class EinzServerClientHandler implements Runnable{
         } catch (IOException e) {
             Log.e("ESCH", "Failed to initialize run(). Aborting");
             e.printStackTrace();
-            return;
         }
     }
 
@@ -105,7 +114,7 @@ public class EinzServerClientHandler implements Runnable{
         //<debug>
         JSONObject container = new JSONObject();
         try {
-            container.put("your thing:", o);
+            container.put("your Object:", o);
             Log.d("ESCH/DEBUG", "printJSONRepresentationOF() : "+ container.toString());
         } catch (JSONException e) {
             e.printStackTrace();
@@ -114,51 +123,26 @@ public class EinzServerClientHandler implements Runnable{
         //</debug>
     }
 
+
     /**
-     * Load the resource file containing an Array of Pair<String messagegroup, Class<\? extends EinzParser>
-     *     @param rawResourceFile e.g. R.raw.serverDefaultParserMappings
-     *                            This file should be formatted as a JSONObject containing a JSONArray "parsermappings" of JSONObjects of the form
-     *                            {"messagegroup":"some thing", "mapstoparser":{...}}
-     *                            where {...} stands for the JSON representation of the EinzParser class, e.g. <i>class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser</i>
-     *     @throws JSONException if some of the JSON is not as expected
-     *     @throws InvalidResourceFormatException if the mapping objects themselves are not valid. Contains more details in extended message
+     * load ParserMappings for networking and for gamelogic from file set up in {@link EinzServerManager}
+     * @throws JSONException
+     * @throws InvalidResourceFormatException
+     * @throws ClassNotFoundException
      */
-    private void registerParserMappings(int rawResourceFile) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
-        InputStream jsonStream = parentEinzServer.applicationContext.getResources().openRawResource(rawResourceFile);
-        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
-        JSONArray array = jsonObject.getJSONArray("parsermappings");
-        int size = array.length();
-        // register each object
-        for(int i=0; i<size; i++){
-            JSONObject pair = array.getJSONObject(i);
-            String s =pair.getString("mapstoparser");
-            String prefix = "class ";
-            if(!s.startsWith(prefix)){
-                throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" does not start with class ");
-            } else {
-                String substring = s.substring(prefix.length()); // classname without prefix
-                Class o = Class.forName(substring);
-                if (!(EinzParser.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
-                    throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" is not of type Class");
-                } else {
-                    // everything is fine, do stuff
-                    @SuppressWarnings("unchecked") // I checked this with above tests
-                    Class<? extends EinzParser> parserclass = (Class<? extends EinzParser>) o;
-                    this.einzParserFactory.registerMessagegroup(pair.getString("messagegroup"), parserclass);
-                }
-            }
-        }
+    private void registerParserMappings() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        this.parentEinzServer.getServerManager().loadAndRegisterNetworkingParsers(this.einzParserFactory);
+        this.parentEinzServer.getServerManager().loadAndRegisterGameLogicParsers(this.einzParserFactory);
     }
 
-    // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
-    // utility function
-    private String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
 
-    private void registerActionMappings(){
-        this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzFinishRegistrationPhaseAction.class); // DEBUG purely. not actually useful
+    /**
+     * load ActionMappings for networking and for gamelogic from file set up in {@link EinzServerManager}
+     */
+    private void registerActionMappings() throws InvalidResourceFormatException, JSONException, ClassNotFoundException {
+        this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzFinishRegistrationPhaseAction.class); // DEBUG purely. not actually useful// TODO: remove debug mappings
+        this.parentEinzServer.getServerManager().loadAndRegisterNetworkingActions(this.einzActionFactory);
+        this.parentEinzServer.getServerManager().loadAndRegisterGameLogicActions(this.einzActionFactory);
     }
 
     // source: https://stackoverflow.com/questions/10131377/socket-programming-multiple-client-to-one-server
@@ -193,12 +177,12 @@ public class EinzServerClientHandler implements Runnable{
         }
     }
 
-    // TODO: implement this method
+    // TODO: implement stopClientHandler
     private void stopThread() {
         Log.d("ESCH/stopThread", "NOT YET IMPLEMENTED!");
     }
 
-    // TODO implement this method
+    // TODO implement onClientDisconnected
     private void onClientDisconnected(){
         Log.d("ESCH/clientDisconnected", "NOT YET IMPLEMENTED");
     }
@@ -249,6 +233,41 @@ public class EinzServerClientHandler implements Runnable{
     }
 
     /**
+     * Same as the other sendMessage, but transforms JSON to String for you.<br/>
+     * <b>appends \r\n at the end if there is no \n at the end</b>
+     * Threadsafe ✔ <br/>
+     * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
+     * @see #sendMessage(String)
+     * @param message
+     */
+    public void sendMessage(JSONObject message){
+        String msg = message.toString();
+        if(!msg.endsWith("\n")){
+            msg += "\r\n";
+        }
+        sendMessage(msg);
+    }
+
+    /**
+     * Same as the other sendMessage, but transforms EinzMessage to JSON to String for you.<br>
+     * <b>appends \r\n at the end if there is no \n at the end</b>
+     * Threadsafe ✔<br>
+     * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
+     * @see #sendMessage(JSONObject)
+     * @see #sendMessage(String)
+     * @param message
+     */
+    public void sendMessage(EinzMessage message){
+        try {
+            sendMessage(message.toJSON());
+        } catch (JSONException e) {
+            Log.e("ESCH/sendMsg", "You sent an EinzMessage which could not be translated toJSON().");
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * reads synchronizedly from socket
      * @return the line
      */
@@ -292,5 +311,9 @@ public class EinzServerClientHandler implements Runnable{
 
     public void setConnectedUser(String connectedUser) {
         this.connectedUser = connectedUser;
+    }
+
+    public boolean isFirstConnectionOnServer() {
+        return firstConnectionOnServer;
     }
 }
