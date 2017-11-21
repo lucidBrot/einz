@@ -20,6 +20,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -34,7 +35,9 @@ public class EinzServerClientHandler implements Runnable{
 
     private ThreadedEinzServer parentEinzServer;
     private DataOutputStream out = null;
-    public ReentrantReadWriteLock socketLock = new ReentrantReadWriteLock();
+    public ReentrantReadWriteLock socketLock;
+    private ReentrantLock socketReadLock = new ReentrantLock();
+    private ReentrantLock socketWriteLock = new ReentrantLock();
     private InputStream inp;
     private BufferedReader brinp;
 
@@ -63,6 +66,7 @@ public class EinzServerClientHandler implements Runnable{
         this.firstConnectionOnServer = firstConnectionOnServer;
 
         this.socket = clientSocket;
+        this.socketLock = new ReentrantReadWriteLock(true);
         this.serverInterface = serverFunctionDefinition;
         this.einzParserFactory = new EinzParserFactory();
         this.einzActionFactory = new EinzActionFactory(serverInterface, this.parentEinzServer.getServerManager(), this);
@@ -210,7 +214,7 @@ public class EinzServerClientHandler implements Runnable{
 
     /**
      * sends the message to the client associated with this EinzServerClientHandler instance.<br>
-     * Threadsafety: Writelock on {@link #socketLock}<br>
+     * Threadsafety: Writelock on {@link #socketWriteLock}<br>
      * @param message the line to send. Do not include \r\n except as the end of your package (as we're reading a packet each line)
      *                DO include it at the end of the package
      */
@@ -337,5 +341,13 @@ public class EinzServerClientHandler implements Runnable{
      */
     public String getLatestUser() {
         return latestUser;
+    }
+
+    public ReentrantLock getSocketReadLock() {
+        return socketReadLock;
+    }
+
+    public ReentrantLock getSocketWriteLock() {
+        return socketWriteLock;
     }
 }
