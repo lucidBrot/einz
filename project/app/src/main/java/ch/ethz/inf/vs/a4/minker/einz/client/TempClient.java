@@ -45,6 +45,7 @@ public class TempClient {
      * @param message text entered by client
      */
     public void sendMessage(String message) {
+        //if(message.endsWith("\n")){Log.d("TempClient", "message ends with newline");}
         if (mBufferOut != null && !mBufferOut.checkError()) {
             mBufferOut.println(message);
             mBufferOut.flush();

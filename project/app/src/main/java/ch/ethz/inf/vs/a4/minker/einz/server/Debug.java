@@ -59,7 +59,7 @@ public class Debug {
                     interrupt();
                 }
 
-                tc.sendMessage(Debug.debug_getRegisterMessage("roger")+"\r");
+                tc.sendMessage(Debug.debug_getRegisterMessage("roger"));
             }
         };
         m.start(); // send message
@@ -123,7 +123,7 @@ public class Debug {
             EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
             EinzRegisterMessageBody body = new EinzRegisterMessageBody(username, "player");
             EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
-            Log.d("tempClient/dGetRegMsg","message.toString() : "+message.toString()+",\nmessage.toJSON().toString() : "+message.toJSON().toString());
+            Log.d("tempClient/dGetRegMsg","simulating message.toJSON().toString() : "+message.toJSON().toString());
             return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
@@ -138,7 +138,7 @@ public class Debug {
             EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
             EinzUnregisterRequestMessageBody body = new EinzUnregisterRequestMessageBody(username);
             EinzMessage<EinzUnregisterRequestMessageBody> message = new EinzMessage<>(header, body);
-            Log.d("DEBUG/dGetUnRegMsg","message.toJSON().toString() : "+message.toJSON().toString());
+            Log.d("DEBUG/dGetUnRegMsg","simulating message.toJSON().toString() : "+message.toJSON().toString());
             return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
