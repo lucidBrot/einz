@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import android.support.annotation.Nullable;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
@@ -29,6 +30,7 @@ public class EinzServerManager {
 
     private final ThreadedEinzServer server;
     private ServerFunctionDefinition serverFunctionInterface;
+    private boolean gamePhaseStarted;
 
     // These files are used to initialize the ActionFactories and ParserFactories of the EinzServerClientHandler threads
     // TODO: test the initialization of the factories once we have enough messages
@@ -49,6 +51,7 @@ public class EinzServerManager {
         this.registeredClientHandlers = new ConcurrentHashMap<>();
         this.registeredClientRoles = new ConcurrentHashMap<>();
         this.serverFunctionInterface = serverFunctionInterface;
+        this.gamePhaseStarted = false;
     }
 
     /**
@@ -74,6 +77,7 @@ public class EinzServerManager {
             // TODO: send that info to clients
         }
         Log.d("Manager/finishRegPhase", "Players: "+players.toString());
+        this.gamePhaseStarted = true;
         GameState gameState = getServerFunctionInterface().startStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
 
     }
@@ -218,7 +222,9 @@ public class EinzServerManager {
      * @return The message only for the client who issued the unregister/kick request. Ignore this return in case of a normal unregister<br>
      *     <i>null</i> if there was no failure
      */
+    @Nullable
     public EinzMessage<EinzKickFailureMessageBody> unregisterUser(String username, String unregisterReason){
+        // TODO: removeUser from fabian
         String failureReason = null;
         EinzMessage<EinzUnregisterResponseMessageBody> einzMessage;
 
@@ -267,6 +273,11 @@ public class EinzServerManager {
         }
     }
 
+    /**
+     * Tests if user is allowed to perform this action and performs it
+     * @param userToKick
+     * @param userWhoIssuedThisKick
+     */
     // TODO: kickUser -- including checking if they are allowed to kick and if the user exists.
     public void kickUser(String userToKick, String userWhoIssuedThisKick){
         userListLock.readLock().lock();
@@ -414,5 +425,9 @@ public class EinzServerManager {
                 throw new RuntimeException(e);
             }
         }
+    }
+
+    public boolean isGamePhaseStarted() {
+        return gamePhaseStarted;
     }
 }

@@ -1,7 +1,12 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
+import android.util.DebugUtils;
+import ch.ethz.inf.vs.a4.minker.einz.BuildConfig;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
@@ -23,6 +28,20 @@ public class EinzUnregisterRequestAction extends EinzAction {
      */
     @Override
     public void run() {
+    // TODO: Map and Test UnregisterRequestAction
+        EinzUnregisterRequestMessageBody body = ((EinzUnregisterRequestMessageBody) this.getMessage().getBody());
 
+        // validate that the user is allowed to do this
+        EinzMessage response;
+        if(getIssuedByPlayer().equals(body.getUsername())) {
+            response = getServerManager().unregisterUser(body.getUsername(), "disconnected");
+            if(BuildConfig.DEBUG && response != null){
+                //some failure occurred but we didn't expect that for unregistering ourselves, only for kicking
+                // but then again, we didn't want to use this return anyways
+            }
+
+        } else {
+            // user is not allowed to do this, just don't react
+        }
     }
 }

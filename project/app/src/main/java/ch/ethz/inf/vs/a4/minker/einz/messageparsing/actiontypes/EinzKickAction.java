@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
@@ -23,6 +24,8 @@ public class EinzKickAction extends EinzAction {
      */
     @Override
     public void run() {
-
+        // TODO: test and map KickAction
+        EinzKickMessageBody body = (EinzKickMessageBody) getMessage().getBody();
+        getServerManager().kickUser(body.getUsername(), getIssuedByPlayer());
     }
 }
