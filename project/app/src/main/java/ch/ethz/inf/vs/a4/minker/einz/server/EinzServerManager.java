@@ -268,7 +268,56 @@ public class EinzServerManager {
     }
 
     // TODO: kickUser -- including checking if they are allowed to kick and if the user exists.
-    
+    public void kickUser(String userToKick, String userWhoIssuedThisKick){
+        userListLock.readLock().lock();
+        EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);
+        boolean allowed = (getAdminUsername().equals(userWhoIssuedThisKick));
+        boolean userExists = (esch!=null);
+        boolean success;
+        EinzMessage<EinzKickFailureMessageBody> response;
+        if(userExists && allowed) {
+            response = unregisterUser(userToKick, "kicked");
+            if(response==null)//if success
+            {
+                userListLock.readLock().unlock();
+                return;
+            } else{
+                // failure. send to user.
+                try {
+                    server.sendMessageToUser(userWhoIssuedThisKick, response);
+                } catch (UserNotRegisteredException e) {
+                    e.printStackTrace();
+                    // User who issued this does not exist :(
+                    // Guess that means we don't answer them
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+                userListLock.readLock().unlock();
+                return;
+            }
+        } else {
+            // user doesn't exist or issuer is not admin
+            EinzKickFailureMessageBody ekfmb;
+            if(!allowed){
+                 ekfmb = new EinzKickFailureMessageBody(userToKick, "not allowed");
+            } else {
+                ekfmb = new EinzKickFailureMessageBody(userToKick, "not found");
+            }
+            EinzMessageHeader header = new EinzMessageHeader("registration", "KickFailure");
+            EinzMessage<EinzKickFailureMessageBody> message = new EinzMessage<>(header, ekfmb);
+            try {
+                server.sendMessageToUser(userWhoIssuedThisKick, message);
+            } catch (UserNotRegisteredException e) {
+                e.printStackTrace();
+                // don't send to user if user doesn't exist (anymore)
+            } catch (JSONException e) {
+                e.printStackTrace();
+                throw new RuntimeException(e);
+            }
+        }
+        userListLock.readLock().unlock();
+    }
 
     public EinzMessage<EinzUpdateLobbyListMessageBody> generateUpdateLobbyListRequest(){
         EinzMessageHeader header = new EinzMessageHeader("registration", "UpdateLobbyList");
