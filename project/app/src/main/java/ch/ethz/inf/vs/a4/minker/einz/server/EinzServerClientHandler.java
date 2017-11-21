@@ -217,6 +217,7 @@ public class EinzServerClientHandler implements Runnable{
             // maybe need to append  + "\r\n" to message ?
             try {
                 out.writeBytes(message);
+                out.flush();
             } catch (IOException e) {
                 Log.e("EinzServerThread","sendMessage: failed because of IOException "+e.getMessage());
                 e.printStackTrace();
@@ -224,15 +225,7 @@ public class EinzServerClientHandler implements Runnable{
                 this.onClientDisconnected();
                 this.stopThreadPatiently(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
             }
-            try {
-                out.flush();
-            } catch (IOException e) {
-                Log.e("EinzServerThread","sendMessage: failed because of IOException 2 "+e.getMessage());
-                e.printStackTrace();
 
-                this.onClientDisconnected();
-                this.stopThreadPatiently(); // is it sure that the client has disconnected or can this happen otherwise? I believe so
-            }
         socketLock.writeLock().unlock();
     }
 
@@ -301,7 +294,7 @@ public class EinzServerClientHandler implements Runnable{
             this.einzActionFactory.registerMapping(einzMessage.getBody().getClass(), EinzPlayCardAction.class);*/
             //</Debug>
 
-            EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, connectedUser);
+            EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, getConnectedUser());
             return einzAction;
         } catch (JSONException e) {
             Log.e("ESCH/parse", "JSON Error in parseMessage");

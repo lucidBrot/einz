@@ -92,43 +92,10 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
         //DEBUG: Simulate a message from a client
         if(DEBUG_ONE_MSG){
-            Log.d("EinzServer", "DEBUG_ONE_MSG: Will simulate a message from a client");
+            Log.d("EinzServer", "DEBUG_ONE_MSG: Will simulate messages from a client");
             DEBUG_ONE_MSG = false;
-            //<DEBUG>
-            final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
-                @Override
-                public void messageReceived(String message) {
-                    Log.d("TempClient", "received message "+message);
-                }
-            });
-            Thread t = new Thread(){
-                @Override
-                public void run() {
-                    // DEBUG: start client
-                    // temporary. please do not use in real code
-                    Log.d("EinzServer->TempClient", "simulating client");
-
-                    tc.run();
-                }
-            };
-            t.start(); // start client stub for debug
-            Thread m = new Thread(){
-                @Override
-                public void run() {
-                    try {
-                        sleep(600); // wait until server hopefully runs
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        Log.e("TempClient", "Sleeping Failed");
-                        interrupt();
-                    }
-
-                    tc.sendMessage(tc.debug_getRegisterMessage());
-                    tc.sendMessage(tc.debug_getUnregisterMessage());
-                }
-            };
-            m.start(); // send message
-            //</Debug>
+            Debug.debug_simulateRegisterClient();
+            Debug.debug_simulateRegisterFollowedByUnregister();
         }
 
         boolean firstconnection = true;

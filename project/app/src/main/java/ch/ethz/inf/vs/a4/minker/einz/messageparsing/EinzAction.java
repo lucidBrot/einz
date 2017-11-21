@@ -6,7 +6,8 @@ import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
 
 /**
- * Specifies that an EinzAction should have a function run which will run the action
+ * Specifies that an EinzAction should have a function run which will run the action.
+ * Make sure to check whether IssuedByPlayer is null - that probably means that the user is not registered.
  */
 public abstract class EinzAction {
 
@@ -17,7 +18,7 @@ public abstract class EinzAction {
 
     private final ServerFunctionDefinition sInterface;
     private final EinzMessage message; // This has a specific messagebody in every subclass
-    private final String issuedByPlayer; // CAN BE NULL if user is not registered or not known and irrelevant
+    private final String issuedByPlayer; // CAN BE NULL if user is not registered
     private final EinzServerManager serverManager;
     private final EinzServerClientHandler einzServerClientHandler;
 

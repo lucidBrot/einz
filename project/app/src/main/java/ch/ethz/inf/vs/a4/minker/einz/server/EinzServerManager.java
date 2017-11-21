@@ -177,6 +177,11 @@ public class EinzServerManager {
                 break filterFailureReasons;
             }
 
+            if(res != null && !res.equals(handler)){
+                reason = "not unique";
+                break filterFailureReasons;
+            }
+
             success = (res == null); // success only if nobody was registered (for this username)
             Log.d("serverManager/reg", "registered " + username + ". Success: " + success);
 
@@ -186,12 +191,13 @@ public class EinzServerManager {
             if (success && handler.isFirstConnectionOnServer()) adminUsername = username;
 
             if (success) {
+                handler.setConnectedUser(username); // tell the handler which user it is connected to
                 userListLock.writeLock().lock();
                 String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
                 userListLock.writeLock().unlock();
                 if (DEBUG && absent != null)
                     throw new RuntimeException(new java.lang.Exception("serverManager/reg: username was absent in registeredClientHandlers but not in registeredClientRoles!"));
-                handler.setConnectedUser(username); // tell the handler which user it is connected to
+
             }
         }
 

@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
 import android.util.DebugUtils;
+import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.BuildConfig;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -30,7 +31,11 @@ public class EinzUnregisterRequestAction extends EinzAction {
     public void run() {
     // TODO: Map and Test UnregisterRequestAction
         EinzUnregisterRequestMessageBody body = ((EinzUnregisterRequestMessageBody) this.getMessage().getBody());
-
+        if(getIssuedByPlayer() == null){
+            // A ESCH tried to do this without having a registered user. Don't do that
+            Log.w("UnregisterRequestAction","EinzServerClientHandler without registered username tried to run this");
+            return;
+        }
         // validate that the user is allowed to do this
         EinzMessage response;
         if(getIssuedByPlayer().equals(body.getUsername())) {
