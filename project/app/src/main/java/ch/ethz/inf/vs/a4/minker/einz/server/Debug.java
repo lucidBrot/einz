@@ -123,11 +123,11 @@ public class Debug {
             EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
             EinzRegisterMessageBody body = new EinzRegisterMessageBody(username, "player");
             EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
-            Log.d("tempClient/dGetRegMsg","simulating message.toJSON().toString() : "+message.toJSON().toString());
+            Log.d("DEBUG/dGetRegMsg","simulating message.toJSON().toString() : "+message.toJSON().toString());
             return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e("TempClient/dGetRegMsg", "failed to create deregistration message");
+            Log.e("DEBUG/dGetRegMsg", "failed to create deregistration message");
             return "empty message :(";
         }
 
