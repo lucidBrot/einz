@@ -3,9 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -146,7 +144,8 @@ public class EinzServerManager {
         boolean success = false;
         filterFailureReasons:
         {
-            if(handler.getConnectedUser()!=null && !handler.getConnectedUser().equals(username)){
+            String connectedUser = handler.getConnectedUser();
+            if(connectedUser!=null && !connectedUser.equals(username)){
                 reason = "already registered";
                 break filterFailureReasons; // don't even try registering, this client handler already is registered
             }
@@ -199,6 +198,63 @@ public class EinzServerManager {
         }
         return response;
     }
+
+    /**
+     * Unregisters user and generates message to be broadcasted to inform clients that this user left. <br>
+     *     <b>Broadcasts the message already!</b>
+     *     Returns the response (different from the broadcast!)
+     *     Make sure to check whether the user is allowed to kick somebody if you call this to kick. Also make sure to check that this user exists.
+     * @param username who to remove
+     *
+     * @return The message only for the client who issued the unregister/kick request. Ignore this return in case of a normal unregister<br>
+     *     <i>null</i> if there was no failure
+     */
+    public EinzMessage<EinzKickFailureMessageBody> unregisterUser(String username, String unregisterReason){
+        String failureReason = null;
+        EinzMessage<EinzUnregisterResponseMessageBody> einzMessage;
+
+        if(username==null || isInvalidUsername(username)){
+            failureReason = "invalid";
+        }
+
+        if(failureReason==null){
+            ConcurrentHashMap<String, String> clientRoles = getRegisteredClientRoles();
+            ConcurrentHashMap<String, EinzServerClientHandler> clientHandlers = getRegisteredClientHandlers();
+                    // TODO: does getRegisteredClientRoles and getRegisteredClientHandlers introduce bugs because the state might change between accessing the two?
+            String role = clientRoles.get(username);
+            EinzServerClientHandler esch = clientHandlers.get(username);
+            // unregister them
+            getRegisteredClientRoles().remove(username);
+            getRegisteredClientHandlers().remove(username);
+
+            // inform all clients
+            EinzUnregisterResponseMessageBody body = new EinzUnregisterResponseMessageBody(username, unregisterReason);
+            EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterResponse");
+            EinzMessage<EinzUnregisterResponseMessageBody> message = new EinzMessage<>(header, body);
+            broadcastMessageToAllPlayers(message);
+            broadcastMessageToAllSpectators(message);
+
+            // and stop the corresponding client
+            esch.setConnectedUser(null);
+            esch.stopThreadPatiently();
+
+        }
+
+        EinzMessage<EinzKickFailureMessageBody> emz;
+        EinzMessageHeader header = new EinzMessageHeader("registration", "KickFailure");
+        // generate response
+        if(failureReason==null){
+            return null;
+        } else{
+            EinzKickFailureMessageBody body = new EinzKickFailureMessageBody(username, failureReason);
+            emz = new EinzMessage<>(
+                header, body
+            );
+            return emz;
+        }
+    }
+
+    // TODO: kickUser -- including checking if they are allowed to kick and if the user exists.
 
     public EinzMessage<EinzUpdateLobbyListMessageBody> generateUpdateLobbyListRequest(){
         EinzMessageHeader header = new EinzMessageHeader("registration", "UpdateLobbyList");

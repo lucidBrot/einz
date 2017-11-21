@@ -187,7 +187,7 @@ public class EinzServerClientHandler implements Runnable{
     /**
      * Make thread stop listening for incoming connections and close the socket. All queued messages from other threads might be dismissed and have to catch the IOException.
      */
-    private void stopThreadPatiently() {
+    public void stopThreadPatiently() {
         socketLock.writeLock().lock();
         Log.d("ESCH/stopThread", "STOPPING THREAD PATIENTLY!");
         this.spin = false;
