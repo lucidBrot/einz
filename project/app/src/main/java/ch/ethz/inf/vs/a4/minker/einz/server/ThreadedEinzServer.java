@@ -17,6 +17,7 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Waits for incoming TCP connections, handles each in a separate Thread, dispatches an EinzServerThread for every client
@@ -34,6 +35,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
     final Context applicationContext;
     private final EinzServerManager serverManager;
+    private ReentrantReadWriteLock sherLock = new ReentrantReadWriteLock(); // locks everything here (not servermanager) i.e. glienthandlerhtreads, numClients and clienthandlerthreads
 
     /**
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
@@ -103,7 +105,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
             try {
                 socket = serverSocket.accept();
-                Log.d("EinzServer/launch", "new connection from "+socket.getInetAddress());
+                Log.d("EinzServer/launch", "new connection from "+socket.getInetAddress()+":"+socket.getPort());
             } catch (SocketException e){
                 if(shouldStopSpinning)
                     Log.d("EinzServer/launch", "stopping accepting connections");
@@ -116,13 +118,15 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 e.printStackTrace();
                 return false;
             }
-
+            this.sherLock.readLock().lock(); // for firstconnection, so that it doesn't change and we get two admins
             EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface(),firstconnection);
             Thread thread = new Thread(ez);
+            this.sherLock.writeLock().lock();
             clientHandlerThreads.add(thread);
-            thread.start(); // start new thread for this client.
-
             firstconnection = false; // the first user has connected, all others cannot be admin
+            this.sherLock.writeLock().unlock();
+            this.sherLock.readLock().unlock();
+            thread.start(); // start new thread for this client.
 
         }
         return true;
@@ -170,13 +174,18 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     }
 
     public void incNumClients(){
+        this.sherLock.writeLock().lock();
         this.numClients++;
-        serverActivityCallbackInterface.updateNumClientsUI(numClients);
+        int temp = this.numClients;
+        serverActivityCallbackInterface.updateNumClientsUI(temp);
+        this.sherLock.writeLock().unlock();
     }
 
     public void decNumClients(){
+        this.sherLock.writeLock().lock();
         this.numClients--;
         serverActivityCallbackInterface.updateNumClientsUI(numClients);
+        this.sherLock.writeLock().unlock();
     }
 
     /**
@@ -187,7 +196,9 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * @throws UserNotRegisteredException if username is not registered
      */
     public void sendMessageToUser(String username, String message) throws UserNotRegisteredException {
+        this.sherLock.readLock().lock();
         EinzServerClientHandler ez = getServerManager().getRegisteredClientHandlers().get(username);
+        this.sherLock.readLock().unlock();
         if(!message.endsWith("\r\n")){ // TODO: check if contains newline and if yes, abort
             message += "\r\n";
         }

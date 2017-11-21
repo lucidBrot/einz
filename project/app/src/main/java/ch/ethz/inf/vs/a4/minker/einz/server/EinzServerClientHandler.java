@@ -8,6 +8,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzFinishRegistrationPhaseAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzRegisterAction;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnregisterRequestAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser;
@@ -60,8 +61,6 @@ public class EinzServerClientHandler implements Runnable{
         this.parentEinzServer = parentEinzServer;
         parentEinzServer.incNumClients();
         this.firstConnectionOnServer = firstConnectionOnServer;
-
-        Debug.debug_printJSONRepresentationOf(EinzRegistrationParser.class);
 
         this.socket = clientSocket;
         this.serverInterface = serverFunctionDefinition;

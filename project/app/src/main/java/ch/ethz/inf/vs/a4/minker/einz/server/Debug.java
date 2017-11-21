@@ -21,7 +21,7 @@ public class Debug {
         JSONObject container = new JSONObject();
         try {
             container.put("your Object:", o);
-            Log.d("ESCH/DEBUG", "printJSONRepresentationOF() : "+ container.toString());
+            Log.d("DEBUG", "printJSONRepresentationOF() : "+ container.toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -34,7 +34,7 @@ public class Debug {
         final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
             @Override
             public void messageReceived(String message) {
-                Log.d("TempClient", "received message "+message);
+                Log.d("TempClient", "received message: "+message);
             }
         });
         Thread t = new Thread(){
@@ -71,7 +71,7 @@ public class Debug {
         final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
             @Override
             public void messageReceived(String message) {
-                Log.d("TempClient2", "received message "+message);
+                Log.d("TempClient2", "received message: "+message);
             }
         });
         Thread t = new Thread(){
@@ -89,15 +89,22 @@ public class Debug {
             @Override
             public void run() {
                 try {
-                    sleep(600); // wait until server hopefully runs
+                    sleep(100); // wait until server hopefully runs
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
                     Log.e("TempClient2", "Sleeping Failed");
+                    e.printStackTrace();
                     interrupt();
                 }
 
-                tc.sendMessage(Debug.debug_getRegisterMessage("clemï"));
-                tc.sendMessage(Debug.debug_getUnregisterMessage("clemï"));
+                tc.sendMessage(Debug.debug_getUnregisterMessage("silvia"));
+                tc.sendMessage(Debug.debug_getRegisterMessage("clemi"));
+                try {
+                    sleep(100);
+                } catch (InterruptedException e) {
+                    Log.e("TempClient2", "Sleeping Failed v2");
+                    e.printStackTrace();
+                }
+                tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
             }
         };
         m.start(); // send message

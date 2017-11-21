@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 import ch.ethz.inf.vs.a4.minker.einz.MainActivity;
 import ch.ethz.inf.vs.a4.minker.einz.R;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnregisterRequestAction;
 import org.w3c.dom.Text;
 
 import java.net.Inet4Address;
@@ -65,6 +66,8 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         String temp = ip + ":" + server.getPORT();
         ((TextView) findViewById(R.id.tv_s_ipport)).setText(temp);
 
+
+        Debug.debug_printJSONRepresentationOf(EinzUnregisterRequestAction.class);
     }
 
     @Override

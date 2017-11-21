@@ -9,10 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -169,7 +166,6 @@ public class EinzServerManager {
 
             userListLock.writeLock().lock();
             EinzServerClientHandler res = getRegisteredClientHandlers().putIfAbsent(username, handler);
-            userListLock.writeLock().unlock();
             // res is null if it was not set before this call, else it is the previous value
 
             if(res != null && res.equals(handler)){
@@ -195,10 +191,13 @@ public class EinzServerManager {
                 userListLock.writeLock().lock();
                 String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
                 userListLock.writeLock().unlock();
-                if (DEBUG && absent != null)
+                if (DEBUG && absent != null) { // assertion on android
+                    userListLock.writeLock().unlock();
                     throw new RuntimeException(new java.lang.Exception("serverManager/reg: username was absent in registeredClientHandlers but not in registeredClientRoles!"));
+                }
 
             }
+            userListLock.writeLock().unlock();
         }
 
         EinzMessage response = null;
@@ -207,7 +206,6 @@ public class EinzServerManager {
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
             EinzRegisterSuccessMessageBody body = new EinzRegisterSuccessMessageBody(username, role);
             response = new EinzMessage<EinzRegisterSuccessMessageBody>(header, body);
-            handler.setConnectedUser(username);
         } else {
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterFailure");
             EinzRegisterFailureMessageBody body = new EinzRegisterFailureMessageBody(role, username, reason);
@@ -378,8 +376,8 @@ public class EinzServerManager {
     }
 
     /**
-     * Locks onto {@link #userListLock} to ensure consistency
-     * Make sure to lock for writing on this
+     * Lock onto {@link #userListLock} to ensure consistency while reading this.
+     * Make sure to lock for writing on this.
      * @return
      */
     public ConcurrentHashMap<String, EinzServerClientHandler> getRegisteredClientHandlers() {
