@@ -61,8 +61,10 @@ public class EinzServerManager {
         return new ArrayList<>(this.registeredClientHandlers.keySet());
     }
 
-    public void finishRegistrationPhaseAndStartGame(){ // TODO: disable writing to registeredClientHandlers if game started. Make everything synchronized
-        Log.d("Manager", "finishing registrationphase.");
+
+    public void finishRegistrationPhaseAndStartGame(){
+        Log.d("servMan", "finishing registrationphase.");
+        userListLock.readLock().lock();
         server.stopListeningForIncomingConnections(true);
         ArrayList<Player> players = new ArrayList<>();
         ArrayList<Spectator> spectators = new ArrayList<>();
@@ -74,12 +76,14 @@ public class EinzServerManager {
             } else if ( role.toLowerCase().equals("spectator")){
                 spectators.add(new Spectator((String) entry.getKey()));
             }
-            // TODO: send that info to clients
+            // TODO: send that info to clients. Fabian?
         }
-        Log.d("Manager/finishRegPhase", "Players: "+players.toString());
-        
+        Log.d("servMan/finishRegPhase", "Players: "+players.toString());
+        userListLock.readLock().unlock();
+        userListLock.writeLock().lock();
         this.gamePhaseStarted = true;
-        GameState gameState = getServerFunctionInterface().initialiseStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+        userListLock.writeLock().unlock();
+        GameState gameState = getServerFunctionInterface().initialiseStandardGame(players, spectators); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
 
     }
 
@@ -502,5 +506,23 @@ public class EinzServerManager {
 
     public ThreadedEinzServer getServer() {
         return server;
+    }
+
+    public boolean isRegistered(String username){
+        return (username!=null && !isInvalidUsername(username) && getRegisteredClientRoles().contains(username));
+    }
+
+    public boolean isRegisteredAdmin(String username){
+        return isRegistered(username) && getAdminUsername()!=null && getAdminUsername().equals(username);
+    }
+
+    public void startGame(String issuedByPlayer) {
+        if(isRegisteredAdmin(issuedByPlayer)) {
+            finishRegistrationPhaseAndStartGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
+            serverFunctionInterface.startGame();
+        }
+        else{
+            Log.e("servMan", "somebody unauthorized tried to start the game!");
+        }
     }
 }

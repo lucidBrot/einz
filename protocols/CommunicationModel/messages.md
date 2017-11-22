@@ -247,6 +247,7 @@ If the client has not been registered. This may be because of an invalid usernam
 > + *"already registered"* if the same connection already has registered a username
 > + *"invalid"* if the username is the empty string or *"server"*. Or if the username contains invalid characters. One invalid character is the Tilde, which is reserved to identify non-username-strings
 > + *"lobby full"* if the server decided to fixate the number of players or spectators and the game has not yet started (otherwise, the server wouldn't react at all).
+> + *"game already in progress"*
 
 ```JSON
 {
@@ -416,7 +417,7 @@ The **Server** sends this to the Client. No response from the Client required.
 {
   "header":{
     "messagegroup":"startgame",
-    "messagetype":"SendRules"
+    "messagetype":"InitGame"
   },
   "body":{
     "ruleset":{
