@@ -134,7 +134,7 @@ public class Debug {
                     Log.e("TempClient2", "Sleeping Failed v2");
                     e.printStackTrace();
                 }
-                //tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
+                tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
             }
         };
         m.start(); // send message

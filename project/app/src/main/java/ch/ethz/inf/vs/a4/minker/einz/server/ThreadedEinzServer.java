@@ -107,8 +107,11 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 socket = serverSocket.accept();
                 Log.d("EinzServer/launch", "new connection from "+socket.getInetAddress()+":"+socket.getPort());
             } catch (SocketException e){
-                if(shouldStopSpinning)
+                if(shouldStopSpinning) {
                     Log.d("EinzServer/launch", "stopping accepting connections");
+                    //DEBUG to test if connection is not accepting anymore closed
+                    //Debug.debug_simulateClient2();
+                }
                 else
                     Log.d("EinzServer/launch","SocketException but shouldStopSpinning is false");
                 return false;

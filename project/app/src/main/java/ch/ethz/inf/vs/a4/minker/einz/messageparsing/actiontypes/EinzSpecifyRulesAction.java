@@ -1,12 +1,16 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
+import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSpecifyRulesMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
 
 public class EinzSpecifyRulesAction extends EinzAction {
+
+    private final EinzSpecifyRulesMessageBody body;
     /**
      * @param sInterface
      * @param serverManager
@@ -16,6 +20,7 @@ public class EinzSpecifyRulesAction extends EinzAction {
      */
     public EinzSpecifyRulesAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
+        this.body = (EinzSpecifyRulesMessageBody) params.getBody();
     }
 
     /**
@@ -23,6 +28,14 @@ public class EinzSpecifyRulesAction extends EinzAction {
      */
     @Override
     public void run() {
-
+        if(getServerManager().isRegisteredAdmin(getIssuedByPlayer())){
+            // if admin and registered aka allowed to specify rules
+            getServerManager().specifyRules(body.getRuleset());
+            // TODO: send rules out
+        } else {
+            String admin = getServerManager().getAdminUsername();
+            admin = (admin==null)?"null":admin;
+            Log.w("specifyRulesAction", "Fuck off, "+getIssuedByPlayer()+". You're not allowed to specify rules. (admin="+admin+")");
+        }
     }
 }

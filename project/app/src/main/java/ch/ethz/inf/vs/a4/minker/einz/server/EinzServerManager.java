@@ -531,4 +531,8 @@ public class EinzServerManager {
             Log.e("servMan", "somebody unauthorized tried to start the game!");
         }
     }
+
+    public void specifyRules(ArrayList<Rule> ruleset) { //TODO: readwritelock on serverFunctionInterface
+        // TODO: specifyRules. How is the deck transmitted? in what format should I pass the rules?
+    }
 }

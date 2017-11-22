@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import ch.ethz.inf.vs.a4.minker.einz.*;
+import org.json.JSONObject;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -57,6 +58,7 @@ public interface ServerFunctionDefinition {
         //-the given set of rules with which the game is played represented as an int
         // since we haven't specified yet what options should be available, this int does nothing at the moment
         public GameState initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, int rules);
+
 
         //initialises a new game with standart cards and rules with the given players
         public GameState initialiseStandartGame(ArrayList<Player> players);
