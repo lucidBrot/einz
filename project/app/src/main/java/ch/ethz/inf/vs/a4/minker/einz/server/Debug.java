@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -75,12 +76,14 @@ public class Debug {
                     e.printStackTrace();
                 }
 
-                tc.sendMessage(Debug.debug_getKickMessage("clemi"));
+                //tc.sendMessage(Debug.debug_getKickMessage("clemi"));
+                tc.sendMessage(Debug.debug_getStartGameMessage());
             }
         };
         m.start(); // send message
         //</Debug>
     }
+
 
     public static void debug_simulateClient2() {
         try {
@@ -94,6 +97,11 @@ public class Debug {
             @Override
             public void messageReceived(String message) {
                 Log.d("TempClient2", "received message: "+message);
+
+                /*if(message.equals("{\"header\":{\"messagegroup\":\"registration\",\"messagetype\":\"UnregisterResponse\"},\"body\":{\"username\":\"clemi\",\"reason\":\"kicked\"}}")){
+                    Log.d("TempClient2", "LULZ I WAS KICKED");
+
+                }*/
             }
         });
         Thread t = new Thread(){
@@ -186,7 +194,22 @@ public class Debug {
             return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e("DEBUG/dGetUnRegMsg", "failed to create registration message");
+            Log.e("DEBUG/dGetUnRegMsg", "failed to create deregistration message");
+            return "empty message :(";
+        }
+    }
+
+
+    private static String debug_getStartGameMessage() {
+        try {
+            EinzMessageHeader header = new EinzMessageHeader("startgame", "StartGame");
+            EinzStartGameMessageBody body = new EinzStartGameMessageBody();
+            EinzMessage<EinzStartGameMessageBody> message = new EinzMessage<>(header, body);
+            Log.d("DEBUG/dGetUnRegMsg","simulating message.toJSON().toString() : "+message.toJSON().toString());
+            return message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("DEBUG/dGetUnRegMsg", "failed to create startGame message");
             return "empty message :(";
         }
     }
