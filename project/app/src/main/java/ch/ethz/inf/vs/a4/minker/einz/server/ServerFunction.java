@@ -10,6 +10,7 @@ import ch.ethz.inf.vs.a4.minker.einz.CardTypes;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.PlayerActions;
+import ch.ethz.inf.vs.a4.minker.einz.Spectator;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -95,8 +96,8 @@ public class ServerFunction implements ServerFunctionDefinition {
         return new GameState(players, deck, rules);
     }
 
-    public GameState initialiseStandartGame(ArrayList<Player> players){
-        return new GameState(players);
+    public GameState initialiseStandartGame(ArrayList<Player> players, HashSet<Spectator> spectators){
+        return new GameState(players, spectators);
     }
 
     //sends all players the message that the game started
@@ -111,6 +112,9 @@ public class ServerFunction implements ServerFunctionDefinition {
         if (isPlayable(card, p)){
             gameState.playCardFromHand(card, p);
             gameState.cardEffect(card);
+            if (hasWon(p)){
+                removePlayer(p.name);
+            }
             return true;
         } else {
             return false;
@@ -151,13 +155,13 @@ public class ServerFunction implements ServerFunctionDefinition {
     }
 
     //removes a player from the game and continues the game without that player
-    public void removePlayer(String name){
+    public void removePlayer(Player player){
         for (Player p: gameState.getPlayers()){
-            if (p.name.equals((name))){
+            if (p.equals(player)){
                 if (gameState.getActivePlayer().equals(p)){
                     gameState.nextPlayer();
                 }
-                gameState.removePlayer(name);
+                gameState.removePlayer(player);
                 if (gameState.getPlayers().size() < 2){
                     endGame();
                 }

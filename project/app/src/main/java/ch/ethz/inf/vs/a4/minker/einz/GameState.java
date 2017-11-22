@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Stack;
 
 /**
@@ -15,6 +16,8 @@ public class GameState {
 
     //Array of all players in order in which they play
     private ArrayList<Player> players = new ArrayList<>(); // I changed this from HashMap to Array, because why would you use a hashmap if every user has an index as identifier?
+    //Array of all the spectators
+    private HashSet<Spectator> spectators = new HashSet<>();
     //determines if we have to go up or down in the players Array to determine the next player
     private Order order = Order.UP;
     private Integer indexOfActivePlayer = 0;
@@ -54,20 +57,25 @@ public class GameState {
 
     }
 
-    //This is the constructor that gets used when calling serverFunction.startGame
+    //This is the constructor that gets used when calling serverFunction.initialiseGame
     public GameState (ArrayList<Player> players, HashMap<Card, Integer> deck, int rules){
         //TODO: Constructor (once rules are made)
     }
 
-    //This is the constructor that gets used when calling serverFunction.startStandartGame
-    public GameState (ArrayList<Player> newPlayers){
+    //This is the constructor that gets used when calling serverFunction.initialiseStandartGame
+    public GameState (ArrayList<Player> newPlayers, HashSet<Spectator> newSpectators){
         newStandartDeck();
-        for (int i = 0; i < newPlayers.size(); i++){
-            addPlayer(newPlayers.get(i));
+        for (Player p: newPlayers){
+            players.add(p);
         }
-        for (int i=0; i < players.size(); i++){
+        if (newSpectators != null) {
+            for (Spectator s : newSpectators) {
+                spectators.add(s);
+            }
+        }
+        for (Player p: players){
             for (int j=0; j < 7; j++) {
-                drawOneCard(players.get(i));
+                drawOneCard(p);
             }
         }
         playPile.ensureCapacity(1);
@@ -111,11 +119,9 @@ public class GameState {
     public void increaseThreatenedCards(int x){
         threatenedCards = threatenedCards + x;
     }
-
     public void resetThreatenedCards(){
         threatenedCards = 1;
     }
-
     public Card playPiletopCard() {
         return playPile.get(playPile.size() - 1);
     }
@@ -200,12 +206,8 @@ public class GameState {
         }
     }
 
-    public void removePlayer(String name){
-        for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).name.equals(name)) {
-                players.remove(i);
-            }
-        }
+    public void removePlayer(Player player){
+        players.remove(player);
     }
 
     public void addCardToDrawPile(Card card){

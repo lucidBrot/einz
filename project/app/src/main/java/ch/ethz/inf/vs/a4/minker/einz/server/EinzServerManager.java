@@ -80,7 +80,7 @@ public class EinzServerManager {
         Log.d("Manager/finishRegPhase", "Players: "+players.toString());
         
         this.gamePhaseStarted = true;
-        GameState gameState = getServerFunctionInterface().initialiseStandartGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+        GameState gameState = getServerFunctionInterface().initialiseStandartGame(players, null); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
 
     }
 

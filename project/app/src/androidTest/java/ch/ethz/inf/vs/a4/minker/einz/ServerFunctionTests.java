@@ -42,6 +42,8 @@ public class ServerFunctionTests {
         assertEquals(54 + 7, gameState.getPlayers().get(1).hand.size());
     }
 
+
+    //INVALID TEST: Players now get removed from the game once they have won
     @Test
     public void playTest() {
         GameState gameState = new GameState();
@@ -107,6 +109,7 @@ public class ServerFunctionTests {
 
     }
 
+    //INVALID TEST: Players now get removed from the game once they have won
     @Test
     public void playTestWith4Players(){
         ArrayList<Player> mplayers = new ArrayList<>(4);
@@ -114,7 +117,7 @@ public class ServerFunctionTests {
         mplayers.add(new Player("Tick"));
         mplayers.add(new Player("Trick"));
         mplayers.add(new Player("Track"));
-        GameState gameState = new GameState(mplayers);
+        GameState gameState = new GameState(mplayers, null);
         ServerFunction serverFunction = new ServerFunction(gameState);
         int count[] = new int[4];
         count[0] = 7;

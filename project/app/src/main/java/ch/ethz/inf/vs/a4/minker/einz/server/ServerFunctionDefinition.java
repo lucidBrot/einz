@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import android.widget.GridLayout;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,6 +10,7 @@ import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardColors;
 import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.Spectator;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -61,8 +64,9 @@ public interface ServerFunctionDefinition {
         // since we haven't specified yet what options should be available, this int does nothing at the moment
         public GameState initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, int rules);
 
-        //initialises a new game with standart cards and rules with the given players
-        public GameState initialiseStandartGame(ArrayList<Player> players);
+        //initialises a new game with standart cards and rules with the given players and spectators
+        //if there are no spectators, just use an empty hashset as input (or NULL)
+        public GameState initialiseStandartGame(ArrayList<Player> players, HashSet<Spectator> spectators);
 
         //sends all players the message that the game started
         //sends all players the relevant information they need to have (defined in GlobalInfo and PlayerInfo)
@@ -92,7 +96,7 @@ public interface ServerFunctionDefinition {
         public void endGame();
 
         //removes a player from the game and coninues the game without that player
-        public void removePlayer(String name);
+        public void removePlayer(Player p);
 
 
 
