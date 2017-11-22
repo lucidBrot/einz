@@ -204,7 +204,7 @@ If the client requests the same role multiple times, the request will still succ
 
 ## UpdateLobbyList
 
-The **server** broadcasts the new List of Players and Spectators to the clients whenever a new one connects. The first client thus only receives a list with itself and knows that it is admin.
+The **server** broadcasts the new List of Players and Spectators to the clients whenever a new one connects or leaves. The first client thus only receives a list with itself and knows that it is admin.
 
 It is not important for the client to know spectators and the admin, but it might be useful for the UI if we want to show that.
 
@@ -334,6 +334,7 @@ The **server** informs the admin that [kicking](#kick) did not work. If the clie
 
 > * *"not allowed"* : you are not allowed to kick people
 > * "not found" : this player or spectator is not registered
+> * *"invalid"* : this username is invalid
 
 ```json
 {

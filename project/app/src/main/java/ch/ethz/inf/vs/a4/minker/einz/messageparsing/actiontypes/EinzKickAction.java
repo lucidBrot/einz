@@ -24,7 +24,6 @@ public class EinzKickAction extends EinzAction {
      */
     @Override
     public void run() {
-        // TODO: test and map KickAction
         EinzKickMessageBody body = (EinzKickMessageBody) getMessage().getBody();
         getServerManager().kickUser(body.getUsername(), getIssuedByPlayer());
     }

@@ -10,6 +10,8 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterR
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static java.lang.Thread.sleep;
+
 /**
  * For debugging only.
  * This class is a mess and I'm fine with that
@@ -81,6 +83,12 @@ public class Debug {
     }
 
     public static void debug_simulateClient2() {
+        try {
+            sleep(10); // give Client1 a chance to register first
+        } catch (InterruptedException e) {
+            Log.w("Debug/TempClient2","Insomnia while creating client 2");
+            e.printStackTrace();
+        }
         //<DEBUG>
         final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
             @Override

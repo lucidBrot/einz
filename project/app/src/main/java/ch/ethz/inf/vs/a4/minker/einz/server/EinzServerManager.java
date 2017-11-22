@@ -223,7 +223,7 @@ public class EinzServerManager {
     }
 
     /**
-     * Unregisters user and generates message to be broadcasted to inform clients that this user left. <br>
+     * Unregisters user and generates message to be broadcasted to inform clients that this user left. ({@link EinzUnregisterResponseMessageBody} and {@link EinzUpdateLobbyListMessageBody} <br>
      *     <b>Broadcasts the message already!</b>
      *     Returns the response if kicking failed (different from the broadcast!) or null. This includes null if this was not a kick.
      *     Make sure to check whether the user is allowed to kick somebody if you call this to kick. Also make sure to check that this user exists.
@@ -288,6 +288,8 @@ public class EinzServerManager {
             broadcastMessageToAllPlayers(message);
             broadcastMessageToAllSpectators(message);
 
+            // TODO: UpdateLobbyList
+
             // unregister them
             userListLock.writeLock().lock();
             getRegisteredClientRoles().remove(username);
@@ -318,18 +320,21 @@ public class EinzServerManager {
     }
 
     /**
-     * Tests if user is allowed to perform this action and performs it
+     * Tests if user is allowed to perform this action and performs it.
+     * Says user is not allowed if it was not yet registered as admin. That shouldn't happen though, as messages are supposed to be ordered by client so there should always be a register first.
      * @param userToKick
      * @param userWhoIssuedThisKick
      */
     public void kickUser(String userToKick, String userWhoIssuedThisKick){
         userListLock.readLock().lock();
         EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);
-        boolean allowed = (getAdminUsername().equals(userWhoIssuedThisKick));
+        // if admin is not yet set, don't kick
+        boolean allowed = (getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick));
         boolean userExists = (esch!=null);
+        boolean userValid = !isInvalidUsername(userToKick);
 
         EinzMessage<EinzKickFailureMessageBody> response;
-        if(userExists && allowed) {
+        if(userExists && allowed && userValid) {
             response = unregisterUser(userToKick, "kicked", userWhoIssuedThisKick);
             if(response==null)//if success
             {
@@ -340,6 +345,7 @@ public class EinzServerManager {
                 try {
                     server.sendMessageToUser(userWhoIssuedThisKick, response);
                 } catch (UserNotRegisteredException e) {
+                    Log.w("servMan/kick", "User "+userWhoIssuedThisKick+" was allowed to issue (kick "+userToKick+") but is not registered");
                     e.printStackTrace();
                     // User who issued this does not exist :(
                     // Guess that means we don't answer them
@@ -355,7 +361,9 @@ public class EinzServerManager {
             EinzKickFailureMessageBody ekfmb;
             if(!allowed){
                  ekfmb = new EinzKickFailureMessageBody(userToKick, "not allowed");
-            } else {
+            } else if(!userValid){
+                ekfmb = new EinzKickFailureMessageBody(userToKick, "invalid");
+            } else{
                 ekfmb = new EinzKickFailureMessageBody(userToKick, "not found");
             }
             EinzMessageHeader header = new EinzMessageHeader("registration", "KickFailure");
@@ -371,6 +379,7 @@ public class EinzServerManager {
             }
         }
         userListLock.readLock().unlock();
+        return;
     }
 
     public EinzMessage<EinzUpdateLobbyListMessageBody> generateUpdateLobbyListRequest(){
