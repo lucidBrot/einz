@@ -48,7 +48,6 @@ public class EinzServerClientHandler implements Runnable{
 
     // identify this connection by its user as soon as this is available
     private String connectedUser = null; // is set on register and never unset because when the client disconnects, this thread is stopped // TODO: stop thread on disconnect
-    // todo: set to null when unregistering player (and probably end thread afterwards)
     private String latestUser = null; // is only null if there was never a username
 
     /**
@@ -71,7 +70,6 @@ public class EinzServerClientHandler implements Runnable{
         this.einzParserFactory = new EinzParserFactory();
         this.einzActionFactory = new EinzActionFactory(serverInterface, this.parentEinzServer.getServerManager(), this);
 
-        // TODO: initialize ParserFactory by registering all Messagegroup->Parser mappings
         try {
             registerParserMappings();
         } catch (JSONException e) {
@@ -85,7 +83,7 @@ public class EinzServerClientHandler implements Runnable{
             e.printStackTrace();
         }
 
-        // TODO: initialize ActionFactory by registering all Message->Action mappings
+
         try {
             registerActionMappings();
         } catch (InvalidResourceFormatException e) {
@@ -131,7 +129,7 @@ public class EinzServerClientHandler implements Runnable{
      * load ActionMappings for networking and for gamelogic from file set up in {@link EinzServerManager}
      */
     private void registerActionMappings() throws InvalidResourceFormatException, JSONException, ClassNotFoundException {
-        this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzFinishRegistrationPhaseAction.class); // DEBUG purely. not actually useful// TODO: remove debug mappings
+        ///this.einzActionFactory.registerMapping(EinzJsonMessageBody.class, EinzFinishRegistrationPhaseAction.class); // DEBUG purely. not actually useful
         this.parentEinzServer.getServerManager().loadAndRegisterNetworkingActions(this.einzActionFactory);
         this.parentEinzServer.getServerManager().loadAndRegisterGameLogicActions(this.einzActionFactory);
     }
@@ -165,7 +163,7 @@ public class EinzServerClientHandler implements Runnable{
             } catch (IOException e) {
                 e.printStackTrace();
                 Log.e("ESCH", "Something Failed. Probably the client disconnected without warning. Or maybe the socket is closed.");
-                // TODO: inform that user has left if he was registered. and stop thread
+
                 this.onClientDisconnected();
                 this.stopThreadPatiently();
                 return;
@@ -198,7 +196,8 @@ public class EinzServerClientHandler implements Runnable{
 
     // TODO implement onClientDisconnected, make sure to call this from stopThreadPatiently and from deregister.
     private void onClientDisconnected(){
-        Log.d("ESCH/clientDisconnected", "NOT YET IMPLEMENTED");
+        Log.d("ESCH/clientDisconnected", "IOException on socket - user probably lost connection");
+        parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
     }
 
     /**

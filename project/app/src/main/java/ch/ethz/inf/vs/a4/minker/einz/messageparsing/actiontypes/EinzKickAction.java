@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
+import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
@@ -24,6 +25,10 @@ public class EinzKickAction extends EinzAction {
      */
     @Override
     public void run() {
+        if(getIssuedByPlayer()==null){
+            Log.d("KickAction", "an ESCH without registered user tried to run this. don't.");
+            return; // only perform this if the user was registered
+        }
         EinzKickMessageBody body = (EinzKickMessageBody) getMessage().getBody();
         getServerManager().kickUser(body.getUsername(), getIssuedByPlayer());
     }

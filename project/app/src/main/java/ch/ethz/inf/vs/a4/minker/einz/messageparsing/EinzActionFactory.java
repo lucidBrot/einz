@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
 import android.support.annotation.Nullable;
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKickAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
@@ -109,8 +110,11 @@ public class EinzActionFactory {
                 Log.d("ActionFactory", "The unregistered action was for "+message.toJSON().toString());
                 return null;
             }
+
             EinzAction ret = mapping.getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
+
             Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
+
             return ret;
         } catch (InstantiationException e) {
             Log.e("ActionFactory", "Failed to generate Mapping: "+e.getMessage());

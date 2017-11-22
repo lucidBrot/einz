@@ -241,7 +241,7 @@ public class EinzServerManager {
         String failureReason = null;
         EinzMessage<EinzKickFailureMessageBody> returnMessage;
 
-        if(username==null || isInvalidUsername(username)){
+        if(username==null || ( isInvalidUsername(username) && !username.equals("server"))){
             failureReason = "invalid";
         }
 
@@ -332,7 +332,7 @@ public class EinzServerManager {
         userListLock.readLock().lock();
         EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);
         // if admin is not yet set, don't kick
-        boolean allowed = (getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick));
+        boolean allowed = ((getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick))||userWhoIssuedThisKick.equals("server"));
         boolean userExists = (esch!=null);
         boolean userValid = !isInvalidUsername(userToKick);
 
