@@ -185,10 +185,5 @@ public class ServerFunctionTests {
 
     }
 
-    @Test
-    public void drawTooManyCards(){
-        ServerFunction serverFunction = new ServerFunction();
-        ThreadedEinzServer dummyTES = new ThreadedEinzServer(null, 1000, null, serverFunction);
-    }
 }
 

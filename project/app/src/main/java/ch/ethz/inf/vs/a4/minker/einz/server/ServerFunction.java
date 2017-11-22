@@ -113,7 +113,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             gameState.playCardFromHand(card, p);
             gameState.cardEffect(card);
             if (hasWon(p)){
-                removePlayer(p.name);
+                removePlayer(p);
             }
             return true;
         } else {
