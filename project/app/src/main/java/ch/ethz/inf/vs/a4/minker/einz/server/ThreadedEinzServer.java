@@ -96,8 +96,8 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         if(DEBUG_ONE_MSG){
             Log.d("EinzServer", "DEBUG_ONE_MSG: Will simulate messages from a client");
             DEBUG_ONE_MSG = false;
-            Debug.debug_simulateRegisterClient();
-            Debug.debug_simulateRegisterFollowedByUnregister();
+            Debug.debug_simulateClient1();
+            Debug.debug_simulateClient2();
         }
 
         boolean firstconnection = true;

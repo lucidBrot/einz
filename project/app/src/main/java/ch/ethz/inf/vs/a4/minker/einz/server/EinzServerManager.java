@@ -225,22 +225,50 @@ public class EinzServerManager {
     /**
      * Unregisters user and generates message to be broadcasted to inform clients that this user left. <br>
      *     <b>Broadcasts the message already!</b>
-     *     Returns the response (different from the broadcast!) or null
+     *     Returns the response if kicking failed (different from the broadcast!) or null. This includes null if this was not a kick.
      *     Make sure to check whether the user is allowed to kick somebody if you call this to kick. Also make sure to check that this user exists.
-     *     <br>This function (will) respond to the client who requested this. the return message is only to check for what happened. // TODO: UnregisterResponse and KickFailure
+     *     <br>This function responds to the client who requested this. the return message is only to check for what happened.
      * @param username who to remove
+     * @param issuedByUser who wanted this kick/unregister. Can be the same as username
+     * @param unregisterReason "kicked", "timeout", or "disconnect"(voluntary)
      *
      * @return The message only for the client who issued the unregister/kick request. Ignore this return in case of a normal unregister<br>
      *     <i>null</i> if there was no failure
      */
     @Nullable
-    public EinzMessage<EinzKickFailureMessageBody> unregisterUser(String username, String unregisterReason){
+    public EinzMessage<EinzKickFailureMessageBody> unregisterUser(String username, String unregisterReason, String issuedByUser){
         // TODO: removeUser from fabian
         String failureReason = null;
-        EinzMessage<EinzUnregisterResponseMessageBody> einzMessage;
+        EinzMessage<EinzKickFailureMessageBody> returnMessage;
 
         if(username==null || isInvalidUsername(username)){
             failureReason = "invalid";
+        }
+
+
+        //       if kicked check for failure and respond with it, then broadcast unregisterresponse
+        //       if timout, do the same as if unregistered by disconnect
+        //       if disconnected, only broadcast unregisterresponse, with no response to the player who disconnected
+        if(unregisterReason.toLowerCase().equals("kicked")){
+            if(failureReason!=null){
+                Log.d("servMan/unregUser", "Sending KickFailure Message (issued by \"+issuedByUser+\") for kicking "+username );
+                EinzKickFailureMessageBody kickFailureMessageBody = new EinzKickFailureMessageBody(username, failureReason);
+                EinzMessageHeader header = new EinzMessageHeader("registration", "KickFailure");
+                EinzMessage<EinzKickFailureMessageBody> kickFailureMessage = new EinzMessage<>(header, kickFailureMessageBody);
+                returnMessage = kickFailureMessage;
+                try {
+                    this.getServer().sendMessageToUser(issuedByUser, kickFailureMessage);
+                } catch (UserNotRegisteredException e) {
+                    Log.w("servMan/unregUser", "The user who requested a kick does no longer exist!");
+                    // continue because hopefully the kick itself was valid but this user left in the meantime
+                    e.printStackTrace();
+                } catch (JSONException e) { // this is something that should be correct by design!
+                    throw new RuntimeException(e);
+                }
+            } else {
+                returnMessage = null; // null stands for successful kicking or that it wasn't a kick
+                Log.d("servMan/unregUser", "kicking "+username+"...");
+            }
         }
 
         if(failureReason==null){
@@ -253,6 +281,7 @@ public class EinzServerManager {
             userListLock.readLock().unlock();
 
             // inform all clients
+            // broadcast UnregisterResponse
             EinzUnregisterResponseMessageBody body = new EinzUnregisterResponseMessageBody(username, unregisterReason);
             EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterResponse");
             EinzMessage<EinzUnregisterResponseMessageBody> message = new EinzMessage<>(header, body);
@@ -298,10 +327,10 @@ public class EinzServerManager {
         EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);
         boolean allowed = (getAdminUsername().equals(userWhoIssuedThisKick));
         boolean userExists = (esch!=null);
-        boolean success;
+
         EinzMessage<EinzKickFailureMessageBody> response;
         if(userExists && allowed) {
-            response = unregisterUser(userToKick, "kicked");
+            response = unregisterUser(userToKick, "kicked", userWhoIssuedThisKick);
             if(response==null)//if success
             {
                 userListLock.readLock().unlock();

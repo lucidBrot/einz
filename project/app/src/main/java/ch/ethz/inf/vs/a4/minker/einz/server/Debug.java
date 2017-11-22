@@ -4,11 +4,17 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * For debugging only.
+ * This class is a mess and I'm fine with that
+ * function names might not correcpond to their content
+ */
 public class Debug {
 
     /**
@@ -29,7 +35,7 @@ public class Debug {
         //</debug>
     }
 
-    public static void debug_simulateRegisterClient() {
+    public static void debug_simulateClient1() {
         //<DEBUG>
         final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
             @Override
@@ -60,13 +66,21 @@ public class Debug {
                 }
 
                 tc.sendMessage(Debug.debug_getRegisterMessage("roger"));
+                try {
+                    sleep(600);
+                } catch (InterruptedException e) {
+                    Log.e("TempClient1", "Insomnia!");
+                    e.printStackTrace();
+                }
+
+                tc.sendMessage(Debug.debug_getKickMessage("clemi"));
             }
         };
         m.start(); // send message
         //</Debug>
     }
 
-    public static void debug_simulateRegisterFollowedByUnregister() {
+    public static void debug_simulateClient2() {
         //<DEBUG>
         final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
             @Override
@@ -96,7 +110,7 @@ public class Debug {
                     interrupt();
                 }
 
-                //tc.sendMessage(Debug.debug_getUnregisterMessage("silvia"));
+                // tc.sendMessage(Debug.debug_getRegisterMessage("silvia"));
                 tc.sendMessage(Debug.debug_getRegisterMessage("clemi"));
                 try {
                     sleep(100);
@@ -104,7 +118,7 @@ public class Debug {
                     Log.e("TempClient2", "Sleeping Failed v2");
                     e.printStackTrace();
                 }
-                tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
+                //tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
             }
         };
         m.start(); // send message
@@ -139,6 +153,21 @@ public class Debug {
         }
 
     }
+
+    private static String debug_getKickMessage(String username) {
+        try {
+            EinzMessageHeader header = new EinzMessageHeader("registration", "Kick");
+            EinzKickMessageBody body = new EinzKickMessageBody(username);
+            EinzMessage<EinzKickMessageBody> message = new EinzMessage<>(header, body);
+            Log.d("DEBUG/dGetUnRegMsg","simulating message.toJSON().toString() : "+message.toJSON().toString());
+            return message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("DEBUG/dGetUnRegMsg", "failed to create kick message");
+            return "empty message :(";
+        }
+    }
+
 
     public static String debug_getUnregisterMessage(String username){
         try {

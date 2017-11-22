@@ -31,7 +31,6 @@ public class EinzUnregisterRequestAction extends EinzAction {
      */
     @Override
     public void run() {
-    // TODO: Map and Test UnregisterRequestAction
         Log.d("UnregReqAction", "starting run()");
         EinzUnregisterRequestMessageBody body = ((EinzUnregisterRequestMessageBody) this.getMessage().getBody());
         if(getIssuedByPlayer() == null){
@@ -42,7 +41,7 @@ public class EinzUnregisterRequestAction extends EinzAction {
         // validate that the user is allowed to do this
         EinzMessage response;
         if(getIssuedByPlayer().equals(body.getUsername())) {
-            response = getServerManager().unregisterUser(body.getUsername(), "disconnected");
+            response = getServerManager().unregisterUser(body.getUsername(), "disconnected", body.getUsername());
             if(BuildConfig.DEBUG && response != null){
                 //some failure occurred but we didn't expect that for unregistering ourselves, only for kicking
                 // but then again, we didn't want to use this return anyways
