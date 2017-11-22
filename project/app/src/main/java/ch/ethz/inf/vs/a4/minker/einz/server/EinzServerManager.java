@@ -29,7 +29,6 @@ public class EinzServerManager {
     private boolean gamePhaseStarted;
 
     // These files are used to initialize the ActionFactories and ParserFactories of the EinzServerClientHandler threads
-    // TODO: test the initialization of the factories once we have enough messages
     private final int networkingParserFile = R.raw.initial_networking_parser_mappings; // the networking parser shall be loaded from here
     private final int gameLogicParserFile = R.raw.initial_game_logic_parser_mappings; // the gamelogic parser shall be loaded from here
     private final int networkingActionFile = R.raw.server_initial_networking_action_mappings; // the mapping from messagebodytype to action
@@ -58,7 +57,7 @@ public class EinzServerManager {
     /**
      * @return List of registered users.
      */
-    protected ArrayList<String> getConnectedUsers(){ //TODO: remove users on disconnect
+    protected ArrayList<String> getConnectedUsers(){
         return new ArrayList<>(this.registeredClientHandlers.keySet());
     }
 
@@ -170,7 +169,12 @@ public class EinzServerManager {
                 break filterFailureReasons;
             }
 
-            userListLock.writeLock().lock();
+            getUserListLock().writeLock().lock();
+            if(gamePhaseStarted){
+                reason = "game already in progress";
+                break filterFailureReasons;
+            }
+
             EinzServerClientHandler res = getRegisteredClientHandlers().putIfAbsent(username, handler);
             // res is null if it was not set before this call, else it is the previous value
 
@@ -237,7 +241,7 @@ public class EinzServerManager {
      */
     @Nullable
     public EinzMessage<EinzKickFailureMessageBody> unregisterUser(String username, String unregisterReason, String issuedByUser){
-        // TODO: removeUser from fabian
+        getUserListLock().readLock().lock();
         String failureReason = null;
         EinzMessage<EinzKickFailureMessageBody> returnMessage;
 
@@ -268,8 +272,13 @@ public class EinzServerManager {
             } else {
                 returnMessage = null; // null stands for successful kicking or that it wasn't a kick
                 Log.d("servMan/unregUser", "kicking "+username+"...");
+                if(gamePhaseStarted){
+                    // TODO: removeUser from fabian
+
+                }
             }
         }
+        getUserListLock().readLock().unlock();
 
         if(failureReason==null){
             userListLock.readLock().lock();

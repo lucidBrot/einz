@@ -47,7 +47,7 @@ public class EinzServerClientHandler implements Runnable{
     private EinzActionFactory einzActionFactory;
 
     // identify this connection by its user as soon as this is available
-    private String connectedUser = null; // is set on register and never unset because when the client disconnects, this thread is stopped // TODO: stop thread on disconnect
+    private String connectedUser = null; // is set on register and never unset because when the client disconnects, this thread is stopped
     private String latestUser = null; // is only null if there was never a username
 
     /**
@@ -194,7 +194,7 @@ public class EinzServerClientHandler implements Runnable{
         socketWriteLock.unlock();
     }
 
-    // TODO implement onClientDisconnected, make sure to call this from stopThreadPatiently and from deregister.
+
     private void onClientDisconnected(){
         Log.d("ESCH/clientDisconnected", "IOException on socket - user probably lost connection");
         parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");

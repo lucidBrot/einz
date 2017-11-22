@@ -26,7 +26,7 @@ public class EinzKickAction extends EinzAction {
     @Override
     public void run() {
         if(getIssuedByPlayer()==null){
-            Log.d("KickAction", "an ESCH without registered user tried to run this. don't.");
+            Log.w("KickAction", "an ESCH without registered user tried to run this. don't.");
             return; // only perform this if the user was registered
         }
         EinzKickMessageBody body = (EinzKickMessageBody) getMessage().getBody();
