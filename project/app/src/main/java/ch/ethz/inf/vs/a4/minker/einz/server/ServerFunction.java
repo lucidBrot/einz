@@ -4,12 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardColors;
-import ch.ethz.inf.vs.a4.minker.einz.CardTypes;
-import ch.ethz.inf.vs.a4.minker.einz.GameState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
-import ch.ethz.inf.vs.a4.minker.einz.PlayerActions;
+import ch.ethz.inf.vs.a4.minker.einz.*;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -98,6 +93,12 @@ public class ServerFunction implements ServerFunctionDefinition {
     public GameState initialiseStandartGame(ArrayList<Player> players){
         return new GameState(players);
     }
+
+    @Override
+    public GameState initialiseStandardGame(ArrayList<Player> players, ArrayList<Spectator> spectators) {
+        return initialiseStandartGame(players); // TODO: implement. Assume the caller will not keep the GameState
+    }
+
 
     //sends all players the message that the game started
     //sends all players the relevant information they need to have (defined in GlobalInfo and PlayerInfo)
