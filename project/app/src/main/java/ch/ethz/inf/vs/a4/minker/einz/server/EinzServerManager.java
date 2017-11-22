@@ -288,7 +288,10 @@ public class EinzServerManager {
             broadcastMessageToAllPlayers(message);
             broadcastMessageToAllSpectators(message);
 
-            // TODO: UpdateLobbyList
+            //broadcast updateLobbyList
+            EinzMessage<EinzUpdateLobbyListMessageBody> msg = generateUpdateLobbyListRequest();
+            broadcastMessageToAllPlayers(msg);
+            broadcastMessageToAllSpectators(msg);
 
             // unregister them
             userListLock.writeLock().lock();
