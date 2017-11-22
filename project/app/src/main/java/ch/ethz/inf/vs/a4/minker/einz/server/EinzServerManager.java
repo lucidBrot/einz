@@ -5,6 +5,7 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -67,6 +68,7 @@ public class EinzServerManager {
         userListLock.readLock().lock();
         server.stopListeningForIncomingConnections(true);
         ArrayList<Player> players = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>(); // for debug
         ArrayList<Spectator> spectators = new ArrayList<>();
         for(Map.Entry<String, EinzServerClientHandler> entry : registeredClientHandlers.entrySet()){
             EinzServerClientHandler handler = (EinzServerClientHandler) entry.getValue();
@@ -76,9 +78,10 @@ public class EinzServerManager {
             } else if ( role.toLowerCase().equals("spectator")){
                 spectators.add(new Spectator((String) entry.getKey()));
             }
+            list.add(entry.getKey());
             // TODO: send that info to clients. Fabian?
         }
-        Log.d("servMan/finishRegPhase", "Players: "+players.toString());
+        Log.d("servMan/finishRegPhase", "Players and Spectators: "+new JSONArray(list).toString());
         userListLock.readLock().unlock();
         userListLock.writeLock().lock();
         this.gamePhaseStarted = true;
@@ -509,11 +512,14 @@ public class EinzServerManager {
     }
 
     public boolean isRegistered(String username){
-        return (username!=null && !isInvalidUsername(username) && getRegisteredClientRoles().contains(username));
+        boolean b = (username!=null && !isInvalidUsername(username) && getRegisteredClientRoles().keySet().contains(username));
+        return b;
     }
 
     public boolean isRegisteredAdmin(String username){
-        return isRegistered(username) && getAdminUsername()!=null && getAdminUsername().equals(username);
+        boolean b = isRegistered(username);
+        b = b && getAdminUsername()!=null && getAdminUsername().equals(username);
+        return b;
     }
 
     public void startGame(String issuedByPlayer) {
