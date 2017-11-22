@@ -39,7 +39,7 @@ public class EinzServerManager {
     private ConcurrentHashMap<String, String> registeredClientRoles; // mapping client usernames to roles
     protected String adminUsername;
 
-    public ReentrantReadWriteLock getUserListLock() {
+    public ReentrantReadWriteLock getUserListLock() { // registeredClientRoles, registeredClientHandlers, gamePhaseStarted
         return userListLock;
     }
 
@@ -274,7 +274,7 @@ public class EinzServerManager {
                 Log.d("servMan/unregUser", "kicking "+username+"...");
                 if(gamePhaseStarted){
                     // TODO: removeUser from fabian
-
+                    serverFunctionInterface.removePlayer(username);
                 }
             }
         }

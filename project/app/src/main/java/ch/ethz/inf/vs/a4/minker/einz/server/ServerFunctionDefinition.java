@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardColors;
-import ch.ethz.inf.vs.a4.minker.einz.GameState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.*;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -63,6 +60,9 @@ public interface ServerFunctionDefinition {
 
         //initialises a new game with standart cards and rules with the given players
         public GameState initialiseStandartGame(ArrayList<Player> players);
+
+        //initializes a new game with standard cards and rules with the given players and spectators
+        public GameState initialiseStandardGame(ArrayList<Player> players, ArrayList<Spectator> spectators);
 
         //sends all players the message that the game started
         //sends all players the relevant information they need to have (defined in GlobalInfo and PlayerInfo)
