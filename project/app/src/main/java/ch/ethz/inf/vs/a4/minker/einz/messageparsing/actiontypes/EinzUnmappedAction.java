@@ -10,6 +10,7 @@ import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
 
 public class EinzUnmappedAction extends EinzAction {
     private final EinzMessage message;
+    private final String messageString;
     /**
      *
      * @param sInterface
@@ -21,10 +22,11 @@ public class EinzUnmappedAction extends EinzAction {
     public EinzUnmappedAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
         this.message = getMessage();
+        this.messageString = (this.message==null)?"null":message.toString();
     }
 
     @Override
     public void run() {
-        Log.w("unmappedAction", "Unmapped Action was run. Message: "+message.getBody().toString());
+        Log.w("unmappedAction", "Unmapped Action was run. Message: "+messageString);
     }
 }
