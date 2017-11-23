@@ -27,6 +27,11 @@ public class EinzServerManager {
 
     private final ThreadedEinzServer server;
     private ServerFunctionDefinition serverFunctionInterface;
+
+    public ReentrantReadWriteLock getSFLock() {
+        return SFLock;
+    }
+
     private ReentrantReadWriteLock SFLock = new ReentrantReadWriteLock(); // lock when reading/writing to serverFunctionInterface by calling a function on there
     private boolean gamePhaseStarted;
 

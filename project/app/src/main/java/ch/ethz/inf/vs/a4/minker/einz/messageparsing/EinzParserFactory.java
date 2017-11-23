@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzUnmappedParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +25,8 @@ public class EinzParserFactory {
     }
 
     /**
-     * Might return null if message is not a valid JSONObject or not a valid message
+     * Might return null if message is not a valid JSONObject or not a valid message.
+     * Will return EinzUnmappedParser if the message was kinda valid but not mapped
      * @param message String representation of a message as specified in protocols/documentation_Messages.md
      * @return Parser specifically for this messagegroup
      * @throws JSONException if the message is invalidly formatted. E.g. if it is not a JSONObject or if it has no header...
@@ -88,7 +90,7 @@ public class EinzParserFactory {
         try {
             Class<? extends EinzParser> c = getMapping(messagegroup);
             if(c==null)
-                return null;
+                return new EinzUnmappedParser(); // in case it is not mapped
 
             return getMapping(messagegroup).getDeclaredConstructor().newInstance();
         } catch (InstantiationException e) {
@@ -98,7 +100,7 @@ public class EinzParserFactory {
             e.printStackTrace();
         }
         Log.e("EinzParserFactory", "Failed to instantiate mapped Parser");
-        return null;
+        return new EinzUnmappedParser();
     }
 
     /**
@@ -111,8 +113,9 @@ public class EinzParserFactory {
 
     /**
      * @param messagegroup The messagegroup whose mapping should be removed from the internal dictionary.
+     *                     Does nothing if the messagegroup is not registered
      */
-    public void deregisterMessagegroup(String messagegroup){ // TODO: what does this do if the messagegroup wasn't registered?
+    public void deregisterMessagegroup(String messagegroup){
         this.dictionary.remove(messagegroup);
     }
 

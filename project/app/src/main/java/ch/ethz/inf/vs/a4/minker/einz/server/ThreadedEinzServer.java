@@ -122,7 +122,9 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
             this.sherLock.writeLock().lock();// for firstconnection, so that it doesn't change and we get two admins
+            getServerManager().getSFLock().readLock().lock();
             EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface(),firstconnection);
+            getServerManager().getSFLock().readLock().unlock();
             Thread thread = new Thread(ez);
             clientHandlerBiMap.put(thread, ez);
 
@@ -203,7 +205,11 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         getServerManager().getUserListLock().readLock().lock();
         EinzServerClientHandler ez = getServerManager().getRegisteredClientHandlers().get(username);
         getServerManager().getUserListLock().readLock().unlock();
-        if(!message.endsWith("\r\n")){ // TODO: check if contains newline and if yes, abort
+        int lindex = message.lastIndexOf("\n");
+        if(message.substring(0,(lindex>=0)?lindex:0).contains("\n")){
+            Log.w("EinzServer/sendMsg", "the message contains multiple newlines: "+message);
+        }
+        if(!message.endsWith("\r\n")){
             message += "\r\n";
         }
         if (ez == null) {

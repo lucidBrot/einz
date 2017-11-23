@@ -30,6 +30,8 @@ All Strings and Booleans should be stored as String to allow further extensibili
 The header must always contain `messagegroup` and `messagetype`. The body may vary.
 `messagegroup` is camelCase, `messagetype` is PascalCase, to make it easier to visually distinguish them.
 
+Within the program, messagegroup and messagetype might be null if the mapping was not registered.
+
   ```json
   {
     "header":{
@@ -294,7 +296,7 @@ Sent by the **server** to all clients, including the one who was unregistered. A
 
 `reason` : *String*
 
-> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server. *"server shutdown"* if the server is turning off.
+> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server. *"server"* if the server is turning off or other internal reasons.
 
 ```Json
 {

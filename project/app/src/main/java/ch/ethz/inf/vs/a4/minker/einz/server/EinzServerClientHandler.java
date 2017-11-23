@@ -328,7 +328,7 @@ public class EinzServerClientHandler implements Runnable{
             EinzAction einzAction = this.einzActionFactory.generateEinzAction(einzMessage, getConnectedUser());
             return einzAction;
         } catch (JSONException e) {
-            Log.e("ESCH/parse", "JSON Error in parseMessage");
+            Log.w("ESCH/parse", "JSON Error in parseMessage");
             e.printStackTrace();
         }
         return null;

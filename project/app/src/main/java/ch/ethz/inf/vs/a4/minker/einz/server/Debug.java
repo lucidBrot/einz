@@ -4,10 +4,7 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -134,6 +131,16 @@ public class Debug {
                     Log.e("TempClient2", "Sleeping Failed v2");
                     e.printStackTrace();
                 }
+
+                EinzMessageHeader header = new EinzMessageHeader("registration", "alösdkjf");
+                EinzKickFailureMessageBody badBody = new EinzKickFailureMessageBody("roger", "lol this is a bad message");
+                EinzMessage<EinzKickFailureMessageBody> emsg = new EinzMessage<>(header, badBody);
+                try {
+                    tc.sendMessage(emsg.toJSON().toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
             }
         };

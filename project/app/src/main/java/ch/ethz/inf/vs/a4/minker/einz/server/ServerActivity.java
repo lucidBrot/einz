@@ -86,7 +86,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
                     serverThread.start();
                 break;
             case R.id.btn_s_start_game_initialization:
-                // TODO: start game
+
                 break;
         }
     }
