@@ -90,13 +90,13 @@ public class EinzServerManager {
 
     }
 
-    public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException { //TODO: register networking actions, maybe from json file
+    public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
         InputStream jsonStream = server.applicationContext.getResources().openRawResource(this.networkingActionFile);
         JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
         actionFactory.loadMappingsFromJson(jsonObject);
     }
 
-    public void loadAndRegisterGameLogicActions(EinzActionFactory actionFactory) throws InvalidResourceFormatException, JSONException, ClassNotFoundException { //TODO: register actions for game logic. from different json file
+    public void loadAndRegisterGameLogicActions(EinzActionFactory actionFactory) throws InvalidResourceFormatException, JSONException, ClassNotFoundException {
         InputStream jsonStream = server.applicationContext.getResources().openRawResource(this.gameLogicActionFile);
         JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
         actionFactory.loadMappingsFromJson(jsonObject);
@@ -351,10 +351,11 @@ public class EinzServerManager {
         boolean allowed = ((getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick))||userWhoIssuedThisKick.equals("server"));
         boolean userExists = (esch!=null);
         boolean userValid = !isInvalidUsername(userToKick);
+        String unregisterReason = (userWhoIssuedThisKick.equals("server"))?"server":"kicked";
 
         EinzMessage<EinzKickFailureMessageBody> response;
         if(userExists && allowed && userValid) {
-            response = unregisterUser(userToKick, "kicked", userWhoIssuedThisKick);
+            response = unregisterUser(userToKick, unregisterReason, userWhoIssuedThisKick);
             if(response==null)//if success
             {
                 userListLock.readLock().unlock();
@@ -533,6 +534,21 @@ public class EinzServerManager {
     }
 
     public void specifyRules(ArrayList<Rule> ruleset) { //TODO: readwritelock on serverFunctionInterface
-        // TODO: specifyRules. How is the deck transmitted? in what format should I pass the rules?
+        // TODO: RULES: specifyRules. How is the deck transmitted? in what format should I pass the rules?
+        // TODO: add message for endTurn Action to docs and implement
+        // TODO: RULES: rulemessage
+    }
+
+    /**
+     * Locks to avoid inconsistencies
+     */
+    public void kickAllAndCloseSockets() {
+        userListLock.writeLock().lock();
+        for(String username : getRegisteredClientHandlers().keySet()){
+            EinzServerClientHandler esch = getRegisteredClientHandlers().get(username);
+            kickUser(username, "server");
+            esch.stopThreadPatiently();
+        }
+        userListLock.writeLock().unlock();
     }
 }

@@ -226,4 +226,21 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     public EinzServerManager getServerManager() {
         return serverManager;
     }
+
+    /**
+     * Waits for all clientHanlderThreads after kicking all clients. may take some time. You should consider running this method in a non-UI thread.
+     */
+    public void shutdown() {
+        stopListeningForIncomingConnections(true);
+        getServerManager().kickAllAndCloseSockets();
+        // waiting because clientHandlerThreads might still need this server
+        for(Thread t : this.clientHandlerThreads){
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Log.w("EinzServer/shutdown", "couldn't wait for thread.");
+                e.printStackTrace();
+            }
+        }
+    }
 }

@@ -294,7 +294,7 @@ Sent by the **server** to all clients, including the one who was unregistered. A
 
 `reason` : *String*
 
-> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server.
+> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server. *"server shutdown"* if the server is turning off.
 
 ```Json
 {
@@ -358,7 +358,7 @@ The **admin client** informs the server what rules it chose. The rule is only pa
 
 Since every rule might have dynamic parameters, they are all stored as JSONObject where only their name is guaranteed to be available.
 
-`ruleset` : *JSONOBject containing non-uniform JSONObjects*
+`ruleset` : *JSONObject containing non-uniform JSONObjects*
 
 > The identifier of the JSONObject is also the identifier of the [rule](#rule)
 
