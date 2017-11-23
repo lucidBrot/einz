@@ -4,11 +4,17 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static java.lang.Thread.sleep;
+
+/**
+ * For debugging only.
+ * This class is a mess and I'm fine with that
+ * function names might not correcpond to their content
+ */
 public class Debug {
 
     /**
@@ -29,7 +35,7 @@ public class Debug {
         //</debug>
     }
 
-    public static void debug_simulateRegisterClient() {
+    public static void debug_simulateClient1() {
         //<DEBUG>
         final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
             @Override
@@ -52,7 +58,7 @@ public class Debug {
             @Override
             public void run() {
                 try {
-                    sleep(10); // wait until server hopefully runs
+                    sleep(100); // wait until server hopefully runs
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Log.e("TempClient1", "Sleeping Failed");
@@ -60,18 +66,39 @@ public class Debug {
                 }
 
                 tc.sendMessage(Debug.debug_getRegisterMessage("roger"));
+                try {
+                    sleep(600);
+                } catch (InterruptedException e) {
+                    Log.e("TempClient1", "Insomnia!");
+                    e.printStackTrace();
+                }
+
+                //tc.sendMessage(Debug.debug_getKickMessage("clemi"));
+                tc.sendMessage(Debug.debug_getStartGameMessage());
             }
         };
         m.start(); // send message
         //</Debug>
     }
 
-    public static void debug_simulateRegisterFollowedByUnregister() {
+
+    public static void debug_simulateClient2() {
+        try {
+            sleep(200); // give Client1 a chance to register first
+        } catch (InterruptedException e) {
+            Log.w("Debug/TempClient2","Insomnia while creating client 2");
+            e.printStackTrace();
+        }
         //<DEBUG>
         final TempClient tc = new TempClient(new TempClient.OnMessageReceived() {
             @Override
             public void messageReceived(String message) {
                 Log.d("TempClient2", "received message: "+message);
+
+                /*if(message.equals("{\"header\":{\"messagegroup\":\"registration\",\"messagetype\":\"UnregisterResponse\"},\"body\":{\"username\":\"clemi\",\"reason\":\"kicked\"}}")){
+                    Log.d("TempClient2", "LULZ I WAS KICKED");
+
+                }*/
             }
         });
         Thread t = new Thread(){
@@ -96,7 +123,7 @@ public class Debug {
                     interrupt();
                 }
 
-                //tc.sendMessage(Debug.debug_getUnregisterMessage("silvia"));
+                // tc.sendMessage(Debug.debug_getRegisterMessage("silvia"));
                 tc.sendMessage(Debug.debug_getRegisterMessage("clemi"));
                 try {
                     sleep(100);
@@ -104,6 +131,16 @@ public class Debug {
                     Log.e("TempClient2", "Sleeping Failed v2");
                     e.printStackTrace();
                 }
+
+                EinzMessageHeader header = new EinzMessageHeader("registration", "alösdkjf");
+                EinzKickFailureMessageBody badBody = new EinzKickFailureMessageBody("roger", "lol this is a bad message");
+                EinzMessage<EinzKickFailureMessageBody> emsg = new EinzMessage<>(header, badBody);
+                try {
+                    tc.sendMessage(emsg.toJSON().toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
             }
         };
@@ -140,6 +177,21 @@ public class Debug {
 
     }
 
+    private static String debug_getKickMessage(String username) {
+        try {
+            EinzMessageHeader header = new EinzMessageHeader("registration", "Kick");
+            EinzKickMessageBody body = new EinzKickMessageBody(username);
+            EinzMessage<EinzKickMessageBody> message = new EinzMessage<>(header, body);
+            Log.d("DEBUG/dGetUnRegMsg","simulating message.toJSON().toString() : "+message.toJSON().toString());
+            return message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("DEBUG/dGetUnRegMsg", "failed to create kick message");
+            return "empty message :(";
+        }
+    }
+
+
     public static String debug_getUnregisterMessage(String username){
         try {
             EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
@@ -149,7 +201,22 @@ public class Debug {
             return message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.e("DEBUG/dGetUnRegMsg", "failed to create registration message");
+            Log.e("DEBUG/dGetUnRegMsg", "failed to create deregistration message");
+            return "empty message :(";
+        }
+    }
+
+
+    private static String debug_getStartGameMessage() {
+        try {
+            EinzMessageHeader header = new EinzMessageHeader("startgame", "StartGame");
+            EinzStartGameMessageBody body = new EinzStartGameMessageBody();
+            EinzMessage<EinzStartGameMessageBody> message = new EinzMessage<>(header, body);
+            Log.d("DEBUG/dGetUnRegMsg","simulating message.toJSON().toString() : "+message.toJSON().toString());
+            return message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("DEBUG/dGetUnRegMsg", "failed to create startGame message");
             return "empty message :(";
         }
     }

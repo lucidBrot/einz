@@ -2,7 +2,10 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
 import android.support.annotation.Nullable;
 import android.util.Log;
-
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKickAction;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnmappedAction;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -80,7 +83,7 @@ public class EinzActionFactory {
      * Takes an EinzMessage and returns its mapping.
      * This does not keep the object, only its type!
      * @param e
-     * @return null if mapping does not exist, else the Class you want // TODO: Default Action?
+     * @return null if mapping does not exist, else the Class you want
      */
     public Class<? extends EinzAction> getMapping(EinzMessage e){
         Log.d("ActionFactory", "Getting mapping for body type "+e.getBody().getClass());
@@ -89,27 +92,31 @@ public class EinzActionFactory {
         return temp;
     }
 
+
     /**
      * This can fail in <b>so</b> many ways
      * @param message some Message that is the key to the Action
      * @param issuedBy the username who issued this action or null if irrelevant and unknown
-     * @return the action, or null if this messagetype was not registered or it failed for some other reason
+     * @return the action, (or null, but I don't think so, if this messagetype was not registered or it failed for some other reason, or maybe just the empty {@link ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnmappedAction})
      */
     @Nullable
     public EinzAction generateEinzAction(EinzMessage message, @Nullable String issuedBy){
         if(message == null){
             Log.e("ActionFactory", "Message was null.");
-            return null;
+            return new EinzUnmappedAction(sInterface, sManager, message, issuedBy, clientHandler);
         }
         try {
             Class<? extends  EinzAction> mapping = getMapping(message);
             if(mapping == null){
                 Log.w("ActionFactory", "generation of unregistered action was requested!");
                 Log.d("ActionFactory", "The unregistered action was for "+message.toJSON().toString());
-                return null;
+                return new EinzUnmappedAction(sInterface, sManager, message, issuedBy, clientHandler);
             }
+
             EinzAction ret = mapping.getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
+
             Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
+
             return ret;
         } catch (InstantiationException e) {
             Log.e("ActionFactory", "Failed to generate Mapping: "+e.getMessage());
@@ -127,8 +134,8 @@ public class EinzActionFactory {
             e.printStackTrace();
             // When printing the unregistered action fails. Whatever, don't care. Action is unregistered.
         }
-        Log.e("ActionFactory", "failed to map to an action");
-        return null;
+        Log.w("ActionFactory", "failed to map to an action");
+        return new EinzUnmappedAction(sInterface, sManager, message, issuedBy, clientHandler);
     }
 
     /**

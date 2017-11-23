@@ -3,6 +3,10 @@
     {
       "messagegroup": "registration",
       "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"
+    },
+	{
+      "messagegroup": "startgame",
+      "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzStartGameParser"
     }
   ]
 }

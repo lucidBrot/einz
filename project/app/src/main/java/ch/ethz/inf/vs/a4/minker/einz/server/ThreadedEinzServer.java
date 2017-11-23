@@ -5,6 +5,8 @@ import android.util.Log;
 
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.json.JSONException;
 
 import java.io.IOException;
@@ -24,7 +26,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private boolean shouldStopSpinning = false;
     private ServerSocket serverSocket;
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
-    private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
+    private BiMap<Thread, EinzServerClientHandler> clientHandlerBiMap = HashBiMap.create(); // list of registered clients and ESCHs
 
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
@@ -37,10 +39,8 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      */
     public ThreadedEinzServer(Context applicationContext, int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
-        this.clientHandlerThreads = new ArrayList<Thread>();
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverManager = new EinzServerManager(this, serverFunctionDefinition);
-        this.getServerManager().setServerFunctionInterface(serverFunctionDefinition);
         this.applicationContext = applicationContext;
     }
 
@@ -91,8 +91,8 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         if(DEBUG_ONE_MSG){
             Log.d("EinzServer", "DEBUG_ONE_MSG: Will simulate messages from a client");
             DEBUG_ONE_MSG = false;
-            Debug.debug_simulateRegisterClient();
-            Debug.debug_simulateRegisterFollowedByUnregister();
+            Debug.debug_simulateClient1();
+            Debug.debug_simulateClient2();
         }
 
         boolean firstconnection = true;
@@ -102,8 +102,11 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 socket = serverSocket.accept();
                 Log.d("EinzServer/launch", "new connection from "+socket.getInetAddress()+":"+socket.getPort());
             } catch (SocketException e){
-                if(shouldStopSpinning)
+                if(shouldStopSpinning) {
                     Log.d("EinzServer/launch", "stopping accepting connections");
+                    //DEBUG to test if connection is not accepting anymore closed
+                    //Debug.debug_simulateClient2();
+                }
                 else
                     Log.d("EinzServer/launch","SocketException but shouldStopSpinning is false");
                 return false;
@@ -114,9 +117,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 return false;
             }
             this.sherLock.writeLock().lock();// for firstconnection, so that it doesn't change and we get two admins
+            getServerManager().getSFLock().readLock().lock();
             EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface(),firstconnection);
+            getServerManager().getSFLock().readLock().unlock();
             Thread thread = new Thread(ez);
-            clientHandlerThreads.add(thread);
+            clientHandlerBiMap.put(thread, ez);
+
             firstconnection = false; // the first user has connected, all others cannot be admin
             this.sherLock.writeLock().unlock();
             thread.start(); // start new thread for this client.
@@ -152,10 +158,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * THIS WILL PUT THE SERVER INTO UNDEFINED STATE. ONLY USE IT AS A KILL SWITCH
      */
     public void abortAllClientHandlers(){
-        for (Thread ez : clientHandlerThreads){
-            if(ez.getState() != Thread.State.TERMINATED)
-                ez.stop();
-        }
+        this.sherLock.writeLock().lock();
+            for (Thread ez : clientHandlerBiMap.keySet()) {
+                if (ez.getState() != Thread.State.TERMINATED)
+                    ez.stop();
+            }
+        this.sherLock.writeLock().unlock();
     }
 
     public int getPORT() {
@@ -192,7 +200,11 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         getServerManager().getUserListLock().readLock().lock();
         EinzServerClientHandler ez = getServerManager().getRegisteredClientHandlers().get(username);
         getServerManager().getUserListLock().readLock().unlock();
-        if(!message.endsWith("\r\n")){ // TODO: check if contains newline and if yes, abort
+        int lindex = message.lastIndexOf("\n");
+        if(message.substring(0,(lindex>=0)?lindex:0).contains("\n")){
+            Log.w("EinzServer/sendMsg", "the message contains multiple newlines: "+message);
+        }
+        if(!message.endsWith("\r\n")){
             message += "\r\n";
         }
         if (ez == null) {
@@ -217,5 +229,32 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
     public EinzServerManager getServerManager() {
         return serverManager;
+    }
+
+    /**
+     * Waits for all clientHanlderThreads after kicking all clients. may take some time. You should consider running this method in a non-UI thread.
+     */
+    public void shutdown() {
+        Log.d("EinzServer/shutdown", "initiating shutdown...");
+        stopListeningForIncomingConnections(true);
+        this.sherLock.writeLock().lock();
+        getServerManager().kickAllAndCloseSockets();
+        // waiting because clientHandlerThreads might still need this server
+        for(Thread t : this.clientHandlerBiMap.keySet()){
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Log.w("EinzServer/shutdown", "couldn't wait for thread.");
+                e.printStackTrace();
+            }
+        }
+        this.sherLock.writeLock().unlock();
+        Log.d("EinzServer/shutdown", "finished shutting down server");
+    }
+
+    public void removeEinzServerClientHandlerFromClientHandlerList(EinzServerClientHandler handler) {
+        this.sherLock.writeLock().lock();
+        this.clientHandlerBiMap.inverse().remove(handler);
+        this.sherLock.writeLock().unlock();
     }
 }

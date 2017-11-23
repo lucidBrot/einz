@@ -15,6 +15,8 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import ch.ethz.inf.vs.a4.minker.einz.server.UserNotRegisteredException;
+import ch.ethz.inf.vs.a4.minker.einz.*;
+import org.json.JSONObject;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -102,6 +104,13 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     public GameState initialiseStandartGame(ArrayList<Player> players, HashSet<Spectator> spectators){
         return new GameState(players, spectators);
+    }
+
+    @Override
+    public GameState initialiseStandardGame(ArrayList<Player> players, ArrayList<Spectator> spectators) {
+        //initialiseStandartGame(players, spectators)
+        // TODO: Fabian. Wieso eine arraylist und ein hashset?
+        return null;
     }
 
     //sends all players the message that the game started

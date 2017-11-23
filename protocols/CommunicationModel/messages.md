@@ -30,6 +30,8 @@ All Strings and Booleans should be stored as String to allow further extensibili
 The header must always contain `messagegroup` and `messagetype`. The body may vary.
 `messagegroup` is camelCase, `messagetype` is PascalCase, to make it easier to visually distinguish them.
 
+Within the program, messagegroup and messagetype might be null if the mapping was not registered.
+
   ```json
   {
     "header":{
@@ -204,7 +206,7 @@ If the client requests the same role multiple times, the request will still succ
 
 ## UpdateLobbyList
 
-The **server** broadcasts the new List of Players and Spectators to the clients whenever a new one connects. The first client thus only receives a list with itself and knows that it is admin.
+The **server** broadcasts the new List of Players and Spectators to the clients whenever a new one connects or leaves. The first client thus only receives a list with itself and knows that it is admin.
 
 It is not important for the client to know spectators and the admin, but it might be useful for the UI if we want to show that.
 
@@ -247,6 +249,7 @@ If the client has not been registered. This may be because of an invalid usernam
 > + *"already registered"* if the same connection already has registered a username
 > + *"invalid"* if the username is the empty string or *"server"*. Or if the username contains invalid characters. One invalid character is the Tilde, which is reserved to identify non-username-strings
 > + *"lobby full"* if the server decided to fixate the number of players or spectators and the game has not yet started (otherwise, the server wouldn't react at all).
+> + *"game already in progress"*
 
 ```JSON
 {
@@ -293,7 +296,7 @@ Sent by the **server** to all clients, including the one who was unregistered. A
 
 `reason` : *String*
 
-> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server.
+> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server. *"server"* if the server is turning off or other internal reasons.
 
 ```Json
 {
@@ -334,6 +337,7 @@ The **server** informs the admin that [kicking](#kick) did not work. If the clie
 
 > * *"not allowed"* : you are not allowed to kick people
 > * "not found" : this player or spectator is not registered
+> * *"invalid"* : this username is invalid
 
 ```json
 {
@@ -356,7 +360,7 @@ The **admin client** informs the server what rules it chose. The rule is only pa
 
 Since every rule might have dynamic parameters, they are all stored as JSONObject where only their name is guaranteed to be available.
 
-`ruleset` : *JSONOBject containing non-uniform JSONObjects*
+`ruleset` : *JSONObject containing non-uniform JSONObjects*
 
 > The identifier of the JSONObject is also the identifier of the [rule](#rule)
 
@@ -415,7 +419,7 @@ The **Server** sends this to the Client. No response from the Client required.
 {
   "header":{
     "messagegroup":"startgame",
-    "messagetype":"SendRules"
+    "messagetype":"InitGame"
   },
   "body":{
     "ruleset":{
