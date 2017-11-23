@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
-import ch.ethz.inf.vs.a4.minker.einz.Rule;
+import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -9,16 +9,16 @@ import java.util.ArrayList;
 
 public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
 
-    private final ArrayList<Rule> ruleset;
+    private final ArrayList<BasicRule> ruleset;
 
     /**
      * @param ruleset an ArrayList of Rules to set
      */
-    public EinzSpecifyRulesMessageBody(ArrayList<Rule> ruleset) {
+    public EinzSpecifyRulesMessageBody(ArrayList<BasicRule> ruleset) {
         this.ruleset = ruleset;
     }
 
-    public ArrayList<Rule> getRuleset() {
+    public ArrayList<BasicRule> getRuleset() {
         return ruleset;
     }
 
@@ -29,7 +29,7 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
     public JSONObject toJSON() throws JSONException {
         JSONObject body = new JSONObject();
         JSONObject ruleset = new JSONObject();
-        for(Rule rule : this.ruleset){
+        for(BasicRule rule : this.ruleset){
             ruleset.put(rule.getIdentifier(), rule.getContentAsJSON());
         }
         body.put("ruleset",ruleset);

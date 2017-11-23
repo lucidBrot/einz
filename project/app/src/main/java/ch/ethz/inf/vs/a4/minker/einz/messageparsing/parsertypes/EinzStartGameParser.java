@@ -1,7 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.Rule;
+import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;
@@ -38,11 +38,11 @@ public class EinzStartGameParser extends EinzParser {
 
     private EinzMessage<EinzInitGameMessageBody> parseInitGame(JSONObject message) throws JSONException {
         EinzMessageHeader mheader = new EinzMessageHeader("startgame", "InitGame");
-        ArrayList<Rule> ruleset=new ArrayList<>();
+        ArrayList<BasicRule> ruleset=new ArrayList<>();
         JSONObject body = message.getJSONObject("body");
         JSONObject jruleset = body.getJSONObject("ruleset");
         for(int i = 0; i<jruleset.names().length(); i++) {
-            Rule rule = new Rule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
+            BasicRule rule = new BasicRule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
             ruleset.add(rule);
         }
         JSONArray jturnOrder = body.getJSONArray("turn-order");
@@ -66,12 +66,12 @@ public class EinzStartGameParser extends EinzParser {
     private EinzMessage<EinzSpecifyRulesMessageBody> parseSpecifyRules(JSONObject message) throws JSONException {
         JSONObject body = message.getJSONObject("body");
         EinzMessageHeader mheader = new EinzMessageHeader("startgame", "SpecifyRules");
-        ArrayList<Rule> ruleset=new ArrayList<>();
+        ArrayList<BasicRule> ruleset=new ArrayList<>();
         JSONObject jruleset = body.getJSONObject("ruleset");
         // there are SO many ways to iterate over a json object
         // https://stackoverflow.com/questions/9151619/how-to-iterate-over-a-jsonobject
         for(int i = 0; i<jruleset.names().length(); i++) {
-            Rule rule = new Rule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
+            BasicRule rule = new BasicRule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
             ruleset.add(rule);
         }
         EinzSpecifyRulesMessageBody mbody = new EinzSpecifyRulesMessageBody(ruleset);

@@ -18,7 +18,11 @@ public class GlobalState {
     private Stack<Card> discardPile;
     private Queue<Card> drawPile;
     private Player activePlayer;
+    private Player nextPlayer;
     private List<Player> players;
+    private List<Player> finishedPlayer;
+    private boolean isGameRunning;
+
 
     public GlobalState(){
         this(new LinkedList<Card>());
