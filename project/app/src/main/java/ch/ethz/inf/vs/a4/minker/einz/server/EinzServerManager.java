@@ -304,21 +304,25 @@ public class EinzServerManager {
             broadcastMessageToAllPlayers(message);
             broadcastMessageToAllSpectators(message);
 
-            //broadcast updateLobbyList
-            EinzMessage<EinzUpdateLobbyListMessageBody> msg = generateUpdateLobbyListRequest();
-            broadcastMessageToAllPlayers(msg);
-            broadcastMessageToAllSpectators(msg);
-
             // unregister them
             userListLock.writeLock().lock();
             getRegisteredClientRoles().remove(username);
             getRegisteredClientHandlers().remove(username);
             userListLock.writeLock().unlock();
 
+            //broadcast updateLobbyList
+            EinzMessage<EinzUpdateLobbyListMessageBody> msg = generateUpdateLobbyListRequest();
+            broadcastMessageToAllPlayers(msg);
+            broadcastMessageToAllSpectators(msg);
+
             // and stop the corresponding client
-            esch.setConnectedUser(null);
-            esch.stopThreadPatiently();
-            Log.d("servMan/unreg", "unregistered user "+username);
+            try {
+                esch.setConnectedUser(null);
+                esch.stopThreadPatiently();
+            }catch(java.lang.NullPointerException e){
+                Log.d("servMan/kick", "ESCH didn't exist anymore. (Did you maybe shut down the server?)");
+            }
+            Log.d("servMan/unreg", "I have unregistered user "+username);
 
         } else {
             Log.d("servMan/unreg", "failed to unregister user "+username+" because "+failureReason);
@@ -340,6 +344,7 @@ public class EinzServerManager {
 
     /**
      * Tests if user is allowed to perform this action and performs it.
+     * A kicked users associated thread will be stopped and the socket closed.
      * Says user is not allowed if it was not yet registered as admin. That shouldn't happen though, as messages are supposed to be ordered by client so there should always be a register first.
      * @param userToKick
      * @param userWhoIssuedThisKick
@@ -547,7 +552,7 @@ public class EinzServerManager {
         for(String username : getRegisteredClientHandlers().keySet()){
             EinzServerClientHandler esch = getRegisteredClientHandlers().get(username);
             kickUser(username, "server");
-            esch.stopThreadPatiently();
+            // esch.stopThreadPatiently(); is already within kickUser
         }
         userListLock.writeLock().unlock();
     }

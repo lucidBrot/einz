@@ -18,6 +18,7 @@ public class EinzServerClientHandler implements Runnable{
 
     private boolean spin = false;
     private boolean stopping = false;
+    private final int SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET = 100; // milisecs
     private boolean firstConnectionOnServer = false; // whether this user should be considered admin
 
     private ThreadedEinzServer parentEinzServer;
@@ -148,8 +149,12 @@ public class EinzServerClientHandler implements Runnable{
                 }
 
             } catch (IOException e) {
+                if(spin){
                 e.printStackTrace();
-                Log.e("ESCH", "Something Failed. Probably the client disconnected without warning. Or maybe the socket is closed.");
+                Log.w("ESCH", "Something Failed. Probably the client disconnected without warning. Or maybe the socket is closed.");}
+                else{
+                    Log.d("ESCH", "IOException but it's fine because I'm supposed to stop anyways.");
+                }
 
                 this.onClientDisconnected();
                 this.stopThreadPatiently();
@@ -167,6 +172,12 @@ public class EinzServerClientHandler implements Runnable{
 
 
         this.stopping = true;
+        try {
+            Thread.sleep(SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET);
+        } catch (InterruptedException e) {
+            Log.e("ESCH/stopPatiently", "You interrupted my sleep (giving the other threads time to finish their actions): ");
+            e.printStackTrace();
+        }
         socketWriteLock.lock();
         String usr = getLatestUser(); usr = (usr==null)?"has never been set":usr;
         Log.d("ESCH/stopThread", "STOPPING THREAD(user="+usr+") PATIENTLY!");
@@ -183,7 +194,9 @@ public class EinzServerClientHandler implements Runnable{
 
 
     private void onClientDisconnected(){
-        Log.d("ESCH/clientDisconnected", "IOException on socket - user probably lost connection");
+        if(!stopping && spin) {
+            Log.d("ESCH/clientDisconnected", "IOException on socket - user probably lost connection");
+        }
         parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
     }
 
