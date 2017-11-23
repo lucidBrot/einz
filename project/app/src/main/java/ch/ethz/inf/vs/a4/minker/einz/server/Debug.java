@@ -61,7 +61,7 @@ public class Debug {
             @Override
             public void run() {
                 try {
-                    sleep(10); // wait until server hopefully runs
+                    sleep(100); // wait until server hopefully runs
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                     Log.e("TempClient1", "Sleeping Failed");
@@ -87,7 +87,7 @@ public class Debug {
 
     public static void debug_simulateClient2() {
         try {
-            sleep(10); // give Client1 a chance to register first
+            sleep(200); // give Client1 a chance to register first
         } catch (InterruptedException e) {
             Log.w("Debug/TempClient2","Insomnia while creating client 2");
             e.printStackTrace();

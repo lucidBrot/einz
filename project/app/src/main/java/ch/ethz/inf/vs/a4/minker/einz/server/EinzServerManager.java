@@ -321,6 +321,7 @@ public class EinzServerManager {
                 esch.stopThreadPatiently();
             }catch(java.lang.NullPointerException e){
                 Log.d("servMan/kick", "ESCH didn't exist anymore. (Did you maybe shut down the server?)");
+                e.printStackTrace();
             }
             Log.d("servMan/unreg", "I have unregistered user "+username);
 

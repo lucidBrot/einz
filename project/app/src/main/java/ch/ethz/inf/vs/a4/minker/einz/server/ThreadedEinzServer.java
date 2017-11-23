@@ -31,8 +31,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private boolean shouldStopSpinning = false;
     private ServerSocket serverSocket;
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
-    private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
-    private BiMap<Thread, EinzServerClientHandler> clientHandlerBiMap = HashBiMap.create();
+    private BiMap<Thread, EinzServerClientHandler> clientHandlerBiMap = HashBiMap.create(); // list of registered clients and ESCHs
 
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
@@ -45,7 +44,6 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      */
     public ThreadedEinzServer(Context applicationContext, int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
-        this.clientHandlerThreads = new ArrayList<Thread>();
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverManager = new EinzServerManager(this, serverFunctionDefinition);
         this.getServerManager().setServerFunctionInterface(serverFunctionDefinition);
@@ -127,7 +125,8 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             this.sherLock.writeLock().lock();// for firstconnection, so that it doesn't change and we get two admins
             EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface(),firstconnection);
             Thread thread = new Thread(ez);
-            clientHandlerThreads.add(thread);
+            clientHandlerBiMap.put(thread, ez);
+
             firstconnection = false; // the first user has connected, all others cannot be admin
             this.sherLock.writeLock().unlock();
             thread.start(); // start new thread for this client.
@@ -163,10 +162,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * THIS WILL PUT THE SERVER INTO UNDEFINED STATE. ONLY USE IT AS A KILL SWITCH
      */
     public void abortAllClientHandlers(){
-        for (Thread ez : clientHandlerThreads){
-            if(ez.getState() != Thread.State.TERMINATED)
-                ez.stop();
-        }
+        this.sherLock.writeLock().lock();
+            for (Thread ez : clientHandlerBiMap.keySet()) {
+                if (ez.getState() != Thread.State.TERMINATED)
+                    ez.stop();
+            }
+        this.sherLock.writeLock().unlock();
     }
 
     public int getPORT() {
@@ -234,10 +235,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * Waits for all clientHanlderThreads after kicking all clients. may take some time. You should consider running this method in a non-UI thread.
      */
     public void shutdown() {
+        Log.d("EinzServer/shutdown", "initiating shutdown...");
         stopListeningForIncomingConnections(true);
+        this.sherLock.writeLock().lock();
         getServerManager().kickAllAndCloseSockets();
         // waiting because clientHandlerThreads might still need this server
-        for(Thread t : this.clientHandlerThreads){
+        for(Thread t : this.clientHandlerBiMap.keySet()){
             try {
                 t.join();
             } catch (InterruptedException e) {
@@ -245,11 +248,13 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 e.printStackTrace();
             }
         }
+        this.sherLock.writeLock().unlock();
+        Log.d("EinzServer/shutdown", "finished shutting down server");
     }
 
     public void removeEinzServerClientHandlerFromClientHandlerList(EinzServerClientHandler handler) {
         this.sherLock.writeLock().lock();
-        this.clientHandlerThreads.
+        this.clientHandlerBiMap.inverse().remove(handler);
         this.sherLock.writeLock().unlock();
     }
 }

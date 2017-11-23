@@ -156,17 +156,19 @@ public class EinzServerClientHandler implements Runnable{
                 else{
                     Log.d("ESCH", "IOException but it's fine because I'm supposed to stop anyways.");
                 }
-
-                this.onClientDisconnected();
-                this.stopThreadPatiently();
-                this.onThreadEnded();
                 return;
             }
         }
+
+        this.onClientDisconnected();
+        this.stopThreadPatiently();
+        this.onThreadEnded();
     }
 
     private void onThreadEnded() {
+        Log.d("ESCH/"+getLatestUser(), "Thread ending...");
         parentEinzServer.removeEinzServerClientHandlerFromClientHandlerList(this);
+        Log.d("ESCH/"+getLatestUser(), "This should be the last you heard of this client handler thread");
     }
 
     /**
@@ -199,12 +201,15 @@ public class EinzServerClientHandler implements Runnable{
     }
 
 
+    /**
+     * Unregisters user
+     */
     private void onClientDisconnected(){
         if(!stopping && spin) {
             Log.d("ESCH/clientDisconnected", "IOException on socket - user probably lost connection");
+            parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
+            parentEinzServer.decNumClients();
         }
-        parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
-        parentEinzServer.decNumClients();
     }
 
     /**
