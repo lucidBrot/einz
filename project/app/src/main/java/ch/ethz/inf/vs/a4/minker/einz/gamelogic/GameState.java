@@ -141,6 +141,13 @@ public class GameState {
     }
 
     public Card drawOneCard(Player p){
+        /*
+         *  for rule in rules:
+         *      rule.isValidCardDraw()
+         *  drawCard
+         *  for rule in rules:
+         *      rule.onDrawCard()
+         */
         if (drawPile.size() < 1) {
             newStandartDeck();
         }

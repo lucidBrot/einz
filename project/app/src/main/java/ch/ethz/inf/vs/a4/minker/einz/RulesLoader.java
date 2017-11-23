@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz.rules;
+package ch.ethz.inf.vs.a4.minker.einz;
 
 import org.json.JSONObject;
 
@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule;
 
 /**
  * Created by Josua on 11/22/17.
