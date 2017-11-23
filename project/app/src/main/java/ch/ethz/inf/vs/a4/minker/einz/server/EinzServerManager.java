@@ -27,6 +27,7 @@ public class EinzServerManager {
 
     private final ThreadedEinzServer server;
     private ServerFunctionDefinition serverFunctionInterface;
+    private ReentrantReadWriteLock SFLock = new ReentrantReadWriteLock(); // lock when reading/writing to serverFunctionInterface by calling a function on there
     private boolean gamePhaseStarted;
 
     // These files are used to initialize the ActionFactories and ParserFactories of the EinzServerClientHandler threads
@@ -63,7 +64,10 @@ public class EinzServerManager {
     }
 
 
-    public void finishRegistrationPhaseAndStartGame(){
+    /**
+     * stops the server from accepting new connections, calls initialize on the serverFunctionDefinition
+     */
+    public void finishRegistrationPhaseAndInitGame(){
         Log.d("servMan", "finishing registrationphase.");
         userListLock.readLock().lock();
         server.stopListeningForIncomingConnections(true);
@@ -79,15 +83,16 @@ public class EinzServerManager {
                 spectators.add(new Spectator((String) entry.getKey()));
             }
             list.add(entry.getKey());
-            // TODO: send that info to clients. Fabian?
         }
         Log.d("servMan/finishRegPhase", "Players and Spectators: "+new JSONArray(list).toString());
         userListLock.readLock().unlock();
         userListLock.writeLock().lock();
         this.gamePhaseStarted = true;
         userListLock.writeLock().unlock();
+        SFLock.writeLock().lock();
         GameState gameState = getServerFunctionInterface().initialiseStandardGame(players, spectators); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
-
+        // TODO: not standard game but with rules, maybe call initialise earlier
+        SFLock.writeLock().lock();
     }
 
     public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
@@ -131,12 +136,11 @@ public class EinzServerManager {
         return s.hasNext() ? s.next() : "";
     }
 
+    /**
+     * @return the ServerFunctionDefinition by Fabian. Make sure to lock {@link #SFLock} for accessing this
+     */
     public ServerFunctionDefinition getServerFunctionInterface() {
         return serverFunctionInterface;
-    }
-
-    public void setServerFunctionInterface(ServerFunctionDefinition serverFunctionInterface) {
-        this.serverFunctionInterface = serverFunctionInterface;
     }
 
     private boolean isInvalidUsername(String username){
@@ -279,10 +283,6 @@ public class EinzServerManager {
             } else {
                 returnMessage = null; // null stands for successful kicking or that it wasn't a kick
                 Log.d("servMan/unregUser", "kicking "+username+"...");
-                if(gamePhaseStarted){
-                    // TODO: removeUser from fabian
-                    serverFunctionInterface.removePlayer(username);
-                }
             }
         }
         getUserListLock().readLock().unlock();
@@ -309,6 +309,17 @@ public class EinzServerManager {
             getRegisteredClientRoles().remove(username);
             getRegisteredClientHandlers().remove(username);
             userListLock.writeLock().unlock();
+
+            // tell fabian about it
+            if(gamePhaseStarted){
+                SFLock.writeLock().lock();
+                if(role.equals("player")) {
+                    serverFunctionInterface.removePlayer(username);
+                } else if(role.equals("specator")){
+                    // TODO: removeSpecator from fabian once the interface offers this
+                }
+                SFLock.writeLock().unlock();
+            }
 
             //broadcast updateLobbyList
             EinzMessage<EinzUpdateLobbyListMessageBody> msg = generateUpdateLobbyListRequest();
@@ -531,8 +542,10 @@ public class EinzServerManager {
 
     public void startGame(String issuedByPlayer) {
         if(isRegisteredAdmin(issuedByPlayer)) {
-            finishRegistrationPhaseAndStartGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
+            finishRegistrationPhaseAndInitGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
+            SFLock.writeLock().lock();
             serverFunctionInterface.startGame();
+            SFLock.writeLock().unlock();
         }
         else{
             Log.e("servMan", "somebody unauthorized tried to start the game!");

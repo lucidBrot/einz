@@ -210,6 +210,7 @@ public class EinzServerClientHandler implements Runnable{
             parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
             parentEinzServer.decNumClients();
         }
+        parentEinzServer.decNumClients();
     }
 
     /**

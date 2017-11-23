@@ -46,7 +46,6 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         this.PORT = PORT;
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverManager = new EinzServerManager(this, serverFunctionDefinition);
-        this.getServerManager().setServerFunctionInterface(serverFunctionDefinition);
         this.applicationContext = applicationContext;
     }
 
