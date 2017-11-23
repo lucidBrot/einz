@@ -1,18 +1,13 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
-import android.util.DebugUtils;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.BuildConfig;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
-import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
-import ch.ethz.inf.vs.a4.minker.einz.server.UserNotRegisteredException;
-import org.json.JSONException;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 
 public class EinzUnregisterRequestAction extends EinzAction {
     /**

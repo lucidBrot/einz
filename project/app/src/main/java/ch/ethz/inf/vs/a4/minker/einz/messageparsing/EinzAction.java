@@ -1,9 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
-import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
-import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 
 /**
  * Specifies that an EinzAction should have a function run which will run the action.

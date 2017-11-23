@@ -1,6 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz.server;
-
-import android.widget.GridLayout;
+package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +6,6 @@ import java.util.HashSet;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardColors;
-import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
 
@@ -69,7 +66,7 @@ public interface ServerFunctionDefinition {
         public GameState initialiseStandartGame(ArrayList<Player> players, HashSet<Spectator> spectators);
 
         //sends all players the message that the game started
-        //sends all players the relevant information they need to have (defined in GlobalInfo and PlayerInfo)
+        //sends all players the relevant information they need to have (defined in GlobalState and PlayerState)
         public void startGame();
 
         //player p plays a card

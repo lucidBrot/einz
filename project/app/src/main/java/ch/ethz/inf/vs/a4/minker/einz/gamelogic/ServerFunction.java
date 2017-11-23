@@ -1,4 +1,6 @@
-package ch.ethz.inf.vs.a4.minker.einz.server;
+package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
+
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,11 +8,13 @@ import java.util.HashSet;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardColors;
-import ch.ethz.inf.vs.a4.minker.einz.CardTypes;
-import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
-import ch.ethz.inf.vs.a4.minker.einz.PlayerActions;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
+import ch.ethz.inf.vs.a4.minker.einz.server.UserNotRegisteredException;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -101,7 +105,7 @@ public class ServerFunction implements ServerFunctionDefinition {
     }
 
     //sends all players the message that the game started
-    //sends all players the relevant information they need to have (defined in GlobalInfo and PlayerInfo)
+    //sends all players the relevant information they need to have (defined in GlobalState and PlayerState)
     public void startGame(){
         //TODO: Implement
 
@@ -112,8 +116,10 @@ public class ServerFunction implements ServerFunctionDefinition {
         if (isPlayable(card, p)){
             gameState.playCardFromHand(card, p);
             gameState.cardEffect(card);
+            sendPlayCardResponse(p);
+            sendState(p);
             if (hasWon(p)){
-                removePlayer(p);
+                //removePlayer(p);
             }
             return true;
         } else {
@@ -165,7 +171,27 @@ public class ServerFunction implements ServerFunctionDefinition {
                 if (gameState.getPlayers().size() < 2){
                     endGame();
                 }
+                break;
             }
         }
+    }
+
+    public void sendPlayCardResponse(Player p){
+        /*
+        EinzMessageHeader header = new EinzMessageHeader("playcard", "PlaycardResponse");
+        EinzPlayCardResponseMessageBody body = new EinzPlayCardResponseMessageBody("true");
+        EinzMessage<EinzPlayCardResponseMessageBody> message = new EinzMessage<>(header, body);
+        try {
+            threadedEinzServer.sendMessageToUser(p.getName(), message);
+        } catch (UserNotRegisteredException e) {
+            gameState.removePlayer(p);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        */
+    }
+
+    public void sendState(Player p){
+        //TODO: implement this after building State Messages to send works
     }
 }

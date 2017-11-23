@@ -1,10 +1,18 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
+
+import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.CardColors;
+import ch.ethz.inf.vs.a4.minker.einz.CardTypes;
+import ch.ethz.inf.vs.a4.minker.einz.Order;
+import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.Spectator;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalState;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -28,6 +36,9 @@ public class GameState {
     //This indicates how many cards a player has to draw if he can't play a card on his turn
     //Special rules apply when this is greater than one (which means there lie some active plusTwo or changeColorPlusFour cards)
     private int threatenedCards = 1;
+    //saves the GlobalStateexplicitly to easily send it to Clients wehenver needed
+    //TODO: instatiate this upon initialiseGame
+    private GlobalState globalState;
 
 
     //Conctrsuctors
@@ -87,7 +98,7 @@ public class GameState {
 
     public ArrayList<Player> getPlayers(){
         return players;
-    }
+    } //TODO; Don't return the private ArrayList
     public Order getOrder(){
         return order;
     }
@@ -179,8 +190,8 @@ public class GameState {
     //allows multiple people to have the same name (as long as they have different IPs
     public void addPlayer (String name){
         boolean newName = true;
-        for (int i = 0; i < players.size(); i++){
-            if (players.get(i).name.equals(name)){
+        for (Player p: players){
+            if (p.getName().equals(name)){
                 newName = false;
                 break;
             }
@@ -192,17 +203,17 @@ public class GameState {
         }
     }
 
-    public void addPlayer (Player p){
+    public void addPlayer (Player player){
         boolean newName = true;
-        for (int i = 0; i < players.size(); i++){
-            if (players.get(i).name.equals(p.name)){
+        for (Player p: players){
+            if (p.getName().equals(player.getName())){
                 newName = false;
                 break;
             }
         }
         if (newName) {
             players.ensureCapacity(players.size() + 1);
-            players.add(p);
+            players.add(player);
         }
     }
 
@@ -215,7 +226,9 @@ public class GameState {
     }
 
     public void playerWon(Player p){
-       // players.remove(p);
+       //TODO: Implement
+        // Remove player from the game and save that he is finsihed so we can build a list of
+        // finished players at the end of the game
     }
 
     public void newStandartDeck(){
@@ -303,20 +316,8 @@ public class GameState {
         }
     }
 
-    public void updatePlayerInfo(Player p) {
-        p.playerInfo.handCards.clear();
-        p.playerInfo.possibleActions.clear();
-        for (Card c : p.hand) {
-            p.playerInfo.handCards.add(c.ID);
-            if (isPlayable(c, p)){
-                p.playerInfo.possibleActions.add(PlayerActions.CANPLAY);
-            }
-        }
-        if (!hasDrawn) {
-            p.playerInfo.possibleActions.add(PlayerActions.CANDRAW);
-        } else {
-            p.playerInfo.possibleActions.add(PlayerActions.ENDTURN);
-        }
+    public void updatePlayerState(Player p) {
+        //TODO: implement
     }
 
     public boolean isPlayable (Card card, Player p) {

@@ -2,11 +2,10 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
 import android.support.annotation.Nullable;
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
+
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
-import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

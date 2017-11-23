@@ -1,18 +1,14 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
-import android.content.Context;
 import android.util.Log;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.concurrent.ThreadLocalRandom;
 
-import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
-import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunction;
-import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.GameState;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 
-import static android.support.test.InstrumentationRegistry.getContext;
 import static junit.framework.Assert.assertEquals;
 
 /**
@@ -58,7 +54,7 @@ public class ServerFunctionTests {
         for (int i = 0; i < 50; i++) {
             boolean hasPlayed = false;
             Player p = gameState.getActivePlayer();
-            String logString = p.name+": ";
+            String logString = p.getName()+": ";
             for (Card card : p.hand){
                 logString = logString + "("+card.color+","+card.type+","+card.wish+"), ";
             }
@@ -66,7 +62,7 @@ public class ServerFunctionTests {
             Card c = serverFunction.topCard();
             Log.i("State1", "topCard: ("+c.color+","+c.type+","+c.wish+")");
             Log.i("State2", logString);
-            if (p.name.equals("Peter")) {
+            if (p.getName().equals("Peter")) {
                 APN = 0;
             } else {
                 APN = 1;
@@ -128,7 +124,7 @@ public class ServerFunctionTests {
         for (int i = 0; i < 200; i++) {
             boolean hasPlayed = false;
             Player p = gameState.getActivePlayer();
-            String logString = p.name+": ";
+            String logString = p.getName()+": ";
             for (Card card : p.hand){
                 logString = logString + "("+card.color+","+card.type+","+card.wish+"), ";
             }
@@ -136,11 +132,11 @@ public class ServerFunctionTests {
             Card c = serverFunction.topCard();
             Log.i("State1", "topCard: ("+c.color+","+c.type+","+c.wish+")");
             Log.i("State2", logString);
-            if (p.name.equals("Donald")) {
+            if (p.getName().equals("Donald")) {
                 APN = 0;
-            } else if (p.name.equals("Tick")){
+            } else if (p.getName().equals("Tick")){
                 APN = 1;
-            } else if (p.name.equals("Trick")) {
+            } else if (p.getName().equals("Trick")) {
                 APN = 2;
             } else {
                 APN =3;
