@@ -83,7 +83,7 @@ public class EinzActionFactory {
      * Takes an EinzMessage and returns its mapping.
      * This does not keep the object, only its type!
      * @param e
-     * @return null if mapping does not exist, else the Class you want // TODO: Default Action?
+     * @return null if mapping does not exist, else the Class you want
      */
     public Class<? extends EinzAction> getMapping(EinzMessage e){
         Log.d("ActionFactory", "Getting mapping for body type "+e.getBody().getClass());
