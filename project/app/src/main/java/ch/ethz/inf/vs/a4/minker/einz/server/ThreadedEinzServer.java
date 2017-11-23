@@ -7,6 +7,8 @@ import ch.ethz.inf.vs.a4.minker.einz.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,6 +32,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private ServerSocket serverSocket;
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
     private ArrayList<Thread> clientHandlerThreads; // list of registered clients. use .getState to check if it is still running
+    private BiMap<Thread, EinzServerClientHandler> clientHandlerBiMap = HashBiMap.create();
 
     private int numClients;
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
@@ -242,5 +245,11 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 e.printStackTrace();
             }
         }
+    }
+
+    public void removeEinzServerClientHandlerFromClientHandlerList(EinzServerClientHandler handler) {
+        this.sherLock.writeLock().lock();
+        this.clientHandlerThreads.
+        this.sherLock.writeLock().unlock();
     }
 }

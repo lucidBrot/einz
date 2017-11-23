@@ -138,7 +138,8 @@ public class EinzServerClientHandler implements Runnable{
                     socketWriteLock.lock();
                     socket.close();
                     socketWriteLock.unlock();
-                    parentEinzServer.decNumClients();
+                    onClientDisconnected();
+                    stopThreadPatiently();
                     Log.d("ESCH", "closed clientSocket");
                     return;
                 } else {
@@ -158,9 +159,14 @@ public class EinzServerClientHandler implements Runnable{
 
                 this.onClientDisconnected();
                 this.stopThreadPatiently();
+                this.onThreadEnded();
                 return;
             }
         }
+    }
+
+    private void onThreadEnded() {
+        parentEinzServer.removeEinzServerClientHandlerFromClientHandlerList(this);
     }
 
     /**
@@ -198,6 +204,7 @@ public class EinzServerClientHandler implements Runnable{
             Log.d("ESCH/clientDisconnected", "IOException on socket - user probably lost connection");
         }
         parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
+        parentEinzServer.decNumClients();
     }
 
     /**
