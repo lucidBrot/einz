@@ -137,7 +137,7 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
           }
         }
          */
-        EinzMessageHeader emh = new EinzMessageHeader("registration", "register");
+        EinzMessageHeader emh = new EinzMessageHeader("registration", "Register");
         String username, role;
         JSONObject body = message.getJSONObject("body");
         username = body.getString("username");
@@ -166,7 +166,7 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
           }
         }
          */
-        EinzMessageHeader emh = new EinzMessageHeader("registration", "RegisterResponse");
+        EinzMessageHeader emh = new EinzMessageHeader("registration", "RegisterSuccess");
         JSONObject body = message.getJSONObject("body");
         EinzRegisterSuccessMessageBody emb = new EinzRegisterSuccessMessageBody(body.getString("username"), body.getString("role"));
         return new EinzMessage<>(emh, emb);

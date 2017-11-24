@@ -63,7 +63,7 @@ public class EinzStateInfoParser extends EinzParser {
         }
         String whoseturn = globalstateJSON.getString("whoseturn");
         String drawxcardsmin = globalstateJSON.getString("drawxcardsmin");
-        GlobalState globalstate = new GlobalState(numcardsinhand, stack, whoseturn, drawxcardsmin);
+        GlobalStateParser globalstate = new GlobalStateParser(numcardsinhand, stack, whoseturn, drawxcardsmin);
 
         //get playerstate
         JSONObject playerstateJSON = body.getJSONObject("playerstate");

@@ -15,13 +15,13 @@ import ch.ethz.inf.vs.a4.minker.einz.Card;
  * Created by silvia on 11/17/17.
  */
 //this class is used for EinzSendStateMessageBody
-public class GlobalState {
+public class GlobalStateParser {
     private HashMap<String, Integer> numcardsinhand;
     private ArrayList<Card> stack;
     private String whoseTurn;
     private String drawxCardsMin;
 
-    public GlobalState(HashMap<String, Integer> numcardsinhand, ArrayList<Card> stack, String whoseTurn, String drawxCardsMin){
+    public GlobalStateParser(HashMap<String, Integer> numcardsinhand, ArrayList<Card> stack, String whoseTurn, String drawxCardsMin){
         this.numcardsinhand = numcardsinhand;
         this.stack = stack;
         this.whoseTurn = whoseTurn;
@@ -67,7 +67,7 @@ public class GlobalState {
         for (Map.Entry<String, Integer> entry : numcardsinhand.entrySet()) {
             String name = entry.getKey();
             Integer number = entry.getValue();
-            numcardsinhandJSON.put(name, number);
+            numcardsinhandJSON.put(name, number.toString());
         }
         //build stack object
         JSONArray stackJSON = new JSONArray();
@@ -75,7 +75,8 @@ public class GlobalState {
         for (int i = 0; i<stack.size(); i++){
             Card card = stack.get(i);
             JSONObject cardJSON = new JSONObject();
-            cardJSON.put(card.ID, card.origin);
+            cardJSON.put("origin", card.origin);
+            cardJSON.put("ID", card.ID);
             stackJSON.put(i, cardJSON);
         }
         //get whoseturn

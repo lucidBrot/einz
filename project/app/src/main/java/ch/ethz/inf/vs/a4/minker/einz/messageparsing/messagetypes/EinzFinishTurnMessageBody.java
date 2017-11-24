@@ -12,7 +12,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 public class EinzFinishTurnMessageBody extends EinzMessageBody {
     @Override
     public JSONObject toJSON() throws JSONException {
-        return null;
+        return new JSONObject();
     }
 }
 /*
