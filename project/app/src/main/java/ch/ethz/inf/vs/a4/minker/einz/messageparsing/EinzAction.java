@@ -44,6 +44,19 @@ public abstract class EinzAction {
         this.clientActionCallbackInterface = clientActionCallbackInterface;
     }
 
+    /**
+     * Only needs the params your action needs. null is possibly fine.
+     * Backwards compatibility for serverside actions. Client cannot use this.
+     * @param sInterface
+     * @param serverManager
+     * @param params must be of a Messagetype fitting to (expected by)this action
+     * @param issuedByPlayer
+     * @param issuedByClientHandler
+     */
+    public EinzAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler){
+        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, null, null);
+    }
+
     public ServerFunctionDefinition getsInterface() {
         return sInterface;
     }
