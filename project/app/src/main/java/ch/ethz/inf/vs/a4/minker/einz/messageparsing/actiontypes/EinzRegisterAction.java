@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
+import ch.ethz.inf.vs.a4.minker.einz.client.ClientActionCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
@@ -25,6 +26,13 @@ public class EinzRegisterAction extends EinzAction{
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
         this.params = params;
         this.body = params.getBody();
+    }
+
+    /**
+     * compatibility for new actionfactory (for client)
+     */
+    public EinzRegisterAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
     }
 
     /**

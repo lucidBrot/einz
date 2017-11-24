@@ -20,10 +20,39 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
     private EinzActionFactory actionFactory;
     private Context appContext;
     private EinzClientConnection clientConnection;
+    private ClientActionCallbackInterface actionsCallback;
 
     public ClientMessenger(Context appContext){
         // initialize local variables
         this.appContext = appContext;
+        this.parserFactory = new EinzParserFactory();
+        actionsCallback = new ClientActionCallbackInterface() {
+            @Override
+            public int hashCode() {
+                return super.hashCode();
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                return super.equals(obj);
+            }
+
+            @Override
+            protected Object clone() throws CloneNotSupportedException {
+                return super.clone();
+            }
+
+            @Override
+            public String toString() {
+                return super.toString();
+            }
+
+            @Override
+            protected void finalize() throws Throwable {
+                super.finalize();
+            }
+        }; // TODO: specify this interface and implement some handling
+        this.actionFactory = new EinzActionFactory(actionsCallback);
 
         // initialize Factories by loading the mappings from the specified files above
         initializeParserFactory(); // from messagegroup to Parser
