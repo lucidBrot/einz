@@ -29,7 +29,6 @@ public class EinzClient implements Runnable {
         this.clientMessenger = new ClientMessenger(appContext, this.actionCallbackInterface);
         this.connection = new EinzClientConnection(serverIP, serverPort, clientMessenger);
         this.username = username;
-
     }
 
     /**
@@ -41,7 +40,8 @@ public class EinzClient implements Runnable {
         this.clientConnectionThread.start(); // establish connection
 
         // TODO: register and all other messages
-        Log.d("EinzClient/run", "server is up methinks");
+        Log.d("EinzClient/run", "server is up methinks"); // if server is running on localhost, it told us when it was ready to accept connections
+        // still need to spin until isConnected to make sure we do not send register message before connecting, thus losing that message
 
         // send messages in background because android does not allow networking in main thread
         (new Thread(new Runnable() {
