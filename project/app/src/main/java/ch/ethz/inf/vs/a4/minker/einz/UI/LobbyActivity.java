@@ -87,8 +87,8 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         Log.d("serverSetupActivity", "startServer was pressed");
         if(serverThread==null) { // only create one server
             serverLogicInterface = new ServerFunction(); // Fabians Part
-            server = new ThreadedEinzServer(this.getApplicationContext(), 8080, this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
-            // TODO: replace this with the call for an arbitrary port ( remove 8080 )
+            server = new ThreadedEinzServer(this.getApplicationContext(), this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
+            server.setDEBUG_ONE_MSG(false); // set to true to let server generate messages on same host
             serverThread = new Thread(server);
             serverThread.start();
         }

@@ -27,7 +27,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private int PORT;
     private boolean shouldStopSpinning = false;
     private ServerSocket serverSocket;
-    private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client
+
+    public void setDEBUG_ONE_MSG(boolean DEBUG_ONE_MSG) {
+        this.DEBUG_ONE_MSG = DEBUG_ONE_MSG;
+    }
+
+    private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client. is set to false if PORT is 0
     private BiMap<Thread, EinzServerClientHandler> clientHandlerBiMap = HashBiMap.create(); // list of registered clients and ESCHs
 
     private int numClients;
@@ -40,16 +45,19 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     /**
      * @param serverActivityCallbackInterface can be null if you don't want to be informed about numClients change
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
+     *             if PORT is 0, sets {@link #DEBUG_ONE_MSG} to false
      */
     public ThreadedEinzServer(Context applicationContext, int PORT, @Nullable  ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
+        if(PORT==0)
+            this.DEBUG_ONE_MSG=false;
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverManager = new EinzServerManager(this, serverFunctionDefinition);
         this.applicationContext = applicationContext;
     }
 
     /**
-     * Listen on any one free port. Dispatch an EinzServerThread for every Connection
+     * Listen on any one free port. Dispatch an EinzServerThread for every Connection. Disables {@link #DEBUG_ONE_MSG}
      * @param serverActivityCallbackInterface if you want to be informed on events such as change in number of clients or that the server has started up
      */
     public ThreadedEinzServer(Context applicationContext, @Nullable ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
@@ -57,6 +65,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     }
 
     /**
+     * Disbles {@link #DEBUG_ONE_MSG}
      * Runs the server on any free port and doesn't use the serverActivityCallbackInterface, because you might not need this unless you're the admin
      * @param applicationContext
      * @param serverFunctionDefinition
