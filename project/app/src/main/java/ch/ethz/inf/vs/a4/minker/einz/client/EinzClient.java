@@ -72,7 +72,8 @@ public class EinzClient implements Runnable {
             public void run() {
                 while (!connection.isConnected()) {
                     try {
-                        sleep(1); // wait for server ready
+                        sleep(10000); // wait for server ready. it works if you put a breakpoint on the line with "new Thread(", so waiting should help
+                        // TODO: this is ugly. better idea?
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
