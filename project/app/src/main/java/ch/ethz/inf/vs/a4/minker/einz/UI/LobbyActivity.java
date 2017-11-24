@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Locale;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Lobby List. corresponds to screen 3 in our proposal
  */
@@ -86,9 +88,9 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         ((TextView) findViewById(R.id.tv_lobby_port)).setText(p);
 
         // <Debug>
-        TempClient.SERVER_PORT=port;
-        TempClient.SERVER_IP=ip;
-        //</debug>
+        //this.ip="127.0.0.1";
+        //this.port=8080;
+        // </Debug>
     }
 
     private void startServer() {
@@ -165,14 +167,18 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     @Override
     public void onLocalServerReady() {
         Log.d("LobbyActivity", "local server ready. Connecting...");
-        connectClientToLocalServer();
         setIPAndPort(server);
+        try {
+            sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        connectClientToLocalServer();
     }
 
     private void connectClientToLocalServer() {
         this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext());
-        this.ourClientThread = new Thread(this.ourClient);
-        this.ourClientThread.start();
+        this.ourClient.run();
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
 }

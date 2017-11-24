@@ -18,6 +18,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * This class handles one Connection per instance (thread)
  */
 public class EinzServerClientHandler implements Runnable{
+
     public Socket socket;
 
     private boolean spin = false;
@@ -148,7 +149,7 @@ public class EinzServerClientHandler implements Runnable{
                     return;
                 } else {
                     Log.d("ESCH", "received line: "+line);
-                    sendMessage("Your Package was: "+line + "\r\n"); // echo back the same packet // TODO: don't echo back
+                    if(parentEinzServer.DEBUG_ECHO) sendMessage("Your Package was: "+line + "\r\n"); // echo back the same packet // T/ODO: don't echo back
                     runAction(parseMessage(line));
 
                 }

@@ -28,9 +28,11 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private int PORT;
     private boolean shouldStopSpinning = false;
     private ServerSocket serverSocket;
+    public boolean DEBUG_ECHO = true;
 
     public void setDEBUG_ONE_MSG(boolean DEBUG_ONE_MSG) {
         this.DEBUG_ONE_MSG = DEBUG_ONE_MSG;
+        this.DEBUG_ECHO = DEBUG_ONE_MSG;
     }
 
     private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client. is set to false if PORT is 0
@@ -52,6 +54,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         this.PORT = PORT;
         if(PORT==0) {
             this.DEBUG_ONE_MSG = false;
+            this.DEBUG_ECHO = false;
         }
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverManager = new EinzServerManager(this, serverFunctionDefinition);

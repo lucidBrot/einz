@@ -13,7 +13,7 @@ import java.net.Socket;
 /**
  * call {@link #run} to actually connect
  */
-public class EinzClientConnection {
+public class EinzClientConnection implements Runnable{
 
     private final String serverIP;
     private final int serverPort;
@@ -23,6 +23,7 @@ public class EinzClientConnection {
     private PrintWriter bufferOut;
     // used to read messages from the server
     private BufferedReader bufferIn;
+    private Socket socket;
     private EinzClientConnection.OnMessageReceived mMessageListener = null; // interface on message received
 
     /**
@@ -62,9 +63,7 @@ public class EinzClientConnection {
      */
     public void sendMessage(JSONObject message){
         String msg = message.toString();
-        if(!msg.endsWith("\n")){
-            msg += "\r\n";
-        }
+            // don't add \r\n because println
         sendMessage(msg);
     }
 
@@ -98,7 +97,7 @@ public class EinzClientConnection {
             Log.d("EinzClientConnection", "Connecting to "+serverIP +":"+serverPort);
 
             //create a socket to make the connection with the server
-            Socket socket = new Socket(serverAddr, serverPort);
+            socket = new Socket(serverAddr, serverPort);
 
             try {
 
@@ -162,7 +161,16 @@ public class EinzClientConnection {
         // TODO: is it ok to abort like this?
     }
 
+    /**
+     * Returns the connection state of the socket.
+     Note: Closing a socket doesn't clear its connection state, which means this method will return true for a closed socket (see isClosed()) if it was successfuly connected prior to being closed.
+     */
+    public boolean isConnected(){
+        return (this.socket==null || this.socket.isConnected());
+    }
+
     public interface OnMessageReceived {
         public void messageReceived(String message);
     }
+
 }
