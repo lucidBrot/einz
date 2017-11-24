@@ -28,7 +28,7 @@ public class EinzPlayCardResponseAction extends EinzAction {
      * compatibility for new actionfactory (for client)
      */
     public EinzPlayCardResponseAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
-        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
+        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
     }
 
     @Override

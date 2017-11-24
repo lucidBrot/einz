@@ -23,16 +23,16 @@ public class EinzRegisterAction extends EinzAction{
      * @param issuedByClientHandler
      */
     public EinzRegisterAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage<EinzRegisterMessageBody> params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
-        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
-        this.params = params;
-        this.body = params.getBody();
+        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, null, null);
     }
 
     /**
      * compatibility for new actionfactory (for client)
      */
-    public EinzRegisterAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
-        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
+    public EinzRegisterAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage<EinzRegisterMessageBody> params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
+        this.params=params;
+        this.body=params.getBody();
     }
 
     /**

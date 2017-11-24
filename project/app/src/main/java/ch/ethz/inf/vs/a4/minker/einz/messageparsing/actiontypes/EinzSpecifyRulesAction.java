@@ -20,15 +20,15 @@ public class EinzSpecifyRulesAction extends EinzAction {
      * @param issuedByClientHandler
      */
     public EinzSpecifyRulesAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
-        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
-        this.body = (EinzSpecifyRulesMessageBody) params.getBody();
+        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, null, null);
     }
 
     /**
      * compatibility for new actionfactory (for client)
      */
     public EinzSpecifyRulesAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
-        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
+        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
+        this.body = (EinzSpecifyRulesMessageBody) params.getBody();
     }
 
     /**

@@ -22,7 +22,15 @@ public class EinzUnmappedAction extends EinzAction {
      * @param issuedByClientHandler
      */
     public EinzUnmappedAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
-        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
+        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, null, null);
+
+    }
+
+    /**
+     * compatibility for new actionfactory (for client)
+     */
+    public EinzUnmappedAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
         this.message = getMessage();
         String m;
         try {
@@ -32,13 +40,6 @@ public class EinzUnmappedAction extends EinzAction {
             m="not set";
         }
         messageString=m;
-    }
-
-    /**
-     * compatibility for new actionfactory (for client)
-     */
-    public EinzUnmappedAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
-        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
     }
 
     @Override
