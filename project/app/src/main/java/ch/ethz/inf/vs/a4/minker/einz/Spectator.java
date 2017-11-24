@@ -1,17 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
-public class Spectator {
-    private String name;
+public class Spectator extends Participant{
 
     public Spectator(String name) {
-        this.name = name;
+        super(name);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

@@ -4,7 +4,7 @@ package ch.ethz.inf.vs.a4.minker.einz;
  * Created by Fabian on 13.11.2017.
  */
 
-public enum CardTypes {
+public enum CardText {
     ZERO("zero"),
     ONE("one"),
     TWO("two"),
@@ -22,7 +22,7 @@ public enum CardTypes {
     CHANGECOLORPLUSFOUR("changeColorPlusFour");
 
     public String type;
-    CardTypes(String type){
+    CardText(String type){
         this.type = type;
     }
 }

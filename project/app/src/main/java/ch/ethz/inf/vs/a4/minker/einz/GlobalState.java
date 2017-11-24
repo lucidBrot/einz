@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz;
 import org.json.JSONObject;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,15 @@ import java.util.Stack;
  */
 
 public class GlobalState {
+
+    /*
+    discard pile
+    activePlayer
+    nextPlayer
+    order
+    allPlayers
+    gameFinished
+     */
     private Stack<Card> discardPile;
     private Queue<Card> drawPile;
     private Player activePlayer;
@@ -36,14 +46,13 @@ public class GlobalState {
         this.discardPile = discardPile;
         this.discardPile = discardPile;
         this.drawPile = new LinkedList<>(drawPile);
-
     }
 
     public List<Card> getDiscardPile() {
         return discardPile.subList(0, discardPile.size() - 1);
     }
 
-    public void playCatd(Card card){
+    public void playCard(Card card){
         discardPile.add(card);
     }
 

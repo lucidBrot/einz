@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.temp;
 
 /**
  * Created by Fabian on 13.11.2017.

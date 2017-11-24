@@ -9,17 +9,13 @@ import java.util.Set;
  */
 
 public class GameConfig {
-    /**
-     * all rules
-     * rules mapping
-     *
-     */
+
     Map<Card,Set<BasicRule>> rulePerCard;
 
     Set<BasicRule> allRules;
 
     Set<Card> allCardsInGame;
 
-
+    List<Participant> allParticipants;
 
 }

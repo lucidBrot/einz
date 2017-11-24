@@ -8,8 +8,8 @@ import java.util.Stack;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardColors;
-import ch.ethz.inf.vs.a4.minker.einz.CardTypes;
-import ch.ethz.inf.vs.a4.minker.einz.Order;
+import ch.ethz.inf.vs.a4.minker.einz.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.temp.Order;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalState;
@@ -240,8 +240,8 @@ public class GameState {
 
     public void newStandartDeck(){
         //go over the cards and add them to the deck twice each
-        for (CardTypes ct: CardTypes.values()) {
-            if (ct != CardTypes.CHANGECOLOR && ct != CardTypes.CHANGECOLORPLUSFOUR) {
+        for (CardText ct: CardText.values()) {
+            if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR) {
                 for (CardColors cc : CardColors.values()) {
                     if (cc != CardColors.NONE) {
                         Card card = new Card(ct, cc);
@@ -307,13 +307,13 @@ public class GameState {
     public boolean specialPlayRules(Card bottomCard, Card topCard){
         switch (topCard.type){
             case PLUSTWO:
-                if (bottomCard.type == CardTypes.PLUSTWO){
+                if (bottomCard.type == CardText.PLUSTWO){
                     return true;
                 } else {
                     return false;
                 }
             case CHANGECOLORPLUSFOUR:
-                if (bottomCard.type == CardTypes.CHANGECOLORPLUSFOUR){
+                if (bottomCard.type == CardText.CHANGECOLORPLUSFOUR){
                     return true;
                 } else {
                     return false;

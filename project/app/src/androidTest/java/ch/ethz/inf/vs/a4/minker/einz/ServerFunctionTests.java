@@ -69,8 +69,8 @@ public class ServerFunctionTests {
             }
             for (Card card : p.hand) {
                 if (serverFunction.isPlayable(card, p) && hasPlayed == false) {
-                    if (card.type.equals(CardTypes.CHANGECOLORPLUSFOUR) ||
-                            card.type.equals(CardTypes.CHANGECOLOR)){
+                    if (card.type.equals(CardText.CHANGECOLORPLUSFOUR) ||
+                            card.type.equals(CardText.CHANGECOLOR)){
                         card.wish =  CardColors.BLUE;
                     }
                     serverFunction.play(card, p);
@@ -143,8 +143,8 @@ public class ServerFunctionTests {
             }
             for (Card card : p.hand) {
                 if (serverFunction.isPlayable(card, p) && hasPlayed == false) {
-                    if (card.type.equals(CardTypes.CHANGECOLORPLUSFOUR) ||
-                            card.type.equals(CardTypes.CHANGECOLOR)){
+                    if (card.type.equals(CardText.CHANGECOLORPLUSFOUR) ||
+                            card.type.equals(CardText.CHANGECOLOR)){
                         card.wish =  CardColors.BLUE;
                     }
                     serverFunction.play(card, p);

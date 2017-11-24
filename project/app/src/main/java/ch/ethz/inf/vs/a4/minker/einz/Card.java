@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 public class Card {
 
-    public Card (CardTypes type, CardColors color){
+    public Card (CardText type, CardColors color){
         //This is used for cards which don't need the "wish" to function properly
 
         this.type = type;
@@ -26,7 +26,7 @@ public class Card {
     }
 
     //type determines what kind of card you play. This can be "zero", "one", "plusTwo", ...
-    public CardTypes type;
+    public CardText type;
     //color determines the color of the card. If the card has no color, it is "none"
     public CardColors color;
     //when playing certain cards, you can choose something (e.g. a color)
