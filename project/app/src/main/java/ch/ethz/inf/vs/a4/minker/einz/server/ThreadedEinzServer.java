@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import com.google.common.collect.BiMap;
@@ -49,8 +50,9 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      */
     public ThreadedEinzServer(Context applicationContext, int PORT, @Nullable  ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
-        if(PORT==0)
-            this.DEBUG_ONE_MSG=false;
+        if(PORT==0) {
+            this.DEBUG_ONE_MSG = false;
+        }
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverManager = new EinzServerManager(this, serverFunctionDefinition);
         this.applicationContext = applicationContext;
@@ -115,7 +117,8 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         //DEBUG: Simulate a message from a client
         if(DEBUG_ONE_MSG){
             Log.d("EinzServer", "DEBUG_ONE_MSG: Will simulate messages from a client");
-            DEBUG_ONE_MSG = false;
+            DEBUG_ONE_MSG = false; // only on first launch call, whyever you would call that more often
+            // ip and port are specified from tempclient
             Debug.debug_simulateClient1();
             Debug.debug_simulateClient2();
         }

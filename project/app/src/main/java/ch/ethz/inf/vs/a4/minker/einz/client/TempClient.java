@@ -19,8 +19,8 @@ import java.net.Socket;
  */
 public class TempClient {
 
-    public static final String SERVER_IP = "127.0.0.1"; //server IP address
-    public static final int SERVER_PORT = 8080;
+    public static String SERVER_IP = "127.0.0.1"; //server IP address
+    public static int SERVER_PORT = 8080;
     // message to send to the server
     private String mServerMessage;
     // sends message received notifications

@@ -12,6 +12,7 @@ import android.widget.TextView;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClientConnection;
 import ch.ethz.inf.vs.a4.minker.einz.client.LobbyUIInterface;
+import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
@@ -81,13 +82,19 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         this.port = einzServer.getPORT();
         String p = "PORT: "+String.valueOf(port);
         ((TextView) findViewById(R.id.tv_lobby_port)).setText(p);
+
+        // <Debug>
+        TempClient.SERVER_PORT=port;
+        TempClient.SERVER_IP=ip;
+        //</debug>
     }
 
     private void startServer() {
         Log.d("serverSetupActivity", "startServer was pressed");
         if(serverThread==null) { // only create one server
             serverLogicInterface = new ServerFunction(); // Fabians Part
-            server = new ThreadedEinzServer(this.getApplicationContext(), this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
+            ///server = new ThreadedEinzServer(this.getApplicationContext(), this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
+            server = new ThreadedEinzServer(this.getApplicationContext(),8080, this, serverLogicInterface);
             server.setDEBUG_ONE_MSG(false); // set to true to let server generate messages on same host
             serverThread = new Thread(server);
             serverThread.start();
