@@ -142,7 +142,7 @@ public class EinzActionFactory {
     public EinzAction generateEinzAction(EinzMessage message, @Nullable String issuedBy){
         if(message == null){
             Log.e("ActionFactory", "Message was null.");
-            return new EinzUnmappedAction(sInterface, sManager, message, issuedBy, clientHandler);
+            return new EinzUnmappedAction(sInterface, sManager, message, issuedBy, clientHandler); //TODO: use full constructor for unmappedaction
         }
         try {
             Class<? extends  EinzAction> mapping = getMapping(message);
@@ -152,7 +152,7 @@ public class EinzActionFactory {
                 return new EinzUnmappedAction(sInterface, sManager, message, issuedBy, clientHandler);
             }
 
-            EinzAction ret = mapping.getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
+            EinzAction ret = mapping.getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class, ClientActionCallbackInterface.class, Object.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler, this.clientActionCallbackInterface, this.completelyCustomObject);
 
             Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
 
