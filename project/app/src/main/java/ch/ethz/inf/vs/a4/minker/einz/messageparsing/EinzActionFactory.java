@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKickAction;
@@ -13,8 +14,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Scanner;
 
 public class EinzActionFactory {
 
@@ -96,7 +99,8 @@ public class EinzActionFactory {
     /**
      * This can fail in <b>so</b> many ways
      * @param message some Message that is the key to the Action
-     * @param issuedBy the username who issued this action or null if irrelevant and unknown
+     * @param issuedBy the username who issued this action or null if irrelevant and unknown.
+     *                 The server-side has multiple connections and thus needs this field. the client probably doesn't care
      * @return the action, (or null, but I don't think so, if this messagetype was not registered or it failed for some other reason, or maybe just the empty {@link ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnmappedAction})
      */
     @Nullable
@@ -190,5 +194,18 @@ public class EinzActionFactory {
                 }
             }
         }
+    }
+
+    public void loadMappingsFromResourceFile(Context applicationContext, int resourceFile) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        InputStream jsonStream = applicationContext.getResources().openRawResource(resourceFile);
+        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
+        this.loadMappingsFromJson(jsonObject);
+    }
+
+    // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
+    // utility function
+    private String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }

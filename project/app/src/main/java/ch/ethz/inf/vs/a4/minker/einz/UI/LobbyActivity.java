@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import ch.ethz.inf.vs.a4.minker.einz.R;
-import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
+import ch.ethz.inf.vs.a4.minker.einz.client.EinzClientConnection;
 import ch.ethz.inf.vs.a4.minker.einz.client.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -34,7 +34,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private ThreadedEinzServer server; // there should be only one
     private Thread serverThread;
     private ServerFunctionDefinition serverLogicInterface;
-    private EinzClient ourClient;
+    private EinzClientConnection ourClient;
     private String ip;
     private int port;
 
@@ -160,7 +160,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     private void connectClientToLocalServer() {
-        this.ourClient = new EinzClient(this.ip, this.port);
+        this.ourClient = new EinzClientConnection(this.ip, this.port, serverIP1, serverPort1);
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
 }

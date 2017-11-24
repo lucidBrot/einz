@@ -22,6 +22,7 @@ public abstract class EinzAction {
     private final EinzServerClientHandler einzServerClientHandler;
 
     /**
+     * Only needs the params your action needs. null is possibly fine
      * @param sInterface
      * @param serverManager
      * @param params must be of a Messagetype fitting to (expected by)this action
