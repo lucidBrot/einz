@@ -160,7 +160,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     private void connectClientToLocalServer() {
-        this.ourClient = new EinzClientConnection(this.ip, this.port, serverIP1, serverPort1);
+        this.ourClient = new EinzClientConnection(this.ip, this.port);
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
 }

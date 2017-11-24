@@ -275,12 +275,15 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     public void shutdown() {
         Log.d("EinzServer/shutdown", "initiating shutdown...");
         stopListeningForIncomingConnections(true);
+        getServerManager().serverShuttingDownGracefully = true;
+        Log.d("EinzServer/shutdown", "stopped listening for incoming connections.");
         this.sherLock.writeLock().lock();
         getServerManager().kickAllAndCloseSockets();
+        Log.d("EinzServer/shutdown", "closed all sockets");
         // waiting because clientHandlerThreads might still need this server
         for(Thread t : this.clientHandlerBiMap.keySet()){
             try {
-                t.join();
+                t.join(20);
             } catch (InterruptedException e) {
                 Log.w("EinzServer/shutdown", "couldn't wait for thread.");
                 e.printStackTrace();

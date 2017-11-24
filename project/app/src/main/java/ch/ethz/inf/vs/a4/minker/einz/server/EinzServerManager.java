@@ -36,6 +36,7 @@ public class EinzServerManager {
 
     private ReentrantReadWriteLock SFLock = new ReentrantReadWriteLock(); // lock when reading/writing to serverFunctionInterface by calling a function on there
     private boolean gamePhaseStarted;
+    public boolean serverShuttingDownGracefully;
 
     // These files are used to initialize the ActionFactories and ParserFactories of the EinzServerClientHandler threads
     private final int networkingParserFile = R.raw.initial_networking_parser_mappings; // the networking parser shall be loaded from here
@@ -99,7 +100,7 @@ public class EinzServerManager {
         SFLock.writeLock().lock();
         GameState gameState = getServerFunctionInterface().initialiseStandardGame(players, spectators); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
         // TODO: not standard game but with rules, maybe call initialise earlier
-        SFLock.writeLock().lock();
+        SFLock.writeLock().unlock();
     }
 
     public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
@@ -318,7 +319,7 @@ public class EinzServerManager {
             userListLock.writeLock().unlock();
 
             // tell fabian about it
-            if(gamePhaseStarted){
+            if(gamePhaseStarted &&!serverShuttingDownGracefully){
                 SFLock.writeLock().lock();
                 if(role.equals("player")) {
                     serverFunctionInterface.removePlayer(new Player(username));
@@ -337,8 +338,9 @@ public class EinzServerManager {
             try {
                 esch.setConnectedUser(null);
                 esch.stopThreadPatiently();
+                Log.d("servMan/unReg", "stopped Thread of"+username);
             }catch(java.lang.NullPointerException e){
-                Log.d("servMan/kick", "ESCH didn't exist anymore. (Did you maybe shut down the server?)");
+                Log.d("servMan/unReg", "ESCH didn't exist anymore. (Did you maybe shut down the server?)");
                 e.printStackTrace();
             }
             Log.d("servMan/unreg", "I have unregistered user "+username);
