@@ -42,8 +42,8 @@ public class GlobalState {
         this(drawPile, new Stack<Card>());
     }
 
-    private GlobalState(Collection<Card> drawPile, Stack<Card> discardPile) {
-        this.discardPile = discardPile;
+    //Fabian: Changed this to public so I can create a GlobalState with one card already on the discardPile
+    public GlobalState(Collection<Card> drawPile, Stack<Card> discardPile) {
         this.discardPile = discardPile;
         this.drawPile = new LinkedList<>(drawPile);
     }
