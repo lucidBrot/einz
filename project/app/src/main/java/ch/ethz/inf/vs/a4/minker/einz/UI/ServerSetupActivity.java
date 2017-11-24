@@ -128,7 +128,7 @@ public class ServerSetupActivity extends AppCompatActivity {
         findViewById(R.id.btn_s_setupactivity_start_server).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startLobbyAction();
+                startLobbyAction((((EditText) findViewById(R.id.et_s_username)).getText().toString()));
             }
         });
 
@@ -138,7 +138,7 @@ public class ServerSetupActivity extends AppCompatActivity {
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_NULL
                         && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                    startLobbyAction();//match this behavior to your 'Send' (or Confirm) button
+                    startLobbyAction((((EditText) findViewById(R.id.et_s_username)).getText().toString()));//match this behavior to your 'Send' (or Confirm) button
                     return true;
                 }
                 return false;
@@ -146,9 +146,11 @@ public class ServerSetupActivity extends AppCompatActivity {
         });
     }
 
-    private void startLobbyAction() {
+    private void startLobbyAction(String username) {
+        Log.d("ServerSetup", "username set to "+username);
         Intent lobbyIntent = new Intent(this, LobbyActivity.class);
         lobbyIntent.putExtra("host", true);
+        lobbyIntent.putExtra("username", username);
         startActivity(lobbyIntent);
     }
 

@@ -24,11 +24,14 @@ public class EinzUnmappedAction extends EinzAction {
     public EinzUnmappedAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
         this.message = getMessage();
+        String m;
         try {
-            this.messageString = (this.message==null)?"null":message.toJSON().toString();
+            m = (this.message==null)?"null":message.toJSON().toString();
         } catch (JSONException e) {
             e.printStackTrace();
+            m="not set";
         }
+        messageString=m;
     }
 
     /**

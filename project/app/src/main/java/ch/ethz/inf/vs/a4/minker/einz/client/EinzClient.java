@@ -19,8 +19,9 @@ public class EinzClient implements Runnable {
     private int serverPort;
     private Context appContext;
     private Thread clientConnectionThread;
+    private String username;
 
-    public EinzClient(String serverIP, int serverPort, Context appContext) {
+    public EinzClient(String serverIP, int serverPort, Context appContext, String username) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.appContext = appContext;
@@ -54,12 +55,12 @@ public class EinzClient implements Runnable {
                 }
                 // example message sending. implement this where you like
                 EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
-                EinzRegisterMessageBody body = new EinzRegisterMessageBody("the real chris", "player"); // getting all the girls
+                EinzRegisterMessageBody body = new EinzRegisterMessageBody(username, "player"); // getting all the girls
                 final EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
 
                 //DEBUG
 
-                connection.sendMessage(Debug.debug_getRegisterMessage("roger")); // TODO: use real username
+                connection.sendMessage(message);
 
 
                 //simple logging:

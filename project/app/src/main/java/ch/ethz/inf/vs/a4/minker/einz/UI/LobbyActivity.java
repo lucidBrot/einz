@@ -43,6 +43,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
     private boolean host; // if this device is hosting the server
     private Thread ourClientThread;
+    private String username;
     // TODO: what if the host is not the first user to connect? stop server and restart?
 
     @Override
@@ -52,6 +53,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
         Intent intent = getIntent();
         this.host = intent.getBooleanExtra("host", false);
+        this.username = intent.getStringExtra("username");
 
         startServer();
         // wait for server to tell us it's ready so we can connect in onLocalServerReady()
@@ -177,7 +179,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     private void connectClientToLocalServer() {
-        this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext());
+        this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext(), this.username);
         this.ourClient.run();
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
