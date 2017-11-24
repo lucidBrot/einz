@@ -9,5 +9,4 @@ import java.util.ArrayList;
 public interface LobbyUIInterface {
     public void setLobbyList(ArrayList<String> players, ArrayList<String> spectators);
     public void setAdmin(String username);
-
 }

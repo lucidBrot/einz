@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,7 +26,7 @@ import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
  * This is to get a somewhat working app-flow as it should finally be.
  * Corresponds to screen 2 in our paper
  */
-public class ServerSetupActivity extends AppCompatActivity implements ServerActivityCallbackInterface {
+public class ServerSetupActivity extends AppCompatActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -127,7 +128,7 @@ public class ServerSetupActivity extends AppCompatActivity implements ServerActi
         findViewById(R.id.btn_s_setupactivity_start_server).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startServerAndEnter();
+                startLobbyAction();
             }
         });
 
@@ -137,7 +138,7 @@ public class ServerSetupActivity extends AppCompatActivity implements ServerActi
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_NULL
                         && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
-                    startServerAndEnter();//match this behavior to your 'Send' (or Confirm) button
+                    startLobbyAction();//match this behavior to your 'Send' (or Confirm) button
                     return true;
                 }
                 return false;
@@ -145,21 +146,11 @@ public class ServerSetupActivity extends AppCompatActivity implements ServerActi
         });
     }
 
-    private static ThreadedEinzServer server; //static because there should be only one
-    private Thread serverThread;
-    private ServerFunctionDefinition serverLogicInterface;
-
-    private void startServerAndEnter() {
-        Log.d("serverSetupActivity", "startServer was pressed");
-        if(serverThread==null) { // only create one server
-            serverLogicInterface = new ServerFunction(); // Fabians Part
-            server = new ThreadedEinzServer(this.getApplicationContext(), 8080, this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
-            serverThread = new Thread(server);
-        }
-
-        // TODO: enter server and transition to lobbylist
-
+    private void startLobbyAction() {
+        Intent lobbyIntent = new Intent(this, LobbyActivity.class);
+        startActivity(lobbyIntent);
     }
+
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
@@ -225,8 +216,4 @@ public class ServerSetupActivity extends AppCompatActivity implements ServerActi
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
-    @Override
-    public void updateNumClientsUI(int num) {
-        // TODO: implement this, but probably in a new activity for lobbylist display and show ip there
-    }
 }

@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -9,6 +10,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.json.JSONException;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -29,15 +31,17 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private BiMap<Thread, EinzServerClientHandler> clientHandlerBiMap = HashBiMap.create(); // list of registered clients and ESCHs
 
     private int numClients;
+    @Nullable
     private ServerActivityCallbackInterface serverActivityCallbackInterface;
     final Context applicationContext;
     private final EinzServerManager serverManager;
     private ReentrantReadWriteLock sherLock = new ReentrantReadWriteLock(); // locks everything here (not servermanager) i.e. glienthandlerhtreads, numClients and clienthandlerthreads
 
     /**
+     * @param serverActivityCallbackInterface can be null if you don't want to be informed about numClients change
      * @param PORT specifies the port to use. If the port is already in use, we will still use a different port
      */
-    public ThreadedEinzServer(Context applicationContext, int PORT, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
+    public ThreadedEinzServer(Context applicationContext, int PORT, @Nullable  ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this.PORT = PORT;
         this.serverActivityCallbackInterface = serverActivityCallbackInterface;
         this.serverManager = new EinzServerManager(this, serverFunctionDefinition);
@@ -46,15 +50,27 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
     /**
      * Listen on any one free port. Dispatch an EinzServerThread for every Connection
+     * @param serverActivityCallbackInterface if you want to be informed on events such as change in number of clients or that the server has started up
      */
-    public ThreadedEinzServer(Context applicationContext, ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
+    public ThreadedEinzServer(Context applicationContext, @Nullable ServerActivityCallbackInterface serverActivityCallbackInterface, ServerFunctionDefinition serverFunctionDefinition){
         this(applicationContext,0, serverActivityCallbackInterface, serverFunctionDefinition);
+    }
+
+    /**
+     * Runs the server on any free port and doesn't use the serverActivityCallbackInterface, because you might not need this unless you're the admin
+     * @param applicationContext
+     * @param serverFunctionDefinition
+     */
+    public ThreadedEinzServer(Context applicationContext, ServerFunctionDefinition serverFunctionDefinition){
+        this(applicationContext, null, serverFunctionDefinition);
     }
 
     @Override
     public void run(){
         boolean success = this.launch(); // spins. returns false if it fails and true if it finishes gracefully
     }
+
+
 
     /**
      * Launches the server and spins waiting for connections.
@@ -96,6 +112,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         }
 
         boolean firstconnection = true;
+        serverReady();
         while (!shouldStopSpinning){
 
             try {
@@ -129,6 +146,25 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
         }
         return true;
+    }
+
+    /**
+     * Callback {@link ServerActivityCallbackInterface#onLocalServerReady()} in main thread
+     * @see <a href=https://stackoverflow.com/questions/11123621/running-code-in-main-thread-from-another-thread>Stackoverflow</a>
+     */
+    private void serverReady() {
+        // Get a handler that can be used to post to the main thread
+        Handler mainHandler = new Handler(applicationContext.getMainLooper());
+
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if(serverActivityCallbackInterface!=null){
+                serverActivityCallbackInterface.onLocalServerReady();
+            }}
+        };
+        mainHandler.post(myRunnable);
+
     }
 
     public boolean isShouldStopSpinning() {
@@ -178,14 +214,16 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         this.sherLock.writeLock().lock();
         this.numClients++;
         int temp = this.numClients;
-        serverActivityCallbackInterface.updateNumClientsUI(temp);
+        if(serverActivityCallbackInterface!=null)
+            serverActivityCallbackInterface.updateNumClientsUI(temp);
         this.sherLock.writeLock().unlock();
     }
 
     public void decNumClients(){
         this.sherLock.writeLock().lock();
         this.numClients--;
-        serverActivityCallbackInterface.updateNumClientsUI(numClients);
+        if(serverActivityCallbackInterface!=null)
+            serverActivityCallbackInterface.updateNumClientsUI(numClients);
         this.sherLock.writeLock().unlock();
     }
 
