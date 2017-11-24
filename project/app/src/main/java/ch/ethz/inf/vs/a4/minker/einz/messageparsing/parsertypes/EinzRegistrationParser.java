@@ -157,7 +157,7 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         {
           "header":{
             "messagegroup":"registration",
-            "messagetype":"RegisterResponse"
+            "messagetype":"RegisterSuccess"
           },
           "body":{
             "success":"true",

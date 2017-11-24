@@ -56,7 +56,10 @@ public class EinzClient implements Runnable {
                 EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
                 EinzRegisterMessageBody body = new EinzRegisterMessageBody("the real chris", "player"); // getting all the girls
                 final EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
-                connection.sendMessage(Debug.debug_getRegisterMessage("roger"));
+
+                //DEBUG
+
+                connection.sendMessage(Debug.debug_getRegisterMessage("roger")); // TODO: use real username
 
 
                 //simple logging:
