@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import ch.ethz.inf.vs.a4.minker.einz.UI.ServerSetupActivity;
 import ch.ethz.inf.vs.a4.minker.einz.client.ClientActivity;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
 
@@ -20,6 +21,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // register onClick handlers
         findViewById(R.id.btn_start_client).setOnClickListener(this);
         findViewById(R.id.btn_start_server).setOnClickListener(this);
+        findViewById(R.id.btn_s_host_game).setOnClickListener(this);
     }
 
     @Override
@@ -34,6 +36,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // start server
                 Intent sintent = new Intent(this, ServerActivity.class);
                 startActivity(sintent);
+                break;
+
+            case R.id.btn_s_host_game:
+                // actually start the UI intended for the admin, and the server then
+                Intent sIntent = new Intent(this, ServerSetupActivity.class);
+                startActivity(sIntent);
                 break;
             default:
                 toast("unexpected onclick");
