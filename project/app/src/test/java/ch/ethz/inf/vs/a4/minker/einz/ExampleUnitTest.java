@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz;
 
 import android.util.Log;
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.InvalidResourceFormatException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -10,6 +11,8 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParserFactory;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzStateInfoParser;
+
+import java.io.InputStream;
 
 import static org.junit.Assert.*;
 
@@ -45,8 +48,29 @@ public class ExampleUnitTest {
         assertEquals(expected, actual);
     }
 
-    public void parser_test(String msg) throws JSONException {
+    public void parser_test(String msg) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
         EinzParserFactory einzParserFactory = new EinzParserFactory();
+
+        JSONObject jsonObject = new JSONObject(
+                "{\n" +
+                        "  \"parsermappings\": [\n" +
+                        "    {\n" +
+                        "      \"messagegroup\": \"registration\",\n" +
+                        "      \"mapstoparser\": \"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser\"\n" +
+                        "    },\n" +
+                        "\t{\n" +
+                        "      \"messagegroup\": \"startgame\",\n" +
+                        "      \"mapstoparser\": \"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzStartGameParser\"\n" +
+                        "    },\n" +
+                        "\t{\n" +
+                        "\t  \"messagegroup\": \"stateinfo\",\n" +
+                        "\t  \"mapstoparser\": \"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzStateInfoParser\"\n" +
+                        "\t}\n" +
+                        "  ]\n" +
+                        "}"
+        );
+        einzParserFactory.loadMappingsFromJson(jsonObject);
+
         EinzParser einzParser = einzParserFactory.generateEinzParser(msg);
         JSONObject expectedJSON = new JSONObject(msg);
         String expected = expectedJSON.toString();
@@ -59,7 +83,7 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void parseGetState() throws JSONException {
+    public void parseGetState() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
         String msg = "{\n" +
                 "  \"header\":{\n" +
                 "    \"messagegroup\":\"stateinfo\",\n" +
