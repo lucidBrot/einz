@@ -135,4 +135,9 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
     }
+
+    @Override
+    public void onLocalServerReady() {
+        // ignore in this debug thing
+    }
 }
