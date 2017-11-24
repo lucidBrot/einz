@@ -20,8 +20,9 @@ public class EinzClient implements Runnable {
     private Context appContext;
     private Thread clientConnectionThread;
     private String username;
+    private String role;
 
-    public EinzClient(String serverIP, int serverPort, Context appContext, String username) {
+    public EinzClient(String serverIP, int serverPort, Context appContext, String username, String role) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.appContext = appContext;
@@ -29,6 +30,7 @@ public class EinzClient implements Runnable {
         this.clientMessenger = new ClientMessenger(appContext, this.actionCallbackInterface);
         this.connection = new EinzClientConnection(serverIP, serverPort, clientMessenger);
         this.username = username;
+        this.role = role;
     }
 
     /**
@@ -36,6 +38,27 @@ public class EinzClient implements Runnable {
      */
     @Override
     public void run() {
+
+        /*
+        How to use this class:
+            EinzClientConnection handles connecting to the server and receiving packets.
+                It features a method sendMessage() which can be used from different threads to send a message to the server
+            Once a Message is received, the corresponding parser is looked up through the parserFactory by checking the mappings
+                specified in the files R.raw.initial_networking_parsing_mappings and R.raw.initial_game_logic_parser_mappings.
+                These files are not only one file because you might want to separate the networking-related messaging with the game-logic related.
+                However, you could technically specify any parser mapping in either of the files (If you specify it in both, we'll see what happens, I think it just keeps one)
+            The thus found Parser takes the message and returns it as a Java Object with the content as variables.
+            This goes through the actionFactory which is mapped in R.raw.client_initial_networking_action_mappings and R.raw.client_initial_game_logic_action_mappings
+                those are separated from the server's action mappings because while the server does not receive different messages than those specified in these files,
+                the reaction might be different.
+            This action has a function run(). You should implement this function in the corresponding child of EinzAction, found in messageparsing.actiontypes
+                Within this run function, you have access to an interface of type ClientActionCallbackInterface, which is implemented by ClientMessengerCallback,
+                So you can implement any functionality there and update the interface, then use those functions in the class.
+            This Client is instanciated once the server is up, called from lobbyactivity, if the device is hosting it, or when the user entered the address of the server and the port and confirmed if it's a client-only device.
+            The LobbyListAction offers what the LobbyUIInterface provides to update the view. (Feel free to change that as well, the LobbyActivity is the only class implementing this)
+            This client should implement some functions that allow the UI-thread to make this client send a message (in a different thread), e.g. when the UI realizes that the host wants to specifyRules or StartGame.
+         */
+
         this.clientConnectionThread = new Thread(this.connection);
         this.clientConnectionThread.start(); // establish connection
 
@@ -56,7 +79,7 @@ public class EinzClient implements Runnable {
                 }
                 // example message sending. implement this where you like
                 EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
-                EinzRegisterMessageBody body = new EinzRegisterMessageBody(username, "player"); // getting all the girls
+                EinzRegisterMessageBody body = new EinzRegisterMessageBody(username, role); // getting all the girls
                 final EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
 
                 //DEBUG

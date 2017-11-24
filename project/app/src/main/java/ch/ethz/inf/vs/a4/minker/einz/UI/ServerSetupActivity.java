@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 import android.view.inputmethod.EditorInfo;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import ch.ethz.inf.vs.a4.minker.einz.R;
@@ -150,7 +151,9 @@ public class ServerSetupActivity extends AppCompatActivity {
         Log.d("ServerSetup", "username set to "+username);
         Intent lobbyIntent = new Intent(this, LobbyActivity.class);
         lobbyIntent.putExtra("host", true);
+        String role = ((CheckBox) findViewById(R.id.cb_s_observer)).isChecked() ? "spectator" : "player";
         lobbyIntent.putExtra("username", username);
+        lobbyIntent.putExtra("role", role);
         startActivity(lobbyIntent);
     }
 

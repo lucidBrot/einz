@@ -42,8 +42,8 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private int port;
 
     private boolean host; // if this device is hosting the server
-    private Thread ourClientThread;
     private String username;
+    private String role;
     // TODO: what if the host is not the first user to connect? stop server and restart?
 
     @Override
@@ -54,6 +54,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         Intent intent = getIntent();
         this.host = intent.getBooleanExtra("host", false);
         this.username = intent.getStringExtra("username");
+        this.role = intent.getStringExtra("role");
 
         startServer();
         // wait for server to tell us it's ready so we can connect in onLocalServerReady()
@@ -148,10 +149,10 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             NetworkInterface intf = en.nextElement();
             for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
                 InetAddress inetAddress = enumIpAddr.nextElement();
-                Log.i("ServerActivity/IP","inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
+                Log.i("LobbyActivity/IP","inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
 //the condition after && is missing in your snippet, checking instance of inetAddress
                 if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
-                    Log.i("ServerActivity/IP","return inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
+                    Log.i("LobbyActivity/IP","return inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
                     return inetAddress.getHostAddress();
                 }
 
@@ -179,7 +180,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     private void connectClientToLocalServer() {
-        this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext(), this.username);
+        this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext(), this.username, this.role);
         this.ourClient.run();
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
