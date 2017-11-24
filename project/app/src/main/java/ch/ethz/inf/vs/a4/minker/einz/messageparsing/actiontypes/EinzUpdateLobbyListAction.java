@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;

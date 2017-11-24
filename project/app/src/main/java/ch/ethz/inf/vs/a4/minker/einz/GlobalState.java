@@ -18,7 +18,11 @@ public class GlobalState {
     private Stack<Card> discardPile;
     private Queue<Card> drawPile;
     private Player activePlayer;
+    private Player nextPlayer;
     private List<Player> players;
+    private List<Player> finishedPlayer;
+    private boolean isGameRunning;
+
 
     public GlobalState(){
         this(new LinkedList<Card>());
@@ -28,8 +32,8 @@ public class GlobalState {
         this(drawPile, new Stack<Card>());
     }
 
-    private GlobalState(Collection<Card> drawPile, Stack<Card> discardPile) {
-        this.discardPile = discardPile;
+    //Fabian: Changed this to public so I can create a GlobalState with one card already on the discardPile
+    public GlobalState(Collection<Card> drawPile, Stack<Card> discardPile) {
         this.discardPile = discardPile;
         this.drawPile = new LinkedList<>(drawPile);
 

@@ -7,6 +7,7 @@ import ch.ethz.inf.vs.a4.minker.einz.gamelogic.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -28,10 +29,15 @@ public class EinzServerManager {
 
     private final ThreadedEinzServer server;
     private ServerFunctionDefinition serverFunctionInterface;
+
+    public ReentrantReadWriteLock getSFLock() {
+        return SFLock;
+    }
+
+    private ReentrantReadWriteLock SFLock = new ReentrantReadWriteLock(); // lock when reading/writing to serverFunctionInterface by calling a function on there
     private boolean gamePhaseStarted;
 
     // These files are used to initialize the ActionFactories and ParserFactories of the EinzServerClientHandler threads
-    // TODO: test the initialization of the factories once we have enough messages
     private final int networkingParserFile = R.raw.initial_networking_parser_mappings; // the networking parser shall be loaded from here
     private final int gameLogicParserFile = R.raw.initial_game_logic_parser_mappings; // the gamelogic parser shall be loaded from here
     private final int networkingActionFile = R.raw.server_initial_networking_action_mappings; // the mapping from messagebodytype to action
@@ -42,7 +48,7 @@ public class EinzServerManager {
     private ConcurrentHashMap<String, String> registeredClientRoles; // mapping client usernames to roles
     protected String adminUsername;
 
-    public ReentrantReadWriteLock getUserListLock() {
+    public ReentrantReadWriteLock getUserListLock() { // registeredClientRoles, registeredClientHandlers, gamePhaseStarted
         return userListLock;
     }
 
@@ -60,14 +66,20 @@ public class EinzServerManager {
     /**
      * @return List of registered users.
      */
-    protected ArrayList<String> getConnectedUsers(){ //TODO: remove users on disconnect
+    protected ArrayList<String> getConnectedUsers(){
         return new ArrayList<>(this.registeredClientHandlers.keySet());
     }
 
-    public void finishRegistrationPhaseAndStartGame(){ // TODO: disable writing to registeredClientHandlers if game started. Make everything synchronized
-        Log.d("Manager", "finishing registrationphase.");
+
+    /**
+     * stops the server from accepting new connections, calls initialize on the serverFunctionDefinition
+     */
+    public void finishRegistrationPhaseAndInitGame(){
+        Log.d("servMan", "finishing registrationphase.");
+        userListLock.readLock().lock();
         server.stopListeningForIncomingConnections(true);
         ArrayList<Player> players = new ArrayList<>();
+        ArrayList<String> list = new ArrayList<>(); // for debug
         ArrayList<Spectator> spectators = new ArrayList<>();
         for(Map.Entry<String, EinzServerClientHandler> entry : registeredClientHandlers.entrySet()){
             EinzServerClientHandler handler = (EinzServerClientHandler) entry.getValue();
@@ -77,22 +89,26 @@ public class EinzServerManager {
             } else if ( role.toLowerCase().equals("spectator")){
                 spectators.add(new Spectator((String) entry.getKey()));
             }
-            // TODO: send that info to clients
+            list.add(entry.getKey());
         }
-        Log.d("Manager/finishRegPhase", "Players: "+players.toString());
-        
+        Log.d("servMan/finishRegPhase", "Players and Spectators: "+new JSONArray(list).toString());
+        userListLock.readLock().unlock();
+        userListLock.writeLock().lock();
         this.gamePhaseStarted = true;
-        GameState gameState = getServerFunctionInterface().initialiseStandartGame(players, null); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
-
+        userListLock.writeLock().unlock();
+        SFLock.writeLock().lock();
+        GameState gameState = getServerFunctionInterface().initialiseStandardGame(players, spectators); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+        // TODO: not standard game but with rules, maybe call initialise earlier
+        SFLock.writeLock().lock();
     }
 
-    public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException { //TODO: register networking actions, maybe from json file
+    public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
         InputStream jsonStream = server.applicationContext.getResources().openRawResource(this.networkingActionFile);
         JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
         actionFactory.loadMappingsFromJson(jsonObject);
     }
 
-    public void loadAndRegisterGameLogicActions(EinzActionFactory actionFactory) throws InvalidResourceFormatException, JSONException, ClassNotFoundException { //TODO: register actions for game logic. from different json file
+    public void loadAndRegisterGameLogicActions(EinzActionFactory actionFactory) throws InvalidResourceFormatException, JSONException, ClassNotFoundException {
         InputStream jsonStream = server.applicationContext.getResources().openRawResource(this.gameLogicActionFile);
         JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
         actionFactory.loadMappingsFromJson(jsonObject);
@@ -127,12 +143,11 @@ public class EinzServerManager {
         return s.hasNext() ? s.next() : "";
     }
 
+    /**
+     * @return the ServerFunctionDefinition by Fabian. Make sure to lock {@link #SFLock} for accessing this
+     */
     public ServerFunctionDefinition getServerFunctionInterface() {
         return serverFunctionInterface;
-    }
-
-    public void setServerFunctionInterface(ServerFunctionDefinition serverFunctionInterface) {
-        this.serverFunctionInterface = serverFunctionInterface;
     }
 
     private boolean isInvalidUsername(String username){
@@ -172,7 +187,12 @@ public class EinzServerManager {
                 break filterFailureReasons;
             }
 
-            userListLock.writeLock().lock();
+            getUserListLock().writeLock().lock();
+            if(gamePhaseStarted){
+                reason = "game already in progress";
+                break filterFailureReasons;
+            }
+
             EinzServerClientHandler res = getRegisteredClientHandlers().putIfAbsent(username, handler);
             // res is null if it was not set before this call, else it is the previous value
 
@@ -225,25 +245,54 @@ public class EinzServerManager {
     }
 
     /**
-     * Unregisters user and generates message to be broadcasted to inform clients that this user left. <br>
+     * Unregisters user and generates message to be broadcasted to inform clients that this user left. ({@link EinzUnregisterResponseMessageBody} and {@link EinzUpdateLobbyListMessageBody} <br>
      *     <b>Broadcasts the message already!</b>
-     *     Returns the response (different from the broadcast!) or null
+     *     Returns the response if kicking failed (different from the broadcast!) or null. This includes null if this was not a kick.
      *     Make sure to check whether the user is allowed to kick somebody if you call this to kick. Also make sure to check that this user exists.
-     *     <br>This function (will) respond to the client who requested this. the return message is only to check for what happened. // TODO: UnregisterResponse and KickFailure
+     *     <br>This function responds to the client who requested this. the return message is only to check for what happened.
      * @param username who to remove
+     * @param issuedByUser who wanted this kick/unregister. Can be the same as username
+     * @param unregisterReason "kicked", "timeout", or "disconnect"(voluntary)
      *
      * @return The message only for the client who issued the unregister/kick request. Ignore this return in case of a normal unregister<br>
      *     <i>null</i> if there was no failure
      */
     @Nullable
-    public EinzMessage<EinzKickFailureMessageBody> unregisterUser(String username, String unregisterReason){
-        // TODO: removeUser from fabian
+    public EinzMessage<EinzKickFailureMessageBody> unregisterUser(String username, String unregisterReason, String issuedByUser){
+        getUserListLock().readLock().lock();
         String failureReason = null;
-        EinzMessage<EinzUnregisterResponseMessageBody> einzMessage;
+        EinzMessage<EinzKickFailureMessageBody> returnMessage;
 
-        if(username==null || isInvalidUsername(username)){
+        if(username==null || ( isInvalidUsername(username) && !username.equals("server"))){
             failureReason = "invalid";
         }
+
+
+        //       if kicked check for failure and respond with it, then broadcast unregisterresponse
+        //       if timout, do the same as if unregistered by disconnect
+        //       if disconnected, only broadcast unregisterresponse, with no response to the player who disconnected
+        if(unregisterReason.toLowerCase().equals("kicked")){
+            if(failureReason!=null){
+                Log.d("servMan/unregUser", "Sending KickFailure Message (issued by \"+issuedByUser+\") for kicking "+username );
+                EinzKickFailureMessageBody kickFailureMessageBody = new EinzKickFailureMessageBody(username, failureReason);
+                EinzMessageHeader header = new EinzMessageHeader("registration", "KickFailure");
+                EinzMessage<EinzKickFailureMessageBody> kickFailureMessage = new EinzMessage<>(header, kickFailureMessageBody);
+                returnMessage = kickFailureMessage;
+                try {
+                    this.getServer().sendMessageToUser(issuedByUser, kickFailureMessage);
+                } catch (UserNotRegisteredException e) {
+                    Log.w("servMan/unregUser", "The user who requested a kick does no longer exist!");
+                    // continue because hopefully the kick itself was valid but this user left in the meantime
+                    e.printStackTrace();
+                } catch (JSONException e) { // this is something that should be correct by design!
+                    throw new RuntimeException(e);
+                }
+            } else {
+                returnMessage = null; // null stands for successful kicking or that it wasn't a kick
+                Log.d("servMan/unregUser", "kicking "+username+"...");
+            }
+        }
+        getUserListLock().readLock().unlock();
 
         if(failureReason==null){
             userListLock.readLock().lock();
@@ -255,6 +304,7 @@ public class EinzServerManager {
             userListLock.readLock().unlock();
 
             // inform all clients
+            // broadcast UnregisterResponse
             EinzUnregisterResponseMessageBody body = new EinzUnregisterResponseMessageBody(username, unregisterReason);
             EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterResponse");
             EinzMessage<EinzUnregisterResponseMessageBody> message = new EinzMessage<>(header, body);
@@ -267,10 +317,31 @@ public class EinzServerManager {
             getRegisteredClientHandlers().remove(username);
             userListLock.writeLock().unlock();
 
+            // tell fabian about it
+            if(gamePhaseStarted){
+                SFLock.writeLock().lock();
+                if(role.equals("player")) {
+                    serverFunctionInterface.removePlayer(new Player(username));
+                } else if(role.equals("specator")){
+                    // TODO: removeSpecator from fabian once the interface offers this
+                }
+                SFLock.writeLock().unlock();
+            }
+
+            //broadcast updateLobbyList
+            EinzMessage<EinzUpdateLobbyListMessageBody> msg = generateUpdateLobbyListRequest();
+            broadcastMessageToAllPlayers(msg);
+            broadcastMessageToAllSpectators(msg);
+
             // and stop the corresponding client
-            esch.setConnectedUser(null);
-            esch.stopThreadPatiently();
-            Log.d("servMan/unreg", "unregistered user "+username);
+            try {
+                esch.setConnectedUser(null);
+                esch.stopThreadPatiently();
+            }catch(java.lang.NullPointerException e){
+                Log.d("servMan/kick", "ESCH didn't exist anymore. (Did you maybe shut down the server?)");
+                e.printStackTrace();
+            }
+            Log.d("servMan/unreg", "I have unregistered user "+username);
 
         } else {
             Log.d("servMan/unreg", "failed to unregister user "+username+" because "+failureReason);
@@ -291,19 +362,24 @@ public class EinzServerManager {
     }
 
     /**
-     * Tests if user is allowed to perform this action and performs it
+     * Tests if user is allowed to perform this action and performs it.
+     * A kicked users associated thread will be stopped and the socket closed.
+     * Says user is not allowed if it was not yet registered as admin. That shouldn't happen though, as messages are supposed to be ordered by client so there should always be a register first.
      * @param userToKick
      * @param userWhoIssuedThisKick
      */
     public void kickUser(String userToKick, String userWhoIssuedThisKick){
         userListLock.readLock().lock();
         EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);
-        boolean allowed = (getAdminUsername().equals(userWhoIssuedThisKick));
+        // if admin is not yet set, don't kick
+        boolean allowed = ((getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick))||userWhoIssuedThisKick.equals("server"));
         boolean userExists = (esch!=null);
-        boolean success;
+        boolean userValid = !isInvalidUsername(userToKick);
+        String unregisterReason = (userWhoIssuedThisKick.equals("server"))?"server":"kicked";
+
         EinzMessage<EinzKickFailureMessageBody> response;
-        if(userExists && allowed) {
-            response = unregisterUser(userToKick, "kicked");
+        if(userExists && allowed && userValid) {
+            response = unregisterUser(userToKick, unregisterReason, userWhoIssuedThisKick);
             if(response==null)//if success
             {
                 userListLock.readLock().unlock();
@@ -313,6 +389,7 @@ public class EinzServerManager {
                 try {
                     server.sendMessageToUser(userWhoIssuedThisKick, response);
                 } catch (UserNotRegisteredException e) {
+                    Log.w("servMan/kick", "User "+userWhoIssuedThisKick+" was allowed to issue (kick "+userToKick+") but is not registered");
                     e.printStackTrace();
                     // User who issued this does not exist :(
                     // Guess that means we don't answer them
@@ -328,7 +405,9 @@ public class EinzServerManager {
             EinzKickFailureMessageBody ekfmb;
             if(!allowed){
                  ekfmb = new EinzKickFailureMessageBody(userToKick, "not allowed");
-            } else {
+            } else if(!userValid){
+                ekfmb = new EinzKickFailureMessageBody(userToKick, "invalid");
+            } else{
                 ekfmb = new EinzKickFailureMessageBody(userToKick, "not found");
             }
             EinzMessageHeader header = new EinzMessageHeader("registration", "KickFailure");
@@ -344,6 +423,7 @@ public class EinzServerManager {
             }
         }
         userListLock.readLock().unlock();
+        return;
     }
 
     public EinzMessage<EinzUpdateLobbyListMessageBody> generateUpdateLobbyListRequest(){
@@ -454,5 +534,47 @@ public class EinzServerManager {
 
     public ThreadedEinzServer getServer() {
         return server;
+    }
+
+    public boolean isRegistered(String username){
+        boolean b = (username!=null && !isInvalidUsername(username) && getRegisteredClientRoles().keySet().contains(username));
+        return b;
+    }
+
+    public boolean isRegisteredAdmin(String username){
+        boolean b = isRegistered(username);
+        b = b && getAdminUsername()!=null && getAdminUsername().equals(username);
+        return b;
+    }
+
+    public void startGame(String issuedByPlayer) {
+        if(isRegisteredAdmin(issuedByPlayer)) {
+            finishRegistrationPhaseAndInitGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
+            SFLock.writeLock().lock();
+            serverFunctionInterface.startGame();
+            SFLock.writeLock().unlock();
+        }
+        else{
+            Log.e("servMan", "somebody unauthorized tried to start the game!");
+        }
+    }
+
+    public void specifyRules(ArrayList<Rule> ruleset) { //TODO: readwritelock on serverFunctionInterface
+        // TODO: RULES: specifyRules. How is the deck transmitted? in what format should I pass the rules?
+        // TODO: add message for endTurn Action to docs and implement
+        // TODO: RULES: rulemessage
+    }
+
+    /**
+     * Locks to avoid inconsistencies
+     */
+    public void kickAllAndCloseSockets() {
+        userListLock.writeLock().lock();
+        for(String username : getRegisteredClientHandlers().keySet()){
+            EinzServerClientHandler esch = getRegisteredClientHandlers().get(username);
+            kickUser(username, "server");
+            // esch.stopThreadPatiently(); is already within kickUser
+        }
+        userListLock.writeLock().unlock();
     }
 }
