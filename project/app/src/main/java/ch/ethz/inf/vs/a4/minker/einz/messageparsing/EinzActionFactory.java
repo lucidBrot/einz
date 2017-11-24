@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.client.ClientActionCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKickAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnmappedAction;
@@ -29,16 +30,16 @@ public class EinzActionFactory {
     private EinzServerManager sManager;
 
     private EinzServerClientHandler clientHandler;
+    private ClientActionCallbackInterface clientActionCallbackInterface;
+    private Object completelyCustomObject;
 
     /**
+     * This is the constructor that the server would be happy with. it does not need more
      * @param serverFunctionDefinition provides game logic actions
      * @param serverManager provides framework actions
      */
     public EinzActionFactory(ServerFunctionDefinition serverFunctionDefinition, EinzServerManager serverManager, EinzServerClientHandler clientHandler){
-        this.sInterface = serverFunctionDefinition;
-        this.dictionary = new HashMap<Class<? extends EinzMessageBody>, Class<? extends EinzAction>>();
-        this.sManager = serverManager;
-        this.clientHandler = clientHandler;
+        this(serverFunctionDefinition, serverManager, clientHandler, null, null);
 
         //<Debug>
         /*
@@ -48,6 +49,40 @@ public class EinzActionFactory {
         */
         //getMapping(new EinzMessage(new EinzMessageHeader("a", "b"), new EinzPlayCardMessageBody()));
         //</Debug>
+    }
+
+    /**
+     * All options could be null, if the action supports that. The serverside actions need some of those, the clientside others, and further extensions may use the completelyCustom parameter
+     * @param serverFunctionDefinition server
+     * @param serverManager server
+     * @param clientHandler server
+     * @param clientCallbackInterface client
+     * @param completelyCustom custom
+     */
+    public EinzActionFactory(ServerFunctionDefinition serverFunctionDefinition, EinzServerManager serverManager, EinzServerClientHandler clientHandler, ClientActionCallbackInterface clientCallbackInterface, Object completelyCustom){
+        this.sInterface = serverFunctionDefinition;
+        this.dictionary = new HashMap<Class<? extends EinzMessageBody>, Class<? extends EinzAction>>();
+        this.sManager = serverManager;
+        this.clientHandler = clientHandler;
+        this.completelyCustomObject = completelyCustom;
+        this.clientActionCallbackInterface = clientCallbackInterface;
+    }
+
+    /**
+     * This constructor is enough for the client.
+     * Sets every other option to null. Make sure the actions that you map to don't need them!
+     * @param clientCallbackInterface
+     */
+    public EinzActionFactory(ClientActionCallbackInterface clientCallbackInterface){
+        this(null, null, null, clientCallbackInterface, null);
+    }
+
+    /**
+     * sets every other option to null. Make sure the actions that you map to support this!
+     * @param customObject
+     */
+    public EinzActionFactory(Object customObject){
+        this(null, null, null, null, customObject);
     }
 
     /**

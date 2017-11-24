@@ -24,6 +24,8 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
     public ClientMessenger(Context appContext){
         // initialize local variables
         this.appContext = appContext;
+        this.parserFactory = new EinzParserFactory();
+        this.actionFactory = new EinzActionFactory()
 
         // initialize Factories by loading the mappings from the specified files above
         initializeParserFactory(); // from messagegroup to Parser

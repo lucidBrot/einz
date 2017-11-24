@@ -29,7 +29,7 @@ public abstract class EinzAction {
      * @param issuedByPlayer
      * @param issuedByClientHandler
      */
-    public EinzAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler){
+    public EinzAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ){
         this.sInterface = sInterface;
         this.message = params;
         this.issuedByPlayer = issuedByPlayer;
