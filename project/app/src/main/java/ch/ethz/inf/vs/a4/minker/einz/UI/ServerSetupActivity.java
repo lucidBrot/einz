@@ -23,6 +23,7 @@ import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 /**
  * Feel free to change this layout Chris.
  * This is to get a somewhat working app-flow as it should finally be.
+ * Corresponds to screen 2 in our paper
  */
 public class ServerSetupActivity extends AppCompatActivity implements ServerActivityCallbackInterface {
     /**

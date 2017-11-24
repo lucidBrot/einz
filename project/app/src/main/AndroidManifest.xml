@@ -33,6 +33,8 @@
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="ch.ethz.inf.vs.a4.minker.einz.MainActivity"/>
         </activity>
+        <activity android:name=".UI.LobbyActivity">
+        </activity>
     </application>
 
 </manifest>
