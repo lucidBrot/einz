@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz;
 
 import java.util.ArrayList;
 
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
 
 /**
