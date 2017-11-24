@@ -8,6 +8,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnmappedMes
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
+import org.json.JSONException;
 
 public class EinzUnmappedAction extends EinzAction {
     private final EinzMessage message;
@@ -23,7 +24,11 @@ public class EinzUnmappedAction extends EinzAction {
     public EinzUnmappedAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
         this.message = getMessage();
-        this.messageString = (this.message==null)?"null":message.toString();
+        try {
+            this.messageString = (this.message==null)?"null":message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
