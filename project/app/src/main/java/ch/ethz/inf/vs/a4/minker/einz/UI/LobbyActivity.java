@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
+import android.content.Intent;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
@@ -37,10 +38,16 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private String ip;
     private int port;
 
+    private boolean host; // if this device is hosting the server
+    // TODO: what if the host is not the first user to connect? stop server and restart?
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
+
+        Intent intent = getIntent();
+        this.host = intent.getBooleanExtra("host", false);
 
         startServer();
         // wait for server to tell us it's ready so we can connect in onLocalServerReady()
@@ -54,12 +61,14 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
     @Override
     public void setAdmin(String username) {
-
+        // make the corresponding name red or something
     }
 
     @Override
     public void onClick(View view) {
-
+        //TODO: button to start game if you're the host, handle the onclick
+        //TODO: kick player buttons if you're the host
+        //TODO: settings if you're the host
     }
 
     /**
@@ -152,5 +161,6 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
     private void connectClientToLocalServer() {
         this.ourClient = new EinzClient(this.ip, this.port);
+        // from now on, the client has the program flow and needs to update the UI appropriately
     }
 }

@@ -148,6 +148,7 @@ public class ServerSetupActivity extends AppCompatActivity {
 
     private void startLobbyAction() {
         Intent lobbyIntent = new Intent(this, LobbyActivity.class);
+        lobbyIntent.putExtra("host", true);
         startActivity(lobbyIntent);
     }
 
