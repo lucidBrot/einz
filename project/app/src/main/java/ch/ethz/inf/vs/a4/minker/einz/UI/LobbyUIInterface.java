@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz.client;
+package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import java.util.ArrayList;
 

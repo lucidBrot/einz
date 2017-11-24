@@ -10,8 +10,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import ch.ethz.inf.vs.a4.minker.einz.R;
+import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClientConnection;
-import ch.ethz.inf.vs.a4.minker.einz.client.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -35,11 +35,12 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private ThreadedEinzServer server; // there should be only one
     private Thread serverThread;
     private ServerFunctionDefinition serverLogicInterface;
-    private EinzClientConnection ourClient;
+    private EinzClient ourClient;
     private String ip;
     private int port;
 
     private boolean host; // if this device is hosting the server
+    private Thread ourClientThread;
     // TODO: what if the host is not the first user to connect? stop server and restart?
 
     @Override
@@ -77,7 +78,8 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
      * @param einzServer
      */
     private void setIPAndPort(ThreadedEinzServer einzServer) {
-        this.ip = "IP: "+getIP();
+        this.ip = getIP();
+        String ip = "IP: "+this.ip;
         ((TextView) findViewById(R.id.tv_lobby_ip)).setText(ip);
         this.port = einzServer.getPORT();
         String p = "PORT: "+String.valueOf(port);
@@ -95,6 +97,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             serverLogicInterface = new ServerFunction(); // Fabians Part
             ///server = new ThreadedEinzServer(this.getApplicationContext(), this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
             server = new ThreadedEinzServer(this.getApplicationContext(),8080, this, serverLogicInterface);
+            setIPAndPort(server);
             server.setDEBUG_ONE_MSG(false); // set to true to let server generate messages on same host
             serverThread = new Thread(server);
             serverThread.start();
@@ -167,7 +170,9 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     private void connectClientToLocalServer() {
-        this.ourClient = new EinzClientConnection(this.ip, this.port);
+        this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext());
+        this.ourClientThread = new Thread(this.ourClient);
+        this.ourClientThread.start();
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
 }

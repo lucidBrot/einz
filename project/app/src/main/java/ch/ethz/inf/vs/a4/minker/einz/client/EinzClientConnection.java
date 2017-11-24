@@ -1,11 +1,18 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
+/**
+ * call {@link #run} to actually connect
+ */
 public class EinzClientConnection {
 
     private final String serverIP;
@@ -18,6 +25,11 @@ public class EinzClientConnection {
     private BufferedReader bufferIn;
     private EinzClientConnection.OnMessageReceived mMessageListener = null; // interface on message received
 
+    /**
+     * @param serverIP
+     * @param serverPort
+     * @param messageListener to react to messages. implement EinzClientConnection.OnMessageReceived
+     */
     public EinzClientConnection(String serverIP, int serverPort, EinzClientConnection.OnMessageReceived messageListener){
         this.serverIP = serverIP;
         this.serverPort = serverPort;
@@ -37,6 +49,41 @@ public class EinzClientConnection {
         if (bufferOut != null && !bufferOut.checkError()) {
             bufferOut.println(message);
             bufferOut.flush();
+        }
+    }
+
+    /**
+     * Same as the other sendMessage, but transforms JSON to String for you.<br/>
+     * <b>appends \r\n at the end if there is no \n at the end</b>
+     * Threadsafe ✔ <br/>
+     * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
+     * @see #sendMessage(String)
+     * @param message
+     */
+    public void sendMessage(JSONObject message){
+        String msg = message.toString();
+        if(!msg.endsWith("\n")){
+            msg += "\r\n";
+        }
+        sendMessage(msg);
+    }
+
+    /**
+     * Same as the other sendMessage, but transforms EinzMessage to JSON to String for you.<br>
+     * <b>appends \r\n at the end if there is no \n at the end</b>
+     * Threadsafe ✔<br>
+     * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
+     * @see #sendMessage(JSONObject)
+     * @see #sendMessage(String)
+     * @param message
+     */
+    public void sendMessage(EinzMessage message){
+        try {
+            sendMessage(message.toJSON());
+        } catch (JSONException e) {
+            Log.e("ESCH/sendMsg", "You sent an EinzMessage which could not be translated toJSON().");
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 

@@ -30,6 +30,6 @@ public class EinzRegisterSuccessAction extends EinzAction {
      */
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onRegisterSuccess(getMessage());
     }
 }

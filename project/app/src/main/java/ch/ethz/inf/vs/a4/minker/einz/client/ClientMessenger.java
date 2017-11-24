@@ -22,11 +22,11 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
     private EinzClientConnection clientConnection;
     private ClientActionCallbackInterface actionsCallback;
 
-    public ClientMessenger(Context appContext){
+    public ClientMessenger(Context appContext, ClientActionCallbackInterface callbackInterface){
         // initialize local variables
         this.appContext = appContext;
         this.parserFactory = new EinzParserFactory();
-        this.actionsCallback = new ClientMessengerCallback(); // TODO: specify this interface and implement it
+        this.actionsCallback = callbackInterface;
         this.actionFactory = new EinzActionFactory(actionsCallback);
 
         // initialize Factories by loading the mappings from the specified files above

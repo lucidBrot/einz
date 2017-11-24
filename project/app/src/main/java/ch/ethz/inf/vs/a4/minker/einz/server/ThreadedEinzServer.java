@@ -192,7 +192,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         if(shouldStopSpinning){
             // interrupt the serverSocket.accept() call, so that it will throw a SocketException
             try {
-                serverSocket.close();
+                if(serverSocket!=null){
+                    serverSocket.close();
+                }else{
+                    // probably going back while starting up server
+                    abortAllClientHandlers();
+                }
             } catch (IOException e) {
                 Log.e("EinzServer/stopServer", "Tried to close socket. Failed.");
                 // probably because it lost connection but still has buffer to flush. Don't care, just finish that
@@ -285,6 +290,11 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * Waits for all clientHanlderThreads after kicking all clients. may take some time. You should consider running this method in a non-UI thread.
      */
     public void shutdown() {
+        if(getServerManager()==null) {
+            abortAllClientHandlers();
+            return;
+        }
+
         Log.d("EinzServer/shutdown", "initiating shutdown...");
         stopListeningForIncomingConnections(true);
         getServerManager().serverShuttingDownGracefully = true;
