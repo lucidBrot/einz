@@ -1,5 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 
 /**
@@ -7,4 +10,17 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
  */
 
 public class EinzFinishTurnMessageBody extends EinzMessageBody {
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        return null;
+    }
 }
+/*
+{
+  "header":{
+    "messagegroup":"furtheractions",
+    "messagetype":"FinishTurn"
+  },
+  "body":{}
+}
+ */

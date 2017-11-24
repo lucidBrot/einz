@@ -1,5 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 
 /**
@@ -7,4 +10,26 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
  */
 
 public class EinzCustomActionMessageBody extends EinzMessageBody {
+
+    JSONObject ruleParameter;
+
+    public EinzCustomActionMessageBody(JSONObject ruleParameter) {
+        this.ruleParameter = ruleParameter;
+    }
+
+    @Override
+    public JSONObject toJSON() throws JSONException {
+        return this.ruleParameter;
+    }
 }
+/*
+{
+  "header":{
+    "messagegroup":"furtheractions",
+    "messagetype":"CustomAction"
+  },
+  "body":{
+    "custom parameter of the rule":{ a custom JSONObject},
+  }
+}
+ */
