@@ -383,7 +383,7 @@ public class ExampleUnitTest {
         String msg = "{\n" +
                 "  \"header\":{\n" +
                 "    \"messagegroup\":\"playcard\",\n" +
-                "    \"messagetype\":\"PlaycardResponse\"\n" +
+                "    \"messagetype\":\"PlayCardResponse\"\n" +
                 "  },\n" +
                 "  \"body\":{\n" +
                 "\t\"success\":\"true\"\n" +

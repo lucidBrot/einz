@@ -34,7 +34,7 @@ public class EinzPlayCardResponseMessageBody extends EinzMessageBody {
 {
   "header":{
     "messagegroup":"playcard",
-    "messagetype":"PlaycardResponse"
+    "messagetype":"PlayCardResponse"
   },
   "body":{
 	"success":"true"
