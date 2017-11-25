@@ -187,7 +187,7 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     public void sendPlayCardResponse(Player p){
         /*
-        EinzMessageHeader header = new EinzMessageHeader("playcard", "PlaycardResponse");
+        EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCardResponse");
         EinzPlayCardResponseMessageBody body = new EinzPlayCardResponseMessageBody("true");
         EinzMessage<EinzPlayCardResponseMessageBody> message = new EinzMessage<>(header, body);
         try {
