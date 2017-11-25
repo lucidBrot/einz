@@ -15,5 +15,6 @@
     <string name="observer">Observer</string>
     <string name="host_game_title">E1NZ</string>
     <string name="start_server">START SERVER</string>
+    <string name="IME_start_server">Start Server</string>
 
 </resources>
