@@ -182,6 +182,20 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
 
     }
 
+    void firstESCHReady(){
+        // Get a handler that can be used to post to the main thread
+        Handler mainHandler = new Handler(applicationContext.getMainLooper());
+
+        Runnable myRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if(serverActivityCallbackInterface!=null){
+                    serverActivityCallbackInterface.onFirstESCHReady();
+                }}
+        };
+        mainHandler.post(myRunnable);
+    }
+
     public boolean isShouldStopSpinning() {
         return shouldStopSpinning;
     }

@@ -21,7 +21,8 @@
                   android:textStyle="bold"
                   android:textSize="50sp"
                   android:gravity="center"
-                  android:text="@string/host_game_title"/>
+                  android:text="@string/host_game_title"
+                  android:imeOptions="actionDone"/>
         <EditText android:id="@+id/et_s_username"
                   android:hint="@string/et_s_username"
                   android:layout_weight="0.1"

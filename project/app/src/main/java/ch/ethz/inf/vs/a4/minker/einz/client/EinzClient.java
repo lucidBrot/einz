@@ -67,17 +67,39 @@ public class EinzClient implements Runnable {
         // still need to spin until isConnected to make sure we do not send register message before connecting, thus losing that message
 
         // send messages in background because android does not allow networking in main thread
+        sendRegistrationMessage();
+
+    }
+
+    /**
+     * starts a new thread and sends the registration message from there. username and role as specified when this client was constructed.
+     */
+    public void sendRegistrationMessage(){
         (new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!connection.isConnected()) {
-                    try {
-                        sleep(10000); // wait for server ready. it works if you put a breakpoint on the line with "new Thread(", so waiting should help
-                        // TODO: this is ugly. better idea?
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
+
+                /*
+                // the following bugfix is no longer needed because the server tells the first client that connected when it is ready for the register message
+                // other clients are hopefully slow enough, else they would have to wait or get a response from the server for this... // TODO: (later) check whether non-host clients send register message too early
+                //<Bugfix>
+                while (!connection.isConnected()) { // spin until connected
+                    //sleep(10);
+                    // wait for server ready. it works if you put a breakpoint on the line with "new Thread(", so waiting should help
+                    // this sleeping doesn't seem to help. sometimes it still doesn't get response of the server even after sleeping 1000000, or 10000. Seems to work with 1 and 10 ms though
+                    // BUT: why is this the case? And why does it only sometimes work?
+                    //      below sleep was added after this comment
                 }
+
+                // sleep a little after the connection is there, somehow this helps. If this is not there, the message is lost before the server is fully ready
+                try {
+                    sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                //</Bugfix>
+                */
+
                 // example message sending. implement this where you like
                 EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
                 EinzRegisterMessageBody body = new EinzRegisterMessageBody(username, role); // getting all the girls
@@ -96,6 +118,5 @@ public class EinzClient implements Runnable {
                 }
             }
         })).start();
-
     }
 }

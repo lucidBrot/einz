@@ -126,6 +126,8 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
                 ip = e.getMessage();
                 e.printStackTrace();
             }
+        } else {
+            Log.d("LobbyActivity/IP/1stTry", "wlan address: "+ip);
         }
         return ip;
     }
@@ -141,6 +143,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
                     (ip >> 8 & 0xff),
                     (ip >> 16 & 0xff),
                     (ip >> 24 & 0xff));
+            Log.d("LobbyActivity/IP", "wlan address: "+wifiIpAddress);
             if(!wifiIpAddress.equals("0.0.0.0"))
                 return wifiIpAddress;
         }
@@ -170,13 +173,21 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     @Override
     public void onLocalServerReady() {
         Log.d("LobbyActivity", "local server ready. Connecting...");
-        setIPAndPort(server);
-        try {
+    //    setIPAndPort(server);
+/*        try {
             sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        }*/
         connectClientToLocalServer();
+    }
+
+    /**
+     * When you are the host and the first client-handler in the server is ready to receive the register message
+     */
+    @Override
+    public void onFirstESCHReady() {
+        this.ourClient.sendRegistrationMessage();
     }
 
     private void connectClientToLocalServer() {
