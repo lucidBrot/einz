@@ -67,7 +67,9 @@ public class EinzClient implements Runnable {
         // still need to spin until isConnected to make sure we do not send register message before connecting, thus losing that message
 
         // send messages in background because android does not allow networking in main thread
-        sendRegistrationMessage();
+         sendRegistrationMessage(); // might be sent twice, because the host automatically calls sendRegistrationMEssage when the server is ready to receive it.
+        // but is probably not harmful and other clients might need to send from here because they don't know if the server is ready. Maybe they just need to sleep for 10ms after connecting and before registering
+        // or we could implement a server-ready message.
 
     }
 
