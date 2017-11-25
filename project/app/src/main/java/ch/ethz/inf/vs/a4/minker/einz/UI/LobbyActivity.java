@@ -126,6 +126,8 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
                 ip = e.getMessage();
                 e.printStackTrace();
             }
+        } else {
+            Log.d("LobbyActivity/IP/1stTry", "wlan address: "+ip);
         }
         return ip;
     }
@@ -171,12 +173,12 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     @Override
     public void onLocalServerReady() {
         Log.d("LobbyActivity", "local server ready. Connecting...");
-        setIPAndPort(server);
-        try {
+    //    setIPAndPort(server);
+/*        try {
             sleep(1000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
-        }
+        }*/
         connectClientToLocalServer();
     }
 
