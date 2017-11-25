@@ -44,12 +44,11 @@ public class EinzStateInfoParser extends EinzParser {
         //get globalstate
         JSONObject globalstateJSON = body.getJSONObject("globalstate");
         JSONObject numcardsinhandJSON = globalstateJSON.getJSONObject("numcardsinhand");
-        HashMap<String, Integer> numcardsinhand = new HashMap();
+        HashMap<String, String> numcardsinhand = new HashMap();
         Iterator keys = numcardsinhandJSON.keys();
         while (keys.hasNext()) {
             String name = (String) keys.next();
-            String numString = numcardsinhandJSON.getString(name);
-            Integer num = Integer.getInteger(numString);
+            String num = numcardsinhandJSON.getString(name);
             numcardsinhand.put(name, num);
         }
         JSONArray stackJSON = globalstateJSON.getJSONArray("stack");

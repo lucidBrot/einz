@@ -400,7 +400,7 @@ public class ExampleUnitTest {
                 "    \"messagetype\":\"CustomAction\"\n" +
                 "  },\n" +
                 "  \"body\":{\n" +
-                "    \"custom parameter of the rule\":\" a custom JSONObject\n" +
+                "    \"custom parameter of the rule\":\" a custom JSONObject\"\n" +
                 "  }\n" +
                 "}";
         parser_test(msg);
@@ -414,7 +414,7 @@ public class ExampleUnitTest {
                 "    \"messagetype\":\"CustomActionResponse\"\n" +
                 "  },\n" +
                 "  \"body\":{\n" +
-                "    \"custom parameter of the rule\":\" a custom JSONObject\n" +
+                "    \"custom parameter of the rule\":\" a custom JSONObject\"\n" +
                 "  }\n" +
                 "}";
         parser_test(msg);
