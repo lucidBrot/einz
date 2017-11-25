@@ -136,10 +136,12 @@ public class EinzServerClientHandler implements Runnable{
 
         String line;
         spin = true;
+        boolean firstround = true;
 
         while (spin) {
             try {
                 socketReadLock.lock();
+                if(isFirstConnectionOnServer() && firstround){parentEinzServer.firstESCHReady(); firstround=false;} // inform first(host probably) client when the server is ready to receive the register message
                 line = readSocketLine();
                 socketReadLock.unlock();
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {

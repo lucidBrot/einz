@@ -141,4 +141,12 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
     public void onLocalServerReady() {
         // ignore in this debug thing
     }
+
+    /**
+     * When you are the host and the first client-handler in the server is ready to receive the register message
+     */
+    @Override
+    public void onFirstESCHReady() {
+        // ignore in this debug thing
+    }
 }

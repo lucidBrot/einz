@@ -180,6 +180,14 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         connectClientToLocalServer();
     }
 
+    /**
+     * When you are the host and the first client-handler in the server is ready to receive the register message
+     */
+    @Override
+    public void onFirstESCHReady() {
+        this.ourClient.sendRegistrationMessage();
+    }
+
     private void connectClientToLocalServer() {
         this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext(), this.username, this.role);
         this.ourClient.run();
