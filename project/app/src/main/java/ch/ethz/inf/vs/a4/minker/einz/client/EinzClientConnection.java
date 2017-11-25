@@ -10,6 +10,8 @@ import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import static java.lang.Thread.sleep;
+
 /**
  * call {@link #run} to actually connect
  */

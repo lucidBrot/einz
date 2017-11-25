@@ -141,6 +141,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
                     (ip >> 8 & 0xff),
                     (ip >> 16 & 0xff),
                     (ip >> 24 & 0xff));
+            Log.d("LobbyActivity/IP", "wlan address: "+wifiIpAddress);
             if(!wifiIpAddress.equals("0.0.0.0"))
                 return wifiIpAddress;
         }

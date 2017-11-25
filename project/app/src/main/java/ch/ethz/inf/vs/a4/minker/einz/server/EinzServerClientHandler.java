@@ -14,6 +14,8 @@ import java.net.Socket;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static java.lang.Thread.sleep;
+
 /**
  * This class handles one Connection per instance (thread)
  */
@@ -134,6 +136,7 @@ public class EinzServerClientHandler implements Runnable{
 
         String line;
         spin = true;
+
         while (spin) {
             try {
                 socketReadLock.lock();
@@ -186,7 +189,7 @@ public class EinzServerClientHandler implements Runnable{
 
         this.stopping = true;
         try {
-            Thread.sleep(SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET);
+            sleep(SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET);
         } catch (InterruptedException e) {
             Log.e("ESCH/stopPatiently", "You interrupted my sleep (giving the other threads time to finish their actions): ");
             e.printStackTrace();
