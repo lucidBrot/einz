@@ -87,12 +87,14 @@ public class EinzClient implements Runnable {
         this.clientConnectionThread.start(); // establish connection
 
         // TODO: register and all other messages
-        Log.d("EinzClient/run", "server is up methinks"); // if server is running on localhost, it told us when it was ready to accept connections
-        // still need to spin until isConnected to make sure we do not send register message before connecting, thus losing that message
+        if(this.isHost) {
+            Log.d("EinzClient/run", "server is up methinks"); // if server is running on localhost, it told us when it was ready to accept connections
+            // still need to spin until isConnected to make sure we do not send register message before connecting, thus losing that message
+        }
 
         // send messages in background because android does not allow networking in main thread
          if(!isHost){ // if the server runs on the same device, it will tell the client when it is ready to receive the registrationmessage, and will execute onServersideHandlerReady
-             // no sleeping needed because users are slow at typing IP
+             spinUntilConnectedAndSleep();
              sendRegistrationMessage();
          }
     }
@@ -154,6 +156,29 @@ public class EinzClient implements Runnable {
         })).start();
     }
 
+    private void spinUntilConnectedAndSleep(){
+        //<Bugfix>
+        while (!connection.isConnected()) { // spin until connected
+            try {
+                sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // wait for server ready. it works if you put a breakpoint on the line with "new Thread(", so waiting should help
+            // this sleeping doesn't seem to help. sometimes it still doesn't get response of the server even after sleeping 1000000, or 10000. Seems to work with 1 and 10 ms though
+            // BUT: why is this the case? And why does it only sometimes work?
+            //      below sleep was added after this comment
+        }
+
+        // sleep a little after the connection is there, somehow this helps. If this is not there, the message is lost before the server is fully ready
+        try {
+            sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        //</Bugfix>
+    }
+
     /**
      * Called by the Activity once the server stated that not only is it up and running {@link ServerActivityCallbackInterface#onLocalServerReady()}},
      * but also that it is ready to handle the first connected client. This happens after the client established a connection and the server initialized an {@link ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler}.
@@ -162,5 +187,10 @@ public class EinzClient implements Runnable {
      */
     public void onServersideHandlerReady(){
         sendRegistrationMessage();
+    }
+
+    public void shutdown() {
+        // TODO: send unregister message
+        this.connection.stopClient();
     }
 }

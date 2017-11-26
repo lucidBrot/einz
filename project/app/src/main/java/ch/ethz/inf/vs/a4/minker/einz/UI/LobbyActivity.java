@@ -193,8 +193,21 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         super.onBackPressed();
         // stop server on back button
         if(this.host && this.server!=null) {
-            this.server.shutdown();
+            (new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    server.shutdown();
+                }
+            })).start();
+            // don't run this on the main thread. networking is not allowed on the main thread
         }
+
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ourClient.shutdown();
+            }
+        })).start();
     }
 
     /**
