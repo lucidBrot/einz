@@ -171,6 +171,15 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         //TODO: settings if you're the host
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // stop server on back button
+        if(this.host && this.server!=null) {
+            this.server.shutdown();
+        }
+    }
+
     /**
      * set server serverIP and serverPort to be displayed in ui
      * @param einzServer where the IP and Port info come from
