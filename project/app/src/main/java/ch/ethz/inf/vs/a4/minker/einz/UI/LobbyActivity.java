@@ -88,7 +88,20 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             ((TextView) findViewById(R.id.tv_lobby_ip)).setText(ip);
             ((TextView) findViewById(R.id.tv_lobby_port)).setText(p);
             ((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.CYAN); // CYAN for client, Yellow for server. yey.
+
+            // this client will only be shown in the list once the server told it that it was registered.
+
+            // show that it is connecting
+            addLobbyListUser(this.username, this.role+"   (Connecting...)");
+            // this will be purged once the client receives the first UpdateLobbyList
         }
+
+        ///debug_populate_lobbylist();
+
+
+    }
+
+    private void debug_populate_lobbylist() {
 
         // <Debug>
         ArrayList<String> pl = new ArrayList<>();

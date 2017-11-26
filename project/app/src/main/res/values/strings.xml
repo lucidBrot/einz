@@ -16,5 +16,11 @@
     <string name="host_game_title">E1NZ</string>
     <string name="start_server">START SERVER</string>
     <string name="IME_start_server">Start Server</string>
+    <string name="et_c_username">Username</string>
+    <string name="tv_c_setup_port">PORT</string>
+    <string name="tv_c_username">Username</string>
+    <string name="tv_c_setup_ip">server IP</string>
+    <string name="btn_c_setup">connect</string>
+    <string name="btn_c_join_game">join game</string>
 
 </resources>

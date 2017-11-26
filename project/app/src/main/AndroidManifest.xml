@@ -35,6 +35,8 @@
         </activity>
         <activity android:name=".UI.LobbyActivity">
         </activity>
+        <activity android:name=".UI.ClientSetupActivity">
+        </activity>
     </application>
 
 </manifest>
