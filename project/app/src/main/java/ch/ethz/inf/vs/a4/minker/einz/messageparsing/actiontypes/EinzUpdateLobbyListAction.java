@@ -16,14 +16,14 @@ public class EinzUpdateLobbyListAction extends EinzAction {
      * @param issuedByPlayer
      * @param issuedByClientHandler
      */
-    public EinzUpdateLobbyListAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
+    public EinzUpdateLobbyListAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage<EinzUpdateLobbyListMessageBody> params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
     }
 
     /**
      * compatibility for new actionfactory (for client)
      */
-    public EinzUpdateLobbyListAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+    public EinzUpdateLobbyListAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage<EinzUpdateLobbyListMessageBody> params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
     }
 
@@ -32,6 +32,6 @@ public class EinzUpdateLobbyListAction extends EinzAction {
      */
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onUpdateLobbyList(getMessage());
     }
 }

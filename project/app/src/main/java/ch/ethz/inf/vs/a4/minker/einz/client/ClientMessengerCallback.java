@@ -32,14 +32,11 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         EinzUpdateLobbyListMessageBody body = message.getBody();
         HashMap<String, String> hashMap = body.getLobbylist();
 
-        hashMap.forEach(new BiConsumer<String, String>() {
-            @Override
-            public void accept(String username, String s2) {
-                if(s2.equals("spectator")){
-                    spectators.add(username);
-                } else if (s2.equals("player")){
-                    players.add(username);
-                }
+        hashMap.forEach((username, s2) -> {
+            if(s2.equals("spectator")){
+                spectators.add(username);
+            } else if (s2.equals("player")){
+                players.add(username);
             }
         });
 

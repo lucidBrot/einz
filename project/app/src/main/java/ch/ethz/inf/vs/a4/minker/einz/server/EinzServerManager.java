@@ -296,13 +296,17 @@ public class EinzServerManager {
         getUserListLock().readLock().unlock();
 
         if(failureReason==null){
-            userListLock.readLock().lock();
+            getUserListLock().writeLock().lock();
             ConcurrentHashMap<String, String> clientRoles = getRegisteredClientRoles();
             ConcurrentHashMap<String, EinzServerClientHandler> clientHandlers = getRegisteredClientHandlers();
 
             String role = clientRoles.get(username);
             EinzServerClientHandler esch = clientHandlers.get(username);
-            userListLock.readLock().unlock();
+
+            // unregister them
+            getRegisteredClientRoles().remove(username);
+            getRegisteredClientHandlers().remove(username);
+            getUserListLock().writeLock().unlock();
 
             // inform all clients
             // broadcast UnregisterResponse
@@ -311,12 +315,6 @@ public class EinzServerManager {
             EinzMessage<EinzUnregisterResponseMessageBody> message = new EinzMessage<>(header, body);
             broadcastMessageToAllPlayers(message);
             broadcastMessageToAllSpectators(message);
-
-            // unregister them
-            userListLock.writeLock().lock();
-            getRegisteredClientRoles().remove(username);
-            getRegisteredClientHandlers().remove(username);
-            userListLock.writeLock().unlock();
 
             // tell fabian about it
             if(gamePhaseStarted &&!serverShuttingDownGracefully){
@@ -338,7 +336,7 @@ public class EinzServerManager {
             try {
                 esch.setConnectedUser(null);
                 esch.stopThreadPatiently();
-                Log.d("servMan/unReg", "stopped Thread of"+username);
+                Log.d("servMan/unReg", "stopped Thread of "+username);
             }catch(java.lang.NullPointerException e){
                 Log.d("servMan/unReg", "ESCH didn't exist anymore. (Did you maybe shut down the server?)");
                 e.printStackTrace();
