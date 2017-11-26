@@ -28,7 +28,7 @@ android {
     // through dependencies).
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_7
     }
     // https://stackoverflow.com/questions/37347326/errorconflict-with-dependency-com-google-code-findbugsjsr305
     android {

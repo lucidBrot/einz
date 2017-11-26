@@ -55,6 +55,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private boolean host; // if this device is hosting the server
     private String username;
     private String role;
+    private String adminUsername; // which user was chosen as admin by the server
     // TODO: what if the host is not the first user to connect? stop server and restart?
 
     @Override
@@ -87,10 +88,15 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             ((TextView) findViewById(R.id.tv_lobby_port)).setText(p);
             ((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.CYAN); // CYAN for client, Yellow for server. yey.
         }
-        debug_addLobbyListUser();
+
     }
 
-    private void debug_addLobbyListUser() {
+    /**
+     * adds the user to the list and highlights him if he's (previously set using {@link #setAdmin(String)}) admin.
+     * @param username
+     * @param role
+     */
+    private void addLobbyListUser(String username, String role) {
         LinearLayout lobbyList = findViewById(R.id.ll_lobbylist);
 
         CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_lobbylist_element, lobbyList, false);
@@ -100,22 +106,51 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         TextView tv_role = usercard.findViewById(R.id.tv_lobbylist_role);
 
         // set text
-        tv_username.setText(this.username);
-        tv_role.setText(this.role);
+        tv_username.setText(username);
+        tv_role.setText(role);
+
+        // highlight admin
+        if(username.equals(this.adminUsername)){
+            usercard.setCardBackgroundColor(Color.GREEN);
+        }
 
         // add view
         lobbyList.addView(usercard);
     }
 
+    /**
+     * remove all usercards from the lobby list (and all other content of the list as well)
+     */
+    private void clearLobbyList(){
+        LinearLayout lobbyList = findViewById(R.id.ll_lobbylist);
+        lobbyList.removeAllViews();
+    }
 
+
+    /**
+     * clears the lobby list, rewrites it based on the parameters
+     * @param players
+     * @param spectators
+     */
     @Override
     public void setLobbyList(ArrayList<String> players, ArrayList<String> spectators) {
+        clearLobbyList();
+
+        // first add all players
+        for(String player : players){
+            addLobbyListUser(player, "player");
+        }
+
+        // then add all spectators
+        for(String spectator : spectators){
+            addLobbyListUser(spectator, "spectator");
+        }
 
     }
 
     @Override
     public void setAdmin(String username) {
-        // make the corresponding name red or something
+        this.adminUsername = username;
     }
 
     @Override

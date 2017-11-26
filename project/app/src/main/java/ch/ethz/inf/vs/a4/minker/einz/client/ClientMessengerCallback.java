@@ -27,20 +27,23 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
         Log.d("ClientMessengerCallback", "received UpdateLobbyList");
-        final ArrayList<Player> players = new ArrayList<>();
-        final ArrayList<Spectator> spectators = new ArrayList<>();
+        final ArrayList<String> players = new ArrayList<>();
+        final ArrayList<String> spectators = new ArrayList<>();
         EinzUpdateLobbyListMessageBody body = message.getBody();
         HashMap<String, String> hashMap = body.getLobbylist();
 
         hashMap.forEach(new BiConsumer<String, String>() {
             @Override
-            public void accept(String s, String s2) {
+            public void accept(String username, String s2) {
                 if(s2.equals("spectator")){
-                    spectators.add(new Spectator(s));
+                    spectators.add(username);
                 } else if (s2.equals("player")){
-                    players.add(new Player(s));
+                    players.add(username);
                 }
             }
         });
+
+        this.lobbyUI.setAdmin(message.getBody().getAdmin());
+        this.lobbyUI.setLobbyList(players, spectators);
     }
 }
