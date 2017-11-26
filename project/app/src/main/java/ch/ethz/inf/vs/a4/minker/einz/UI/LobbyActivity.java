@@ -1,18 +1,18 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
-import ch.ethz.inf.vs.a4.minker.einz.client.EinzClientConnection;
-import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
@@ -29,7 +29,16 @@ import java.util.Locale;
 import static java.lang.Thread.sleep;
 
 /**
- * Lobby List. corresponds to screen 3 in our proposal
+ * Lobby List. corresponds to screen 3 in our proposal.
+ * Can be started either from the server device or from a client-only device.
+ * Pass this Activity the following intent extra information:
+ *  Both:
+ *    "host" - boolean -     whether this device is hosting the server
+ *    "username" - String -  the username the user entered
+ *    "role" - String  -     Currently either "spectator" or "player"
+ *  Client-only:
+ *    "serverPort" - int -   on which port the server is listening
+ *    "serverIP" - String -  at which IP the server is located
  */
 public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface, View.OnClickListener, ServerActivityCallbackInterface {
     // implement some interface so that the client can update this
@@ -38,8 +47,8 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private Thread serverThread;
     private ServerFunctionDefinition serverLogicInterface;
     private EinzClient ourClient;
-    private String ip;
-    private int port;
+    private String serverIP;
+    private int serverPort;
 
     private boolean host; // if this device is hosting the server
     private String username;
@@ -56,8 +65,26 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         this.username = intent.getStringExtra("username");
         this.role = intent.getStringExtra("role");
 
-        startServer();
-        // wait for server to tell us it's ready so we can connect in onLocalServerReady()
+        if(this.host) {
+            startServer();
+            ((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.YELLOW); // CYAN for client, Yellow for server. yey.
+
+            // wait for server to tell us it's ready so we can connect in onLocalServerReady()
+        } else {
+            // still display the IP/PORT info so that they can tell their friends
+
+            /// Option to hide the infobox
+            ///((CardView) findViewById(R.id.cv_lobby_server_info)).setVisibility(View.GONE);
+
+            // get info
+            this.serverPort = intent.getIntExtra("serverPort",-1);
+            this.serverIP = intent.getStringExtra("serverIP");
+            // set UI to display this
+            String ip = "IP: "+this.serverIP; String p = "PORT: "+String.valueOf(this.serverPort);
+            ((TextView) findViewById(R.id.tv_lobby_ip)).setText(ip);
+            ((TextView) findViewById(R.id.tv_lobby_port)).setText(p);
+            ((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.CYAN); // CYAN for client, Yellow for server. yey.
+        }
     }
 
 
@@ -79,20 +106,20 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     /**
-     * set server ip and port to be displayed in ui
-     * @param einzServer
+     * set server serverIP and serverPort to be displayed in ui
+     * @param einzServer where the IP and Port info come from
      */
     private void setIPAndPort(ThreadedEinzServer einzServer) {
-        this.ip = getIP();
-        String ip = "IP: "+this.ip;
+        this.serverIP = getIP();
+        String ip = "IP: "+this.serverIP;
         ((TextView) findViewById(R.id.tv_lobby_ip)).setText(ip);
-        this.port = einzServer.getPORT();
-        String p = "PORT: "+String.valueOf(port);
+        this.serverPort = einzServer.getPORT();
+        String p = "PORT: "+String.valueOf(serverPort);
         ((TextView) findViewById(R.id.tv_lobby_port)).setText(p);
 
         // <Debug>
-        //this.ip="127.0.0.1";
-        //this.port=8080;
+        //this.serverIP="127.0.0.1";
+        //this.serverPort=8080;
         // </Debug>
     }
 
@@ -100,7 +127,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         Log.d("serverSetupActivity", "startServer was pressed");
         if(serverThread==null) { // only create one server
             serverLogicInterface = new ServerFunction(); // Fabians Part
-            ///server = new ThreadedEinzServer(this.getApplicationContext(), this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
+            ///server = new ThreadedEinzServer(this.getApplicationContext(), this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove serverPort specification
             server = new ThreadedEinzServer(this.getApplicationContext(),8080, this, serverLogicInterface);
             setIPAndPort(server);
             server.setDEBUG_ONE_MSG(false); // set to true to let server generate messages on same host
@@ -114,7 +141,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
      * @return the probably used IP address
      */
     public String getIP(){
-        // display server port
+        // display serverPort
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         @SuppressWarnings("deprecation") // https://stackoverflow.com/a/20846328/2550406
                 String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
@@ -191,7 +218,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     private void connectClientToLocalServer() {
-        this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext(), this.username, this.role, this.host);
+        this.ourClient = new EinzClient(this.serverIP, this.serverPort, this.getApplicationContext(), this.username, this.role, this.host);
         this.ourClient.run();
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
