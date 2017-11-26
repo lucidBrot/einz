@@ -37,6 +37,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         EinzUpdateLobbyListMessageBody body = message.getBody();
         HashMap<String, String> hashMap = body.getLobbylist();
 
+        // this code uses JAVA8 and crashes on API 23. Works on API 26. (both emulators with Nexus)
+        /*
         hashMap.forEach((username, s2) -> {
             if(s2.equals("spectator")){
                 spectators.add(username);
@@ -44,6 +46,16 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
                 players.add(username);
             }
         });
+        */
+        // same functionality but works on older devices:
+        for(String username : hashMap.keySet()){
+            String s2 = hashMap.get(username);
+            if(s2.equals("spectator")){
+                spectators.add(username);
+            } else if (s2.equals("player")){
+                players.add(username);
+            }
+        }
 
         // only the thread that created the view is allowed to update them
         Runnable runnable = new Runnable() {
