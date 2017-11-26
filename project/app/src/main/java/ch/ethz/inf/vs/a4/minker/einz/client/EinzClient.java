@@ -87,6 +87,7 @@ public class EinzClient implements Runnable {
 
         // send messages in background because android does not allow networking in main thread
          if(!isHost){ // if the server runs on the same device, it will tell the client when it is ready to receive the registrationmessage, and will execute onServersideHandlerReady
+             // no sleeping needed because users are slow at typing IP
              sendRegistrationMessage();
          }
     }

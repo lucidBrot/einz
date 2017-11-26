@@ -94,6 +94,10 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             // show that it is connecting
             addLobbyListUser(this.username, this.role+"   (Connecting...)");
             // this will be purged once the client receives the first UpdateLobbyList
+
+            // start client. Because we specify "host" as false, the client will automatically register
+            this.ourClient = new EinzClient(this.serverIP, this.serverPort, getApplicationContext(), this.username, this.role, false, this);
+            this.ourClient.run();
         }
 
         ///debug_populate_lobbylist();
