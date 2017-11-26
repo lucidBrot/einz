@@ -20,6 +20,7 @@ import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
+import java.lang.reflect.Array;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -89,6 +90,15 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             ((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.CYAN); // CYAN for client, Yellow for server. yey.
         }
 
+        // <Debug>
+        ArrayList<String> pl = new ArrayList<>();
+        pl.add("some player");
+        ArrayList<String> sp = new ArrayList<>();
+        sp.add("some spectator");
+        pl.add("admin player");
+        setAdmin("admin player");
+        setLobbyList(pl, sp);
+        //</Debug>
     }
 
     /**
@@ -150,6 +160,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
     @Override
     public void setAdmin(String username) {
+        Log.d("LobbyActivity", "set admin to "+username);
         this.adminUsername = username;
     }
 

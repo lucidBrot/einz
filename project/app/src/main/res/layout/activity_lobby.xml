@@ -29,6 +29,7 @@
                   android:orientation="vertical"
                   android:id="@+id/ll_lobbylist"
                   android:layout_below="@id/cv_lobby_server_info">
+        <!-- will be set dynamically from LobbyActivity. Will then purge all content -->
         <android.support.v7.widget.CardView android:layout_width="match_parent"
                                             android:layout_height="wrap_content">
             <LinearLayout android:layout_width="wrap_content"
@@ -37,7 +38,7 @@
                 <TextView android:layout_height="wrap_content"
                           android:layout_width="match_parent"
                           android:id="@+id/tv_lobbylist_username"
-                          android:text="Roger"
+                          android:text="DUMMY"
                           android:layout_margin="5dp"/>
                 <TextView android:layout_height="wrap_content"
                           android:layout_width="match_parent"
