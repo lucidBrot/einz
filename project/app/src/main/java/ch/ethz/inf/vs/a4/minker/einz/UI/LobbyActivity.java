@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.text.format.Formatter;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
@@ -85,6 +87,24 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             ((TextView) findViewById(R.id.tv_lobby_port)).setText(p);
             ((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.CYAN); // CYAN for client, Yellow for server. yey.
         }
+        debug_addLobbyListUser();
+    }
+
+    private void debug_addLobbyListUser() {
+        LinearLayout lobbyList = findViewById(R.id.ll_lobbylist);
+
+        CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_lobbylist_element, lobbyList, false);
+        // false because don't add view yet - I first want to set some text
+
+        TextView tv_username = usercard.findViewById(R.id.tv_lobbylist_username);
+        TextView tv_role = usercard.findViewById(R.id.tv_lobbylist_role);
+
+        // set text
+        tv_username.setText(this.username);
+        tv_role.setText(this.role);
+
+        // add view
+        lobbyList.addView(usercard);
     }
 
 
