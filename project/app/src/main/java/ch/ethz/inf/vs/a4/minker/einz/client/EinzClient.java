@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
@@ -23,6 +24,7 @@ public class EinzClient implements Runnable {
     private Thread clientConnectionThread;
     private String username;
     private String role;
+    private final LobbyUIInterface lobbyUI;
 
     /**
      * Creates a Client which offersa run() function. This function will establish a connection to the server, doing so in a new thread. For this, it is not neccessary to run that function in a new thread.
@@ -35,12 +37,14 @@ public class EinzClient implements Runnable {
      * @param isHost an indicator whether the server is running on this device.
      *               The first client to connect to the server is the admin. We hope that this will be consistently the same device, because of the network delay.
      *               isHost is only used to decide when to send the registration message
+     * @param lobbyUI the implementation of{@link LobbyUIInterface} that should be called to update the UI
      */
-    public EinzClient(String serverIP, int serverPort, Context appContext, String username, String role, boolean isHost) {
+    public EinzClient(String serverIP, int serverPort, Context appContext, String username, String role, boolean isHost, LobbyUIInterface lobbyUI) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.appContext = appContext;
-        this.actionCallbackInterface = new ClientMessengerCallback();
+        this.lobbyUI = lobbyUI;
+        this.actionCallbackInterface = new ClientMessengerCallback(lobbyUI);
         this.clientMessenger = new ClientMessenger(appContext, this.actionCallbackInterface);
         this.connection = new EinzClientConnection(serverIP, serverPort, clientMessenger);
         this.username = username;
