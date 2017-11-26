@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import org.json.JSONException;
 
 import static java.lang.Thread.sleep;
@@ -13,6 +14,7 @@ import static java.lang.Thread.sleep;
 public class EinzClient implements Runnable {
 
     private final EinzClientConnection connection;
+    private final boolean isHost; // true if admin
     private ClientActionCallbackInterface actionCallbackInterface; // handles the methods that an action might call (as reaction to incoming message)
     private ClientMessenger clientMessenger; // handles incoming messages
     private String serverIP;
@@ -22,7 +24,19 @@ public class EinzClient implements Runnable {
     private String username;
     private String role;
 
-    public EinzClient(String serverIP, int serverPort, Context appContext, String username, String role) {
+    /**
+     * Creates a Client which offersa run() function. This function will establish a connection to the server, doing so in a new thread. For this, it is not neccessary to run that function in a new thread.
+     * This class only implements Runnable because it can, not because it must.
+     * @param serverIP the IP to connect to
+     * @param serverPort the Port to connect to
+     * @param appContext the ApplicationContext from getApplicationContext()
+     * @param username the desired username. The server might respond with a registerFailure though
+     * @param role the desired role. Currently this could be "spectator" or "player"
+     * @param isHost an indicator whether the server is running on this device.
+     *               The first client to connect to the server is the admin. We hope that this will be consistently the same device, because of the network delay.
+     *               isHost is only used to decide when to send the registration message
+     */
+    public EinzClient(String serverIP, int serverPort, Context appContext, String username, String role, boolean isHost) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.appContext = appContext;
@@ -31,6 +45,7 @@ public class EinzClient implements Runnable {
         this.connection = new EinzClientConnection(serverIP, serverPort, clientMessenger);
         this.username = username;
         this.role = role;
+        this.isHost = isHost;
     }
 
     /**
@@ -67,9 +82,9 @@ public class EinzClient implements Runnable {
         // still need to spin until isConnected to make sure we do not send register message before connecting, thus losing that message
 
         // send messages in background because android does not allow networking in main thread
-         sendRegistrationMessage(); // might be sent twice, because the host automatically calls sendRegistrationMEssage when the server is ready to receive it.
-        // but is probably not harmful and other clients might need to send from here because they don't know if the server is ready. Maybe they just need to sleep for 10ms after connecting and before registering
-        // or we could implement a server-ready message.
+         if(!isHost){ // if the server runs on the same device, it will tell the client when it is ready to receive the registrationmessage, and will execute onServersideHandlerReady
+             sendRegistrationMessage();
+         }
     }
 
     /**
@@ -119,5 +134,15 @@ public class EinzClient implements Runnable {
                 }
             }
         })).start();
+    }
+
+    /**
+     * Called by the Activity once the server stated that not only is it up and running {@link ServerActivityCallbackInterface#onLocalServerReady()}},
+     * but also that it is ready to handle the first connected client. This happens after the client established a connection and the server initialized an {@link ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler}.
+     * That means that the server calls {@link ServerActivityCallbackInterface#onFirstESCHReady()} on the host. The {@link ch.ethz.inf.vs.a4.minker.einz.UI.LobbyActivity} implements this interface and will inform the host client by calling this method.
+     * From then on, the client is allowed to send messages freely.
+     */
+    public void onServersideHandlerReady(){
+        sendRegistrationMessage();
     }
 }

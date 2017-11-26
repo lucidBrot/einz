@@ -187,11 +187,11 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
      */
     @Override
     public void onFirstESCHReady() {
-        this.ourClient.sendRegistrationMessage();
+        this.ourClient.onServersideHandlerReady();
     }
 
     private void connectClientToLocalServer() {
-        this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext(), this.username, this.role);
+        this.ourClient = new EinzClient(this.ip, this.port, this.getApplicationContext(), this.username, this.role, this.host);
         this.ourClient.run();
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
