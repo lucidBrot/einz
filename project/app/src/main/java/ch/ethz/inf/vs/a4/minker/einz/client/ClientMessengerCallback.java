@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
+import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
@@ -14,9 +16,12 @@ import java.util.function.BiConsumer;
 
 public class ClientMessengerCallback implements ClientActionCallbackInterface {
     private final LobbyUIInterface lobbyUI; // TODO: implement reactions to messages
+    private final Context applicationContext;
 
-    public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface){
+
+    public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface, Context appContext){
         this.lobbyUI = lobbyUIInterface;
+        this.applicationContext=appContext;
     }
 
     @Override
@@ -40,7 +45,20 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
             }
         });
 
-        this.lobbyUI.setAdmin(message.getBody().getAdmin());
-        this.lobbyUI.setLobbyList(players, spectators);
+        // only the thread that created the view is allowed to update them
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                lobbyUI.setAdmin(message.getBody().getAdmin());
+                lobbyUI.setLobbyList(players, spectators);
+            }
+        };
+        runOnMainThread(runnable);
+
+    }
+
+    private void runOnMainThread(Runnable runnable){
+        Handler mainHandler = new Handler(this.applicationContext.getMainLooper());
+        mainHandler.post(runnable);
     }
 }

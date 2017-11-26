@@ -44,7 +44,7 @@ public class EinzClient implements Runnable {
         this.serverPort = serverPort;
         this.appContext = appContext;
         this.lobbyUI = lobbyUI;
-        this.actionCallbackInterface = new ClientMessengerCallback(lobbyUI);
+        this.actionCallbackInterface = new ClientMessengerCallback(lobbyUI, appContext);
         this.clientMessenger = new ClientMessenger(appContext, this.actionCallbackInterface);
         this.connection = new EinzClientConnection(serverIP, serverPort, clientMessenger);
         this.username = username;
