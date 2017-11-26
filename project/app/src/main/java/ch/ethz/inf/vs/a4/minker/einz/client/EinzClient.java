@@ -78,6 +78,11 @@ public class EinzClient implements Runnable {
             This client should implement some functions that allow the UI-thread to make this client send a message (in a different thread), e.g. when the UI realizes that the host wants to specifyRules or StartGame.
          */
 
+        // <debug>
+        // fake receiving new lobby list
+        //debug_faceReceiveUpdateLobbyList();
+        //</debug>
+
         this.clientConnectionThread = new Thread(this.connection);
         this.clientConnectionThread.start(); // establish connection
 
@@ -90,6 +95,14 @@ public class EinzClient implements Runnable {
              // no sleeping needed because users are slow at typing IP
              sendRegistrationMessage();
          }
+    }
+
+    private void debug_faceReceiveUpdateLobbyList() {
+        this.clientMessenger.messageReceived("{\"header\":{\"messagegroup\":\"registration\",\"messagetype\":\"UpdateLobbyList\"},\"body\":{\"lobbylist\":{\""+username+"\":\""+role+"\"},\"admin\":\"this is a debug packet\"}}");
+    }
+
+    private void debug_faceReceiveRegisterSuccess() {
+        this.clientMessenger.messageReceived("{\"header\":{\"messagegroup\":\"registration\",\"messagetype\":\"RegisterSuccess\"},\"body\":{\"role\":\""+this.role+"\",\"username\":\""+this.username+"\"}}");
     }
 
     /**

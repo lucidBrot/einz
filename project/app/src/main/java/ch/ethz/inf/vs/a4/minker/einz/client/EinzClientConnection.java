@@ -138,7 +138,7 @@ public class EinzClientConnection implements Runnable{
 
             Log.e("EinzClientConnection", "Clientside Error (2)");
             e.printStackTrace();
-            // TODO: handle these
+            // TODO: handle these, e.g. ECONNREFUSED (server not reachable under that port and IP
 
         }
 

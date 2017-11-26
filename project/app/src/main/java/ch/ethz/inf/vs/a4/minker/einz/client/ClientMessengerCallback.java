@@ -65,7 +65,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
                 lobbyUI.setLobbyList(players, spectators);
             }
         };
+
         runOnMainThread(runnable);
+        Log.d("ClientMessengerCallback", "updated LobbyList");
 
     }
 
