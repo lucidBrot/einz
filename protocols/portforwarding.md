@@ -61,7 +61,7 @@ https://developer.android.com/studio/run/emulator-networking.html#calling :
 
 The emulators port number is visible in its window top bar.
 
-![emulator_portforwarding](N:\Files\Schule\XCubby\studium\DS\dontsync\einz\protocols\emulator_portforwarding.jpg)
+![emulator_portforwarding](./emulator_portforwarding.jpg)
 
 (On the left the server, on the right the client. The client did not need any redirection)
 
