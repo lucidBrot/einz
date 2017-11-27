@@ -9,7 +9,6 @@ import java.util.Stack;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardColors;
 import ch.ethz.inf.vs.a4.minker.einz.CardText;
-import ch.ethz.inf.vs.a4.minker.einz.temp.Order;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalState;
@@ -27,7 +26,7 @@ public class GameState {
     //Array of all the spectators
     private HashSet<Spectator> spectators = new HashSet<>();
     //determines if we have to go up or down in the players Array to determine the next player
-    private Order order = Order.UP;
+//    private Order order = Order.UP;
     private Integer indexOfActivePlayer = 0;
     private boolean hasDrawn = false;
     //index indicates how many cards lie below the actual card (bottom card has index 0)
@@ -99,9 +98,9 @@ public class GameState {
     public ArrayList<Player> getPlayers(){
         return players;
     } //TODO; Don't return the private ArrayList
-    public Order getOrder(){
-        return order;
-    }
+//    public Order getOrder(){
+//        return order;
+//    }
     public Player getActivePlayer() {
         return players.get(indexOfActivePlayer);
     }
@@ -186,11 +185,11 @@ public class GameState {
     }
 
     public void switchOrder(){
-        if(order == Order.UP){
-            order = Order.DOWN;
-        } else if (order == Order.DOWN){
-            order = Order.UP;
-        }
+//        if(order == Order.UP){
+//            order = Order.DOWN;
+//        } else if (order == Order.DOWN){
+//            order = Order.UP;
+//        }
     }
 
     //adds a player to the game at the end, so players that get added last also play last
