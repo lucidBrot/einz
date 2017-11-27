@@ -10,4 +10,9 @@ public interface ServerActivityCallbackInterface {
      * When you are the host and the server is ready to accept connections
      */
     public void onLocalServerReady();
+
+    /**
+     * When you are the host and the first client-handler in the server is ready to receive the register message
+     */
+    public void onFirstESCHReady();
 }

@@ -74,7 +74,7 @@ public class Debug {
                 }
 
                 //tc.sendMessage(Debug.debug_getKickMessage("clemi"));
-                tc.sendMessage(Debug.debug_getStartGameMessage());
+                //tc.sendMessage(Debug.debug_getStartGameMessage());
             }
         };
         m.start(); // send message

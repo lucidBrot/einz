@@ -133,15 +133,23 @@ public class ServerSetupActivity extends AppCompatActivity {
             }
         });
 
-        ((EditText) findViewById(R.id.et_s_username)).setImeActionLabel("Start Server", KeyEvent.KEYCODE_ENTER);
+        ((EditText) findViewById(R.id.et_s_username)).setImeActionLabel("Start Server", KeyEvent.KEYCODE_ENTER); // emulator seems to use ENTER instead of ACTION DONE
         ((EditText) findViewById(R.id.et_s_username)).setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+
                 if (actionId == EditorInfo.IME_NULL
                         && keyEvent.getAction() == KeyEvent.ACTION_DOWN) {
                     startLobbyAction((((EditText) findViewById(R.id.et_s_username)).getText().toString()));//match this behavior to your 'Send' (or Confirm) button
                     return true;
+                } // because emulator seems to ignore the setting in xml and uses ENTER
+
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    //same thing again
+                    startLobbyAction((((EditText) findViewById(R.id.et_s_username)).getText().toString()));//match this behavior to your 'Send' (or Confirm) button
+                    return true; // state that we consumed this event
                 }
+
                 return false;
             }
         });

@@ -25,7 +25,7 @@ public class EinzPlayCardResponseMessageBody extends EinzMessageBody {
     @Override
     public JSONObject toJSON() throws JSONException {
         JSONObject jsonObject = new JSONObject();
-        String success = getSuccess();
+        String success = this.getSuccess();
         jsonObject.put("success", success);
         return jsonObject;
     }
