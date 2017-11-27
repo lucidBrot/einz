@@ -27,6 +27,6 @@ public class PlayTextRule extends BasicCardRule {
 
     @Override
     public boolean isValidPlayCardPermissive(GlobalState state, Card played) {
-        return state.getTopCardDiscardPile().text.equals(played.text);
+        return state.getTopCardDiscardPile().getText().equals(played.getText());
     }
 }

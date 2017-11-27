@@ -27,6 +27,6 @@ public class PlayColorRule extends BasicCardRule {
 
     @Override
     public boolean isValidPlayCardPermissive(GlobalState state, Card played){
-        return state.getTopCardDiscardPile().color == played.color;
+        return state.getTopCardDiscardPile().getColor() == played.getColor();
     }
 }

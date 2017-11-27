@@ -32,7 +32,7 @@ public class WishColorRule extends BasicCardRule {
 
     @Override
     public boolean isValidPlayCardPermissive(GlobalState state, Card played) {
-        return played.color.equals(wishedColor);
+        return played.getColor().equals(wishedColor);
     }
 
     @Override
