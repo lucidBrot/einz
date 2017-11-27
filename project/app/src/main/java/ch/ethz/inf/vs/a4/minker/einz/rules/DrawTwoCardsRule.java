@@ -44,7 +44,7 @@ public class DrawTwoCardsRule extends BasicCardRule{
     }
 
     @Override
-    public GlobalState onPlayCard(GlobalState state, Card played) {
+    public GlobalState onPlayAnyCard(GlobalState state, Card played) {
         if(played.text.equals(assignedTo.text)){
             if(state.getCardsToDraw() == 1){
                 state.setCardsToDraw(2);

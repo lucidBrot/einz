@@ -14,6 +14,8 @@ public class WishColorRule extends BasicCardRule {
 
     private CardColors wishedColor = null;
 
+    private boolean wished = false;
+
     public WishColorRule(GameConfig config, Card assignedTo) {
         super(config, assignedTo);
     }
@@ -29,14 +31,22 @@ public class WishColorRule extends BasicCardRule {
     }
 
     @Override
-    public boolean isValidPlayCardRestrictive(GlobalState state, Card played) {
+    public boolean isValidPlayCardPermissive(GlobalState state, Card played) {
         return played.color.equals(wishedColor);
     }
 
     @Override
-    public GlobalState onPlayCard(GlobalState state, Card played) {
+    public GlobalState onPlayAssignedCard(GlobalState state, Card played) {
         state.setRestrictive();
-        
+        wished = true;
+        return state;
+    }
+
+    @Override
+    public GlobalState onPlayAnyCard(GlobalState state, Card played) {
+        if(!assignedTo.equals(played)){
+            wished = false;
+        }
         return state;
     }
 }

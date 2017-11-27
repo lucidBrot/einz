@@ -5,6 +5,9 @@ package ch.ethz.inf.vs.a4.minker.einz;
  */
 public abstract class BasicCardRule extends BasicRule{
 
+    /**
+     * The Card which the rule belongs to
+     */
     protected Card assignedTo;
 
     public BasicCardRule(GameConfig config, Card assignedTo) {
@@ -13,64 +16,83 @@ public abstract class BasicCardRule extends BasicRule{
     }
 
 
-    public boolean isValidKickPlayerPermissive(GlobalState state, Player toKick){
-        return false;
-    }
-    public boolean isValidKickPlayerRestrictive(GlobalState state, Player toKick){
-        return true;
-    }
-
-    public boolean isValidLeaveGamePermissive(GlobalState state, Player leaves){
-        return false;
-    }
-    public boolean isValidLeaveGameRestrictive(GlobalState state, Player leaves){
-        return true;
-    }
-
+    /**
+     * Checks whether the player is allowed to draw cards.
+     * <br />
+     * In permissive mode at least one rule has to return true to allow the player to draw a card.
+     * @param state
+     * @return True if he is allowed to
+     */
     public boolean isValidDrawCardsPermissive(GlobalState state){
         return false;
     }
+
+    /**
+     * Checks whether the player is allowed to draw cards.
+     * <br />
+     * In restrictive mode every rule has to return true to allow the player to draw a card.
+     * @param state
+     * @return False if he is not allowed to.
+     */
     public boolean isValidDrawCardsRestrictive(GlobalState state){
         return true;
     }
 
+    /**
+     * Checks whether the card that the player wants to play is valid.
+     * <br />
+     * In permissive mode at least one rule has to return true to allow the player to draw a card.
+     * @param state
+     * @param played
+     * @return False
+     */
     public boolean isValidPlayCardPermissive(GlobalState state, Card played){
         return false;
     }
+
+    /**
+     * Checks whether the card that the player wants to play is valid.
+     * <br />
+     * In restrictive mode every rule has to return true to allow the player to draw a card.
+     * @param state
+     * @param played
+     * @return
+     */
     public boolean isValidPlayCardRestrictive(GlobalState state, Card played){
         return true;
     }
 
-    public boolean isPlayerFinishedPermissive(GlobalState state, Card played){
-        return false;
-    }
-    public boolean isPlayerFinishedRestrictive(GlobalState state, Card played){
-        return true;
-    }
 
 
 
 
-    public GlobalState onKickPlayer(GlobalState state){
-        return state;
-    }
-
-    public GlobalState onLeaveGame(GlobalState state){
-        return state;
-    }
-
+    /**
+     * Called after a card player decides to draw a card
+     * @param state
+     * @return
+     */
     public GlobalState onDrawCard(GlobalState state){
         return state;
     }
 
-    public GlobalState onPlayCard(GlobalState state, Card played){
+    /**
+     * Called if a player played the card assigned with the rule
+     * @param state
+     * @param played
+     * @return
+     */
+    public GlobalState onPlayAssignedCard(GlobalState state, Card played){
         return state;
     }
 
-    public GlobalState onPlayerFinished(GlobalState state){
+    /**
+     * Called on any card the player plays. This includes the card assigned to this rule.
+     * @param state
+     * @param played
+     * @return
+     */
+    public GlobalState onPlayAnyCard(GlobalState state, Card played){
         return state;
     }
-
-
 
 }
