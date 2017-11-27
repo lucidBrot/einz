@@ -557,7 +557,7 @@ This is sent by the **server** to specify whether a play was valid and has been 
 {
   "header":{
     "messagegroup":"playcard",
-    "messagetype":"PlaycardResponse"
+    "messagetype":"PlayCardResponse"
   },
   "body":{
 	"success":"true"

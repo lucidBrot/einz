@@ -22,14 +22,16 @@
                   android:textSize="50sp"
                   android:gravity="center"
                   android:text="@string/host_game_title"
-                  android:imeOptions="actionDone"/>
+                  />
         <EditText android:id="@+id/et_s_username"
                   android:hint="@string/et_s_username"
                   android:layout_weight="0.1"
                   android:layout_width="match_parent"
                   android:inputType="text"
                   android:maxLines="1"
-                  android:layout_height="wrap_content"/>
+                  android:layout_height="wrap_content"
+                  android:imeOptions="actionDone"
+                  android:imeActionLabel="@string/IME_start_server"/>
         <CheckBox android:id="@+id/cb_s_observer"
                   android:layout_weight="0.2"
                   android:textColor="#33b5e5"

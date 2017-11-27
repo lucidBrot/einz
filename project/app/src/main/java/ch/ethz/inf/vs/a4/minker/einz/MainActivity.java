@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import ch.ethz.inf.vs.a4.minker.einz.UI.ClientSetupActivity;
 import ch.ethz.inf.vs.a4.minker.einz.UI.ServerSetupActivity;
 import ch.ethz.inf.vs.a4.minker.einz.client.ClientActivity;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
@@ -21,7 +22,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // register onClick handlers
         findViewById(R.id.btn_start_client).setOnClickListener(this);
         findViewById(R.id.btn_start_server).setOnClickListener(this);
+        // below: the non-debug listeners
         findViewById(R.id.btn_s_host_game).setOnClickListener(this);
+        findViewById(R.id.btn_c_join_game).setOnClickListener(this);
     }
 
     @Override
@@ -43,6 +46,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Intent sIntent = new Intent(this, ServerSetupActivity.class);
                 startActivity(sIntent);
                 break;
+            case R.id.btn_c_join_game:
+                // start the UI intended for the clients
+                Intent cIntent = new Intent(this, ClientSetupActivity.class);
+                startActivity(cIntent);
+                break;
+
             default:
                 toast("unexpected onclick");
                 Log.d("MainActivity/OnClick", "Unhandled onClick event.");
