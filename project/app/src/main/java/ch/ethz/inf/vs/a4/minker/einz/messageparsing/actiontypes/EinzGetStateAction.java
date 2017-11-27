@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
+import ch.ethz.inf.vs.a4.minker.einz.client.ClientActionCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
@@ -22,6 +23,13 @@ public class EinzGetStateAction extends EinzAction {
      */
     public EinzGetStateAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
+    }
+
+    /**
+     * compatibility for new actionfactory (for client)
+     */
+    public EinzGetStateAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
     }
 
     @Override

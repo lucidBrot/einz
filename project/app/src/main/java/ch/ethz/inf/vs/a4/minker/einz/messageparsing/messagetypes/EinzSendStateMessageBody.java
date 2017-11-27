@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalStateParser;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
 
 /**
@@ -17,10 +17,10 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
 
 public class EinzSendStateMessageBody extends EinzMessageBody {
 
-    private final GlobalState globalstate;
+    private final GlobalStateParser globalstate;
     private final PlayerState playerstate;
 
-    public GlobalState getGlobalstate() {
+    public GlobalStateParser getGlobalstate() {
         return globalstate;
     }
 
@@ -28,7 +28,7 @@ public class EinzSendStateMessageBody extends EinzMessageBody {
         return playerstate;
     }
 
-    public EinzSendStateMessageBody(GlobalState globalstate, PlayerState playerstate){
+    public EinzSendStateMessageBody(GlobalStateParser globalstate, PlayerState playerstate){
         this.playerstate = playerstate;
         this.globalstate = globalstate;
     }

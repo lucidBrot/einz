@@ -9,9 +9,9 @@ import java.util.Stack;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardColors;
 import ch.ethz.inf.vs.a4.minker.einz.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalState;
 
 /**
  * Created by Fabian on 09.11.2017.

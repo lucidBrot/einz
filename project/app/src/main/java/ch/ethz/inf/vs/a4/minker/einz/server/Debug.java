@@ -74,7 +74,7 @@ public class Debug {
                 }
 
                 //tc.sendMessage(Debug.debug_getKickMessage("clemi"));
-                tc.sendMessage(Debug.debug_getStartGameMessage());
+                //tc.sendMessage(Debug.debug_getStartGameMessage());
             }
         };
         m.start(); // send message
@@ -84,7 +84,7 @@ public class Debug {
 
     public static void debug_simulateClient2() {
         try {
-            sleep(200); // give Client1 a chance to register first
+            sleep(1200); // give Client1 a chance to register first
         } catch (InterruptedException e) {
             Log.w("Debug/TempClient2","Insomnia while creating client 2");
             e.printStackTrace();
@@ -116,7 +116,7 @@ public class Debug {
             @Override
             public void run() {
                 try {
-                    sleep(100); // wait until server hopefully runs
+                    sleep(1000); // wait until server hopefully runs
                 } catch (InterruptedException e) {
                     Log.e("TempClient2", "Sleeping Failed");
                     e.printStackTrace();

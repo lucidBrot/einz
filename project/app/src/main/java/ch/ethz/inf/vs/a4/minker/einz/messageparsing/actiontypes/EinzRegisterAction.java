@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
+import ch.ethz.inf.vs.a4.minker.einz.client.ClientActionCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
@@ -22,9 +23,16 @@ public class EinzRegisterAction extends EinzAction{
      * @param issuedByClientHandler
      */
     public EinzRegisterAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage<EinzRegisterMessageBody> params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
-        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
-        this.params = params;
-        this.body = params.getBody();
+        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, null, null);
+    }
+
+    /**
+     * compatibility for new actionfactory (for client)
+     */
+    public EinzRegisterAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage<EinzRegisterMessageBody> params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
+        this.params=params;
+        this.body=params.getBody();
     }
 
     /**

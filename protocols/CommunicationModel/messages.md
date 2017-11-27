@@ -78,6 +78,14 @@ Within the program, messagegroup and messagetype might be null if the mapping wa
 
   > [PlayCard](#playcard), [PlayCardResponse](#playcardresponse)
 
+* furtheractions
+
+  > All actions that a user can perform, except for the otherwise specified (e.g. playCard, DrawCard)
+  >
+  > [CustomAction](#customaction), [CustomActionResponse](#customactionresponse), [FinishTurn](#finishturn)
+  >
+  > These were added only lately and their parsers are not yet implemented (23.11.2017)
+
 
 * toast
 
@@ -549,7 +557,7 @@ This is sent by the **server** to specify whether a play was valid and has been 
 {
   "header":{
     "messagegroup":"playcard",
-    "messagetype":"PlaycardResponse"
+    "messagetype":"PlayCardResponse"
   },
   "body":{
 	"success":"true"
@@ -797,8 +805,53 @@ Action-IDs the client can choose from and should support:
   > [PlayCard](#PlayCard)
 
 
-
 Possibly in the future supported: "transferServer"
+
+## FurtherActions
+
+Depending on the rules, we need additional messages. E.g. when the user plays a card that allows them to choose a colour, they will get a state where something like "choose color" is a  (custom) possible action. To reply to the server, the rule must handle sending/receiving custom messages, i.e. [CustomAction](#customaction) on the client side and [CustomActionResponse](#customactionresponse) to respond from the server.
+
+### CustomAction
+
+```json
+{
+  "header":{
+    "messagegroup":"furtheractions",
+    "messagetype":"CustomAction"
+  },
+  "body":{
+    "custom parameter of the rule":{ a custom JSONObject},
+  }
+}
+```
+
+### CustomActionResponse
+
+```json
+{
+  "header":{
+    "messagegroup":"furtheractions",
+    "messagetype":"CustomActionResponse"
+  },
+  "body":{
+    "custom parameter of the rule":{ a custom JSONObject},
+  }
+}
+```
+
+### FinishTurn
+
+```json
+{
+  "header":{
+    "messagegroup":"furtheractions",
+    "messagetype":"FinishTurn"
+  },
+  "body":{}
+}
+```
+
+
 
 ## Rules
 

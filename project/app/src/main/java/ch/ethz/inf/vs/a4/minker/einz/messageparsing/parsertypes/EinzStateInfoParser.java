@@ -44,12 +44,11 @@ public class EinzStateInfoParser extends EinzParser {
         //get globalstate
         JSONObject globalstateJSON = body.getJSONObject("globalstate");
         JSONObject numcardsinhandJSON = globalstateJSON.getJSONObject("numcardsinhand");
-        HashMap<String, Integer> numcardsinhand = new HashMap();
+        HashMap<String, String> numcardsinhand = new HashMap();
         Iterator keys = numcardsinhandJSON.keys();
         while (keys.hasNext()) {
             String name = (String) keys.next();
-            String numString = numcardsinhandJSON.getString(name);
-            Integer num = Integer.getInteger(numString);
+            String num = numcardsinhandJSON.getString(name);
             numcardsinhand.put(name, num);
         }
         JSONArray stackJSON = globalstateJSON.getJSONArray("stack");
@@ -63,7 +62,7 @@ public class EinzStateInfoParser extends EinzParser {
         }
         String whoseturn = globalstateJSON.getString("whoseturn");
         String drawxcardsmin = globalstateJSON.getString("drawxcardsmin");
-        GlobalState globalstate = new GlobalState(numcardsinhand, stack, whoseturn, drawxcardsmin);
+        GlobalStateParser globalstate = new GlobalStateParser(numcardsinhand, stack, whoseturn, drawxcardsmin);
 
         //get playerstate
         JSONObject playerstateJSON = body.getJSONObject("playerstate");

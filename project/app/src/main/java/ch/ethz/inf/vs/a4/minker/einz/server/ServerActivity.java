@@ -101,6 +101,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
                     (ip >> 8 & 0xff),
                     (ip >> 16 & 0xff),
                     (ip >> 24 & 0xff));
+            Log.d("LobbyActivity/IP", "wlan address: "+wifiIpAddress);
             if(!wifiIpAddress.equals("0.0.0.0"))
                 return wifiIpAddress;
         }
@@ -134,5 +135,18 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
                 ((TextView) findViewById(R.id.tv_num_connected_clients)).setText(new String("#Connected clients: "+num));
             }
         });
+    }
+
+    @Override
+    public void onLocalServerReady() {
+        // ignore in this debug thing
+    }
+
+    /**
+     * When you are the host and the first client-handler in the server is ready to receive the register message
+     */
+    @Override
+    public void onFirstESCHReady() {
+        // ignore in this debug thing
     }
 }

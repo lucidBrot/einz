@@ -15,13 +15,13 @@ import ch.ethz.inf.vs.a4.minker.einz.Card;
  * Created by silvia on 11/17/17.
  */
 //this class is used for EinzSendStateMessageBody
-public class GlobalState {
-    private HashMap<String, Integer> numcardsinhand;
+public class GlobalStateParser {
+    private HashMap<String, String> numcardsinhand;
     private ArrayList<Card> stack;
     private String whoseTurn;
     private String drawxCardsMin;
 
-    public GlobalState(HashMap<String, Integer> numcardsinhand, ArrayList<Card> stack, String whoseTurn, String drawxCardsMin){
+    public GlobalStateParser(HashMap<String, String> numcardsinhand, ArrayList<Card> stack, String whoseTurn, String drawxCardsMin){
         this.numcardsinhand = numcardsinhand;
         this.stack = stack;
         this.whoseTurn = whoseTurn;
@@ -52,21 +52,21 @@ public class GlobalState {
         this.stack = stack;
     }
 
-    public HashMap<String, Integer> getNumCardsInHand() {
+    public HashMap<String, String> getNumCardsInHand() {
         return numcardsinhand;
     }
 
-    public void setNumCardsInHand(HashMap<String, Integer> numCardsInHand) {
+    public void setNumCardsInHand(HashMap<String, String> numCardsInHand) {
         this.numcardsinhand = numCardsInHand;
     }
 
     public JSONObject toJSON() throws JSONException {
         //build numcardsinhand object
         JSONObject numcardsinhandJSON = new JSONObject();
-        HashMap<String, Integer> numcardsinhand = getNumCardsInHand();
-        for (Map.Entry<String, Integer> entry : numcardsinhand.entrySet()) {
+        HashMap<String, String> numcardsinhand = getNumCardsInHand();
+        for (Map.Entry<String, String> entry : numcardsinhand.entrySet()) {
             String name = entry.getKey();
-            Integer number = entry.getValue();
+            String number = entry.getValue();
             numcardsinhandJSON.put(name, number);
         }
         //build stack object
@@ -75,7 +75,8 @@ public class GlobalState {
         for (int i = 0; i<stack.size(); i++){
             Card card = stack.get(i);
             JSONObject cardJSON = new JSONObject();
-            cardJSON.put(card.ID, card.origin);
+            cardJSON.put("origin", card.origin);
+            cardJSON.put("ID", card.ID);
             stackJSON.put(i, cardJSON);
         }
         //get whoseturn

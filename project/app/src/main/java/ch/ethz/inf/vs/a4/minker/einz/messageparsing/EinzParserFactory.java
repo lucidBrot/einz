@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
+import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzUnmappedParser;
@@ -7,9 +8,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Scanner;
 
 /**
  * This class is used to generate an EinzParser that corresponds to the messagegroup.
@@ -156,5 +159,18 @@ public class EinzParserFactory {
                 }
             }
         }
+    }
+
+    public void loadMappingsFromResourceFile(Context applicationContext, int resourceFile) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        InputStream jsonStream = applicationContext.getResources().openRawResource(resourceFile);
+        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
+        this.loadMappingsFromJson(jsonObject);
+    }
+
+    // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
+    // utility function
+    private String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }

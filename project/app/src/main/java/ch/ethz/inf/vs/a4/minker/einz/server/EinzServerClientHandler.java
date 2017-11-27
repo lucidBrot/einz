@@ -14,10 +14,13 @@ import java.net.Socket;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import static java.lang.Thread.sleep;
+
 /**
  * This class handles one Connection per instance (thread)
  */
 public class EinzServerClientHandler implements Runnable{
+
     public Socket socket;
 
     private boolean spin = false;
@@ -133,9 +136,12 @@ public class EinzServerClientHandler implements Runnable{
 
         String line;
         spin = true;
+        boolean firstround = true;
+
         while (spin) {
             try {
                 socketReadLock.lock();
+                if(isFirstConnectionOnServer() && firstround){parentEinzServer.firstESCHReady(); firstround=false;} // inform first(host probably) client when the server is ready to receive the register message
                 line = readSocketLine();
                 socketReadLock.unlock();
                 if ((line == null) || line.equalsIgnoreCase("QUIT")) {
@@ -148,7 +154,7 @@ public class EinzServerClientHandler implements Runnable{
                     return;
                 } else {
                     Log.d("ESCH", "received line: "+line);
-                    sendMessage("Your Package was: "+line + "\r\n"); // echo back the same packet // TODO: don't echo back
+                    if(parentEinzServer.DEBUG_ECHO) sendMessage("Your Package was: "+line + "\r\n"); // echo back the same packet // T/ODO: don't echo back
                     runAction(parseMessage(line));
 
                 }
@@ -185,7 +191,7 @@ public class EinzServerClientHandler implements Runnable{
 
         this.stopping = true;
         try {
-            Thread.sleep(SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET);
+            sleep(SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET);
         } catch (InterruptedException e) {
             Log.e("ESCH/stopPatiently", "You interrupted my sleep (giving the other threads time to finish their actions): ");
             e.printStackTrace();

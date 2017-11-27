@@ -23,7 +23,9 @@ public class EinzPlayerFinishedMessageBody extends EinzMessageBody {
 
     @Override
     public JSONObject toJSON() throws JSONException {
-        return null;
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("username", this.getUsername());
+        return jsonObject;
     }
 }
 /*

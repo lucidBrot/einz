@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
+import ch.ethz.inf.vs.a4.minker.einz.client.ClientActionCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -20,8 +21,32 @@ public abstract class EinzAction {
     private final String issuedByPlayer; // CAN BE NULL if user is not registered
     private final EinzServerManager serverManager;
     private final EinzServerClientHandler einzServerClientHandler;
+    private final ClientActionCallbackInterface clientActionCallbackInterface;
+    private final Object completelyCustom;
 
     /**
+     * Only needs the params your action needs. null is possibly fine
+     * @param sInterface
+     * @param serverManager
+     * @param params must be of a Messagetype fitting to (expected by)this action
+     * @param issuedByPlayer
+     * @param issuedByClientHandler
+     * @param clientActionCallbackInterface
+     * @param completelyCustom
+     */
+    public EinzAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+        this.sInterface = sInterface;
+        this.message = params;
+        this.issuedByPlayer = issuedByPlayer;
+        this.serverManager = serverManager;
+        this.einzServerClientHandler = issuedByClientHandler;
+        this.completelyCustom = completelyCustom;
+        this.clientActionCallbackInterface = clientActionCallbackInterface;
+    }
+
+    /**
+     * Only needs the params your action needs. null is possibly fine.
+     * Backwards compatibility for serverside actions. Client cannot use this.
      * @param sInterface
      * @param serverManager
      * @param params must be of a Messagetype fitting to (expected by)this action
@@ -29,11 +54,7 @@ public abstract class EinzAction {
      * @param issuedByClientHandler
      */
     public EinzAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler){
-        this.sInterface = sInterface;
-        this.message = params;
-        this.issuedByPlayer = issuedByPlayer;
-        this.serverManager = serverManager;
-        einzServerClientHandler = issuedByClientHandler;
+        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, null, null);
     }
 
     public ServerFunctionDefinition getsInterface() {
@@ -54,5 +75,13 @@ public abstract class EinzAction {
 
     public EinzServerClientHandler getEinzServerClientHandler() {
         return einzServerClientHandler;
+    }
+
+    public ClientActionCallbackInterface getClientActionCallbackInterface() {
+        return clientActionCallbackInterface;
+    }
+
+    public Object getCompletelyCustom() {
+        return completelyCustom;
     }
 }

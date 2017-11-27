@@ -1,0 +1,69 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:background="#0099cc"
+             tools:context="ch.ethz.inf.vs.a4.minker.einz.UI.ServerSetupActivity">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+    <LinearLayout android:id="@+id/fullscreen_content"
+                  android:keepScreenOn="true"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:orientation="vertical">
+        <TextView android:id="@+id/tv_s_host_game"
+                  android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_weight="0.3"
+                  android:textColor="#33b5e5"
+                  android:textStyle="bold"
+                  android:textSize="50sp"
+                  android:gravity="center"
+                  android:text="@string/host_game_title"
+                  />
+        <EditText android:id="@+id/et_s_username"
+                  android:hint="@string/et_s_username"
+                  android:layout_weight="0.1"
+                  android:layout_width="match_parent"
+                  android:inputType="text"
+                  android:maxLines="1"
+                  android:layout_height="wrap_content"
+                  android:imeOptions="actionDone"
+                  android:imeActionLabel="@string/IME_start_server"/>
+        <CheckBox android:id="@+id/cb_s_observer"
+                  android:layout_weight="0.2"
+                  android:textColor="#33b5e5"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:text="@string/observer"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="0.4"></LinearLayout>
+    </LinearLayout>
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+    <FrameLayout android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 android:fitsSystemWindows="true">
+
+        <LinearLayout android:id="@+id/fullscreen_content_controls"
+                      style="?metaButtonBarStyle"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:layout_gravity="bottom|center_horizontal"
+                      android:background="@color/black_overlay"
+                      android:orientation="horizontal"
+                      tools:ignore="UselessParent">
+
+            <Button android:id="@+id/btn_s_setupactivity_start_server"
+                    style="?metaButtonBarButtonStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/start_server"></Button>
+
+        </LinearLayout>
+    </FrameLayout>
+
+</FrameLayout>

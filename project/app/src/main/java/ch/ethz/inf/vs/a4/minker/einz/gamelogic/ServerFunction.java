@@ -11,7 +11,7 @@ import java.util.Stack;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardColors;
-import ch.ethz.inf.vs.a4.minker.einz.CardTypes;
+import ch.ethz.inf.vs.a4.minker.einz.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
@@ -125,8 +125,8 @@ public class ServerFunction implements ServerFunctionDefinition {
      */
     private Queue<Card> createStandardDeck(){
         ArrayList<Card> cardsToAdd = new ArrayList<>(); //Create Arraylist with cards and only after shuffling dd them to the drawPile Queue
-        for (CardTypes ct: CardTypes.values()) {
-            if (ct != CardTypes.CHANGECOLOR && ct != CardTypes.CHANGECOLORPLUSFOUR) {
+        for (CardText ct: CardText.values()) {
+            if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR) {
                 for (CardColors cc : CardColors.values()) {
                     if (cc != CardColors.NONE) {
                         Card card = new Card(ct, cc);
