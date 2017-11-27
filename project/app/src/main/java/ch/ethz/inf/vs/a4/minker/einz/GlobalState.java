@@ -33,6 +33,8 @@ public class GlobalState {
 
     private int cardsToDraw = 1;
 
+    private boolean gameFinished = false;
+
     private boolean restrictive = false;
 
     private final int maxDiscardPileSize;
@@ -131,10 +133,19 @@ public class GlobalState {
         return result;
     }
 
+    /**
+     * Returns the amount that a player has to draw if he decides to draw cards.
+     * @return Amount of cards to draw.
+     */
     public int getCardsToDraw() {
         return cardsToDraw;
     }
 
+    /**
+     * Sets the amount of cards a player has to draw if he decides to draw cards. The value has to
+     * be non-negative.
+     * @param cardsToDraw Amount the next player should draw. Should be greater equal zero.
+     */
     public void setCardsToDraw(int cardsToDraw) {
         if(cardsToDraw >= 0 ) {
             this.cardsToDraw = cardsToDraw;
@@ -180,6 +191,21 @@ public class GlobalState {
      */
     public List<Player> getPlayersOrdered(){
         return new ArrayList<>(players);
+    }
+
+    /**
+     * Returns if the game should be ended. Is set to true if a rule decides to end the game.
+     * @return True if the game has finished.
+     */
+    public boolean isGameFinished(){
+        return gameFinished;
+    }
+
+    /**
+     * Sets the finished Flag to true.
+     */
+    public void finishGame(){
+        gameFinished = true;
     }
 
     /**

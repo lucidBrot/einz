@@ -18,6 +18,10 @@ public abstract class BasicGlobalRule extends BasicRule {
         return false;
     }
 
+    public boolean isPlayerFinished(GlobalState state, Player player) {
+        return false;
+    }
+
 
     public GlobalState onStartGame(GlobalState state) {
         return state;
@@ -27,4 +31,7 @@ public abstract class BasicGlobalRule extends BasicRule {
         return state;
     }
 
+    public GlobalState onPlayerFinished(GlobalState state, Player player){
+        return state;
+    }
 }

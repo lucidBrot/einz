@@ -6,27 +6,27 @@ import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 /**
- * Created by Josua on 11/24/17.
+ * Created by Josua on 11/27/17.
  */
 
-public class WinOnNoCardsRule extends BasicGlobalRule {
-
-    public WinOnNoCardsRule(GameConfig config) {
+public class GameEndsonWinRule extends BasicGlobalRule {
+    public GameEndsonWinRule(GameConfig config) {
         super(config);
     }
 
     @Override
     public String getName() {
-        return "Play all cards";
+        return "End game when a Player finishes";
     }
 
     @Override
     public String getDescription() {
-        return "A player is finished if he has played all his cards";
+        return "The game ends if one player has satisfied a winning condition";
     }
 
     @Override
-    public boolean isPlayerFinished(GlobalState state, Player player) {
-        return player.hand.size() == 0;
+    public GlobalState onPlayerFinished(GlobalState state, Player player) {
+        state.finishGame();
+        return state;
     }
 }

@@ -36,7 +36,7 @@ public class WishColorRule extends BasicCardRule {
     @Override
     public GlobalState onPlayCard(GlobalState state, Card played) {
         state.setRestrictive();
-        config
+        
         return state;
     }
 }
