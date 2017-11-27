@@ -1,5 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -220,5 +224,38 @@ public class GlobalState {
         } else {
             nextPlayer = players.get((playerIndex + players.size() - 1) % players.size());
         }
+    }
+
+
+    /**
+     * Serializes the GlobalState object to JSON.
+     * @return To JSON serialized GlobalState object
+     */
+    public JSONObject toJSON() throws JSONException{
+
+        JSONObject numCardsInHand = new JSONObject();
+        for (Player player : players){
+            numCardsInHand.put(player.getName(), player.hand.size());
+        }
+
+        JSONArray stack = new JSONArray();
+        for(Card card : discardPile){
+            JSONObject cardObj = new JSONObject();
+            cardObj.put("ID",card.getID());
+            cardObj.put("origin", card.origin);
+            stack.put(cardObj);
+        }
+
+        JSONObject serializedState = new JSONObject();
+        serializedState.put("activePlayer", activePlayer.getName());
+        serializedState.put("cardsToDraw", cardsToDraw);
+        serializedState.put("numCardsInHand", numCardsInHand);
+        serializedState.put("stack",stack);
+
+        return serializedState;
+    }
+
+    public static GlobalState fromJSON(){
+        return null;
     }
 }
