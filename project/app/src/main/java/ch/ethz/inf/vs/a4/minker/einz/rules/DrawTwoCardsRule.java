@@ -37,7 +37,7 @@ public class DrawTwoCardsRule extends BasicCardRule{
     public GlobalState onDrawCard(GlobalState state) {
         if(assignedCardPlayed) {
             state.setPermissive();
-            state.cardsToDraw = 1;
+            state.setCardsToDraw(1);
             assignedCardPlayed = false;
         }
         return state;
@@ -46,10 +46,10 @@ public class DrawTwoCardsRule extends BasicCardRule{
     @Override
     public GlobalState onPlayCard(GlobalState state, Card played) {
         if(played.text.equals(assignedTo.text)){
-            if(state.cardsToDraw == 1){
-                state.cardsToDraw = 2;
+            if(state.getCardsToDraw() == 1){
+                state.setCardsToDraw(2);
             } else {
-                state.cardsToDraw += 2;
+                state.setCardsToDraw(state.getCardsToDraw() + 2);
             }
             assignedCardPlayed = true;
             state.setRestrictive();

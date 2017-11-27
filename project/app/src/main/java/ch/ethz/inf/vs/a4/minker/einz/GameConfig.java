@@ -41,7 +41,7 @@ public class GameConfig {
 
 
     public List<Card> getShuffledDrawPile(){
-        List<Card> shuffledDrawPile = new LinkedList<Card>();
+        List<Card> shuffledDrawPile = new LinkedList<>();
         shuffledDrawPile.addAll(drawPile);
         Collections.shuffle(shuffledDrawPile);
         return shuffledDrawPile;

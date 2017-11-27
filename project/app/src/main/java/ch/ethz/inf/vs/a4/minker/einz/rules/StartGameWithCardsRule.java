@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules;
 
+import java.util.List;
+
 import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
@@ -28,13 +30,13 @@ public class StartGameWithCardsRule extends BasicGlobalRule {
 
     @Override
     public GlobalState onStartGame(GlobalState state) {
-        for(Player player : state.players){
-            Card drawnCard = state.drawCard();
-            if (drawnCard == null){
+        for(Player player : state.getPlayersOrdered()){
+            List<Card> startHand = state.drawCards(7);
+            if (startHand == null){
                 state.addCardsToDrawPile(config.getShuffledDrawPile());
-                drawnCard = state.drawCard();
+                startHand = state.drawCards(7);
             }
-            player.hand.add(drawnCard);
+            player.hand.addAll(startHand);
         }
         return state;
     }

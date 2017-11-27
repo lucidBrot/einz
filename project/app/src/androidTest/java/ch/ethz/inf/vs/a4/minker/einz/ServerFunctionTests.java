@@ -22,7 +22,7 @@ public class ServerFunctionTests {
     public void constructorTest() {
         GameState gameState = new GameState();
 
-        assertEquals(gameState.getPlayers().size(), 2);
+        assertEquals(gameState.getPlayersOrdered().size(), 2);
         assertEquals(gameState.getThreatenedCards(), 1);
 
     }
@@ -32,11 +32,11 @@ public class ServerFunctionTests {
         GameState gameState = new GameState();
         ServerFunction serverFunction = new ServerFunction(gameState);
 
-        serverFunction.drawXCards(27, gameState.getPlayers().get(0));
-        serverFunction.drawXCards(54, gameState.getPlayers().get(1));
+        serverFunction.drawXCards(27, gameState.getPlayersOrdered().get(0));
+        serverFunction.drawXCards(54, gameState.getPlayersOrdered().get(1));
 
-        assertEquals(27 + 7, gameState.getPlayers().get(0).hand.size());
-        assertEquals(54 + 7, gameState.getPlayers().get(1).hand.size());
+        assertEquals(27 + 7, gameState.getPlayersOrdered().get(0).hand.size());
+        assertEquals(54 + 7, gameState.getPlayersOrdered().get(1).hand.size());
     }
 
 
@@ -100,8 +100,8 @@ public class ServerFunctionTests {
             }
         }
 
-        assertEquals(count[0], gameState.getPlayers().get(0).hand.size());
-        assertEquals(count[1], gameState.getPlayers().get(1).hand.size());
+        assertEquals(count[0], gameState.getPlayersOrdered().get(0).hand.size());
+        assertEquals(count[1], gameState.getPlayersOrdered().get(1).hand.size());
 
 
     }
@@ -174,10 +174,10 @@ public class ServerFunctionTests {
             }
         }
 
-        assertEquals(count[0], gameState.getPlayers().get(0).hand.size());
-        assertEquals(count[1], gameState.getPlayers().get(1).hand.size());
-        assertEquals(count[2], gameState.getPlayers().get(2).hand.size());
-        assertEquals(count[3], gameState.getPlayers().get(3).hand.size());
+        assertEquals(count[0], gameState.getPlayersOrdered().get(0).hand.size());
+        assertEquals(count[1], gameState.getPlayersOrdered().get(1).hand.size());
+        assertEquals(count[2], gameState.getPlayersOrdered().get(2).hand.size());
+        assertEquals(count[3], gameState.getPlayersOrdered().get(3).hand.size());
 
 
     }
