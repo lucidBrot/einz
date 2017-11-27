@@ -263,7 +263,7 @@ public class GameState {
     // (III) Functions to check rules
 
     public void cardEffect(Card card){
-        switch (card.type){
+        switch (card.text){
             case PLUSTWO:
                 if (threatenedCards == 1){
                     increaseThreatenedCards(1);
@@ -289,13 +289,13 @@ public class GameState {
     }
 
     public boolean normalPlayRules(Card bottomCard, Card topCard){
-        switch (topCard.type){
+        switch (topCard.text){
             case CHANGECOLOR:
             case CHANGECOLORPLUSFOUR:
                 return true;
             default:
                 if (topCard.color == bottomCard.color ||
-                        topCard.type == bottomCard.type ||
+                        topCard.text == bottomCard.text ||
                         topCard.color == bottomCard.wish){
                     return true;
                 } else {
@@ -305,15 +305,15 @@ public class GameState {
     }
 
     public boolean specialPlayRules(Card bottomCard, Card topCard){
-        switch (topCard.type){
+        switch (topCard.text){
             case PLUSTWO:
-                if (bottomCard.type == CardText.PLUSTWO){
+                if (bottomCard.text == CardText.PLUSTWO){
                     return true;
                 } else {
                     return false;
                 }
             case CHANGECOLORPLUSFOUR:
-                if (bottomCard.type == CardText.CHANGECOLORPLUSFOUR){
+                if (bottomCard.text == CardText.CHANGECOLORPLUSFOUR){
                     return true;
                 } else {
                     return false;

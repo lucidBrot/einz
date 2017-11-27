@@ -1,14 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
-import org.json.JSONObject;
-
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Stack;
 
 
 /**
@@ -16,7 +9,6 @@ import java.util.Stack;
  */
 
 public class GlobalState {
-
     /*
     discard pile
     activePlayer
@@ -24,73 +16,135 @@ public class GlobalState {
     order
     allPlayers
     gameFinished
-     */
-    private Stack<Card> discardPile;
-    private Queue<Card> drawPile;
+
+*/
+
+    public int cardsToDraw = 1;
+
+
+    public Player nextPlayer;
+    public List<Player> players;
+
     private Player activePlayer;
-    private Player nextPlayer;
-    private List<Player> players;
-    private List<Player> finishedPlayer;
-    private boolean isGameRunning;
 
+    private List<Card> drawPile;
+    private List<Card> discardPile;
 
-    public GlobalState(){
-        this(new LinkedList<Card>());
-    }
+    private boolean restrictive = false;
 
-    public GlobalState(Collection<Card> drawPile) {
-        this(drawPile, new Stack<Card>());
-    }
+    private final int maxDiscardPileSize;
 
-    //Fabian: Changed this to public so I can create a GlobalState with one card already on the discardPile
-    public GlobalState(Collection<Card> drawPile, Stack<Card> discardPile) {
-        this.discardPile = discardPile;
-        this.drawPile = new LinkedList<>(drawPile);
-    }
-
-    public List<Card> getDiscardPile() {
-        return discardPile.subList(0, discardPile.size() - 1);
-    }
-
-    public void playCard(Card card){
-        discardPile.add(card);
+    /**
+     * Creates an instance of a Global game state
+     * @param maxDiscardPilesize
+     */
+    public GlobalState(int maxDiscardPilesize){
+        this.maxDiscardPileSize = maxDiscardPilesize;
+        drawPile = new LinkedList<>();
     }
 
     /**
-     * @return The Top card of the draw pile or null if the draw pile is empty
+     * Creates an instance of a Global game state initialized with an initial card
+     * @param maxDiscardPileSize Sets the maximum size of the Discard Pile
+     * @param startCard initializes the gameState with a start card on the discard pile
      */
-    public Card drawCard() {
-        if (drawPile.isEmpty()) {
-            return null;
-        }
-        return drawPile.poll();
-    }
+    public GlobalState(int maxDiscardPileSize, Card startCard){
+        this(maxDiscardPileSize);
+        addCardToDiscardPile(startCard);
 
-    public int drawPileSize() {
-        return drawPile.size();
     }
 
     /**
-     * Adds cards at the bottom of the draw pile.
-     * @param cards Collection of cards to add to the bottom of the draw pile
+     * Adds the given List of Cards to the Draw pile to refill the draw Pile.
+     * @param cards Cards to add to the Draw Pile
      */
-    public void addCardstoDrawPile(Collection<Card> cards){
+    public void addCardsToDrawPile(List<Card> cards){
         drawPile.addAll(cards);
     }
 
-    public Player getActivePlayer() {
-        return activePlayer;
+    /**
+     * Returns a reference to the discardPile. Rules may change it. The lowermost Card is at index 0
+     * and the top card is at the end of the list.
+     * @return Reference to the Discardpile
+     */
+    public List<Card> getDiscardPile(){
+        return discardPile;
     }
 
-    public void setActivePlayer(Player player) {
-        activePlayer = player;
+    /**
+     * Returns the top of the discardPile.
+     * @return Card on top of the discardPile
+     */
+    public Card getTopCardDiscardPile(){
+        return discardPile.get(discardPile.size() - 1);
     }
 
-    public JSONObject toJSON() {
-        return null;
+    /**
+     * Adds many cards to the discard pile. the Cards have to be ordered such that the card that
+     * should be on the lowermost position is at index 0. the discard Pile gets trimmed to the
+     * macDiscardPileSize.
+     * @param cards List of cards to add to the discardPile
+     */
+    public void addCardsToDiscardPile(List<Card> cards){
+        discardPile.addAll(cards);
+        discardPile.subList(Math.max(0, discardPile.size() - maxDiscardPileSize), discardPile.size() - 1);
     }
 
-    public static GlobalState fromJSON(JSONObject jsonObject) {
-        return null;
+    /**
+     * Adds one Card to the discard pile and sets it on top of the pile (at the end of the list)
+     * @param card Card to play on top of the discard pile
+     */
+    public void addCardToDiscardPile(Card card){
+        discardPile.add(card);
+        if(discardPile.size() > maxDiscardPileSize){
+            discardPile = discardPile.subList(1, discardPile.size() - 1);
+        }
+    }
+
+    /**
+     * Draws a card from the drawPile and returns it. The card will be removed from the DrawPile. If
+     * the drawPile is empty null is returned
+     * @return The drawn Card or null if the drawPile is empty.
+     */
+    public Card drawCard(){
+        if(drawPile.size() == 0){
+            return null;
+        }
+        return drawPile.remove(0);
+    }
+
+    /**
+     * Changes the validation of the Rules to Restrictive mode. In Restrictive Mode every rule has
+     * to return True to be able to perform a certain action.
+     */
+    public void setRestrictive(){
+        restrictive = true;
+    }
+
+    /**
+     * Changes the validation of the Rules to Permissive mode. In permissive mode at least one rule
+     * has to return true in order to perform a certain action.
+     * This is the default.
+     */
+    public void setPermissive(){
+        restrictive = false;
+    }
+
+    /**
+     * Returns whether restrictive mode is enabled or not
+     * @return True if restrictive mode is enabled
+     */
+    public boolean isRestrictive(){
+        return restrictive;
+    }
+
+    public void nextTurn(boolean forwards){
+        activePlayer = nextPlayer;
+        int playerIndex = players.indexOf(nextPlayer);
+        if(forwards){
+            nextPlayer = players.get((playerIndex + 1) % players.size());
+        } else {
+            nextPlayer = players.get((playerIndex + players.size() - 1) % players.size());
+        }
     }
 }

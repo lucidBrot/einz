@@ -57,11 +57,11 @@ public class ServerFunctionTests {
             Player p = gameState.getActivePlayer();
             String logString = p.getName()+": ";
             for (Card card : p.hand){
-                logString = logString + "("+card.color+","+card.type+","+card.wish+"), ";
+                logString = logString + "("+card.color+","+card.text+","+card.wish+"), ";
             }
             logString.substring(0, logString.length()-2);
             Card c = serverFunction.topCard();
-            Log.i("State1", "topCard: ("+c.color+","+c.type+","+c.wish+")");
+            Log.i("State1", "topCard: ("+c.color+","+c.text+","+c.wish+")");
             Log.i("State2", logString);
             if (p.getName().equals("Peter")) {
                 APN = 0;
@@ -70,8 +70,8 @@ public class ServerFunctionTests {
             }
             for (Card card : p.hand) {
                 if (serverFunction.isPlayable(card, p) && hasPlayed == false) {
-                    if (card.type.equals(CardText.CHANGECOLORPLUSFOUR) ||
-                            card.type.equals(CardText.CHANGECOLOR)){
+                    if (card.text.equals(CardText.CHANGECOLORPLUSFOUR) ||
+                            card.text.equals(CardText.CHANGECOLOR)){
                         card.wish =  CardColors.BLUE;
                     }
                     serverFunction.play(card, p);
@@ -127,11 +127,11 @@ public class ServerFunctionTests {
             Player p = gameState.getActivePlayer();
             String logString = p.getName()+": ";
             for (Card card : p.hand){
-                logString = logString + "("+card.color+","+card.type+","+card.wish+"), ";
+                logString = logString + "("+card.color+","+card.text+","+card.wish+"), ";
             }
             logString.substring(0, logString.length()-2);
             Card c = serverFunction.topCard();
-            Log.i("State1", "topCard: ("+c.color+","+c.type+","+c.wish+")");
+            Log.i("State1", "topCard: ("+c.color+","+c.text+","+c.wish+")");
             Log.i("State2", logString);
             if (p.getName().equals("Donald")) {
                 APN = 0;
@@ -144,8 +144,8 @@ public class ServerFunctionTests {
             }
             for (Card card : p.hand) {
                 if (serverFunction.isPlayable(card, p) && hasPlayed == false) {
-                    if (card.type.equals(CardText.CHANGECOLORPLUSFOUR) ||
-                            card.type.equals(CardText.CHANGECOLOR)){
+                    if (card.text.equals(CardText.CHANGECOLORPLUSFOUR) ||
+                            card.text.equals(CardText.CHANGECOLOR)){
                         card.wish =  CardColors.BLUE;
                     }
                     serverFunction.play(card, p);

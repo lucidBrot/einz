@@ -9,7 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Used as a parser for unmapped parsers. Check for the type of action or just let it run (probably does nothing)
+ * Used as a parser for unmapped parsers. Check for the text of action or just let it run (probably does nothing)
  */
 public class EinzUnmappedParser extends EinzParser{
     @Override

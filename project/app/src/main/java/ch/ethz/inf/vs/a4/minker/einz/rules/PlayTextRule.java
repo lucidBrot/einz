@@ -6,27 +6,27 @@ import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 
 /**
- * Created by Josua on 11/22/17.
+ * Created by Josua on 11/24/17.
  */
 
-public class PlayColorRule extends BasicCardRule {
+public class PlayTextRule extends BasicCardRule {
 
-    public PlayColorRule(GameConfig config, Card assignedTo) {
+    public PlayTextRule(GameConfig config, Card assignedTo) {
         super(config, assignedTo);
     }
 
     @Override
     public String getName() {
-        return "Play Color on Color";
+        return "Play on equal text";
     }
 
     @Override
     public String getDescription() {
-        return "Enables to play the card on top of a card with the same color";
+        return "Enables to play a card on top of one with the same text";
     }
 
     @Override
-    public boolean isValidPlayCardPermissive(GlobalState state, Card played){
-        return state.getTopCardDiscardPile().color == played.color;
+    public boolean isValidPlayCardPermissive(GlobalState state, Card played) {
+        return state.getTopCardDiscardPile().text.equals(played.text);
     }
 }

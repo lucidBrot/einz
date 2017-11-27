@@ -147,7 +147,7 @@ public class EinzParserFactory {
                 String substring = s.substring(prefix.length()); // classname without prefix
                 Class o = Class.forName(substring);
                 if (!(EinzParser.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
-                    throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" is not of type Class");
+                    throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" is not of text Class");
                 } else {
                     // everything is fine, do stuff
                     @SuppressWarnings("unchecked") // I checked this with above tests

@@ -5,25 +5,47 @@ package ch.ethz.inf.vs.a4.minker.einz;
  */
 public abstract class BasicCardRule extends BasicRule{
 
+    protected Card assignedTo;
 
-    public boolean isValidKickPlayer(GlobalState state, Player toKick){
-        return false;
+    public BasicCardRule(GameConfig config, Card assignedTo) {
+        super(config);
+        this.assignedTo = assignedTo;
     }
 
-    public boolean isValidLeaveGame(GlobalState state, Player leaves){
+
+    public boolean isValidKickPlayerPermissive(GlobalState state, Player toKick){
         return false;
     }
-
-    public boolean isValidDrawCards(GlobalState state){
-        return false;
+    public boolean isValidKickPlayerRestrictive(GlobalState state, Player toKick){
+        return true;
     }
 
-    public boolean isValidPlayCard(GlobalState state, Card played){
+    public boolean isValidLeaveGamePermissive(GlobalState state, Player leaves){
         return false;
     }
+    public boolean isValidLeaveGameRestrictive(GlobalState state, Player leaves){
+        return true;
+    }
 
-    public boolean isPlayerFinished(GlobalState state, Card played){
+    public boolean isValidDrawCardsPermissive(GlobalState state){
         return false;
+    }
+    public boolean isValidDrawCardsRestrictive(GlobalState state){
+        return true;
+    }
+
+    public boolean isValidPlayCardPermissive(GlobalState state, Card played){
+        return false;
+    }
+    public boolean isValidPlayCardRestrictive(GlobalState state, Card played){
+        return true;
+    }
+
+    public boolean isPlayerFinishedPermissive(GlobalState state, Card played){
+        return false;
+    }
+    public boolean isPlayerFinishedRestrictive(GlobalState state, Card played){
+        return true;
     }
 
 
@@ -41,7 +63,7 @@ public abstract class BasicCardRule extends BasicRule{
         return state;
     }
 
-    public GlobalState onPlayCard(GlobalState state){
+    public GlobalState onPlayCard(GlobalState state, Card played){
         return state;
     }
 

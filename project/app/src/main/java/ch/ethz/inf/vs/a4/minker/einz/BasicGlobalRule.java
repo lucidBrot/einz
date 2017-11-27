@@ -10,6 +10,10 @@ package ch.ethz.inf.vs.a4.minker.einz;
  */
 public abstract class BasicGlobalRule extends BasicRule {
 
+    public BasicGlobalRule(GameConfig config) {
+        super(config);
+    }
+
     public boolean isValidEndTurn(GlobalState state) {
         return false;
     }

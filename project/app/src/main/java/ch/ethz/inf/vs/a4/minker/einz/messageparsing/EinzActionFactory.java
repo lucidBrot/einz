@@ -20,8 +20,8 @@ public class EinzActionFactory {
 
     private ServerFunctionDefinition sInterface;
     private HashMap<Class<? extends EinzMessageBody>, Class<? extends EinzAction>> dictionary; // mapping Message types to Action types
-    // this Map is using the MessageBody because a) this is what distinguishes the messages and b) the generic type cannot really be gotten at runtime.
-    // .getClass and .class only return EinzMessage, without the generic type
+    // this Map is using the MessageBody because a) this is what distinguishes the messages and b) the generic text cannot really be gotten at runtime.
+    // .getClass and .class only return EinzMessage, without the generic text
     // The key is EinzMessageBody and not just the messagtype because like this we could add further header info and create new EinzMessages based on them
     private EinzServerManager sManager;
 
@@ -48,7 +48,7 @@ public class EinzActionFactory {
     }
 
     /**
-     * register a mapping from a messagetype to an action. Because the message's type can only be gotten via its body, you need to pass the class of the body.
+     * register a mapping from a messagetype to an action. Because the message's text can only be gotten via its body, you need to pass the class of the body.
      * If the entry already exists, this will replace it. (If you want to execute both the old and the new action, you need to pass that as one action)
      */
     public void registerMapping(Class<? extends EinzMessageBody> bodyclass, Class<? extends EinzAction> actionclass){
@@ -70,7 +70,7 @@ public class EinzActionFactory {
     }
 
     /**
-     * get the action type that is currently mapped to this messagetype
+     * get the action text that is currently mapped to this messagetype
      * @param bodyclass the class of the body of the EinzMessage
      * @return
      */
@@ -81,12 +81,12 @@ public class EinzActionFactory {
     /**
      * more convenient interface than with the bodytype as parameter.
      * Takes an EinzMessage and returns its mapping.
-     * This does not keep the object, only its type!
+     * This does not keep the object, only its text!
      * @param e
      * @return null if mapping does not exist, else the Class you want
      */
     public Class<? extends EinzAction> getMapping(EinzMessage e){
-        Log.d("ActionFactory", "Getting mapping for body type "+e.getBody().getClass());
+        Log.d("ActionFactory", "Getting mapping for body text "+e.getBody().getClass());
         Class temp = this.dictionary.get(e.getBody().getClass());
         if(temp == null) {Log.d("ActionFactory", "Mapping was requested but not registered before");}
         return temp;
@@ -115,7 +115,7 @@ public class EinzActionFactory {
 
             EinzAction ret = mapping.getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler);
 
-            Log.d("ActionFactory","successfully generated action of type "+ret.getClass());
+            Log.d("ActionFactory","successfully generated action of text "+ret.getClass());
 
             return ret;
         } catch (InstantiationException e) {
@@ -169,7 +169,7 @@ public class EinzActionFactory {
                 Log.d("ActionFactory/load","substring to get class of : "+substring);
                 Class o = Class.forName(substring);
                 if (!(EinzAction.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
-                    throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"mapstoaction\" is not of type Class");
+                    throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"mapstoaction\" is not of text Class");
                 } else {
                     // everything is fine, do stuff
                     @SuppressWarnings("unchecked") // I checked this with above tests
@@ -178,7 +178,7 @@ public class EinzActionFactory {
                     // for the dictionary, we need the key also as a class
                     substring = pair.getString("messagebodyclass").substring(prefix.length());
                     if(!s.startsWith(prefix)){
-                        throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"actionmappings\" is not of type Class");
+                        throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"actionmappings\" is not of text Class");
                     } else {
                         Class q = Class.forName(substring);
                         // everything is fine, do stuff

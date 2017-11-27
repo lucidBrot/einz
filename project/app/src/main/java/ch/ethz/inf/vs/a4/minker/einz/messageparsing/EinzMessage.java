@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 /**
  * Immutable container of an {@link EinzMessageHeader} and an {@link EinzMessageBody}
- * Generic because we need to make sure Action only gets the type of Message it wants
+ * Generic because we need to make sure Action only gets the text of Message it wants
  * BODYTYPE is some EinzMessageBody extension
  */
 public class EinzMessage<BODYTYPE extends EinzMessageBody> {

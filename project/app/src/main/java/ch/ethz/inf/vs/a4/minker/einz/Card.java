@@ -8,10 +8,21 @@ import org.json.JSONObject;
 
 public class Card {
 
-    public Card (CardText type, CardColors color){
+    //text determines what kind of card you play. This can be "zero", "one", "plusTwo", ...
+    public CardText text;
+    //color determines the color of the card. If the card has no color, it is "none"
+    public CardColors color;
+    //when playing certain cards, you can choose something (e.g. a color)
+    //with all other cards, this field is ignored
+    public CardColors wish;
+    public String ID;
+    public String origin;
+
+
+    public Card (CardText text, CardColors color){
         //This is used for cards which don't need the "wish" to function properly
 
-        this.type = type;
+        this.text = text;
         this.color = color;
         this.wish = CardColors.NONE;
         //TODO: Set ID according to Josua
@@ -24,16 +35,6 @@ public class Card {
     public Card (String ID){
         this.ID = ID;
     }
-
-    //type determines what kind of card you play. This can be "zero", "one", "plusTwo", ...
-    public CardText type;
-    //color determines the color of the card. If the card has no color, it is "none"
-    public CardColors color;
-    //when playing certain cards, you can choose something (e.g. a color)
-    //with all other cards, this field is ignored
-    public CardColors wish;
-    public String ID;
-    public String origin;
 
     public JSONObject toJSON(){ // TODO: implement toJSON
         return null;
