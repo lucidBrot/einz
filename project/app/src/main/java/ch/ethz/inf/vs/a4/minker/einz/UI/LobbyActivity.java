@@ -18,6 +18,7 @@ import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import info.whitebyte.hotspotmanager.ClientScanResult;
@@ -186,6 +187,44 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     @Override
+    public void onRegistrationFailed(EinzRegisterFailureMessageBody body) {
+        /*
+        - "not unique" if the same username was already registered
+        - "already registered" if the same connection already has registered a username
+        - "invalid" if the username is the empty string or "server". Or if the username contains invalid characters. One invalid character is the Tilde, which is reserved to identify non-username-strings
+        - "lobby full" if the server decided to fixate the number of players or spectators and the game has not yet started (otherwise, the server wouldn't react at all).
+        - "game already in progress"
+         */
+        String toastMsg;
+        switch (body.getReason()) {
+            case "not unique":
+            case "invalid":
+            case "already registered":
+                // make user change name
+                // only the thread that created the view is allowed to update them
+                toastMsg = "Please choose a different name. Yours is " + body.getReason();
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+                cleanupActivity();
+                this.onBackPressed();
+                return;
+            case "lobby full":
+            case "game already in progress":
+                // tell user that he cannot join
+                toastMsg = "You cannot join, sorry. "+body.getReason();
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+                this.onBackPressed();
+                return;
+
+            default:
+                toastMsg = "Something went wrong.";
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+                this.onBackPressed();
+                return;
+
+        }
+    }
+
+    @Override
     public void onClick(View view) {
         //TODO: button to start game if you're the host, handle the onclick
         //TODO: kick player buttons if you're the host
@@ -193,25 +232,37 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed() { // TODO: ask to disconnect instead of timeouting (UnregisterRequest)
         super.onBackPressed();
+        cleanupActivity();
+    }
+
+    /**
+     * stops server if there is one on this device. <br>
+     *     stops client.
+     */
+    private void cleanupActivity() {
         // stop server on back button
         if(this.host && this.server!=null) {
             (new Thread(new Runnable() {
                 @Override
                 public void run() {
                     server.shutdown();
+                    server=null;
                 }
             })).start();
             // don't run this on the main thread. networking is not allowed on the main thread
         }
 
-        (new Thread(new Runnable() {
-            @Override
-            public void run() {
-                ourClient.shutdown();
-            }
-        })).start();
+        if(this.ourClient!=null) {
+            (new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    ourClient.shutdown();
+                    ourClient=null;
+                }
+            })).start();
+        }
     }
 
     /**
@@ -286,7 +337,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
         // if no wlan address because not connected or in hotspot mode.
         // the default ip of hotspot server would be 192.168.43.1 if the device manufacturer did not change it
-        // maybe TODO: check if hotspot mode using https://github.com/nickrussler/Android-Wifi-Hotspot-Manager-Class
+        // Check if hotspot mode using https://github.com/nickrussler/Android-Wifi-Hotspot-Manager-Class
 
         WifiApManager wifiApManager = new WifiApManager(this);
         boolean hotspotModeOn = wifiApManager.isWifiApEnabled();

@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
+
 import java.util.ArrayList;
 
 /**
@@ -9,4 +11,9 @@ import java.util.ArrayList;
 public interface LobbyUIInterface {
     public void setLobbyList(ArrayList<String> players, ArrayList<String> spectators);
     public void setAdmin(String username);
+
+    void onRegistrationFailed(EinzRegisterFailureMessageBody body);
+    // still to do:
+    // on connection failed
+
 }

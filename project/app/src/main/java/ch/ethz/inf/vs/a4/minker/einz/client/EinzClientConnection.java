@@ -140,6 +140,7 @@ public class EinzClientConnection implements Runnable{
             e.printStackTrace();
             // TODO: handle these, e.g. ECONNREFUSED (server not reachable under that port and IP
             // or java.net.ConnectException: Connection timed out
+            // and tell LobbyListActivity that
 
         }
 

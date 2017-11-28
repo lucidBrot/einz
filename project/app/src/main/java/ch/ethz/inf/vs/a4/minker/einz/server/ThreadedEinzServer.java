@@ -317,7 +317,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         getServerManager().serverShuttingDownGracefully = true;
         Log.d("EinzServer/shutdown", "stopped listening for incoming connections.");
         this.sherLock.writeLock().lock();
-        getServerManager().kickAllAndCloseSockets();
+        getServerManager().kickAllAndCloseSockets(); // TODO: dEBUG: why are clients not informed?
         Log.d("EinzServer/shutdown", "closed all sockets");
         // waiting because clientHandlerThreads might still need this server
         for(Thread t : this.clientHandlerBiMap.keySet()){
