@@ -10,9 +10,6 @@ import ch.ethz.inf.vs.a4.minker.einz.Player;
  */
 
 public class GameEndsOnWinRule extends BasicGlobalRule {
-    public GameEndsOnWinRule(GameConfig config) {
-        super(config);
-    }
 
     @Override
     public String getName() {

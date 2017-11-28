@@ -1,11 +1,11 @@
 [
-  "class ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule",
-  "class ch.ethz.inf.vs.a4.minker.einz.rules.DrawTwoCardsRule",
-  "class ch.ethz.inf.vs.a4.minker.einz.rules.GameEndsOnWinRule",
-  "class ch.ethz.inf.vs.a4.minker.einz.rules.PlayAlwaysRule",
-  "class ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule",
-  "class ch.ethz.inf.vs.a4.minker.einz.rules.PlayTextRule",
-  "class ch.ethz.inf.vs.a4.minker.einz.rules.StartGameWithCardsRule",
-  "class ch.ethz.inf.vs.a4.minker.einz.rules.WinOnNoCardsRule",
-  "class ch.ethz.inf.vs.a4.minker.einz.rules.WishColorRule"
+  "ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.DrawTwoCardsRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.GameEndsOnWinRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.PlayAlwaysRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.PlayTextRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.StartGameWithCardsRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.WinOnNoCardsRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.WishColorRule"
 ]

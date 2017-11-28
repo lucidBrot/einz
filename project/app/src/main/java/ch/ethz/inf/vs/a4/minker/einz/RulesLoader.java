@@ -19,7 +19,7 @@ import ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule;
  */
 
 public class RulesLoader {
-    
+
     private Map<String, String> ruleMapping;
     private Map<String, String> ruleDescription;
 

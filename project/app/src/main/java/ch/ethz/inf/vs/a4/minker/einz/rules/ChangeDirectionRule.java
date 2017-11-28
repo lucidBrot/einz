@@ -14,10 +14,6 @@ import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 public class ChangeDirectionRule extends BasicCardRule {
 
-    public ChangeDirectionRule(GameConfig config, Card assignedTo) {
-        super(config, assignedTo);
-    }
-
     @Override
     public String getName() {
         return "Reverse play Direction";
