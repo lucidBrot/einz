@@ -3,10 +3,12 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 
@@ -19,9 +21,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
     private final Context applicationContext;
 
 
-    public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface, Context appContext){
+    public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface, Context appContext) {
         this.lobbyUI = lobbyUIInterface;
-        this.applicationContext=appContext;
+        this.applicationContext = appContext;
     }
 
     @Override
@@ -48,11 +50,11 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         });
         */
         // same functionality but works on older devices:
-        for(String username : hashMap.keySet()){
+        for (String username : hashMap.keySet()) {
             String s2 = hashMap.get(username);
-            if(s2.equals("spectator")){
+            if (s2.equals("spectator")) {
                 spectators.add(username);
-            } else if (s2.equals("player")){
+            } else if (s2.equals("player")) {
                 players.add(username);
             }
         }
@@ -71,7 +73,23 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
     }
 
-    private void runOnMainThread(Runnable runnable){
+    @Override
+    public void onRegisterFailure(EinzMessage<EinzRegisterFailureMessageBody> message) {
+        Log.d("ClientMessengerCallback", "registration Failed");
+        EinzRegisterFailureMessageBody body = message.getBody();
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                lobbyUI.onRegistrationFailed(body);
+            }
+        };
+
+        runOnMainThread(runnable);
+
+    }
+
+    private void runOnMainThread(Runnable runnable) {
         Handler mainHandler = new Handler(this.applicationContext.getMainLooper());
         mainHandler.post(runnable);
     }

@@ -86,7 +86,6 @@ public class EinzClient implements Runnable {
         this.clientConnectionThread = new Thread(this.connection);
         this.clientConnectionThread.start(); // establish connection
 
-        // TODO: register and all other messages
         if(this.isHost) {
             Log.d("EinzClient/run", "server is up methinks"); // if server is running on localhost, it told us when it was ready to accept connections
             // still need to spin until isConnected to make sure we do not send register message before connecting, thus losing that message
@@ -97,6 +96,8 @@ public class EinzClient implements Runnable {
              spinUntilConnectedAndSleep();
              sendRegistrationMessage();
          }
+
+        // TODO: all other messages
     }
 
     private void debug_faceReceiveUpdateLobbyList() {
