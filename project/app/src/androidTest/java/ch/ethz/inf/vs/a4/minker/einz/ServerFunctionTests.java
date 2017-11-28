@@ -72,7 +72,7 @@ public class ServerFunctionTests {
                 if (serverFunction.isPlayable(card, p) && hasPlayed == false) {
                     if (card.text.equals(CardText.CHANGECOLORPLUSFOUR) ||
                             card.text.equals(CardText.CHANGECOLOR)){
-                        card.wish =  CardColors.BLUE;
+                        card.wish =  CardColor.BLUE;
                     }
                     serverFunction.play(card, p);
                     count[APN] = count[APN] - 1;
@@ -146,7 +146,7 @@ public class ServerFunctionTests {
                 if (serverFunction.isPlayable(card, p) && hasPlayed == false) {
                     if (card.text.equals(CardText.CHANGECOLORPLUSFOUR) ||
                             card.text.equals(CardText.CHANGECOLOR)){
-                        card.wish =  CardColors.BLUE;
+                        card.wish =  CardColor.BLUE;
                     }
                     serverFunction.play(card, p);
                     count[APN] = count[APN] - 1;

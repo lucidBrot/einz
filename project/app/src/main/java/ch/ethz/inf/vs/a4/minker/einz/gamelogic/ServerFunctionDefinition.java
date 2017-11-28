@@ -6,11 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardColors;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
-import ch.ethz.inf.vs.a4.minker.einz.*;
-import org.json.JSONObject;
 
 /**
  * Created by Fabian on 09.11.2017.

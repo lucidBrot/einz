@@ -28,6 +28,7 @@ public class RuleLoader {
         ruleMapping = new HashMap<>();
         ruleDescription = new HashMap<>();
     }
+
     public BasicRule getInstanceOfRule(String ruleName){
         if(!ruleMapping.containsKey(ruleName)){
             return null;
@@ -52,8 +53,7 @@ public class RuleLoader {
         return ruleMapping.keySet();
     }
 
-    public List<BasicRule> loadRules(JSONArray rulesClasses) throws JSONException{
-        List<BasicRule> rules = new ArrayList<>();
+    public void  loadRules(JSONArray rulesClasses) throws JSONException{
         for(int i = 0; i < rulesClasses.length(); i++){
             try {
                 String ruleClassName = rulesClasses.getString(i);
@@ -68,6 +68,5 @@ public class RuleLoader {
                 e.printStackTrace();
             }
         }
-        return rules;
     }
 }

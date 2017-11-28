@@ -10,7 +10,7 @@ import java.util.Queue;
 import java.util.Stack;
 
 import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardColors;
+import ch.ethz.inf.vs.a4.minker.einz.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
@@ -127,8 +127,8 @@ public class ServerFunction implements ServerFunctionDefinition {
         ArrayList<Card> cardsToAdd = new ArrayList<>(); //Create Arraylist with cards and only after shuffling dd them to the drawPile Queue
         for (CardText ct: CardText.values()) {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR) {
-                for (CardColors cc : CardColors.values()) {
-                    if (cc != CardColors.NONE) {
+                for (CardColor cc : CardColor.values()) {
+                    if (cc != CardColor.NONE) {
                         Card card = new Card("temp", ct, cc); // #cardtag replace "temp"
                         cardsToAdd.add(card);
                         cardsToAdd.add(card);
@@ -136,7 +136,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                 }
             } else {
                 for (int i = 0; i < 4; i++) {
-                    Card card = new Card("temp", ct, CardColors.NONE); // #cardtag
+                    Card card = new Card("temp", ct, CardColor.NONE); // #cardtag
                     cardsToAdd.add(card);
                 }
             }

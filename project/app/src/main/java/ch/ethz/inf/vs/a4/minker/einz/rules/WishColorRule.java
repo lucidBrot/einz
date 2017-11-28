@@ -2,8 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.rules;
 
 import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardColors;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 
 /**
@@ -12,7 +11,7 @@ import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 
 public class WishColorRule extends BasicCardRule {
 
-    private CardColors wishedColor = null;
+    private CardColor wishedColor = null;
 
     private boolean wished = false;
 
