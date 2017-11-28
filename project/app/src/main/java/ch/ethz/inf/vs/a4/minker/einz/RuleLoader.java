@@ -18,13 +18,13 @@ import ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule;
  * Created by Josua on 11/22/17.
  */
 
-public class RulesLoader {
+public class RuleLoader {
 
     private Map<String, String> ruleMapping;
     private Map<String, String> ruleDescription;
 
 
-    public RulesLoader(){
+    public RuleLoader(){
         ruleMapping = new HashMap<>();
         ruleDescription = new HashMap<>();
     }
