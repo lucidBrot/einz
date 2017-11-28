@@ -14,11 +14,6 @@ import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 public class StartGameWithCardsRule extends BasicGlobalRule {
 
-    public StartGameWithCardsRule(GameConfig config) {
-        super(config);
-    }
-
-    @Override
     public String getName() {
         return "Start Cards";
     }

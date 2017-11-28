@@ -11,10 +11,6 @@ import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 
 public class PlayAlwaysRule extends BasicCardRule{
 
-    public PlayAlwaysRule(GameConfig config, Card assignedTo) {
-        super(config, assignedTo);
-    }
-
     @Override
     public String getName() {
         return "Play always";

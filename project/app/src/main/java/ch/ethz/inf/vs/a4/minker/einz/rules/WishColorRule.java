@@ -12,10 +12,6 @@ public class WishColorRule extends BasicCardRule {
 
     private boolean wished = false; // #bamboozled TODO
 
-    public WishColorRule(GameConfig config, Card assignedTo) { // #bamboozled TODO
-        super(config, assignedTo);
-    }
-
     @Override
     public String getName() {
         return "Wish color";

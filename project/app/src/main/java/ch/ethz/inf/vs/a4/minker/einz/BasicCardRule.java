@@ -10,11 +10,6 @@ public abstract class BasicCardRule extends BasicRule{
      */
     protected Card assignedTo;
 
-    public BasicCardRule(GameConfig config, Card assignedTo) {
-        super(); // TODO: sry josua I had to change this #bamboozled
-        this.assignedTo = assignedTo;
-    }
-
 
     /**
      * Checks whether the player is allowed to draw cards.

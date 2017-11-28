@@ -13,10 +13,6 @@ public class DrawTwoCardsRule extends BasicCardRule{
 
     private boolean assignedCardPlayed = false;
 
-    public DrawTwoCardsRule(GameConfig config, Card assignedTo) {
-        super(config, assignedTo);
-    }
-
     @Override
     public String getName() {
         return "Draw Two Cards";
