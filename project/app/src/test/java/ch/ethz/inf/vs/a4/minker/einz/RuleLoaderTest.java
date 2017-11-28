@@ -53,7 +53,5 @@ public class RuleLoaderTest {
             BasicRule loadedRule = loader.getInstanceOfRule(name);
             assertEquals("Not an instance of the right class", loadedRule.getName(), name);
         }
-
-
     }
 }

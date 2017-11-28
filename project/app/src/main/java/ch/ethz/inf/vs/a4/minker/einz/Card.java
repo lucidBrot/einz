@@ -11,14 +11,14 @@ public class Card {
     //text determines what kind of card you play. This can be "zero", "one", "plusTwo", ...
     private final CardText text;
     //color determines the color of the card. If the card has no color, it is "none"
-    private final CardColors color;
+    private final CardColor color;
 
     private final String ID;
 
     public String origin;
 
 
-    public Card (String ID, CardText text, CardColors color){
+    public Card (String ID, CardText text, CardColor color){
         this.ID = ID;
         this.text = text;
         this.color = color;
@@ -28,7 +28,7 @@ public class Card {
         return text;
     }
 
-    public CardColors getColor() {
+    public CardColor getColor() {
         return color;
     }
 

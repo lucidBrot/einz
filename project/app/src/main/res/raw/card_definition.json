@@ -1,8 +1,9 @@
-{
-  "ID":{
-    "name":"",
-    "text":"",
-    "color":"",
+[
+  {
+    "ID":"yellow_3",
+    "name":"Yellow 3",
+    "text":"THREE",
+    "color":"YELLOW",
     "image":"",
   }
-}
+]

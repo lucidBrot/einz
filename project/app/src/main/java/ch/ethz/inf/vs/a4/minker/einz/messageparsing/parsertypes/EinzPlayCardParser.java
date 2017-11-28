@@ -2,7 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
 
-import ch.ethz.inf.vs.a4.minker.einz.CardColors;
+import ch.ethz.inf.vs.a4.minker.einz.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.CardText;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +42,7 @@ public class EinzPlayCardParser extends EinzParser {
         //get card
         JSONObject cardJSON = body.getJSONObject("card");
         String ID = cardJSON.getString("ID");
-        Card card = new Card(ID, CardText.CHANGECOLOR, CardColors.BLUE); // temporary to make the program compile
+        Card card = new Card(ID, CardText.CHANGECOLOR, CardColor.BLUE); // temporary to make the program compile
         // #cardtag
 
         //put it all together

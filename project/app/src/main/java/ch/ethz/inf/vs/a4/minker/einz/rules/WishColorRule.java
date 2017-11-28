@@ -2,8 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.rules;
 
 import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardColors;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 
 /**
@@ -12,13 +11,9 @@ import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 
 public class WishColorRule extends BasicCardRule {
 
-    private CardColors wishedColor = null;
+    private CardColor wishedColor = null;
 
     private boolean wished = false;
-
-    public WishColorRule(GameConfig config, Card assignedTo) {
-        super(config, assignedTo);
-    }
 
     @Override
     public String getName() {
@@ -37,7 +32,6 @@ public class WishColorRule extends BasicCardRule {
 
     @Override
     public GlobalState onPlayAssignedCard(GlobalState state, Card played) {
-        state.setRestrictive();
         wished = true;
         return state;
     }
