@@ -30,6 +30,6 @@ public class EinzUnregisterResponseAction extends EinzAction {
      */
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onUnregisterResponse(this.getMessage());
     }
 }

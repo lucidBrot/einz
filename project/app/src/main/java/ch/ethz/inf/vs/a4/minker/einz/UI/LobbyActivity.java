@@ -232,7 +232,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed() { // TODO: ask to disconnect instead of timeouting (UnregisterRequest)
         super.onBackPressed();
         cleanupActivity();
     }

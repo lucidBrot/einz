@@ -11,6 +11,10 @@ import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 
 public class PlayTextRule extends BasicCardRule {
 
+    public PlayTextRule(GameConfig config, Card assignedTo) {
+        super(config, assignedTo);
+    }
+
     @Override
     public String getName() {
         return "Play on equal text";

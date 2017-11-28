@@ -16,6 +16,10 @@ public class WishColorRule extends BasicCardRule {
 
     private boolean wished = false;
 
+    public WishColorRule(GameConfig config, Card assignedTo) {
+        super(config, assignedTo);
+    }
+
     @Override
     public String getName() {
         return "Wish color";
@@ -33,6 +37,7 @@ public class WishColorRule extends BasicCardRule {
 
     @Override
     public GlobalState onPlayAssignedCard(GlobalState state, Card played) {
+        state.setRestrictive();
         wished = true;
         return state;
     }
