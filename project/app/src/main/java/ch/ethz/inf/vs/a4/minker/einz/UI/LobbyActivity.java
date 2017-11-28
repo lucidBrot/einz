@@ -289,10 +289,9 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         WifiApManager wifiApManager = new WifiApManager(this);
         boolean hotspotModeOn = wifiApManager.isWifiApEnabled();
         if(hotspotModeOn){
-            Toast.makeText(this, "You seem to be using a hotspot. Your IP within your own AP network is shown." +
-                    "Default would be 192.168.43.1", Toast.LENGTH_LONG).show();
-            Log.d("LobbyActivity/IP", "FQDN: "+wifiApManager.getWifiApConfiguration().FQDN+
-                    "\nSSID: "+wifiApManager.getWifiApConfiguration().SSID
+            Toast.makeText(this, "You seem to be using a hotspot. Your IP within your own AP network is by default 192.168.43.1", Toast.LENGTH_LONG).show();
+            Log.d("LobbyActivity/IP",
+                    "SSID: "+wifiApManager.getWifiApConfiguration().SSID
             );
         }
 
