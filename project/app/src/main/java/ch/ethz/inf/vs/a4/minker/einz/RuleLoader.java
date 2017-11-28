@@ -43,10 +43,10 @@ public class RuleLoader {
     }
 
     public String getDescriptionOfRule(String ruleName){
-        if(!ruleMapping.containsKey(ruleName)){
+        if(!ruleDescription.containsKey(ruleName)){
             return null;
         }
-        return ruleMapping.get(ruleName);
+        return ruleDescription.get(ruleName);
     }
 
     public Set<String> getRulesNames(){
