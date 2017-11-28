@@ -30,7 +30,7 @@ public class DrawTwoCardsRule extends BasicCardRule{
 
     @Override
     public boolean isValidPlayCardRestrictive(GlobalState state, Card played) {
-        return state.getTopCardDiscardPile().text.equals(played.text) || !assignedCardPlayed;
+        return state.getTopCardDiscardPile().getText().equals(played.getText()) || !assignedCardPlayed;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class DrawTwoCardsRule extends BasicCardRule{
 
     @Override
     public GlobalState onPlayAnyCard(GlobalState state, Card played) {
-        if(played.text.equals(assignedTo.text)){
+        if(played.getText().equals(assignedTo.getText())){
             if(state.getCardsToDraw() == 1){
                 state.setCardsToDraw(2);
             } else {

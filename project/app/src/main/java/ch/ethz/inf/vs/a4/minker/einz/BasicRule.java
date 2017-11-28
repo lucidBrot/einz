@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import org.json.JSONObject;
+
 /**
  * Basic class every Rule has to implement.
  */
@@ -27,6 +29,8 @@ public abstract class BasicRule {
     public abstract String getDescription();
 
 
-
-
+    public JSONObject getContentAsJSON() {
+        return new JSONObject();
+        // #cardtag
+    }
 }

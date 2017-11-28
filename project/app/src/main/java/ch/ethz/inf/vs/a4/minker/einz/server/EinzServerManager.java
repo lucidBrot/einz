@@ -3,7 +3,6 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
-import ch.ethz.inf.vs.a4.minker.einz.gamelogic.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
@@ -98,7 +97,7 @@ public class EinzServerManager {
         this.gamePhaseStarted = true;
         userListLock.writeLock().unlock();
         SFLock.writeLock().lock();
-        GameState gameState = getServerFunctionInterface().initialiseStandardGame(players, spectators); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+        getServerFunctionInterface().initialiseStandardGame(players, new HashSet<>(spectators)); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
         // TODO: not standard game but with rules, maybe call initialise earlier
         SFLock.writeLock().unlock();
     }
@@ -559,7 +558,7 @@ public class EinzServerManager {
         }
     }
 
-    public void specifyRules(ArrayList<Rule> ruleset) { //TODO: readwritelock on serverFunctionInterface
+    public void specifyRules(ArrayList<BasicRule> ruleset) { //TODO: readwritelock on serverFunctionInterface
         // TODO: RULES: specifyRules. How is the deck transmitted? in what format should I pass the rules?
         // TODO: add message for endTurn Action to docs and implement
         // TODO: RULES: rulemessage

@@ -17,7 +17,7 @@ public class RulesLoader {
     public List<BasicRule> loadRules(JSONObject loaded){
         //TODO: Read from JSON
         ArrayList<BasicRule> rules = new ArrayList<>();
-        rules.add(new PlayColorRule());
+        //rules.add(new PlayColorRule());
         return rules;
     }
 }
