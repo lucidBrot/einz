@@ -485,7 +485,11 @@ public class EinzServerManager {
     }
 
     public void broadcastMessageToAllPlayers(EinzMessage message) {
-        Log.d("servMan/broadcastP", "broadcasting "+message.getBody().getClass().getSimpleName());
+        try {
+            Log.d("servMan/broadcastP", "broadcasting "+message.getBody().getClass().getSimpleName()+"\n"+message.toJSON().toString());
+        } catch (JSONException e) {
+            Log.e("servMan/broadcastP", "failed to Log that I'm broadcasting "+message.getBody().getClass().getSimpleName()+" to all players");
+        }
         userListLock.readLock().lock();
         for(String username : getRegisteredClientRoles().keySet()){
 
