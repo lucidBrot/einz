@@ -42,8 +42,9 @@ public class EinzStartGameParser extends EinzParser {
         JSONObject body = message.getJSONObject("body");
         JSONObject jruleset = body.getJSONObject("ruleset");
         for(int i = 0; i<jruleset.names().length(); i++) {
-            BasicRule rule = new BasicRule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
-            ruleset.add(rule);
+            // #cardtag
+            /// BasicRule rule = new BasicRule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
+            /// ruleset.add(rule);
         }
         JSONArray jturnOrder = body.getJSONArray("turn-order");
         ArrayList<String> turnOrder = new ArrayList<>();
@@ -71,8 +72,9 @@ public class EinzStartGameParser extends EinzParser {
         // there are SO many ways to iterate over a json object
         // https://stackoverflow.com/questions/9151619/how-to-iterate-over-a-jsonobject
         for(int i = 0; i<jruleset.names().length(); i++) {
-            BasicRule rule = new BasicRule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
-            ruleset.add(rule);
+            /// BasicRule rule = new BasicRule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
+            /// ruleset.add(rule);
+            // #cardtag
         }
         EinzSpecifyRulesMessageBody mbody = new EinzSpecifyRulesMessageBody(ruleset);
         return new EinzMessage<>(mheader, mbody);

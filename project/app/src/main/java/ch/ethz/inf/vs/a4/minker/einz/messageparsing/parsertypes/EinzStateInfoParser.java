@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
 
+import ch.ethz.inf.vs.a4.minker.einz.CardColors;
+import ch.ethz.inf.vs.a4.minker.einz.CardText;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -57,7 +59,7 @@ public class EinzStateInfoParser extends EinzParser {
             JSONObject cardJSON = stackJSON.getJSONObject(i);
             String ID = cardJSON.getString("ID");
             String origin = cardJSON.getString("origin");
-            Card card = new Card(ID, origin);
+            Card card = new Card("temp", CardText.CHANGECOLOR, CardColors.BLUE); // #cardtag . Also, don't forget to add card origin everywhere in the parsers
             stack.add(card);
         }
         String whoseturn = globalstateJSON.getString("whoseturn");
@@ -72,7 +74,8 @@ public class EinzStateInfoParser extends EinzParser {
             JSONObject cardJSON = handJSON.getJSONObject(i);
             String ID = cardJSON.getString("ID");
             String origin = cardJSON.getString("origin");
-            Card card = new Card(ID, origin);
+            Card card = new Card(ID, CardText.CHANGECOLOR, CardColors.BLUE); // temp code to make the program compile
+            // #cardtag
             hand.add(card);
         }
         JSONArray possibleactionsJSON = playerstateJSON.getJSONArray("possibleactions");

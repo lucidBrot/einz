@@ -39,7 +39,7 @@ public class EinzPlayCardMessageBody extends EinzMessageBody{
         JSONObject jsonbody = new JSONObject();
         Card card = getCard();
         JSONObject IDJSON = new JSONObject();
-        IDJSON.put("ID", card.ID);
+        IDJSON.put("ID", card.getID());
         jsonbody.put("card", IDJSON);
         return jsonbody;
     }

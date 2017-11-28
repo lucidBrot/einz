@@ -30,7 +30,7 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
         JSONObject body = new JSONObject();
         JSONObject ruleset = new JSONObject();
         for(BasicRule rule : this.ruleset){
-            ruleset.put(rule.getIdentifier(), rule.getContentAsJSON());
+            ruleset.put(rule.getName(), rule.getContentAsJSON());
         }
         body.put("ruleset",ruleset);
         return body;

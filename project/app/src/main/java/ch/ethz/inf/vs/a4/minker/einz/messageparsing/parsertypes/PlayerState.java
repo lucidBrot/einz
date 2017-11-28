@@ -45,7 +45,7 @@ public class PlayerState {
             Card card = hand.get(i);
             JSONObject cardJSON = new JSONObject();
             cardJSON.put("origin", card.origin);
-            cardJSON.put("ID", card.ID);
+            cardJSON.put("ID", card.getID());
             handJSON.put(i, cardJSON);
         }
         // build possibleactions

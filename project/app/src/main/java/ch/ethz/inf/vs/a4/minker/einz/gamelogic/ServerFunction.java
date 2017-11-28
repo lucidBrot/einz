@@ -32,7 +32,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         Queue <Card> drawPile = createStandardDeck();
         Stack<Card> discardPile = new Stack<>();
         discardPile.add(drawPile.poll());
-        globalState = new GlobalState(drawPile, discardPile);
+        globalState = new GlobalState(-1, players); // #cardtag
 
 
     }
@@ -129,14 +129,14 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR) {
                 for (CardColors cc : CardColors.values()) {
                     if (cc != CardColors.NONE) {
-                        Card card = new Card(ct, cc);
+                        Card card = new Card("temp", ct, cc); // #cardtag replace "temp"
                         cardsToAdd.add(card);
                         cardsToAdd.add(card);
                     }
                 }
             } else {
                 for (int i = 0; i < 4; i++) {
-                    Card card = new Card(ct, CardColors.NONE);
+                    Card card = new Card("temp", ct, CardColors.NONE); // #cardtag
                     cardsToAdd.add(card);
                 }
             }

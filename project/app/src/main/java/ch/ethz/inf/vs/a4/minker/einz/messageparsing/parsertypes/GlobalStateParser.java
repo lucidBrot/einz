@@ -76,7 +76,7 @@ public class GlobalStateParser {
             Card card = stack.get(i);
             JSONObject cardJSON = new JSONObject();
             cardJSON.put("origin", card.origin);
-            cardJSON.put("ID", card.ID);
+            cardJSON.put("ID", card.getID());
             stackJSON.put(i, cardJSON);
         }
         //get whoseturn
