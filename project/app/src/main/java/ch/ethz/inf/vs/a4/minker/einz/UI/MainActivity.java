@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.UI.ClientSetupActivity;
 import ch.ethz.inf.vs.a4.minker.einz.UI.ServerSetupActivity;
 import ch.ethz.inf.vs.a4.minker.einz.client.ClientActivity;
