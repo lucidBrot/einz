@@ -132,7 +132,7 @@ public class ExampleUnitTest {
     }
     @Test
     public void parseUpdateLobbyList() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
-        String msg = "{\n" +
+        /*String msg = "{\n" +
                 "  \"header\":{\n" +
                 "    \"messagegroup\":\"registration\",\n" +
                 "    \"messagetype\":\"UpdateLobbyList\"\n" +
@@ -145,6 +145,21 @@ public class ExampleUnitTest {
                 "    ],\n" +
                 "    \"admin\":\"roger\"\n" +
                 "  }\n" +
+                "}";
+                */
+        String msg = "{\n" +
+                "  \"header\":{\n" +
+                "    \"messagegroup\":\"registration\",\n" +
+                "    \"messagetype\":\"UpdateLobbyList\"\n" +
+                "  },\n" +
+                "  \"body\":{\n" +
+                "    \"lobbylist\":[\n" +
+                "      {\"username\":\"chris\", \"role\":\"player\"},\n" +
+                "      {\"username\":\"roger\", \"role\":\"player\"},\n" +
+                "      {\"username\":\"table\", \"role\":\"spectator\"}\n" +
+                "    ],\n" +
+                "    \"admin\":\"roger\"\n" +
+                "  }" +
                 "}";
         parser_test(msg);
     }

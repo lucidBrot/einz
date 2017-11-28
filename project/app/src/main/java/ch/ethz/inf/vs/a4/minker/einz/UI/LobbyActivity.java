@@ -20,6 +20,8 @@ import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
+import info.whitebyte.hotspotmanager.ClientScanResult;
+import info.whitebyte.hotspotmanager.FinishScanListener;
 import info.whitebyte.hotspotmanager.WifiApManager;
 
 import java.lang.reflect.Array;
@@ -328,6 +330,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         }*/
         connectClientToLocalServer();
     }
+
 
     /**
      * When you are the host and the first client-handler in the server is ready to receive the register message

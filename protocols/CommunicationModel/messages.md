@@ -234,9 +234,9 @@ It is not important for the client to know spectators and the admin, but it migh
   },
   "body":{
     "lobbylist":[
-      {"roger":"player"},
-      {"chris":"player"},
-      {"table":"spectator"}
+      {"username":"roger", "role":"player"},
+      {"username":"chris", "role":"player"},
+      {"username":"table", "role":"spectator"}
     ],
     "admin":"roger"
   }
