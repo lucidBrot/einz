@@ -280,12 +280,15 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
                 return wifiIpAddress;
         }
 
+        // if no wlan address because not connected or in hotspot mode.
+        // the default ip of hotspot server would be 192.168.43.1 if the device manufacturer did not change it
+        // maybe TODO: check if hotspot mode using https://github.com/nickrussler/Android-Wifi-Hotspot-Manager-Class
         for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
             NetworkInterface intf = en.nextElement();
             for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
                 InetAddress inetAddress = enumIpAddr.nextElement();
                 Log.i("LobbyActivity/IP","inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
-//the condition after && is missing in your snippet, checking instance of inetAddress
+
                 if (!inetAddress.isLoopbackAddress() && inetAddress instanceof Inet4Address) {
                     Log.i("LobbyActivity/IP","return inetAddress.getHostAddress(): "+inetAddress.getHostAddress());
                     return inetAddress.getHostAddress();
