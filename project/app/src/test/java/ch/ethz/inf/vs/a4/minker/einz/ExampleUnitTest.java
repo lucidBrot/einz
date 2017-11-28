@@ -261,7 +261,7 @@ public class ExampleUnitTest {
         String msg = "{\n" +
                 "  \"header\":{\n" +
                 "    \"messagegroup\":\"startgame\",\n" +
-                "    \"messagetype\":\"startGame\"\n" +
+                "    \"messagetype\":\"StartGame\"\n" +
                 "  },\n" +
                 "\t\"body\":{}\n" +
                 "}";
@@ -308,11 +308,11 @@ public class ExampleUnitTest {
         parser_test(msg);
     }
     @Test
-    public void parseDrawCardsResponse() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+    public void parseDrawCardsSuccess() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
         String msg = "{\n" +
                 "  \"header\":{\n" +
                 "    \"messagegroup\":\"draw\",\n" +
-                "    \"messagetype\":\"DrawCardsResponse\"\n" +
+                "    \"messagetype\":\"DrawCardsSuccess\"\n" +
                 "  },\n" +
                 "  \"body\":{\n" +
                 "    \"cards\":[\n" +
@@ -320,6 +320,20 @@ public class ExampleUnitTest {
                 "      {\"ID\":\"cardID3\",\"origin\":\"talon\"},\n" +
                 "      {\"ID\":\"cardID1\",\"origin\":\"talon\"}\n" +
                 "    ]\n" +
+                "  }\n" +
+                "}";
+        parser_test(msg);
+    }
+
+    @Test
+    public void parseDrawCardsFailure() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        String msg = "{\n" +
+                "  \"header\":{\n" +
+                "    \"messagegroup\":\"draw\",\n" +
+                "    \"messagetype\":\"DrawCardsFailure\"\n" +
+                "  },\n" +
+                "  \"body\":{\n" +
+                "    \"reason\":\"it's nothing. I'm fine bae.\"" +
                 "  }\n" +
                 "}";
         parser_test(msg);

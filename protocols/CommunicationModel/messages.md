@@ -402,7 +402,7 @@ The **admin client** informs the server that it should start the game and stop l
 {
   "header":{
     "messagegroup":"startgame",
-    "messagetype":"startGame"
+    "messagetype":"StartGame"
   },
 	"body":{}
 }
@@ -471,7 +471,9 @@ The **Client** sends this request. The Server checks whether the Client is allow
 }
 ```
 
-##DrawCardsResponse
+
+
+## DrawCardsResponse
 
 `cards` : *JSONArray of JSONObjects*
 
@@ -501,7 +503,7 @@ The **server** sends this request and will follow up with a complete [sendState]
 {
   "header":{
     "messagegroup":"draw",
-    "messagetype":"DrawCardsResponse"
+    "messagetype":"DrawCardsSuccess"
   },
   "body":{
     "cards":[
@@ -512,6 +514,22 @@ The **server** sends this request and will follow up with a complete [sendState]
   }
 }
 ```
+
+If the drawing failed for some reason, the response will instead be
+
+```json
+{
+  "header":{
+    "messagegroup":"draw",
+    "messagetype":"DrawCardsFailure"
+  },
+  "body":{
+    "reason":"unspecified"
+  }
+}
+```
+
+where `reason` can be *"unspecified" or *"not allowed"*, ... (has yet to be used. Usage will show what reasons we will have. Until then, it will always be *"unspecified"*)
 
 ***
 

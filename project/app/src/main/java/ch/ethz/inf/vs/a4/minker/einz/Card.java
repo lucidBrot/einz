@@ -17,6 +17,7 @@ public class Card {
         //TODO: Set ID according to Josua
     }
     public Card (String ID, String origin){
+        // TODO: initialize type, color and wish based on ID
         this.ID = ID;
         this.origin = origin;
     }

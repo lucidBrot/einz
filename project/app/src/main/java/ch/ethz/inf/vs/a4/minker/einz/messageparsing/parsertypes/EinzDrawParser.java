@@ -23,7 +23,7 @@ public class EinzDrawParser extends EinzParser {
     @Override
     public EinzMessage parse(JSONObject message) throws JSONException {
         JSONObject header = message.getJSONObject("header");
-        switch(header.getString("messagegroup")){
+        switch(header.getString("messagetype")){
             case "DrawCardsSuccess":
                 return parseDrawCardsSuccess(message);
             case "DrawCardsFailure":
