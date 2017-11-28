@@ -25,10 +25,7 @@ import static org.junit.Assert.*;
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
 public class ExampleUnitTest {
-    @Test
-    public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
-    }
+
    @Test
     public void parseGetStateOld() throws Exception {
         JSONObject expectedJSON = new JSONObject("{\n" +
@@ -135,7 +132,7 @@ public class ExampleUnitTest {
     }
     @Test
     public void parseUpdateLobbyList() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
-        String msg = "{\n" +
+        /*String msg = "{\n" +
                 "  \"header\":{\n" +
                 "    \"messagegroup\":\"registration\",\n" +
                 "    \"messagetype\":\"UpdateLobbyList\"\n" +
@@ -148,6 +145,21 @@ public class ExampleUnitTest {
                 "    ],\n" +
                 "    \"admin\":\"roger\"\n" +
                 "  }\n" +
+                "}";
+                */
+        String msg = "{\n" +
+                "  \"header\":{\n" +
+                "    \"messagegroup\":\"registration\",\n" +
+                "    \"messagetype\":\"UpdateLobbyList\"\n" +
+                "  },\n" +
+                "  \"body\":{\n" +
+                "    \"lobbylist\":[\n" +
+                "      {\"username\":\"chris\", \"role\":\"player\"},\n" +
+                "      {\"username\":\"roger\", \"role\":\"player\"},\n" +
+                "      {\"username\":\"table\", \"role\":\"spectator\"}\n" +
+                "    ],\n" +
+                "    \"admin\":\"roger\"\n" +
+                "  }" +
                 "}";
         parser_test(msg);
     }
@@ -249,7 +261,7 @@ public class ExampleUnitTest {
         String msg = "{\n" +
                 "  \"header\":{\n" +
                 "    \"messagegroup\":\"startgame\",\n" +
-                "    \"messagetype\":\"startGame\"\n" +
+                "    \"messagetype\":\"StartGame\"\n" +
                 "  },\n" +
                 "\t\"body\":{}\n" +
                 "}";
@@ -296,11 +308,11 @@ public class ExampleUnitTest {
         parser_test(msg);
     }
     @Test
-    public void parseDrawCardsResponse() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+    public void parseDrawCardsSuccess() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
         String msg = "{\n" +
                 "  \"header\":{\n" +
                 "    \"messagegroup\":\"draw\",\n" +
-                "    \"messagetype\":\"DrawCardsResponse\"\n" +
+                "    \"messagetype\":\"DrawCardsSuccess\"\n" +
                 "  },\n" +
                 "  \"body\":{\n" +
                 "    \"cards\":[\n" +
@@ -308,6 +320,20 @@ public class ExampleUnitTest {
                 "      {\"ID\":\"cardID3\",\"origin\":\"talon\"},\n" +
                 "      {\"ID\":\"cardID1\",\"origin\":\"talon\"}\n" +
                 "    ]\n" +
+                "  }\n" +
+                "}";
+        parser_test(msg);
+    }
+
+    @Test
+    public void parseDrawCardsFailure() throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        String msg = "{\n" +
+                "  \"header\":{\n" +
+                "    \"messagegroup\":\"draw\",\n" +
+                "    \"messagetype\":\"DrawCardsFailure\"\n" +
+                "  },\n" +
+                "  \"body\":{\n" +
+                "    \"reason\":\"it's nothing. I'm fine bae.\"" +
                 "  }\n" +
                 "}";
         parser_test(msg);

@@ -55,4 +55,5 @@ dependencies {
     compile 'com.google.guava:guava:23.5-android'
     testCompile 'junit:junit:4.12'
     testCompile 'org.json:json:20080701'
+    compile project(':libs:hotspotmanager')
 }

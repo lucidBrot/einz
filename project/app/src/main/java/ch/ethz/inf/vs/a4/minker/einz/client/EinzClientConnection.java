@@ -139,6 +139,7 @@ public class EinzClientConnection implements Runnable{
             Log.e("EinzClientConnection", "Clientside Error (2)");
             e.printStackTrace();
             // TODO: handle these, e.g. ECONNREFUSED (server not reachable under that port and IP
+            // or java.net.ConnectException: Connection timed out
 
         }
 
@@ -148,7 +149,7 @@ public class EinzClientConnection implements Runnable{
      * Close the connection and release the members
      */
     public void stopClient() {
-
+        Log.d("ClientConnection/stop", "stopping listening");
         spin = false;
 
         if (bufferOut != null) {

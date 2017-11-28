@@ -5,6 +5,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,13 +61,12 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         JSONObject body = message.getJSONObject("body");
         String admin = body.getString("admin");
         HashMap<String, String> lobbylist = new HashMap<>();
-        JSONObject jsonLobbyList = body.getJSONObject("lobbylist");
+        JSONArray jsonLobbyList = body.getJSONArray("lobbylist");
 
         // foreach mapping {name:role}
-        Iterator<String> keys = jsonLobbyList.keys();
-        for(;keys.hasNext();){
-            String key = keys.next();
-            lobbylist.put(key, jsonLobbyList.getString(key));
+        for(int i=0; i<jsonLobbyList.length();i++){
+            JSONObject obj = jsonLobbyList.getJSONObject(i);
+            lobbylist.put(obj.getString("username"), obj.getString("role"));
         }
 
         return new EinzMessage<>(
