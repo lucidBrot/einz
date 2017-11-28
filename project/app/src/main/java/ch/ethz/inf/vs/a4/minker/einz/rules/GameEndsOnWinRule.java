@@ -9,8 +9,8 @@ import ch.ethz.inf.vs.a4.minker.einz.Player;
  * Created by Josua on 11/27/17.
  */
 
-public class GameEndsonWinRule extends BasicGlobalRule {
-    public GameEndsonWinRule(GameConfig config) {
+public class GameEndsOnWinRule extends BasicGlobalRule {
+    public GameEndsOnWinRule(GameConfig config) {
         super(config);
     }
 

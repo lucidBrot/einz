@@ -11,7 +11,7 @@ public abstract class BasicCardRule extends BasicRule{
     protected Card assignedTo;
 
     public BasicCardRule(GameConfig config, Card assignedTo) {
-        super(config);
+        super(); // TODO: sry josua I had to change this #bamboozled
         this.assignedTo = assignedTo;
     }
 
