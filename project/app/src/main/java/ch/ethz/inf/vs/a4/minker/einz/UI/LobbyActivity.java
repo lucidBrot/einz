@@ -13,12 +13,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
+import info.whitebyte.hotspotmanager.WifiApManager;
 
 import java.lang.reflect.Array;
 import java.net.Inet4Address;
@@ -283,6 +285,17 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         // if no wlan address because not connected or in hotspot mode.
         // the default ip of hotspot server would be 192.168.43.1 if the device manufacturer did not change it
         // maybe TODO: check if hotspot mode using https://github.com/nickrussler/Android-Wifi-Hotspot-Manager-Class
+
+        WifiApManager wifiApManager = new WifiApManager(this);
+        boolean hotspotModeOn = wifiApManager.isWifiApEnabled();
+        if(hotspotModeOn){
+            Toast.makeText(this, "You seem to be using a hotspot. Your IP within your own AP network is shown." +
+                    "Default would be 192.168.43.1", Toast.LENGTH_LONG).show();
+            Log.d("LobbyActivity/IP", "FQDN: "+wifiApManager.getWifiApConfiguration().FQDN+
+                    "\nSSID: "+wifiApManager.getWifiApConfiguration().SSID
+            );
+        }
+
         for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
             NetworkInterface intf = en.nextElement();
             for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
