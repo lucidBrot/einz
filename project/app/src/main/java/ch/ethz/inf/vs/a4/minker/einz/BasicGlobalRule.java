@@ -11,10 +11,6 @@ package ch.ethz.inf.vs.a4.minker.einz;
  */
 public abstract class BasicGlobalRule extends BasicRule {
 
-    public BasicGlobalRule(GameConfig config) {
-        super(config);
-    }
-
     /**
      * Determines if a player can be kicked
      * @param state

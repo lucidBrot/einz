@@ -1,0 +1,11 @@
+[
+  "class ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule",
+  "class ch.ethz.inf.vs.a4.minker.einz.rules.DrawTwoCardsRule",
+  "class ch.ethz.inf.vs.a4.minker.einz.rules.GameEndsOnWinRule",
+  "class ch.ethz.inf.vs.a4.minker.einz.rules.PlayAlwaysRule",
+  "class ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule",
+  "class ch.ethz.inf.vs.a4.minker.einz.rules.PlayTextRule",
+  "class ch.ethz.inf.vs.a4.minker.einz.rules.StartGameWithCardsRule",
+  "class ch.ethz.inf.vs.a4.minker.einz.rules.WinOnNoCardsRule",
+  "class ch.ethz.inf.vs.a4.minker.einz.rules.WishColorRule"
+]

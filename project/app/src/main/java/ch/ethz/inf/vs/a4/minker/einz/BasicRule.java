@@ -8,9 +8,11 @@ public abstract class BasicRule {
     /**
      * Access to the game Config. Here the rules can get a new drawPile or get all spectators etc.
      */
-    protected final GameConfig config;
+    protected GameConfig config;
 
-    public BasicRule(GameConfig config){
+    public BasicRule() { }
+
+    public void initialize(GameConfig config) {
         this.config = config;
     }
 

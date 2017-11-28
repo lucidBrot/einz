@@ -10,8 +10,15 @@ public abstract class BasicCardRule extends BasicRule{
      */
     protected Card assignedTo;
 
-    public BasicCardRule(GameConfig config, Card assignedTo) {
-        super(config);
+    /**
+     * Initializes the CardRule and assigns a Card to the rule.
+     * <br />
+     * Call this rather to initialize(GameConfig config) to initialize the card.
+     * @param config The Game config the Rule can refer to
+     * @param assignedTo The Card assigned to the Card.
+     */
+    public void initialize(GameConfig config, Card assignedTo) {
+        super.initialize(config);
         this.assignedTo = assignedTo;
     }
 
@@ -21,7 +28,7 @@ public abstract class BasicCardRule extends BasicRule{
      * <br />
      * In permissive mode at least one rule has to return true to allow the player to draw a card.
      * @param state
-     * @return True if he is allowed to
+     * @return True if the player is allowed to
      */
     public boolean isValidDrawCardsPermissive(GlobalState state){
         return false;
@@ -32,7 +39,7 @@ public abstract class BasicCardRule extends BasicRule{
      * <br />
      * In restrictive mode every rule has to return true to allow the player to draw a card.
      * @param state
-     * @return False if he is not allowed to.
+     * @return False if the player is not allowed to.
      */
     public boolean isValidDrawCardsRestrictive(GlobalState state){
         return true;

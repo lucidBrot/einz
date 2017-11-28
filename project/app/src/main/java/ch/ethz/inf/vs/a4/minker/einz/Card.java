@@ -23,7 +23,7 @@ public class Card {
         this.text = text;
         this.color = color;
     }
-    
+
     public CardText getText() {
         return text;
     }
