@@ -71,7 +71,7 @@ public class EinzClientConnection implements Runnable{
 
     /**
      * Same as the other sendMessage, but transforms EinzMessage to JSON to String for you.<br>
-     * <b>appends \r\n at the end if there is no \n at the end</b>
+     * (Does not append \r\n at the end if there is no \n at the end because we send this as a line anyways)
      * Threadsafe ✔<br>
      * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
      * @see #sendMessage(JSONObject)

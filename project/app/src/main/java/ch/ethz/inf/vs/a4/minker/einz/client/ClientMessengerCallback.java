@@ -98,6 +98,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
         Log.d("ClientMessengerCallback", username+" was unregistered. Reason: "+reason);
         // UI is updated later when we receive a LobbyListUpdatedMessage
+        // except for when the server shuts down maybe
         // TODO: notify user either now or on updatelobbylist that somebody left and why
     }
 

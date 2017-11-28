@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import org.json.JSONException;
@@ -190,8 +191,20 @@ public class EinzClient implements Runnable {
         sendRegistrationMessage();
     }
 
+    /**
+     * call this in an non-main-thread
+     */
     public void shutdown() {
         // TODO: send unregister message
+        sendUnregisterRequest();
         this.connection.stopClient();
+    }
+
+    private void sendUnregisterRequest() {
+        EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
+        EinzUnregisterRequestMessageBody body = new EinzUnregisterRequestMessageBody(this.username); // getting all the girls
+        final EinzMessage<EinzUnregisterRequestMessageBody> message = new EinzMessage<>(header, body);
+        this.connection.sendMessage(message);
+        Log.d("EinzClient/shutdown", "sent unregister message for "+this.username);
     }
 }
