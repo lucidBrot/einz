@@ -10,6 +10,7 @@ import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 
 import java.util.ArrayList;
@@ -87,6 +88,17 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
         runOnMainThread(runnable);
 
+    }
+
+    @Override
+    public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message){
+        EinzUnregisterResponseMessageBody body = message.getBody();
+        String username = body.getUsername();
+        String reason = body.getReason();
+
+        Log.d("ClientMessengerCallback", username+" was unregistered. Reason: "+reason);
+        // UI is updated later when we receive a LobbyListUpdatedMessage
+        // TODO: notify user either now or on updatelobbylist that somebody left and why
     }
 
     private void runOnMainThread(Runnable runnable) {
