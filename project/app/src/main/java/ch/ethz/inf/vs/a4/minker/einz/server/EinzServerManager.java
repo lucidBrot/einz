@@ -302,11 +302,6 @@ public class EinzServerManager {
             String role = clientRoles.get(username);
             EinzServerClientHandler esch = clientHandlers.get(username);
 
-            // unregister them
-            getRegisteredClientRoles().remove(username);
-            getRegisteredClientHandlers().remove(username);
-            getUserListLock().writeLock().unlock();
-
             // inform all clients
             // broadcast UnregisterResponse
             EinzUnregisterResponseMessageBody body = new EinzUnregisterResponseMessageBody(username, unregisterReason);
@@ -314,6 +309,11 @@ public class EinzServerManager {
             EinzMessage<EinzUnregisterResponseMessageBody> message = new EinzMessage<>(header, body);
             broadcastMessageToAllPlayers(message);
             broadcastMessageToAllSpectators(message);
+
+            // unregister them
+            getRegisteredClientRoles().remove(username);
+            getRegisteredClientHandlers().remove(username);
+            getUserListLock().writeLock().unlock();
 
             // tell fabian about it
             if(gamePhaseStarted &&!serverShuttingDownGracefully){
