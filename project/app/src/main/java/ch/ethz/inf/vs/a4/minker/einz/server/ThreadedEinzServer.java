@@ -29,6 +29,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     private boolean shouldStopSpinning = false;
     private ServerSocket serverSocket;
     public boolean DEBUG_ECHO = true;
+    private boolean dead = false;
 
     public void setDEBUG_ONE_MSG(boolean DEBUG_ONE_MSG) {
         this.DEBUG_ONE_MSG = DEBUG_ONE_MSG;
@@ -328,6 +329,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
                 e.printStackTrace();
             }
         }
+        this.dead=true;
         this.sherLock.writeLock().unlock();
         Log.d("EinzServer/shutdown", "finished shutting down server");
     }
@@ -336,5 +338,12 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         this.sherLock.writeLock().lock();
         this.clientHandlerBiMap.inverse().remove(handler);
         this.sherLock.writeLock().unlock();
+    }
+
+    /**
+     * @return true if the server shut down but apparently the object still exists
+     */
+    public boolean isDead() {
+        return dead;
     }
 }

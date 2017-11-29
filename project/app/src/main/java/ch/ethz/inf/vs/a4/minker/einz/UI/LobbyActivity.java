@@ -274,7 +274,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
      */
     private void cleanupActivity() {
         // stop server on back button
-        if(this.host && this.server!=null) {
+        if(this.host && this.server!=null && !this.server.isDead()) {
             (new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -285,11 +285,11 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             // don't run this on the main thread. networking is not allowed on the main thread
         }
 
-        if(this.ourClient!=null) {
+        if(this.ourClient!=null && !this.ourClient.isDead()) {
             (new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    ourClient.shutdown();
+                    ourClient.shutdown(true);
                     ourClient=null;
                 }
             })).start();

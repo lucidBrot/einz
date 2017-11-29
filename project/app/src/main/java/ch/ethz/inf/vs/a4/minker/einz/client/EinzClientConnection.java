@@ -27,31 +27,37 @@ public class EinzClientConnection implements Runnable{
     private BufferedReader bufferIn;
     private Socket socket;
     private EinzClientConnection.OnMessageReceived mMessageListener = null; // interface on message received
+    private EinzClient parentClient;
 
     /**
      * @param serverIP
      * @param serverPort
      * @param messageListener to react to messages. implement EinzClientConnection.OnMessageReceived
      */
-    public EinzClientConnection(String serverIP, int serverPort, EinzClientConnection.OnMessageReceived messageListener){
+    public EinzClientConnection(String serverIP, int serverPort, EinzClientConnection.OnMessageReceived messageListener, EinzClient parentClient){
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.mMessageListener = messageListener;
+        this.parentClient=parentClient;
+
     }
 
-    public EinzClientConnection(String serverIP, int serverPort){
-        this(serverIP, serverPort, null);
+    public EinzClientConnection(String serverIP, int serverPort, EinzClient parentClient){
+        this(serverIP, serverPort, null, parentClient);
     }
 
     /**
      * Sends the message entered by client to the server
+     * <code>synchronized</code> because otherwise {@link #stopClient()} could interfere.
      *
      * @param message text entered by client
      */
     public void sendMessage(String message) {
-        if (bufferOut != null && !bufferOut.checkError()) {
-            bufferOut.println(message);
-            bufferOut.flush();
+        synchronized(bufferOut) {
+            if (bufferOut != null && !bufferOut.checkError()) {
+                bufferOut.println(message);
+                bufferOut.flush();
+            }
         }
     }
 
@@ -88,6 +94,7 @@ public class EinzClientConnection implements Runnable{
         }
     }
 
+    // not synchronized. that's the whole point. Catch exceptions.
     public void run() {
 
         spin = true;
@@ -117,9 +124,11 @@ public class EinzClientConnection implements Runnable{
                     if (mServerMessage != null && mMessageListener != null) {
                         // call the message handler
                         mMessageListener.messageReceived(mServerMessage);
+                    } else {
+                        // not sure when this would happen
+                        Log.w("EinzClientConnection", "UNEXPECTED: message or listener was null. Stopping client.");
+                        stopClient();
                     }
-
-                    // TODO: method to stop the client
                 }
 
             } catch (Exception e) {
@@ -150,18 +159,22 @@ public class EinzClientConnection implements Runnable{
      * Close the connection and release the members
      */
     public void stopClient() {
-        Log.d("ClientConnection/stop", "stopping listening");
-        spin = false;
+        synchronized (bufferOut) {
+            Log.d("ClientConnection/stop", "stopping listening");
+            spin = false;
 
-        if (bufferOut != null) {
-            bufferOut.flush();
-            bufferOut.close();
+            if (bufferOut != null) {
+                bufferOut.flush();
+                bufferOut.close();
+            }
+
+            mMessageListener = null;
+            bufferIn = null;
+            bufferOut = null;
+
+            this.parentClient.onClientConnectionDead();
+
         }
-
-        mMessageListener = null;
-        bufferIn = null;
-        bufferOut = null;
-
         // TODO: is it ok to abort like this?
     }
 
