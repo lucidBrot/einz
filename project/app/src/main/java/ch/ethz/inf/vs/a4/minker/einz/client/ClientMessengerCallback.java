@@ -100,6 +100,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         // UI is updated later when we receive a LobbyListUpdatedMessage
         // except for when the server shuts down maybe
         // TODO: notify user either now or on updatelobbylist that somebody left and why
+        // TODO: if I was kicked, stop the client.
     }
 
     private void runOnMainThread(Runnable runnable) {

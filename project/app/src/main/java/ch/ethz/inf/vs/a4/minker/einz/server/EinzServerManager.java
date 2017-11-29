@@ -371,13 +371,13 @@ public class EinzServerManager {
         userListLock.writeLock().lock();
         EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);
         // if admin is not yet set, don't kick
-        boolean allowed = ((getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick))||userWhoIssuedThisKick.equals("server"));
+        boolean allowed_ = ((getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick))||userWhoIssuedThisKick.equals("server"));
         boolean userExists = (esch!=null);
         boolean userValid = !isInvalidUsername(userToKick);
         String unregisterReason = (userWhoIssuedThisKick.equals("server"))?"server":"kicked";
 
         EinzMessage<EinzKickFailureMessageBody> response;
-        if(userExists && allowed && userValid) {
+        if(userExists && allowed_ && userValid) {
             response = unregisterUser(userToKick, unregisterReason, userWhoIssuedThisKick);
             if(response==null)//if success
             {
@@ -402,7 +402,7 @@ public class EinzServerManager {
         } else {
             // user doesn't exist or issuer is not admin
             EinzKickFailureMessageBody ekfmb;
-            if(!allowed){
+            if(!allowed_){
                  ekfmb = new EinzKickFailureMessageBody(userToKick, "not allowed");
             } else if(!userValid){
                 ekfmb = new EinzKickFailureMessageBody(userToKick, "invalid");
