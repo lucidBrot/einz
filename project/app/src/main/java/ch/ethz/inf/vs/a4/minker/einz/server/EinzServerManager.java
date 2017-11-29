@@ -368,7 +368,7 @@ public class EinzServerManager {
      * @param userWhoIssuedThisKick
      */
     public void kickUser(String userToKick, String userWhoIssuedThisKick){
-        userListLock.readLock().lock();
+        userListLock.writeLock().lock();
         EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);
         // if admin is not yet set, don't kick
         boolean allowed = ((getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick))||userWhoIssuedThisKick.equals("server"));
@@ -381,7 +381,7 @@ public class EinzServerManager {
             response = unregisterUser(userToKick, unregisterReason, userWhoIssuedThisKick);
             if(response==null)//if success
             {
-                userListLock.readLock().unlock();
+                userListLock.writeLock().unlock();
                 return;
             } else{
                 // failure. send to user.
@@ -396,7 +396,7 @@ public class EinzServerManager {
                     e.printStackTrace();
                     throw new RuntimeException(e);
                 }
-                userListLock.readLock().unlock();
+                userListLock.writeLock().unlock();
                 return;
             }
         } else {

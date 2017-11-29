@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.wifi.WifiInfo;
@@ -146,8 +147,37 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             usercard.setCardBackgroundColor(Color.GREEN);
         }
 
+        if(this.host){
+            // show kick button // TODO: hide kick button for admin user
+            View kickButtonFrame = usercard.findViewById(R.id.fl_lobby_kick_frame);
+            kickButtonFrame.setVisibility(View.VISIBLE);
+            // setup onclick listener
+            Context context = this;
+            View kickButton = usercard.findViewById(R.id.btn_lobby_kick);
+            kickButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    kick(username);
+                }
+            });
+        }
+
         // add view
         lobbyList.addView(usercard);
+    }
+
+    /**
+     * This method is only for admins.
+     * Sends kick request in new thread
+     * @param username who to kick
+     */
+    private void kick(String username) {
+        (new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ourClient.sendKickRequest(username);
+            }
+        })).start();
     }
 
     /**

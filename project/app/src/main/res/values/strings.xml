@@ -22,5 +22,6 @@
     <string name="tv_c_setup_ip">server IP</string>
     <string name="btn_c_setup">connect</string>
     <string name="btn_c_join_game">join game</string>
+    <string name="kick">kick</string>
 
 </resources>

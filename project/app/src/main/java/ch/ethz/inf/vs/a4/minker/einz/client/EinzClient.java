@@ -5,6 +5,7 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
@@ -206,5 +207,13 @@ public class EinzClient implements Runnable {
         final EinzMessage<EinzUnregisterRequestMessageBody> message = new EinzMessage<>(header, body);
         this.connection.sendMessage(message);
         Log.d("EinzClient/shutdown", "sent unregister message for "+this.username);
+    }
+
+    public void sendKickRequest(String username) {
+        EinzMessageHeader header = new EinzMessageHeader("registration", "Kick");
+        EinzKickMessageBody body = new EinzKickMessageBody(username);
+        final EinzMessage<EinzKickMessageBody> message = new EinzMessage<>(header, body);
+        this.connection.sendMessage(message);
+        Log.d("EinzClient/kick", "Sent kick request (kick "+username+")");
     }
 }
