@@ -32,6 +32,9 @@ The sources worth mentioning:
 
   https://developer.android.com/reference/java/lang/Thread.State.html#RUNNABLE
 
+* Using Loopers, Handlers and HandlerThreads
+  [https://medium.com/@ali.muzaffar/handlerthreads-and-why-you-should-be-using-them-in-your-android-apps-dc8bf1540341](https://medium.com/@ali.muzaffar/handlerthreads-and-why-you-should-be-using-them-in-your-android-apps-dc8bf1540341) 
+
 
 
 # Libraries
