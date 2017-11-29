@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
-import ch.ethz.inf.vs.a4.minker.einz.Spectator;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
@@ -15,16 +13,17 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobby
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.BiConsumer;
 
 public class ClientMessengerCallback implements ClientActionCallbackInterface {
     private final LobbyUIInterface lobbyUI; // TODO: implement reactions to messages
     private final Context applicationContext;
+    private final EinzClient parentClient;
 
 
-    public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface, Context appContext) {
+    public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface, Context appContext, EinzClient parentClient) {
         this.lobbyUI = lobbyUIInterface;
         this.applicationContext = appContext;
+        this.parentClient = parentClient;
     }
 
     @Override
@@ -98,7 +97,38 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
         Log.d("ClientMessengerCallback", username+" was unregistered. Reason: "+reason);
         // UI is updated later when we receive a LobbyListUpdatedMessage
-        // TODO: notify user either now or on updatelobbylist that somebody left and why
+        // except for when the server shuts down maybe
+
+        // if I was kicked or left, stop the client.
+        // run on main thread but wait for this to finish
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                synchronized(this) { // for notifyAll
+                    if(username.equals(parentClient.getUsername())){
+                        parentClient.shutdown(false);
+                        Toast.makeText(applicationContext, "You have been disconnected. Reason: "+reason, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(applicationContext, username+" has been disconnected. Reason: "+reason, Toast.LENGTH_LONG).show();
+                    }
+
+                    this.notifyAll(); // inform any waiting threads
+                }
+            }
+        };
+        runOnMainThread(r);
+        synchronized (r) { // synchronized needed for wait
+            try {
+                r.wait(1000); // wait until the main thread is finished and informs us. or until it took it 1 second
+                // might spuriously awaken, but because the whole runnable is synchronized, that shouldn't be a problem
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                Log.w("ClientMessengerCallback", "Was interrupted while waiting for Toast.show() on unregister event");
+            }
+        }
+
+        // TODO: notify user either now or on updatelobbylist that somebody left and why (maybe not with a toast, or is toast fine?)
+
     }
 
     private void runOnMainThread(Runnable runnable) {

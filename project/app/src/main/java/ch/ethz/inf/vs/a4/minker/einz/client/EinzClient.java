@@ -5,8 +5,9 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import org.json.JSONException;
 
@@ -22,6 +23,15 @@ public class EinzClient implements Runnable {
     private int serverPort;
     private Context appContext;
     private Thread clientConnectionThread;
+    /**
+     * true if the client was shutdown (but apparently still exists)
+     */
+    private boolean dead;
+
+    public String getUsername() {
+        return username;
+    }
+
     private String username;
     private String role;
     private final LobbyUIInterface lobbyUI;
@@ -44,12 +54,13 @@ public class EinzClient implements Runnable {
         this.serverPort = serverPort;
         this.appContext = appContext;
         this.lobbyUI = lobbyUI;
-        this.actionCallbackInterface = new ClientMessengerCallback(lobbyUI, appContext);
+        this.actionCallbackInterface = new ClientMessengerCallback(lobbyUI, appContext, this);
         this.clientMessenger = new ClientMessenger(appContext, this.actionCallbackInterface);
-        this.connection = new EinzClientConnection(serverIP, serverPort, clientMessenger);
+        this.connection = new EinzClientConnection(serverIP, serverPort, clientMessenger, this);
         this.username = username;
         this.role = role;
         this.isHost = isHost;
+        this.dead=false;
     }
 
     /**
@@ -190,8 +201,40 @@ public class EinzClient implements Runnable {
         sendRegistrationMessage();
     }
 
-    public void shutdown() {
-        // TODO: send unregister message
+    /**
+     * call this in an non-main-thread
+     * @param unregisterFirst true if the client should first try to unregister
+     */
+    public void shutdown(boolean unregisterFirst) {
+        if(unregisterFirst &&!this.dead) {sendUnregisterRequest();}
         this.connection.stopClient();
+        this.dead = true;
+    }
+
+    private void sendUnregisterRequest() {
+        EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
+        EinzUnregisterRequestMessageBody body = new EinzUnregisterRequestMessageBody(this.username); // getting all the girls
+        final EinzMessage<EinzUnregisterRequestMessageBody> message = new EinzMessage<>(header, body);
+        this.connection.sendMessage(message);
+        Log.d("EinzClient/shutdown", "sent unregister message for "+this.username);
+    }
+
+    public void sendKickRequest(String username) {
+        EinzMessageHeader header = new EinzMessageHeader("registration", "Kick");
+        EinzKickMessageBody body = new EinzKickMessageBody(username);
+        final EinzMessage<EinzKickMessageBody> message = new EinzMessage<>(header, body);
+        this.connection.sendMessage(message);
+        Log.d("EinzClient/kick", "Sent kick request (kick "+username+")");
+    }
+
+    public boolean isDead() {
+        return dead;
+    }
+
+    /**
+     * when the clientconnection stops completely after {@link EinzClientConnection#stopClient()}
+     */
+    void onClientConnectionDead() {
+        this.dead=true;
     }
 }
