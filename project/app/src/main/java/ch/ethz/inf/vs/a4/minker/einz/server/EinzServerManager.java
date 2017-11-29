@@ -371,7 +371,7 @@ public class EinzServerManager {
         userListLock.writeLock().lock();
         EinzServerClientHandler esch = getRegisteredClientHandlers().get(userToKick);
         // if admin is not yet set, don't kick
-        boolean allowed_ = ((getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick))||userWhoIssuedThisKick.equals("server"));
+        boolean allowed_ = ((getAdminUsername()!=null && getAdminUsername().equals(userWhoIssuedThisKick))||userWhoIssuedThisKick.equals("server"))==true; //==true for debug info
         boolean userExists = (esch!=null);
         boolean userValid = !isInvalidUsername(userToKick);
         String unregisterReason = (userWhoIssuedThisKick.equals("server"))?"server":"kicked";
