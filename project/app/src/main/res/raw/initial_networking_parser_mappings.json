@@ -7,10 +7,6 @@
 	{
       "messagegroup": "startgame",
       "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzStartGameParser"
-    },
-	{
-      "messagegroup": "draw",
-      "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzDrawParser"
-	}
+    }
   ]
 }

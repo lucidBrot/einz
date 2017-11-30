@@ -1,6 +1,10 @@
 package ch.ethz.inf.vs.a4.minker.einz.server;
 
+import android.graphics.Color;
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
@@ -76,7 +80,8 @@ public class Debug {
 
                 //tc.sendMessage(Debug.debug_getKickMessage("clemi"));
                 //tc.sendMessage(Debug.debug_getStartGameMessage());
-                tc.sendMessage(Debug.debug_getDrawCardMessage());
+                //tc.sendMessage(Debug.debug_getDrawCardMessage());
+                tc.sendMessage(Debug.debug_getPlayCardMessage());
             }
         };
         m.start(); // send message
@@ -227,6 +232,19 @@ public class Debug {
     private static String debug_getDrawCardMessage() {
         EinzMessageHeader header=new EinzMessageHeader("draw","DrawCards" );
         EinzMessageBody body  = new EinzDrawCardsMessageBody();
+        EinzMessage message = new EinzMessage(header, body);
+        try {
+            return message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "DEBUG/fuck.";
+        }
+    }
+
+    private static String debug_getPlayCardMessage() {
+        EinzMessageHeader header=new EinzMessageHeader("playcard","PlayCard" );
+        Card card = new Card("card.lul.id", CardText.DEBUG, CardColor.BLUE);
+        EinzMessageBody body  = new EinzPlayCardMessageBody(card);
         EinzMessage message = new EinzMessage(header, body);
         try {
             return message.toJSON().toString();
