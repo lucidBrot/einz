@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import org.json.JSONException;
@@ -75,6 +76,7 @@ public class Debug {
 
                 //tc.sendMessage(Debug.debug_getKickMessage("clemi"));
                 //tc.sendMessage(Debug.debug_getStartGameMessage());
+                tc.sendMessage(Debug.debug_getDrawCardMessage());
             }
         };
         m.start(); // send message
@@ -132,6 +134,7 @@ public class Debug {
                     e.printStackTrace();
                 }
 
+                /* // send bad message
                 EinzMessageHeader header = new EinzMessageHeader("registration", "alösdkjf");
                 EinzKickFailureMessageBody badBody = new EinzKickFailureMessageBody("roger", "lol this is a bad message");
                 EinzMessage<EinzKickFailureMessageBody> emsg = new EinzMessage<>(header, badBody);
@@ -139,7 +142,7 @@ public class Debug {
                     tc.sendMessage(emsg.toJSON().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                }*/
 
                 tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
             }
@@ -218,6 +221,18 @@ public class Debug {
             e.printStackTrace();
             Log.e("DEBUG/dGetUnRegMsg", "failed to create startGame message");
             return "empty message :(";
+        }
+    }
+
+    private static String debug_getDrawCardMessage() {
+        EinzMessageHeader header=new EinzMessageHeader("draw","DrawCards" );
+        EinzMessageBody body  = new EinzDrawCardsMessageBody();
+        EinzMessage message = new EinzMessage(header, body);
+        try {
+            return message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "DEBUG/fuck.";
         }
     }
 
