@@ -84,7 +84,6 @@ Within the program, messagegroup and messagetype might be null if the mapping wa
   >
   > [CustomAction](#customaction), [CustomActionResponse](#customactionresponse), [FinishTurn](#finishturn)
   >
-  > These were added only lately and their parsers are not yet implemented (23.11.2017)
 
 
 * toast
@@ -833,6 +832,8 @@ Depending on the rules, we need additional messages. E.g. when the user plays a 
 
 ### CustomAction
 
+sent by the **client**
+
 ```json
 {
   "header":{
@@ -847,6 +848,8 @@ Depending on the rules, we need additional messages. E.g. when the user plays a 
 
 ### CustomActionResponse
 
+sent by the **server**
+
 ```json
 {
   "header":{
@@ -860,6 +863,10 @@ Depending on the rules, we need additional messages. E.g. when the user plays a 
 ```
 
 ### FinishTurn
+
+sent by the **client**
+
+is ignored by the server if the game is not running.
 
 ```json
 {

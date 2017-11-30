@@ -426,7 +426,7 @@ public class EinzServerManager {
                 throw new RuntimeException(e);
             }
         }
-        userListLock.readLock().unlock();
+        userListLock.writeLock().unlock();
         return;
     }
 
@@ -637,11 +637,24 @@ public class EinzServerManager {
 
         if(gamePhaseStarted){
             // TODO: get state from fabian
+
         } else {
             // TODO: return empty state in message
+
         }
         //EinzSendStateMessageBody body = new EinzSendStateMessageBody();
 
         getSFLock().readLock().unlock();
+        throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
+    }
+
+    public void onFinishTurn(String issuedByPlayer) {
+        if(gamePhaseStarted) { // ignore otherwise
+            getSFLock().writeLock().lock();
+            // TODO: call fabians on finish turn
+
+            getSFLock().writeLock().unlock();
+            throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
+        }
     }
 }
