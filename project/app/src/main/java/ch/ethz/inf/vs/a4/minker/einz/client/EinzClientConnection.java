@@ -115,7 +115,7 @@ public class EinzClientConnection implements Runnable {
             try {
 
                 //sends the message to the server
-                bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
+                bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), Globals.ENCODING)), true);
 
                 //receives the message which the server sends back
                 bufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), Globals.ENCODING));

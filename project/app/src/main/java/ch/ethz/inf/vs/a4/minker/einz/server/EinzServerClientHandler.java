@@ -20,6 +20,7 @@ import static java.lang.Thread.sleep;
  */
 public class EinzServerClientHandler implements Runnable{
 
+    private PrintWriter bufferOut;
     public Socket socket;
 
     private boolean spin = false;
@@ -97,10 +98,12 @@ public class EinzServerClientHandler implements Runnable{
         try {
             inp = socket.getInputStream();
             brinp = new BufferedReader(new InputStreamReader(inp, Globals.ENCODING));
+            bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), Globals.ENCODING)), true);
             out = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             Log.e("ESCH", "Failed to initialize run(). Aborting");
             e.printStackTrace();
+
         }
     }
 
@@ -248,6 +251,9 @@ public class EinzServerClientHandler implements Runnable{
 
         socketWriteLock.lock(); //synchronized
             // maybe need to append  + "\r\n" to message ?
+            bufferOut.print(message);
+            bufferOut.flush();
+            /* // old code that broke encoding
             try {
                 //out.writeBytes(message); // makes ö fail
                 //out.writeChars(message); // client receives gibberish message
@@ -267,6 +273,7 @@ public class EinzServerClientHandler implements Runnable{
                     }
                 }
             }
+            */
 
         socketWriteLock.unlock();
     }
