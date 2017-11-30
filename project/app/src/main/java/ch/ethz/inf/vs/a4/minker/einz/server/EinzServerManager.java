@@ -604,4 +604,22 @@ public class EinzServerManager {
             // this will send response
         }
     }
+
+    public void playCard(EinzMessage message, String issuedByPlayer) {
+        if(gamePhaseStarted) {
+            getServerFunctionInterface().play(((EinzPlayCardMessageBody) message.getBody()).getCard(), new Player(issuedByPlayer));
+            // fabian sends response
+        } else {
+            EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCardResponse");
+            EinzPlayCardResponseMessageBody body= new EinzPlayCardResponseMessageBody("false");
+            EinzMessage<EinzPlayCardResponseMessageBody> response = new EinzMessage<>(header, body);
+            try {
+                server.sendMessageToUser(issuedByPlayer, response);
+            } catch (UserNotRegisteredException e) {
+                Log.w("servMan/playCard", "unregistered user "+issuedByPlayer+" tried to play a card");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 }

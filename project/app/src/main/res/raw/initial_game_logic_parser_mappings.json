@@ -1,4 +1,12 @@
 {
   "parsermappings": [
+  {
+      "messagegroup": "draw",
+      "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzDrawParser"
+  },
+  {
+      "messagegroup": "playcard",
+      "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzPlayCardParser"
+  }
   ]
 }

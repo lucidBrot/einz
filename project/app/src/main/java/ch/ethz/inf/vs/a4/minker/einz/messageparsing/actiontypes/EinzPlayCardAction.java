@@ -29,8 +29,6 @@ public class EinzPlayCardAction extends EinzAction {
     @Override
     public void run() {
         Log.d("EinzPlayCardAction", "run()");
-        this.getsInterface().play(((EinzPlayCardMessageBody) this.getMessage().getBody()).getCard(), new Player(
-                    ""
-            )); // TODO: update this when the interface has updated
+        getServerManager().playCard(getMessage(), getIssuedByPlayer());
     }
 }
