@@ -99,6 +99,7 @@ public class EinzServerManager {
         SFLock.writeLock().lock();
         getServerFunctionInterface().initialiseStandardGame(players, new HashSet<>(spectators)); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
         // TODO: not standard game but with rules, maybe call initialise earlier
+        // TODO: send initGame to clients at some point. either here or on receiving specifyRules
         SFLock.writeLock().unlock();
     }
 
@@ -551,7 +552,7 @@ public class EinzServerManager {
     }
 
     public void startGame(String issuedByPlayer) {
-        if(isRegisteredAdmin(issuedByPlayer)) {
+        if(isRegisteredAdmin(issuedByPlayer) && !gamePhaseStarted) {
             finishRegistrationPhaseAndInitGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
             SFLock.writeLock().lock();
             serverFunctionInterface.startGame();
@@ -579,5 +580,26 @@ public class EinzServerManager {
             // esch.stopThreadPatiently(); is already within kickUser
         }
         userListLock.writeLock().unlock();
+    }
+
+    public void drawCards(String issuedByPlayer) {
+        if(!gamePhaseStarted){
+            // not allowed to draw cards!
+            EinzMessage<EinzDrawCardsFailureMessageBody> message = new EinzMessage<EinzDrawCardsFailureMessageBody>(
+              new EinzMessageHeader("draw", "DrawCardsFailure"),
+                    new EinzDrawCardsFailureMessageBody("game not running")
+            );
+            try {
+                server.sendMessageToUser(issuedByPlayer, message);
+            } catch (UserNotRegisteredException e) {
+                Log.w("servMan/drawCards", "User "+issuedByPlayer+" tried to draw a card but they weren't even registered.");
+            } catch (JSONException e) {
+                throw new RuntimeException(e); // if this happens, the message is corrupted. that shouldn't happen
+            }
+
+        } else {
+            getServerFunctionInterface().drawCards(new Player(issuedByPlayer));
+            // this will send response
+        }
     }
 }

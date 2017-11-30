@@ -529,7 +529,7 @@ If the drawing failed for some reason, the response will instead be
 }
 ```
 
-where `reason` can be *"unspecified" or *"not allowed"*, ... (has yet to be used. Usage will show what reasons we will have. Until then, it will always be *"unspecified"*)
+where `reason` can be *"unspecified" or *"not allowed"*, *"game not running"* ... (has yet to be used. Usage will show what reasons we will have. Until then, it will always be *"unspecified"*)
 
 ***
 
