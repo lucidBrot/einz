@@ -15,7 +15,7 @@ import static java.lang.Thread.sleep;
 /**
  * call {@link #run} to actually connect
  */
-public class EinzClientConnection implements Runnable{
+public class EinzClientConnection implements Runnable {
 
     private final String serverIP;
     private final int serverPort;
@@ -25,6 +25,7 @@ public class EinzClientConnection implements Runnable{
     private PrintWriter bufferOut;
     // used to read messages from the server
     private BufferedReader bufferIn;
+    private Object bufferMonitor = new Object(); // used to synchronize any accesses to the buffers
     private Socket socket;
     private EinzClientConnection.OnMessageReceived mMessageListener = null; // interface on message received
     private EinzClient parentClient;
@@ -34,15 +35,15 @@ public class EinzClientConnection implements Runnable{
      * @param serverPort
      * @param messageListener to react to messages. implement EinzClientConnection.OnMessageReceived
      */
-    public EinzClientConnection(String serverIP, int serverPort, EinzClientConnection.OnMessageReceived messageListener, EinzClient parentClient){
+    public EinzClientConnection(String serverIP, int serverPort, EinzClientConnection.OnMessageReceived messageListener, EinzClient parentClient) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.mMessageListener = messageListener;
-        this.parentClient=parentClient;
+        this.parentClient = parentClient;
 
     }
 
-    public EinzClientConnection(String serverIP, int serverPort, EinzClient parentClient){
+    public EinzClientConnection(String serverIP, int serverPort, EinzClient parentClient) {
         this(serverIP, serverPort, null, parentClient);
     }
 
@@ -53,8 +54,8 @@ public class EinzClientConnection implements Runnable{
      * @param message text entered by client
      */
     public void sendMessage(String message) {
-        synchronized(bufferOut) {
-            if (bufferOut != null && !bufferOut.checkError()) {
+        if (bufferOut != null && !bufferOut.checkError()) {
+            synchronized (bufferMonitor) {
                 bufferOut.println(message);
                 bufferOut.flush();
             }
@@ -66,12 +67,13 @@ public class EinzClientConnection implements Runnable{
      * <b>appends \r\n at the end if there is no \n at the end</b>
      * Threadsafe ✔ <br/>
      * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
-     * @see #sendMessage(String)
+     *
      * @param message
+     * @see #sendMessage(String)
      */
-    public void sendMessage(JSONObject message){
+    public void sendMessage(JSONObject message) {
         String msg = message.toString();
-            // don't add \r\n because println
+        // don't add \r\n because println
         sendMessage(msg);
     }
 
@@ -80,11 +82,12 @@ public class EinzClientConnection implements Runnable{
      * (Does not append \r\n at the end if there is no \n at the end because we send this as a line anyways)
      * Threadsafe ✔<br>
      * Sends message to the client who is connected to this {@link EinzServerClientHandler} Instance
+     *
+     * @param message
      * @see #sendMessage(JSONObject)
      * @see #sendMessage(String)
-     * @param message
      */
-    public void sendMessage(EinzMessage message){
+    public void sendMessage(EinzMessage message) {
         try {
             sendMessage(message.toJSON());
         } catch (JSONException e) {
@@ -103,7 +106,7 @@ public class EinzClientConnection implements Runnable{
             //here you must put your computer's IP address.
             InetAddress serverAddr = InetAddress.getByName(serverIP);
 
-            Log.d("EinzClientConnection", "Connecting to "+serverIP +":"+serverPort);
+            Log.d("EinzClientConnection", "Connecting to " + serverIP + ":" + serverPort);
 
             //create a socket to make the connection with the server
             socket = new Socket(serverAddr, serverPort);
@@ -159,7 +162,7 @@ public class EinzClientConnection implements Runnable{
      * Close the connection and release the members
      */
     public void stopClient() {
-        synchronized (bufferOut) {
+        synchronized (bufferMonitor) {
             Log.d("ClientConnection/stop", "stopping listening");
             spin = false;
 
@@ -180,10 +183,10 @@ public class EinzClientConnection implements Runnable{
 
     /**
      * Returns the connection state of the socket.
-     Note: Closing a socket doesn't clear its connection state, which means this method will return true for a closed socket (see isClosed()) if it was successfuly connected prior to being closed.
+     * Note: Closing a socket doesn't clear its connection state, which means this method will return true for a closed socket (see isClosed()) if it was successfuly connected prior to being closed.
      */
-    public boolean isConnected(){
-        return (this.socket==null || this.socket.isConnected());
+    public boolean isConnected() {
+        return (this.socket == null || this.socket.isConnected());
     }
 
     public interface OnMessageReceived {
