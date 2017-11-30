@@ -92,7 +92,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
 
     // https://stackoverflow.com/a/30183130/2550406
     public String getLocalIpAddress() throws SocketException {
-        WifiManager wifiMgr = (WifiManager) this.getApplicationContext().getSystemService(getApplicationContext().WIFI_SERVICE);
+        WifiManager wifiMgr = (WifiManager) this.getApplicationContext().getSystemService(WIFI_SERVICE);
         if(wifiMgr.isWifiEnabled()) {
             WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
             int ip = wifiInfo.getIpAddress();

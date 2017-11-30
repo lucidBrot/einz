@@ -140,8 +140,11 @@ public class EinzServerManager {
     // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
     // utility function
     private String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        Scanner s = new Scanner(is);
+        s.useDelimiter("\\A");
+        String ret = s.hasNext() ? s.next() : "";
+        s.close();
+        return ret;
     }
 
     /**
@@ -166,7 +169,7 @@ public class EinzServerManager {
      * @param username
      * @param handler
      */
-    public EinzMessage registerUser(String username, String role, EinzServerClientHandler handler){
+    public EinzMessage<? extends EinzMessageBody> registerUser(String username, String role, EinzServerClientHandler handler){
 
         String reason = "unknown";
         boolean success = false;
@@ -230,7 +233,7 @@ public class EinzServerManager {
         if(userListLock.writeLock().isHeldByCurrentThread())
             userListLock.writeLock().unlock();
 
-        EinzMessage response = null;
+        EinzMessage<? extends EinzMessageBody> response = null;
 
         if(success){
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
@@ -446,8 +449,7 @@ public class EinzServerManager {
          */
         // Locking on userlistLock is not neccessary here because we only access one of these and concurrentHashMap guarantees an ok state
         ConcurrentHashMap<String, String> chm = getRegisteredClientRoles();
-        @SuppressWarnings("unchecked")
-        HashMap<String, String> localCopy = (HashMap<String, String>) new HashMap(chm);
+        HashMap<String, String> localCopy = new HashMap<String, String>(chm);
         EinzUpdateLobbyListMessageBody body = new EinzUpdateLobbyListMessageBody(localCopy, getAdminUsername());
 
         return new EinzMessage<>(header, body);
@@ -485,7 +487,7 @@ public class EinzServerManager {
         return adminUsername;
     }
 
-    public void broadcastMessageToAllPlayers(EinzMessage message) {
+    public void broadcastMessageToAllPlayers(EinzMessage<? extends EinzMessageBody> message) {
         try {
             Log.d("servMan/broadcastP", "broadcasting "+message.getBody().getClass().getSimpleName()+"\n"+message.toJSON().toString());
         } catch (JSONException e) {
@@ -513,7 +515,7 @@ public class EinzServerManager {
         userListLock.readLock().unlock();
     }
 
-    public void broadcastMessageToAllSpectators(EinzMessage message) {
+    public void broadcastMessageToAllSpectators(EinzMessage<? extends EinzMessageBody> message) {
         for(String username : getRegisteredClientRoles().keySet()){
             if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
                 continue;

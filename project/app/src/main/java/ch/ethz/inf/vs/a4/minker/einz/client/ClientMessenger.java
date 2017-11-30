@@ -49,7 +49,7 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        EinzMessage einzMessage  = null; // get a message object
+        EinzMessage<? extends EinzMessageBody> einzMessage  = null; // get a message object
         try {
             einzMessage = parser.parse(message);
         } catch (JSONException e) {

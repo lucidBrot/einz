@@ -4,8 +4,6 @@ import android.util.Log;
 
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzJsonMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -295,7 +293,7 @@ public class EinzServerClientHandler implements Runnable{
      * @see #sendMessage(String)
      * @param message
      */
-    public void sendMessage(EinzMessage message){
+    public void sendMessage(EinzMessage<? extends EinzMessageBody> message){
         try {
             sendMessage(message.toJSON());
         } catch (JSONException e) {
@@ -325,7 +323,7 @@ public class EinzServerClientHandler implements Runnable{
     private EinzAction parseMessage(String message){
         try {
             EinzParser einzParser = this.einzParserFactory.generateEinzParser(message);
-            EinzMessage einzMessage = einzParser.parse(message); // TODO: implement parser, especially for when message is not valid
+            EinzMessage<? extends EinzMessageBody> einzMessage = einzParser.parse(message); // TODO: implement parser, especially for when message is not valid
 
             //<Debug>
             /*EinzMessage einzMessage = new EinzMessage(
