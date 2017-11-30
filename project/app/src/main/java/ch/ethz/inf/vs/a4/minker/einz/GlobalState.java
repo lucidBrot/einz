@@ -39,8 +39,6 @@ public class GlobalState {
 
     private boolean gameFinished = false;
 
-    private boolean restrictive = false;
-
     private final int maxDiscardPileSize;
 
 
@@ -154,31 +152,6 @@ public class GlobalState {
         if(cardsToDraw >= 0 ) {
             this.cardsToDraw = cardsToDraw;
         }
-    }
-
-    /**
-     * Changes the validation of the Rules to Restrictive mode. In Restrictive Mode every rule has
-     * to return True to be able to perform a certain action.
-     */
-    public void setRestrictive(){
-        restrictive = true;
-    }
-
-    /**
-     * Changes the validation of the Rules to Permissive mode. In permissive mode at least one rule
-     * has to return true in order to perform a certain action.
-     * This is the default.
-     */
-    public void setPermissive(){
-        restrictive = false;
-    }
-
-    /**
-     * Returns whether restrictive mode is enabled or not
-     * @return True if restrictive mode is enabled
-     */
-    public boolean isRestrictive(){
-        return restrictive;
     }
 
     /**
