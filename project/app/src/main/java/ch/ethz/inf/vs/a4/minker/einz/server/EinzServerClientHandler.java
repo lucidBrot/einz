@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
 
+import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import org.json.JSONException;
@@ -95,7 +96,7 @@ public class EinzServerClientHandler implements Runnable{
         brinp = null;
         try {
             inp = socket.getInputStream();
-            brinp = new BufferedReader(new InputStreamReader(inp));
+            brinp = new BufferedReader(new InputStreamReader(inp, Globals.ENCODING));
             out = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             Log.e("ESCH", "Failed to initialize run(). Aborting");
@@ -248,7 +249,9 @@ public class EinzServerClientHandler implements Runnable{
         socketWriteLock.lock(); //synchronized
             // maybe need to append  + "\r\n" to message ?
             try {
-                out.writeBytes(message);
+                //out.writeBytes(message); // makes ö fail
+                //out.writeChars(message); // client receives gibberish message
+                out.writeUTF(message); // message works with ö, but starts with ��x which cannot be translated to json...
                 out.flush();
             } catch (IOException e) {
                 if(getConnectedUser()!=null) { // didn't realize that user disconnected

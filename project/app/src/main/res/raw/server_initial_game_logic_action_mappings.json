@@ -19,6 +19,6 @@
 		{
 		  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody",
 		  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzCustomActionAction"
-		},
+		}
 	]
 }

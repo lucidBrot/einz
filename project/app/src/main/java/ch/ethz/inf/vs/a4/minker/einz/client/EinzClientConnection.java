@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import org.json.JSONException;
@@ -117,7 +118,7 @@ public class EinzClientConnection implements Runnable {
                 bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())), true);
 
                 //receives the message which the server sends back
-                bufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                bufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), Globals.ENCODING));
 
                 String mServerMessage;
                 //in this while the client listens for the messages sent by the server
