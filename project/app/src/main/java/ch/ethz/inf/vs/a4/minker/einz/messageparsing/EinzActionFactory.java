@@ -240,7 +240,10 @@ public class EinzActionFactory {
     // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
     // utility function
     private String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        Scanner s = new Scanner(is);
+        s.useDelimiter("\\A");
+        String ret = s.hasNext() ? s.next() : "";
+        s.close();
+        return ret;
     }
 }

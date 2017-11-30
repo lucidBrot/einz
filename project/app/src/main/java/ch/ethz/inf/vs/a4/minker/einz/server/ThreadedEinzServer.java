@@ -4,9 +4,9 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
-import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import org.json.JSONException;
@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -296,7 +295,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
      * @throws UserNotRegisteredException if the user is not found
      * @throws JSONException if the message.toJSON() failed
      */
-    public void sendMessageToUser(String username, EinzMessage message) throws UserNotRegisteredException, JSONException {
+    public void sendMessageToUser(String username, EinzMessage<? extends EinzMessageBody> message) throws UserNotRegisteredException, JSONException {
         this.sendMessageToUser(username, message.toJSON().toString());
     }
 
