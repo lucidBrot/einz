@@ -5,17 +5,19 @@ import org.json.JSONObject;
 
 /**
  * Immutable container of an {@link EinzMessageHeader} and an {@link EinzMessageBody}
+ * Generic because we need to make sure Action only gets the text of Message it wants
+ * BODYTYPE is some EinzMessageBody extension
  */
-public class EinzMessage {
+public class EinzMessage<BODYTYPE extends EinzMessageBody> {
     private final EinzMessageHeader header;
-    private final EinzMessageBody body;
+    private final BODYTYPE body;
 
     /**
      * Create a <i>EinzMessage</i> Object that consists of a Header and a Body
      * @param header Uniform among all messages
      * @param body Specific to the messagetype
      */
-    public EinzMessage (EinzMessageHeader header, EinzMessageBody body){
+    public EinzMessage (EinzMessageHeader header, BODYTYPE body){
         this.header = header;
         this.body = body;
     }
@@ -24,7 +26,7 @@ public class EinzMessage {
         return header;
     }
 
-    public EinzMessageBody getBody() {
+    public BODYTYPE getBody() {
         return body;
     }
 

@@ -11,7 +11,7 @@ public abstract class EinzParser {
      * @param message String of a JSON-encoded message as defined in protocols/documentation_Messages.md
      * @return an EinzMessage Object containing all the information specific to this kind of message.
      */
-    public EinzMessage parse (String message) throws JSONException{
+    public EinzMessage<? extends EinzMessageBody> parse (String message) throws JSONException{
         JSONObject msg = null;
         try {
             msg = new JSONObject(message);
@@ -44,7 +44,7 @@ public abstract class EinzParser {
      * @param message JSON-encoded message as defined in protocols/documentation_Messages.md
      * @return an EinzMessage Object containing all the information specific to this kind of message
      */
-    public abstract EinzMessage parse (JSONObject message) throws JSONException;
+    public abstract EinzMessage<? extends  EinzMessageBody> parse (JSONObject message) throws JSONException;
 
 
     /**

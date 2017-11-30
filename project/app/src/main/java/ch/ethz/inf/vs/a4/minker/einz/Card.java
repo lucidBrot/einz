@@ -1,27 +1,43 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import org.json.JSONObject;
+
 /**
  * Created by Fabian on 11.11.2017.
  */
 
-public class Card implements ICardDefinition {
+public class Card {
 
-    public Card (CardTypes type, CardColors color){
-        //This is used for cards which don't need the "wish" to function properly
+    //text determines what kind of card you play. This can be "zero", "one", "plusTwo", ...
+    private final CardText text;
+    //color determines the color of the card. If the card has no color, it is "none"
+    private final CardColor color;
 
-        this.type = type;
+    private final String ID;
+
+    public String origin;
+
+
+    public Card (String ID, CardText text, CardColor color){
+        this.ID = ID;
+        this.text = text;
         this.color = color;
-        this.wish = CardColors.NONE;
-        //TODO: Set ID according to Josua
     }
 
-    //type determines what kind of card you play. This can be "zero", "one", "plusTwo", ...
-    public CardTypes type;
-    //color determines the color of the card. If the card has no color, it is "none"
-    public CardColors color;
-    //when playing certain cards, you can choose something (e.g. a color)
-    //with all other cards, this field is ignored
-    public CardColors wish;
-    public String ID;
+    public CardText getText() {
+        return text;
+    }
+
+    public CardColor getColor() {
+        return color;
+    }
+
+    public String getID() {
+        return ID;
+    }
+
+    public JSONObject toJSON(){ // TODO: implement toJSON
+        return null;
+    }
 
 }

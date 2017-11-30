@@ -1,23 +1,55 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
-import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.client.ClientActionCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
-import ch.ethz.inf.vs.a4.minker.einz.server.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 
 public class EinzRegisterAction extends EinzAction{
 
-    public EinzRegisterAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer) {
-        super(sInterface, serverManager, params, issuedByPlayer);
+    private final EinzMessage params;
+    private final EinzRegisterMessageBody body;
+
+    /**
+     * @param sInterface
+     * @param serverManager
+     * @param params some {@link EinzMessage} featuring {@link ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody}
+     * @param issuedByPlayer
+     * @param issuedByClientHandler
+     */
+    public EinzRegisterAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage<EinzRegisterMessageBody> params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
+        this(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, null, null);
     }
 
     /**
-     * executes the action in the current thread
+     * compatibility for new actionfactory (for client)
+     */
+    public EinzRegisterAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage<EinzRegisterMessageBody> params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+        super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
+        this.params=params;
+        this.body=params.getBody();
+    }
+
+    /**
+     * executes the action in the current thread.
+     * That is, it registers the User for this clientHandler and then triggers a response
      */
     @Override
     public void run() {
-        Log.d("Action/Register", "was run");
+        // register user
+        EinzMessage response = getServerManager().registerUser(this.body.getUsername(), this.body.getRole(), getEinzServerClientHandler());
+        // send response
+        getEinzServerClientHandler().sendMessage(response);
+        // if it was a successful register, inform all clients about the change
+        if(response.getBody() instanceof EinzRegisterSuccessMessageBody) {
+            EinzMessage<EinzUpdateLobbyListMessageBody> msg = getServerManager().generateUpdateLobbyListRequest();
+            getServerManager().broadcastMessageToAllPlayers(msg);
+            getServerManager().broadcastMessageToAllSpectators(msg);
+        }
     }
 }

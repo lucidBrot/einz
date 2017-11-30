@@ -1,13 +1,18 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
+import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzUnmappedParser;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.Scanner;
 
 /**
  * This class is used to generate an EinzParser that corresponds to the messagegroup.
@@ -23,7 +28,8 @@ public class EinzParserFactory {
     }
 
     /**
-     * Might return null if message is not a valid JSONObject or not a valid message
+     * Might return null if message is not a valid JSONObject or not a valid message.
+     * Will return EinzUnmappedParser if the message was kinda valid but not mapped
      * @param message String representation of a message as specified in protocols/documentation_Messages.md
      * @return Parser specifically for this messagegroup
      * @throws JSONException if the message is invalidly formatted. E.g. if it is not a JSONObject or if it has no header...
@@ -87,7 +93,7 @@ public class EinzParserFactory {
         try {
             Class<? extends EinzParser> c = getMapping(messagegroup);
             if(c==null)
-                return null;
+                return new EinzUnmappedParser(); // in case it is not mapped
 
             return getMapping(messagegroup).getDeclaredConstructor().newInstance();
         } catch (InstantiationException e) {
@@ -97,7 +103,7 @@ public class EinzParserFactory {
             e.printStackTrace();
         }
         Log.e("EinzParserFactory", "Failed to instantiate mapped Parser");
-        return null;
+        return new EinzUnmappedParser();
     }
 
     /**
@@ -110,8 +116,61 @@ public class EinzParserFactory {
 
     /**
      * @param messagegroup The messagegroup whose mapping should be removed from the internal dictionary.
+     *                     Does nothing if the messagegroup is not registered
      */
-    public void deregisterMessagegroup(String messagegroup){ // TODO: what does this do if the messagegroup wasn't registered?
+    public void deregisterMessagegroup(String messagegroup){
         this.dictionary.remove(messagegroup);
+    }
+
+    /**
+     * Loads every mapping in the JSONObject and store it in this Factories' dictionary
+     * @param messageToParsermappings
+     *      a JSONObject of format
+     * {
+     * "parsermappings":[
+     *   {"messagegroup":"registration","mapstoparser":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzRegistrationParser"},
+     *   {"messagegroup":"draw","mapstoparser":"class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzDrawParser"}
+     *  ]
+     * }
+     * @throws JSONException If the JSONObject is not valid. i.e. it does not contain the "parsermappings" and "messagegroups"s within them.
+     * @throws InvalidResourceFormatException If the JSON does not start with the prefix "class ". I might add other reasons later
+     * @throws ClassNotFoundException If the stored class mapping in the json file does not exist
+     */
+    public void loadMappingsFromJson(JSONObject messageToParsermappings) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        JSONArray array = messageToParsermappings.getJSONArray("parsermappings");
+        int size = array.length();
+        // register each object
+        for(int i=0; i<size; i++){
+            JSONObject pair = array.getJSONObject(i);
+            String s =pair.getString("mapstoparser");
+            String prefix = "class ";
+            if(!s.startsWith(prefix)){
+                throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" does not start with class ");
+            } else {
+                String substring = s.substring(prefix.length()); // classname without prefix
+                Class o = Class.forName(substring);
+                if (!(EinzParser.class.isAssignableFrom(o))) { // read the docs of isAssignableFrom. I'm testing if o is an EinzParser or a subclass thereof
+                    throw (new InvalidResourceFormatException()).extendMessageInline("Some object within the JSON Array \"parsermappings\" is not of text Class");
+                } else {
+                    // everything is fine, do stuff
+                    @SuppressWarnings("unchecked") // I checked this with above tests
+                            Class<? extends EinzParser> parserclass = (Class<? extends EinzParser>) o;
+                    this.registerMessagegroup(pair.getString("messagegroup"), parserclass);
+                }
+            }
+        }
+    }
+
+    public void loadMappingsFromResourceFile(Context applicationContext, int resourceFile) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {
+        InputStream jsonStream = applicationContext.getResources().openRawResource(resourceFile);
+        JSONObject jsonObject = new JSONObject(convertStreamToString(jsonStream));
+        this.loadMappingsFromJson(jsonObject);
+    }
+
+    // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
+    // utility function
+    private String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }

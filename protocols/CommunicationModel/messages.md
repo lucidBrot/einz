@@ -30,6 +30,8 @@ All Strings and Booleans should be stored as String to allow further extensibili
 The header must always contain `messagegroup` and `messagetype`. The body may vary.
 `messagegroup` is camelCase, `messagetype` is PascalCase, to make it easier to visually distinguish them.
 
+Within the program, messagegroup and messagetype might be null if the mapping was not registered.
+
   ```json
   {
     "header":{
@@ -54,7 +56,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * registration
 
-  > [Register](#register), [RegisterSuccess](#registersuccess), [RegisterFailure](#registerfailure), [UpdateLobbyList](#updatelobbylist) [UnregisterRequest](#unregister), [UnregisterResponse](#unregisterresponse), [Kick](#kick)
+  > [Register](#register), [RegisterSuccess](#registersuccess), [RegisterFailure](#registerfailure), [UpdateLobbyList](#updatelobbylist), [UnregisterRequest](#unregister), [UnregisterResponse](#unregisterresponse), [Kick](#kick), [KickFailure](#kickfailure) 
 
 
 * startgame
@@ -76,6 +78,14 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
   > [PlayCard](#playcard), [PlayCardResponse](#playcardresponse)
 
+* furtheractions
+
+  > All actions that a user can perform, except for the otherwise specified (e.g. playCard, DrawCard)
+  >
+  > [CustomAction](#customaction), [CustomActionResponse](#customactionresponse), [FinishTurn](#finishturn)
+  >
+  > These were added only lately and their parsers are not yet implemented (23.11.2017)
+
 
 * toast
 
@@ -84,7 +94,7 @@ The header must always contain `messagegroup` and `messagetype`. The body may va
 
 * endGame
 
-  > [PlayerFinished](#playerfinished), [EndGame](#endgame)
+  > [PlayerFinished](#playerfinished), [GameOver](#gameover)
 
 
 
@@ -166,11 +176,6 @@ Request to play on this server, or to spectate.
 >
 > should NOT be the empty string *""* or *"server"*
 
-`success` : *String* 
-
-> Can be *"true"*, *"false"* (or later be further extended. E.g. *banned* )
-> *"true"* means the client is allowed to stay on this server
-
 `role` : *String*
 
 > *"player"* or *"spectator"* 
@@ -209,7 +214,7 @@ If the client requests the same role multiple times, the request will still succ
 
 ## UpdateLobbyList
 
-The **server** broadcasts the new List of Players and Spectators to the clients whenever a new one connects. The first client thus only receives a list with itself and knows that it is admin.
+The **server** broadcasts the new List of Players and Spectators to the clients whenever a new one connects or leaves. The first client thus only receives a list with itself and knows that it is admin.
 
 It is not important for the client to know spectators and the admin, but it might be useful for the UI if we want to show that.
 
@@ -229,9 +234,9 @@ It is not important for the client to know spectators and the admin, but it migh
   },
   "body":{
     "lobbylist":[
-      {"roger":"player"},
-      {"chris":"player"},
-      {"table":"spectator"}
+      {"username":"roger", "role":"player"},
+      {"username":"chris", "role":"player"},
+      {"username":"table", "role":"spectator"}
     ],
     "admin":"roger"
   }
@@ -252,6 +257,7 @@ If the client has not been registered. This may be because of an invalid usernam
 > + *"already registered"* if the same connection already has registered a username
 > + *"invalid"* if the username is the empty string or *"server"*. Or if the username contains invalid characters. One invalid character is the Tilde, which is reserved to identify non-username-strings
 > + *"lobby full"* if the server decided to fixate the number of players or spectators and the game has not yet started (otherwise, the server wouldn't react at all).
+> + *"game already in progress"*
 
 ```JSON
 {
@@ -294,11 +300,11 @@ Also, the other Clients need to know about leaves.
 
 ##UnregisterResponse
 
-Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client.
+Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client. This might happen even after the game has started and will then be treated similarly to a client losing connection.
 
 `reason` : *String*
 
-> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server.
+> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server. *"server"* if the server is turning off or other internal reasons.
 
 ```Json
 {
@@ -308,14 +314,16 @@ Sent by the **server** to all clients, including the one who was unregistered. A
   },
   "body":{
     "username":"that random dude who we didn't want",
-    "reason":"true"
+    "reason":"kicked"
   }
 }
 ```
 
 ## Kick
 
-The player who started the server, from now on referred to as admin, may decide to kick a player from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin.
+The player who started the server, from now on referred to as admin, may decide to kick a player or spectator from the lobby or the running game. Doing so is essentially the same as when sending [UnregisterRequest](#unregisterRequest) , but only allowed for the admin. The admin is informed about the outcome, either by a broadcast of [UnregisterResponses](#unregisterresponse) to all clients or by a [KickFailure](#kickfailure) to only the admin.
+
+This request might also be sent during the game.
 
 ```json
 {
@@ -329,6 +337,29 @@ The player who started the server, from now on referred to as admin, may decide 
 }
 ```
 
+## KickFailure
+
+The **server** informs the admin that [kicking](#kick) did not work. If the client who requested the kick was not the admin, it informs that client that it is not allowed to kick.
+
+`reason` : *String*
+
+> * *"not allowed"* : you are not allowed to kick people
+> * "not found" : this player or spectator is not registered
+> * *"invalid"* : this username is invalid
+
+```json
+{
+  "header":{
+    "messagegroup":"registration",
+    "messagetype":"KickFailure"
+  },
+  "body":{
+    "username":"the user that you wanted to kick",
+    "reason":"why you failed"
+  }
+}
+```
+
 ***
 
 ## SpecifyRules
@@ -337,7 +368,7 @@ The **admin client** informs the server what rules it chose. The rule is only pa
 
 Since every rule might have dynamic parameters, they are all stored as JSONObject where only their name is guaranteed to be available.
 
-`ruleset` : *JSONOBject containing non-uniform JSONObjects*
+`ruleset` : *JSONObject containing non-uniform JSONObjects*
 
 > The identifier of the JSONObject is also the identifier of the [rule](#rule)
 
@@ -371,7 +402,7 @@ The **admin client** informs the server that it should start the game and stop l
 {
   "header":{
     "messagegroup":"startgame",
-    "messagetype":"startGame"
+    "messagetype":"StartGame"
   },
 	"body":{}
 }
@@ -396,7 +427,7 @@ The **Server** sends this to the Client. No response from the Client required.
 {
   "header":{
     "messagegroup":"startgame",
-    "messagetype":"SendRules"
+    "messagetype":"InitGame"
   },
   "body":{
     "ruleset":{
@@ -440,7 +471,9 @@ The **Client** sends this request. The Server checks whether the Client is allow
 }
 ```
 
-##DrawCardsResponse
+
+
+## DrawCardsResponse
 
 `cards` : *JSONArray of JSONObjects*
 
@@ -470,7 +503,7 @@ The **server** sends this request and will follow up with a complete [sendState]
 {
   "header":{
     "messagegroup":"draw",
-    "messagetype":"DrawCardsResponse"
+    "messagetype":"DrawCardsSuccess"
   },
   "body":{
     "cards":[
@@ -481,6 +514,22 @@ The **server** sends this request and will follow up with a complete [sendState]
   }
 }
 ```
+
+If the drawing failed for some reason, the response will instead be
+
+```json
+{
+  "header":{
+    "messagegroup":"draw",
+    "messagetype":"DrawCardsFailure"
+  },
+  "body":{
+    "reason":"unspecified"
+  }
+}
+```
+
+where `reason` can be *"unspecified" or *"not allowed"*, *"game not running"* ... (has yet to be used. Usage will show what reasons we will have. Until then, it will always be *"unspecified"*)
 
 ***
 
@@ -526,7 +575,7 @@ This is sent by the **server** to specify whether a play was valid and has been 
 {
   "header":{
     "messagegroup":"playcard",
-    "messagetype":"PlaycardResponse"
+    "messagetype":"PlayCardResponse"
   },
   "body":{
 	"success":"true"
@@ -559,6 +608,8 @@ The [response](#sendstate) will usually also be sent without being requested - e
 The **server** sends this after being asked via [GetState](#getstate) or when appropriate, i.e. some player did something or the state changed for some other reason.
 
 See the specification of [state](#state) for information about the formatting.
+
+The states will be empty if there was a GetState request while not appropriate - e.g. the game not yet running.
 
 ```Json
 {
@@ -643,21 +694,11 @@ After this, the server will remove the player from the turn order list and let i
 }
 ```
 
-## EndGame
+## GameOver
 
-The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, but `points` is not neccessary, depending on the ruleset.
+The **Server** informs the clients that the game is over and they can show the after-game UI. E.g. displaying points. Per default, the Client will display the points next to the user in a Ranking list, sorted based on the points and the specified rules.
 
-`ranking` : *JSONArray of Players*
-
-> The Players are of the form
->
-> ```json
-> {
->   "username":{
->     "points":"12"
->   }
-> }
-> ```
+points: *JSONObject of Players and points*
 
 ```Json
 {
@@ -665,7 +706,12 @@ The **Server** informs the clients that the game is over and they can show the a
 		"messagegroup": "endGame",
 		"messagetype": "GameOver"
 	},
-	"body": {}
+  "body": {
+    "points":{
+      "roger":"17",
+      "chris":"3"
+    }
+  }
 }
 ```
 
@@ -779,8 +825,53 @@ Action-IDs the client can choose from and should support:
   > [PlayCard](#PlayCard)
 
 
-
 Possibly in the future supported: "transferServer"
+
+## FurtherActions
+
+Depending on the rules, we need additional messages. E.g. when the user plays a card that allows them to choose a colour, they will get a state where something like "choose color" is a  (custom) possible action. To reply to the server, the rule must handle sending/receiving custom messages, i.e. [CustomAction](#customaction) on the client side and [CustomActionResponse](#customactionresponse) to respond from the server.
+
+### CustomAction
+
+```json
+{
+  "header":{
+    "messagegroup":"furtheractions",
+    "messagetype":"CustomAction"
+  },
+  "body":{
+    "custom parameter of the rule":{ a custom JSONObject},
+  }
+}
+```
+
+### CustomActionResponse
+
+```json
+{
+  "header":{
+    "messagegroup":"furtheractions",
+    "messagetype":"CustomActionResponse"
+  },
+  "body":{
+    "custom parameter of the rule":{ a custom JSONObject},
+  }
+}
+```
+
+### FinishTurn
+
+```json
+{
+  "header":{
+    "messagegroup":"furtheractions",
+    "messagetype":"FinishTurn"
+  },
+  "body":{}
+}
+```
+
+
 
 ## Rules
 

@@ -4,11 +4,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.ethz.inf.vs.a4.minker.einz.MainActivity">
+    tools:context="ch.ethz.inf.vs.a4.minker.einz.UI.MainActivity">
 
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <Button
+                android:text="@string/btn_s_host_game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/btn_s_host_game" android:layout_weight="1"/>
+        <Button
+                android:text="@string/btn_c_join_game"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" android:id="@+id/btn_c_join_game" android:layout_weight="1"></Button>
+    </LinearLayout>
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
                   android:orientation="horizontal" android:layout_centerHorizontal="true"
-    android:layout_alignParentBottom="true">
+                  android:layout_alignParentBottom="true">
         <Button
                 android:text="start client"
                 android:layout_width="wrap_content"

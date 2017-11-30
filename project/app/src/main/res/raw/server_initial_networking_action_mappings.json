@@ -1,0 +1,20 @@
+{
+  "actionmappings": [
+    {
+      "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody",
+      "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzRegisterAction"
+    },
+    {
+      "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody",
+      "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnregisterRequestAction"
+    },
+	{
+      "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody",
+      "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKickAction"
+    },
+	{
+	  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody",
+	  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzStartGameAction"
+	}
+  ]
+}

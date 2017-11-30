@@ -1,6 +1,12 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -13,8 +19,8 @@ import java.net.Socket;
  */
 public class TempClient {
 
-    public static final String SERVER_IP = "127.0.0.1"; //server IP address
-    public static final int SERVER_PORT = 8080;
+    public static String SERVER_IP = "127.0.0.1"; //server IP address
+    public static int SERVER_PORT = 8080;
     // message to send to the server
     private String mServerMessage;
     // sends message received notifications
@@ -39,6 +45,7 @@ public class TempClient {
      * @param message text entered by client
      */
     public void sendMessage(String message) {
+        //if(message.endsWith("\n")){Log.d("TempClient", "message ends with newline");}
         if (mBufferOut != null && !mBufferOut.checkError()) {
             mBufferOut.println(message);
             mBufferOut.flush();
@@ -98,8 +105,6 @@ public class TempClient {
 
                 }
 
-                Log.e("RESPONSE FROM SERVER", "S: Received Message: '" + mServerMessage + "'");
-
             } catch (Exception e) {
 
                 Log.e("TCP", "S: Error", e);
@@ -122,39 +127,6 @@ public class TempClient {
     //class at on asynckTask doInBackground
     public interface OnMessageReceived {
         public void messageReceived(String message);
-    }
-
-    public String debug_getRegisterMessage(){
-        /*
-        {
-          "header":{
-            "messagegroup":"registration",
-            "messagetype":"Register"
-          },
-          "body":{
-            "username":"roger",
-            "role":"player"
-          }
-        }
-         */
-        try {
-            String s = (new JSONObject("{\n" +
-                    "          \"header\":{\n" +
-                    "            \"messagegroup\":\"registration\",\n" +
-                    "            \"messagetype\":\"Register\"\n" +
-                    "          },\n" +
-                    "          \"body\":{\n" +
-                    "            \"username\":\"roger\",\n" +
-                    "            \"role\":\"player\"\n" +
-                    "          }\n" +
-                    "        }")).toString();
-            return s;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            Log.e("TempClient/dGetRegMsg", "failed to create registration message");
-            return "empty message :(";
-        }
-
     }
 
 }

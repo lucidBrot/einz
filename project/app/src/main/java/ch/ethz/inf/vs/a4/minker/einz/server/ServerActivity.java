@@ -9,17 +9,17 @@ import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
-import ch.ethz.inf.vs.a4.minker.einz.MainActivity;
+
 import ch.ethz.inf.vs.a4.minker.einz.R;
-import org.w3c.dom.Text;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnregisterRequestAction;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.Locale;
 
 /**
@@ -53,7 +53,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         WifiManager wm = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         @SuppressWarnings("deprecation") // https://stackoverflow.com/a/20846328/2550406
         String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-        if(ip.equals("0.0.0.0") || ip.equals("") || ip==null || ip.equals("null")){
+        if(ip.equals("0.0.0.0") || ip.equals("") || ip.equals("null")){
             // not connected via WIFI, use something else
             try {
                 ip=getLocalIpAddress(); // use the code of some stackoverflow dude.
@@ -65,6 +65,15 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         String temp = ip + ":" + server.getPORT();
         ((TextView) findViewById(R.id.tv_s_ipport)).setText(temp);
 
+
+        Debug.debug_printJSONRepresentationOf(EinzUnregisterRequestAction.class);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // stop server on back button
+        getServer().shutdown();
     }
 
     @Override
@@ -72,17 +81,18 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
         switch(view.getId()){
             case R.id.btn_s_listen_for_clients:
                 // start server
-                serverThread.start(); // TODO: stop server on back button
+                if(serverThread.getState() == Thread.State.NEW) //https://developer.android.com/reference/java/lang/Thread.State.html#RUNNABLE
+                    serverThread.start();
                 break;
             case R.id.btn_s_start_game_initialization:
-                // TODO: start game
+
                 break;
         }
     }
 
     // https://stackoverflow.com/a/30183130/2550406
     public String getLocalIpAddress() throws SocketException {
-        WifiManager wifiMgr = (WifiManager) this.getApplicationContext().getSystemService(getApplicationContext().WIFI_SERVICE);
+        WifiManager wifiMgr = (WifiManager) this.getApplicationContext().getSystemService(WIFI_SERVICE);
         if(wifiMgr.isWifiEnabled()) {
             WifiInfo wifiInfo = wifiMgr.getConnectionInfo();
             int ip = wifiInfo.getIpAddress();
@@ -91,6 +101,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
                     (ip >> 8 & 0xff),
                     (ip >> 16 & 0xff),
                     (ip >> 24 & 0xff));
+            Log.d("LobbyActivity/IP", "wlan address: "+wifiIpAddress);
             if(!wifiIpAddress.equals("0.0.0.0"))
                 return wifiIpAddress;
         }
@@ -124,5 +135,18 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
                 ((TextView) findViewById(R.id.tv_num_connected_clients)).setText(new String("#Connected clients: "+num));
             }
         });
+    }
+
+    @Override
+    public void onLocalServerReady() {
+        // ignore in this debug thing
+    }
+
+    /**
+     * When you are the host and the first client-handler in the server is ready to receive the register message
+     */
+    @Override
+    public void onFirstESCHReady() {
+        // ignore in this debug thing
     }
 }
