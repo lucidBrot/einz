@@ -42,7 +42,7 @@ public class EinzPlayCardParser extends EinzParser {
         //get card
         JSONObject cardJSON = body.getJSONObject("card");
         String ID = cardJSON.getString("ID");
-        Card card = new Card(ID, CardText.CHANGECOLOR, CardColor.BLUE); // temporary to make the program compile
+        Card card = new Card(ID, "test", CardText.CHANGECOLOR, CardColor.BLUE); // temporary to make the program compile
         // #cardtag
 
         //put it all together

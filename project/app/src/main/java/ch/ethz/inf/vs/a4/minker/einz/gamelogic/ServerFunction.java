@@ -129,14 +129,14 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        Card card = new Card("temp", ct, cc); // #cardtag replace "temp"
+                        Card card = new Card("temp", "test", ct, cc); // #cardtag replace "temp"
                         cardsToAdd.add(card);
                         cardsToAdd.add(card);
                     }
                 }
             } else {
                 for (int i = 0; i < 4; i++) {
-                    Card card = new Card("temp", ct, CardColor.NONE); // #cardtag
+                    Card card = new Card("temp", "test", ct, CardColor.NONE); // #cardtag
                     cardsToAdd.add(card);
                 }
             }
