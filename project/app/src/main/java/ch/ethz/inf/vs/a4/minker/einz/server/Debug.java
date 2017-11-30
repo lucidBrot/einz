@@ -81,7 +81,8 @@ public class Debug {
                 //tc.sendMessage(Debug.debug_getKickMessage("clemi"));
                 //tc.sendMessage(Debug.debug_getStartGameMessage());
                 //tc.sendMessage(Debug.debug_getDrawCardMessage());
-                tc.sendMessage(Debug.debug_getPlayCardMessage());
+                //tc.sendMessage(Debug.debug_getPlayCardMessage());
+                tc.sendMessage(Debug.debug_getGetStateMessage());
             }
         };
         m.start(); // send message
@@ -232,7 +233,7 @@ public class Debug {
     private static String debug_getDrawCardMessage() {
         EinzMessageHeader header=new EinzMessageHeader("draw","DrawCards" );
         EinzMessageBody body  = new EinzDrawCardsMessageBody();
-        EinzMessage message = new EinzMessage(header, body);
+        EinzMessage message = new EinzMessage<>(header, body);
         try {
             return message.toJSON().toString();
         } catch (JSONException e) {
@@ -245,7 +246,19 @@ public class Debug {
         EinzMessageHeader header=new EinzMessageHeader("playcard","PlayCard" );
         Card card = new Card("card.lul.id", CardText.DEBUG, CardColor.BLUE);
         EinzMessageBody body  = new EinzPlayCardMessageBody(card);
-        EinzMessage message = new EinzMessage(header, body);
+        EinzMessage message = new EinzMessage<>(header, body);
+        try {
+            return message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "DEBUG/fuck.";
+        }
+    }
+
+    private static String debug_getGetStateMessage() {
+        EinzMessageHeader header=new EinzMessageHeader("stateinfo","GetState" );
+        EinzGetStateMessageBody body = new EinzGetStateMessageBody();
+        EinzMessage<EinzGetStateMessageBody> message = new EinzMessage<>(header, body);
         try {
             return message.toJSON().toString();
         } catch (JSONException e) {

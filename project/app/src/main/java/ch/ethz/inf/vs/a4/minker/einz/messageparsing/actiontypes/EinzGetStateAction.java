@@ -34,6 +34,6 @@ public class EinzGetStateAction extends EinzAction {
 
     @Override
     public void run() {
-
+        getServerManager().onGetState(getMessage(), getIssuedByPlayer());
     }
 }

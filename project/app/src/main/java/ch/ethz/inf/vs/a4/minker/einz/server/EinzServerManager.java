@@ -5,6 +5,7 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -585,6 +586,7 @@ public class EinzServerManager {
     }
 
     public void drawCards(String issuedByPlayer) {
+        getSFLock().writeLock().lock();
         if(!gamePhaseStarted){
             // not allowed to draw cards!
             EinzMessage<EinzDrawCardsFailureMessageBody> message = new EinzMessage<EinzDrawCardsFailureMessageBody>(
@@ -603,9 +605,11 @@ public class EinzServerManager {
             getServerFunctionInterface().drawCards(new Player(issuedByPlayer));
             // this will send response
         }
+        getSFLock().writeLock().unlock();
     }
 
     public void playCard(EinzMessage message, String issuedByPlayer) {
+        getSFLock().writeLock().lock();
         if(gamePhaseStarted) {
             getServerFunctionInterface().play(((EinzPlayCardMessageBody) message.getBody()).getCard(), new Player(issuedByPlayer));
             // fabian sends response
@@ -621,5 +625,23 @@ public class EinzServerManager {
                 throw new RuntimeException(e);
             }
         }
+        getSFLock().writeLock().unlock();
+    }
+
+    /**
+     * sends the new state to the specified player. If the game is not running, the state will be null
+     */
+    public void onGetState(EinzMessage message, String issuedByPlayer) {
+        getSFLock().readLock().lock();
+        EinzMessageHeader header = new EinzMessageHeader("stateinfo", "StateInfo");
+
+        if(gamePhaseStarted){
+            // TODO: get state from fabian
+        } else {
+            // TODO: return empty state in message
+        }
+        //EinzSendStateMessageBody body = new EinzSendStateMessageBody();
+
+        getSFLock().readLock().unlock();
     }
 }
