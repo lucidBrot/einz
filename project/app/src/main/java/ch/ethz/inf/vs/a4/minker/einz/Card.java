@@ -31,6 +31,10 @@ public class Card {
         return text;
     }
 
+    /**
+     * Name that can be displayed to the user in the UI
+     * @return The name of the Card
+     */
     public String getName() {
         return name;
     }
