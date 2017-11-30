@@ -609,6 +609,8 @@ The **server** sends this after being asked via [GetState](#getstate) or when ap
 
 See the specification of [state](#state) for information about the formatting.
 
+The states will be empty if there was a GetState request while not appropriate - e.g. the game not yet running.
+
 ```Json
 {
   "header":{
