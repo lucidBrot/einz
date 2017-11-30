@@ -15,19 +15,25 @@ public class Card {
 
     private final String ID;
 
+    private final String name;
+
     public String origin;
 
 
-    public Card (String ID, CardText text, CardColor color){
+    public Card (String ID, String name, CardText text, CardColor color){
         this.ID = ID;
         this.text = text;
         this.color = color;
+        this.name = name;
     }
 
     public CardText getText() {
         return text;
     }
 
+    public String getName() {
+        return name;
+    }
     public CardColor getColor() {
         return color;
     }

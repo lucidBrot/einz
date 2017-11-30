@@ -24,7 +24,7 @@ public class CardLoader {
             return null;
         }
         CardAttributeContainer params = cardMapping.get(cardID);
-        return new Card(cardID, params.text, params.color);
+        return new Card(cardID, params.name, params.text, params.color);
     }
 
 
