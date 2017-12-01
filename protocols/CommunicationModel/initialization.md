@@ -27,7 +27,7 @@ The Client-side view:
 
 I will refer to serverside numbers with S# and cliendside numbers with C#. Above, you can see that we have only one synchronization point: S1 and C3 are more or less at the same time. Anything before them happens before, anything after happens after.
 
-So at C4 happens, the server can be in any state between (inclusive) S1 and S4. If the server is still initializing (S4), the socket apparently drops the packet that the client sent at C4 seamlessly. After some long time, an Exception on the socket might happen. (TODO: handle this!) But otherwise, the client does not know what happened and is waiting for a `RegisterSuccess` message, while the server is waiting for a `Register` message. We're stuck.
+So as C4 happens, the server can be in any state between (inclusive) S1 and S4. If the server is still initializing (S4), the socket apparently drops the packet that the client sent at C4 seamlessly. After some long time, an Exception on the socket might happen. (TODO: handle this!) But otherwise, the client does not know what happened and is waiting for a `RegisterSuccess` message, while the server is waiting for a `Register` message. We're stuck.
 
 
 
