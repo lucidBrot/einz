@@ -667,7 +667,7 @@ public class EinzServerManager {
             throw new RuntimeException(new TodoException("Fabian plis implement"));
         } else {
             EinzMessageHeader header = new EinzMessageHeader("furtheractions", "customActionResponse");
-            EinzCustomActionMessageBody body = new EinzCustomActionMessageBody()
+            //EinzCustomActionMessageBody body = new EinzCustomActionMessageBody()
         }
     }
 }
