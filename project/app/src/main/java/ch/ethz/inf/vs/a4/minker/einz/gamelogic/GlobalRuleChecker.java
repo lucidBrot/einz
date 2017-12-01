@@ -1,17 +1,15 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
+import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 /**
- * Basic rule class for rules not applicable to cards.
- *
- * Example:
- *      Determine number of cards in beginning of a game.
- *      Determine how often a card is in the deck
- *      Determine when a player wins.
+ * Created by Fabian on 01.12.2017.
  */
-public abstract class BasicGlobalRule extends BasicRule {
 
-
+public class GlobalRuleChecker {
     /**
      * Determines if a player can be kicked
      *
@@ -19,7 +17,7 @@ public abstract class BasicGlobalRule extends BasicRule {
      * @param toKick The Player that should be kicked
      * @return
      */
-    public boolean isValidKickPlayer(GlobalState state, Player toKick) {
+    public boolean checkIsValidKickPlayer(GlobalState state, Player toKick, GameConfig gameConfig) {
         return false;
     }
 
@@ -30,7 +28,7 @@ public abstract class BasicGlobalRule extends BasicRule {
      * @param leaves The Player that wants to leave
      * @return
      */
-    public boolean isValidLeaveGame(GlobalState state, Player leaves) {
+    public boolean checkIsValidLeaveGame(GlobalState state, Player leaves, GameConfig gameConfig) {
         return false;
     }
 
@@ -40,7 +38,7 @@ public abstract class BasicGlobalRule extends BasicRule {
      * @param state
      * @return
      */
-    public boolean isValidEndTurn(GlobalState state) {
+    public boolean checkIsValidEndTurn(GlobalState state, GameConfig gameConfig) {
         return false;
     }
 
@@ -51,7 +49,7 @@ public abstract class BasicGlobalRule extends BasicRule {
      * @param player The Player to check if he finished
      * @return
      */
-    public boolean isPlayerFinished(GlobalState state, Player player) {
+    public boolean checkIsPlayerFinished(GlobalState state, Player player, GameConfig gameConfig) {
         return false;
     }
 
@@ -62,7 +60,7 @@ public abstract class BasicGlobalRule extends BasicRule {
      * @param state
      * @return
      */
-    public GlobalState onKickPlayer(GlobalState state) {
+    public GlobalState checkOnKickPlayer(GlobalState state, GameConfig gameConfig) {
         return state;
     }
 
@@ -72,7 +70,7 @@ public abstract class BasicGlobalRule extends BasicRule {
      * @param state
      * @return
      */
-    public GlobalState onLeaveGame(GlobalState state) {
+    public GlobalState checkOnLeaveGame(GlobalState state, GameConfig gameConfig) {
         return state;
     }
 
@@ -82,7 +80,10 @@ public abstract class BasicGlobalRule extends BasicRule {
      * @param state
      * @return
      */
-    public GlobalState onStartGame(GlobalState state) {
+    public static GlobalState checkOnStartGame(GlobalState state, GameConfig gameConfig) {
+        for (BasicGlobalRule r : gameConfig.globalRules) {
+            state = r.onStartGame(state);
+        }
         return state;
     }
 
@@ -92,7 +93,7 @@ public abstract class BasicGlobalRule extends BasicRule {
      * @param state
      * @return
      */
-    public GlobalState onEndTurn(GlobalState state) {
+    public GlobalState checkOnEndTurn(GlobalState state, GameConfig gameConfig) {
         return state;
     }
 
@@ -103,8 +104,7 @@ public abstract class BasicGlobalRule extends BasicRule {
      * @param player The Player that has finished
      * @return
      */
-    public GlobalState onPlayerFinished(GlobalState state, Player player) {
+    public GlobalState checkOnPlayerFinished(GlobalState state, Player player, GameConfig gameConfig) {
         return state;
     }
-
 }

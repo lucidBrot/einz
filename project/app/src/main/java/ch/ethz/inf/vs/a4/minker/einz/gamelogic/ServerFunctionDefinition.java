@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
+import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
@@ -22,15 +25,6 @@ public interface ServerFunctionDefinition {
     public void initialiseStandardGame(ArrayList<Player> players);
 
     /**
-     * initialises a new game with standard cards and rules
-     *
-     * @param players    the players in the game, the players play in the order in which they are in the
-     *                   ArrayList (lowest index plays first)
-     * @param spectators the spectators in the game
-     */
-    public void initialiseStandardGame(ArrayList<Player> players, HashSet<Spectator> spectators);
-
-    /**
      * initialises a new game
      *
      * @param players the players in the game, the players play in the order in which they are in the
@@ -38,22 +32,10 @@ public interface ServerFunctionDefinition {
      * @param deck    contains the specified cards the specified amount of times
      *                in the HashMap, the Key determines the Card and the Mapped value determines how many times
      *                that card is put into the game
-     * @param rules   set of rules with which the game is played
+     * @param globalRules set of global rules with which the game is played
+     * @param cardRules card rules with the card they should apply to
      */
-    public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection rules);
-
-    /**
-     * initialises a new game
-     *
-     * @param players    the players in the game, the players play in the order in which they are in the
-     *                   ArrayList (lowest index plays first)
-     * @param spectators the spectators in the game
-     * @param deck       contains the specified cards the specified amount of times
-     *                   in the HashMap, the Key determines the Card and the Mapped value determines how many times
-     *                   that card is put into the game
-     * @param rules      set of rules with which the game is played
-     */
-    public void initialiseGame(ArrayList<Player> players, HashSet<Spectator> spectators, HashMap<Card, Integer> deck, Collection rules);
+    public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules, Map<BasicCardRule, Card> cardRules);
 
     /**
      * Don't know yet what this does exactly

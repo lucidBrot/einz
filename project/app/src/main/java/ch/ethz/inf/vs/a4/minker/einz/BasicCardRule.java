@@ -10,6 +10,13 @@ public abstract class BasicCardRule extends BasicRule{
      */
     protected Card assignedTo;
 
+    /**
+     * @return the card this rules belongs to
+     */
+    public Card getAssignedTo(){
+        return assignedTo;
+    }
+
 
     /**
      * Checks whether the player is allowed to draw cards.
