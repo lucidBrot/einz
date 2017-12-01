@@ -32,6 +32,10 @@ The sources worth mentioning:
 
   https://developer.android.com/reference/java/lang/Thread.State.html#RUNNABLE
 
+* Choosing a Charset
+
+  https://stackoverflow.com/questions/496321/utf-8-utf-16-and-utf-32
+
 
 
 # Libraries

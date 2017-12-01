@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -16,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.ethz.inf.vs.a4.minker.einz.R;
+import ch.ethz.inf.vs.a4.minker.einz.TodoException;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -59,10 +63,14 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private String serverIP;
     private int serverPort;
 
+    private HandlerThread backgroundThread = new HandlerThread("Networking"); // one background thread instead of many short-lived
+
     private boolean host; // if this device is hosting the server
     private String username;
     private String role;
     private String adminUsername; // which user was chosen as admin by the server
+    private Looper backgroundLooper;
+    private Handler backgroundHandler; // use this to schedule background tasks
     // TODO: what if the host is not the first user to connect? stop server and restart?
 
     @Override
@@ -107,6 +115,11 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         }
 
         ///debug_populate_lobbylist();
+
+        // initialize background threading for small sending tasks
+        this.backgroundThread.start();
+        this.backgroundLooper = this.backgroundThread.getLooper();
+        this.backgroundHandler = new Handler(this.backgroundLooper);
 
 
     }
@@ -172,12 +185,16 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
      * @param username who to kick
      */
     private void kick(String username) {
-        (new Thread(new Runnable() {
+        Runnable r = new Runnable() {
             @Override
             public void run() {
                 ourClient.sendKickRequest(username);
             }
-        })).start();
+        };
+        /* // old version
+        (new Thread(r)).start();
+        */
+        this.backgroundHandler.post(r);
     }
 
     /**
@@ -275,24 +292,31 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private void cleanupActivity() {
         // stop server on back button
         if(this.host && this.server!=null && !this.server.isDead()) {
-            (new Thread(new Runnable() {
+            Runnable r = new Runnable() {
                 @Override
                 public void run() {
                     server.shutdown();
                     server=null;
                 }
-            })).start();
+            };
+            /*//old version
+            (new Thread(r)).start();
+            */
             // don't run this on the main thread. networking is not allowed on the main thread
+            this.backgroundHandler.post(r);
         }
 
         if(this.ourClient!=null && !this.ourClient.isDead()) {
-            (new Thread(new Runnable() {
+            Runnable r = new Runnable() {
                 @Override
                 public void run() {
                     ourClient.shutdown(true);
                     ourClient=null;
                 }
-            })).start();
+            };
+            //old version
+            // /*(new Thread(r)).start();*/
+            this.backgroundHandler.post(r);
         }
     }
 

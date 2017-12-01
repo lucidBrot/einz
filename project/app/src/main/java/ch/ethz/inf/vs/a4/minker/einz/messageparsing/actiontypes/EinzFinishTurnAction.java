@@ -23,6 +23,6 @@ public class EinzFinishTurnAction extends EinzAction {
 
     @Override
     public void run() {
-
+        getServerManager().onFinishTurn(getIssuedByPlayer());
     }
 }

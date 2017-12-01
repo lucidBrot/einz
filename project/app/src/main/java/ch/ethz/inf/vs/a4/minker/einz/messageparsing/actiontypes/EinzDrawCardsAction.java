@@ -32,7 +32,7 @@ public class EinzDrawCardsAction extends EinzAction {
     @Override
     public void run() {
         // chan funktione ufruefe wo brucht werded
-        getServerManager().getServerFunctionInterface();
+        getServerManager().drawCards(getIssuedByPlayer());
 
     }
 }

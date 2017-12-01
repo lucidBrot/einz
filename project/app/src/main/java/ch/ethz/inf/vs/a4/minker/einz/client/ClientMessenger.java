@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import org.json.JSONException;
 
 public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
@@ -49,7 +50,8 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        EinzMessage einzMessage  = null; // get a message object
+        EinzMessage<? extends EinzMessageBody> einzMessage  = null; // get a message object
+
         try {
             einzMessage = parser.parse(message);
         } catch (JSONException e) {

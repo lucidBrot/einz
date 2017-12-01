@@ -15,11 +15,14 @@ public class Card {
 
     private final String ID;
 
+    private final String name;
+
     public String origin;
 
 
-    public Card (String ID, CardText text, CardColor color){
+    public Card (String ID, String name, CardText text, CardColor color){
         this.ID = ID;
+        this.name = name;
         this.text = text;
         this.color = color;
     }
@@ -28,6 +31,13 @@ public class Card {
         return text;
     }
 
+    /**
+     * Name that can be displayed to the user in the UI
+     * @return The name of the Card
+     */
+    public String getName() {
+        return name;
+    }
     public CardColor getColor() {
         return color;
     }

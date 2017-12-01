@@ -84,7 +84,6 @@ Within the program, messagegroup and messagetype might be null if the mapping wa
   >
   > [CustomAction](#customaction), [CustomActionResponse](#customactionresponse), [FinishTurn](#finishturn)
   >
-  > These were added only lately and their parsers are not yet implemented (23.11.2017)
 
 
 * toast
@@ -529,7 +528,7 @@ If the drawing failed for some reason, the response will instead be
 }
 ```
 
-where `reason` can be *"unspecified" or *"not allowed"*, ... (has yet to be used. Usage will show what reasons we will have. Until then, it will always be *"unspecified"*)
+where `reason` can be *"unspecified" or *"not allowed"*, *"game not running"* ... (has yet to be used. Usage will show what reasons we will have. Until then, it will always be *"unspecified"*)
 
 ***
 
@@ -608,6 +607,8 @@ The [response](#sendstate) will usually also be sent without being requested - e
 The **server** sends this after being asked via [GetState](#getstate) or when appropriate, i.e. some player did something or the state changed for some other reason.
 
 See the specification of [state](#state) for information about the formatting.
+
+The states will be empty if there was a GetState request while not appropriate - e.g. the game not yet running.
 
 ```Json
 {
@@ -831,6 +832,8 @@ Depending on the rules, we need additional messages. E.g. when the user plays a 
 
 ### CustomAction
 
+sent by the **client**
+
 ```json
 {
   "header":{
@@ -845,6 +848,8 @@ Depending on the rules, we need additional messages. E.g. when the user plays a 
 
 ### CustomActionResponse
 
+sent by the **server**
+
 ```json
 {
   "header":{
@@ -858,6 +863,10 @@ Depending on the rules, we need additional messages. E.g. when the user plays a 
 ```
 
 ### FinishTurn
+
+sent by the **client**
+
+is ignored by the server if the game is not running.
 
 ```json
 {

@@ -5,6 +5,7 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -99,6 +100,7 @@ public class EinzServerManager {
         SFLock.writeLock().lock();
         getServerFunctionInterface().initialiseStandardGame(players, new HashSet<>(spectators)); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
         // TODO: not standard game but with rules, maybe call initialise earlier
+        // TODO: send initGame to clients at some point. either here or on receiving specifyRules
         SFLock.writeLock().unlock();
     }
 
@@ -139,8 +141,11 @@ public class EinzServerManager {
     // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
     // utility function
     private String convertStreamToString(InputStream is) {
-        Scanner s = new Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
+        Scanner s = new Scanner(is);
+        s.useDelimiter("\\A");
+        String ret = s.hasNext() ? s.next() : "";
+        s.close();
+        return ret;
     }
 
     /**
@@ -165,7 +170,7 @@ public class EinzServerManager {
      * @param username
      * @param handler
      */
-    public EinzMessage registerUser(String username, String role, EinzServerClientHandler handler){
+    public EinzMessage<? extends EinzMessageBody> registerUser(String username, String role, EinzServerClientHandler handler){
 
         String reason = "unknown";
         boolean success = false;
@@ -229,7 +234,7 @@ public class EinzServerManager {
         if(userListLock.writeLock().isHeldByCurrentThread())
             userListLock.writeLock().unlock();
 
-        EinzMessage response = null;
+        EinzMessage<? extends EinzMessageBody> response = null;
 
         if(success){
             EinzMessageHeader header = new EinzMessageHeader("registration", "RegisterSuccess");
@@ -421,7 +426,7 @@ public class EinzServerManager {
                 throw new RuntimeException(e);
             }
         }
-        userListLock.readLock().unlock();
+        userListLock.writeLock().unlock();
         return;
     }
 
@@ -445,8 +450,7 @@ public class EinzServerManager {
          */
         // Locking on userlistLock is not neccessary here because we only access one of these and concurrentHashMap guarantees an ok state
         ConcurrentHashMap<String, String> chm = getRegisteredClientRoles();
-        @SuppressWarnings("unchecked")
-        HashMap<String, String> localCopy = (HashMap<String, String>) new HashMap(chm);
+        HashMap<String, String> localCopy = new HashMap<String, String>(chm);
         EinzUpdateLobbyListMessageBody body = new EinzUpdateLobbyListMessageBody(localCopy, getAdminUsername());
 
         return new EinzMessage<>(header, body);
@@ -484,7 +488,7 @@ public class EinzServerManager {
         return adminUsername;
     }
 
-    public void broadcastMessageToAllPlayers(EinzMessage message) {
+    public void broadcastMessageToAllPlayers(EinzMessage<? extends EinzMessageBody> message) {
         try {
             Log.d("servMan/broadcastP", "broadcasting "+message.getBody().getClass().getSimpleName()+"\n"+message.toJSON().toString());
         } catch (JSONException e) {
@@ -512,7 +516,7 @@ public class EinzServerManager {
         userListLock.readLock().unlock();
     }
 
-    public void broadcastMessageToAllSpectators(EinzMessage message) {
+    public void broadcastMessageToAllSpectators(EinzMessage<? extends EinzMessageBody> message) {
         for(String username : getRegisteredClientRoles().keySet()){
             if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
                 continue;
@@ -551,7 +555,7 @@ public class EinzServerManager {
     }
 
     public void startGame(String issuedByPlayer) {
-        if(isRegisteredAdmin(issuedByPlayer)) {
+        if(isRegisteredAdmin(issuedByPlayer) && !gamePhaseStarted) {
             finishRegistrationPhaseAndInitGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
             SFLock.writeLock().lock();
             serverFunctionInterface.startGame();
@@ -579,5 +583,78 @@ public class EinzServerManager {
             // esch.stopThreadPatiently(); is already within kickUser
         }
         userListLock.writeLock().unlock();
+    }
+
+    public void drawCards(String issuedByPlayer) {
+        getSFLock().writeLock().lock();
+        if(!gamePhaseStarted){
+            // not allowed to draw cards!
+            EinzMessage<EinzDrawCardsFailureMessageBody> message = new EinzMessage<EinzDrawCardsFailureMessageBody>(
+              new EinzMessageHeader("draw", "DrawCardsFailure"),
+                    new EinzDrawCardsFailureMessageBody("game not running")
+            );
+            try {
+                server.sendMessageToUser(issuedByPlayer, message);
+            } catch (UserNotRegisteredException e) {
+                Log.w("servMan/drawCards", "User "+issuedByPlayer+" tried to draw a card but they weren't even registered.");
+            } catch (JSONException e) {
+                throw new RuntimeException(e); // if this happens, the message is corrupted. that shouldn't happen
+            }
+
+        } else {
+            getServerFunctionInterface().drawCards(new Player(issuedByPlayer));
+            // this will send response
+        }
+        getSFLock().writeLock().unlock();
+    }
+
+    public void playCard(EinzMessage message, String issuedByPlayer) {
+        getSFLock().writeLock().lock();
+        if(gamePhaseStarted) {
+            getServerFunctionInterface().play(((EinzPlayCardMessageBody) message.getBody()).getCard(), new Player(issuedByPlayer));
+            // fabian sends response
+        } else {
+            EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCardResponse");
+            EinzPlayCardResponseMessageBody body= new EinzPlayCardResponseMessageBody("false");
+            EinzMessage<EinzPlayCardResponseMessageBody> response = new EinzMessage<>(header, body);
+            try {
+                server.sendMessageToUser(issuedByPlayer, response);
+            } catch (UserNotRegisteredException e) {
+                Log.w("servMan/playCard", "unregistered user "+issuedByPlayer+" tried to play a card");
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        getSFLock().writeLock().unlock();
+    }
+
+    /**
+     * sends the new state to the specified player. If the game is not running, the state will be null
+     */
+    public void onGetState(EinzMessage message, String issuedByPlayer) {
+        getSFLock().readLock().lock();
+        EinzMessageHeader header = new EinzMessageHeader("stateinfo", "StateInfo");
+
+        if(gamePhaseStarted){
+            // TODO: get state from fabian
+
+        } else {
+            // TODO: return empty state in message
+
+        }
+        //EinzSendStateMessageBody body = new EinzSendStateMessageBody();
+
+        getSFLock().readLock().unlock();
+        throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
+    }
+
+    public void onFinishTurn(String issuedByPlayer) {
+        if(gamePhaseStarted) { // ignore otherwise
+            getSFLock().writeLock().lock();
+            // TODO: call fabians on finish turn
+
+            getSFLock().writeLock().unlock();
+            throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
+        }
     }
 }

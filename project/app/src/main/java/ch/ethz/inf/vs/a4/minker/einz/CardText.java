@@ -19,7 +19,8 @@ public enum CardText {
     SWITCHORDER("switchOrder"),
     STOP("stop"),
     CHANGECOLOR("changeColor"),
-    CHANGECOLORPLUSFOUR("changeColorPlusFour");
+    CHANGECOLORPLUSFOUR("changeColorPlusFour"),
+    DEBUG("DEBUG");
 
     public String type;
     CardText(String type){
