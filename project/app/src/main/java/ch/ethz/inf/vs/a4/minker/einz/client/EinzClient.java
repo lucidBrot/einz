@@ -170,7 +170,8 @@ public class EinzClient implements Runnable {
     }
 
     /**
-     * this only spins until the socket is designated connected. The tcp connection might still not be initiated
+     * this only spins until the socket is designated connected. The tcp connection might still not be initiated.
+     * This function is currently not needed if you're the host, because the server will then inform you via callback when it is ready.
      */
     private void spinUntilConnectedAndSleep(){
         //<Bugfix>
