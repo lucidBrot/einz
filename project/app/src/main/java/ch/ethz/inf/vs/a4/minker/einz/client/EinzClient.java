@@ -62,6 +62,7 @@ public class EinzClient implements Runnable {
         this.role = role;
         this.isHost = isHost;
         this.dead=false;
+        Log.d("EinzClient", "Finished constructing this instance ("+username+")");
     }
 
     /**
@@ -97,6 +98,7 @@ public class EinzClient implements Runnable {
 
         this.clientConnectionThread = new Thread(this.connection);
         this.clientConnectionThread.start(); // establish connection
+        Log.d("EinzClient/run", "initiating connection in background");
 
         if(this.isHost) {
             Log.d("EinzClient/run", "server is up methinks"); // if server is running on localhost, it told us when it was ready to accept connections
@@ -155,13 +157,13 @@ public class EinzClient implements Runnable {
                 final EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
 
                 //DEBUG
-
+                Log.d("EinzClient", "Trying to...");
                 connection.sendMessage(message);
 
 
                 //simple logging:
                 try {
-                    Log.d("EinzClient/run", "sent register message: " + message.toJSON().toString());
+                    Log.d("EinzClient/run", "...send(/t) register message: " + message.toJSON().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }

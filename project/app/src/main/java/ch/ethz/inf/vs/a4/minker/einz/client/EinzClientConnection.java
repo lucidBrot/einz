@@ -176,7 +176,8 @@ public class EinzClientConnection implements Runnable {
             bufferIn = null;
             bufferOut = null;
 
-            this.parentClient.onClientConnectionDead();
+            if(this.parentClient!=null)
+                this.parentClient.onClientConnectionDead();
 
         }
         // TODO: is it ok to abort like this?

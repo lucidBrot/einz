@@ -111,7 +111,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
             // start client. Because we specify "host" as false, the client will automatically register
             this.ourClient = new EinzClient(this.serverIP, this.serverPort, getApplicationContext(), this.username, this.role, false, this);
-            this.ourClient.run();
+            new Thread(this.ourClient).start();
         }
 
         ///debug_populate_lobbylist();
@@ -449,6 +449,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private void connectClientToLocalServer() {
         this.ourClient = new EinzClient(this.serverIP, this.serverPort, this.getApplicationContext(), this.username, this.role, this.host, this);
         this.ourClient.run();
+        ///new Thread(this.ourClient).start();
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
 }
