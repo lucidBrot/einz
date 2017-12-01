@@ -32,6 +32,8 @@ public class GlobalState {
     private Player activePlayer;
     private List<Player> players;
 
+    private List<Player> finishedPlayers;
+
     private List<Card> drawPile;
     private List<Card> discardPile;
 
@@ -50,6 +52,7 @@ public class GlobalState {
     public GlobalState(int maxDiscardPileSize, List<Player> orderOfPlayers){
         this.maxDiscardPileSize = maxDiscardPileSize;
         this.players = orderOfPlayers;
+        this.finishedPlayers = new ArrayList<>();
         this.drawPile = new LinkedList<>();
     }
 
@@ -183,6 +186,17 @@ public class GlobalState {
      */
     public void finishGame(){
         gameFinished = true;
+    }
+
+    public void setPlayerFinished(Player player){
+        if(players.contains(player)) {
+            this.players.remove(player);
+            this.finishedPlayers.add(player);
+        }
+    }
+
+    public List<Player> getFinishedPlayers(){
+        return new ArrayList<>(finishedPlayers);
     }
 
     /**

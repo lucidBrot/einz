@@ -6,13 +6,16 @@ import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.ParametizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 /**
  * Created by Josua on 11/24/17.
  */
 
-public class StartGameWithCardsRule extends BasicGlobalRule {
+public class StartGameWithCardsRule extends BasicGlobalRule implements ParametizedRule{
+
+    private int startCards = 7;
 
     public String getName() {
         return "Start Cards";
@@ -29,10 +32,15 @@ public class StartGameWithCardsRule extends BasicGlobalRule {
             List<Card> startHand = state.drawCards(7);
             if (startHand == null){
                 state.addCardsToDrawPile(config.getShuffledDrawPile());
-                startHand = state.drawCards(7);
+                startHand = state.drawCards(startCards);
             }
             player.hand.addAll(startHand);
         }
         return state;
+    }
+
+    @Override
+    public void setParameter() {
+
     }
 }
