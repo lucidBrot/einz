@@ -38,7 +38,7 @@ public class EinzClient implements Runnable {
     private final LobbyUIInterface lobbyUI;
 
     /**
-     * Creates a Client which offersa run() function. This function will establish a connection to the server, doing so in a new thread. For this, it is not neccessary to run that function in a new thread.
+     * Creates a Client which offersa run() function. This function will establish a connection to the server, doing so in a new thread. For this, it is neccessary to run that function in a new thread in case waiting for connection takes forever.
      * This class only implements Runnable because it can, not because it must.
      * @param serverIP the IP to connect to
      * @param serverPort the Port to connect to

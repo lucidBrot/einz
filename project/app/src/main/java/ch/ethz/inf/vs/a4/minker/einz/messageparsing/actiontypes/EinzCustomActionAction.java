@@ -23,6 +23,6 @@ public class EinzCustomActionAction extends EinzAction {
 
     @Override
     public void run() {
-
+        getServerManager().onCustomAction(getIssuedByPlayer(), getMessage());
     }
 }
