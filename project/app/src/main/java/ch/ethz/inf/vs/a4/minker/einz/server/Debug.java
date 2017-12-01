@@ -145,7 +145,7 @@ public class Debug {
                     e.printStackTrace();
                 }
 
-                /* // send bad message
+                // send bad message
                 EinzMessageHeader header = new EinzMessageHeader("registration", "alösdkjf");
                 EinzKickFailureMessageBody badBody = new EinzKickFailureMessageBody("roger", "lol this is a bad message");
                 EinzMessage<EinzKickFailureMessageBody> emsg = new EinzMessage<>(header, badBody);
@@ -153,7 +153,8 @@ public class Debug {
                     tc.sendMessage(emsg.toJSON().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }*/
+                }
+                
 
                 tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
             }

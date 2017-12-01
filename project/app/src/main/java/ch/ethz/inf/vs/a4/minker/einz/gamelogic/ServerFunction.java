@@ -44,7 +44,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param spectators the spectators in the game
      */
     public void initialiseStandardGame(ArrayList<Player> players, HashSet<Spectator> spectators){
-        // TODO: Fabian. Wieso eine arraylist und ein hashset?
+        // Wieso eine arraylist und ein hashset?
         // Weil wir die Spieler in geordneter Reihenfolge brauchen, die Zuschauer aber nicht.
 
     }

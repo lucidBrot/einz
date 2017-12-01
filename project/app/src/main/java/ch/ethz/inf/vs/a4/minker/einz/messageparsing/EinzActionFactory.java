@@ -142,7 +142,7 @@ public class EinzActionFactory {
     public EinzAction generateEinzAction(EinzMessage message, @Nullable String issuedBy){
         if(message == null){
             Log.e("ActionFactory", "Message was null.");
-            return new EinzUnmappedAction(sInterface, sManager, message, issuedBy, clientHandler); //TODO: use full constructor for unmappedaction
+            return new EinzUnmappedAction(sInterface, sManager, message, issuedBy, clientHandler, clientActionCallbackInterface, completelyCustomObject);
         }
         try {
             Class<? extends  EinzAction> mapping = getMapping(message);

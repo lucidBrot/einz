@@ -132,7 +132,7 @@ public class EinzClient implements Runnable {
 
                 /*
                 // the following bugfix is no longer needed because the server tells the first client that connected when it is ready for the register message
-                // other clients are hopefully slow enough, else they would have to wait or get a response from the server for this... // TODO: (later) check whether non-host clients send register message too early
+                // other clients are hopefully slow enough, else they would have to wait or get a response from the server for this...
                 //<Bugfix>
                 while (!connection.isConnected()) { // spin until connected
                     //sleep(10);

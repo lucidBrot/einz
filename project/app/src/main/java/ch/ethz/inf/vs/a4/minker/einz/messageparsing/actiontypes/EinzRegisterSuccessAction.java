@@ -24,7 +24,7 @@ public class EinzRegisterSuccessAction extends EinzAction {
      */
     public EinzRegisterSuccessAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
-    } // TODO: update every action so that it is like this (including the last two params)
+    }
     /**
      * executes the action in the current thread
      */

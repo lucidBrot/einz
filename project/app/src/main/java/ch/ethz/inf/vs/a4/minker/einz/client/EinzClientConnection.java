@@ -135,7 +135,7 @@ public class EinzClientConnection implements Runnable {
                     }
                 }
 
-            } catch (Exception e) {
+            } catch (Exception e) { // errors about keeping connection
 
                 Log.e("EinzClientConnection", "Clientside Error.");
                 e.printStackTrace();
@@ -147,7 +147,7 @@ public class EinzClientConnection implements Runnable {
                 socket.close();
             }
 
-        } catch (Exception e) {
+        } catch (Exception e) { // errors about establishing connection
 
             Log.e("EinzClientConnection", "Clientside Error (2)");
             e.printStackTrace();
