@@ -666,8 +666,21 @@ public class EinzServerManager {
 
             throw new RuntimeException(new TodoException("Fabian plis implement"));
         } else {
-            EinzMessageHeader header = new EinzMessageHeader("furtheractions", "customActionResponse");
-            //EinzCustomActionMessageBody body = new EinzCustomActionMessageBody()
+
+            try {
+                JSONObject failBody = new JSONObject().put("success", "false");
+                EinzMessageHeader header = new EinzMessageHeader("furtheractions", "customActionResponse");
+                EinzCustomActionMessageBody body = new EinzCustomActionMessageBody(failBody);
+                EinzMessage<EinzCustomActionMessageBody> msg = new EinzMessage<>(header, body);
+                server.sendMessageToUser(issuedByPlayer, msg);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                // shouldn't happen
+            } catch (UserNotRegisteredException e) {
+                e.printStackTrace();
+                // who cares
+            }
+
         }
     }
 }
