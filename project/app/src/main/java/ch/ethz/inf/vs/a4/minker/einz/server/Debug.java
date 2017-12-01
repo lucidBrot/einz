@@ -82,7 +82,8 @@ public class Debug {
                 //tc.sendMessage(Debug.debug_getStartGameMessage());
                 //tc.sendMessage(Debug.debug_getDrawCardMessage());
                 //tc.sendMessage(Debug.debug_getPlayCardMessage());
-                tc.sendMessage(Debug.debug_getGetStateMessage());
+                //tc.sendMessage(Debug.debug_getGetStateMessage());
+                tc.sendMessage(Debug.debug_getFinishTurnMessage());
             }
         };
         m.start(); // send message
@@ -259,6 +260,18 @@ public class Debug {
         EinzMessageHeader header=new EinzMessageHeader("stateinfo","GetState" );
         EinzGetStateMessageBody body = new EinzGetStateMessageBody();
         EinzMessage<EinzGetStateMessageBody> message = new EinzMessage<>(header, body);
+        try {
+            return message.toJSON().toString();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return "DEBUG/fuck.";
+        }
+    }
+
+    private static String debug_getFinishTurnMessage() {
+        EinzMessageHeader header=new EinzMessageHeader("furtheractions","FinishTurn" );
+        EinzFinishTurnMessageBody body = new EinzFinishTurnMessageBody();
+        EinzMessage<EinzFinishTurnMessageBody> message = new EinzMessage<>(header, body);
         try {
             return message.toJSON().toString();
         } catch (JSONException e) {
