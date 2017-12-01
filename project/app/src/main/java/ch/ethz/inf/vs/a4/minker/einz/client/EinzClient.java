@@ -111,11 +111,11 @@ public class EinzClient implements Runnable {
         // TODO: all other messages
     }
 
-    private void debug_faceReceiveUpdateLobbyList() {
+    private void debug_fakeReceiveUpdateLobbyList() {
         this.clientMessenger.messageReceived("{\"header\":{\"messagegroup\":\"registration\",\"messagetype\":\"UpdateLobbyList\"},\"body\":{\"lobbylist\":{\""+username+"\":\""+role+"\"},\"admin\":\"this is a debug packet\"}}");
     }
 
-    private void debug_faceReceiveRegisterSuccess() {
+    private void debug_fakeReceiveRegisterSuccess() {
         this.clientMessenger.messageReceived("{\"header\":{\"messagegroup\":\"registration\",\"messagetype\":\"RegisterSuccess\"},\"body\":{\"role\":\""+this.role+"\",\"username\":\""+this.username+"\"}}");
     }
 
@@ -168,9 +168,12 @@ public class EinzClient implements Runnable {
         })).start();
     }
 
+    /**
+     * this only spins until the socket is designated connected. The tcp connection might still not be initiated
+     */
     private void spinUntilConnectedAndSleep(){
         //<Bugfix>
-        while (!connection.isConnected()) { // spin until connected
+        while (!connection.isConnected()) { // spin until connected. sadly, this can only tell us that the socket is connected locally, not that the client actually is connected
             try {
                 sleep(1);
             } catch (InterruptedException e) {
@@ -183,8 +186,9 @@ public class EinzClient implements Runnable {
         }
 
         // sleep a little after the connection is there, somehow this helps. If this is not there, the message is lost before the server is fully ready
+        // this helps because above while loop ending does not mean that the server is ready, only that the connection is said to exist when socket.connect() has been called
         try {
-            sleep(10);
+            sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
