@@ -1,6 +1,6 @@
 # Initialization
 
-As it turns out, the re are difficulties that can cause the first message sent over our tcp socket connection to be lost.
+As it turns out, there are difficulties that can cause the first message sent over our tcp socket connection to be lost.
 
 (Any time I mention `RegisterSuccess` below, it could also be `RegisterFailure` )
 
