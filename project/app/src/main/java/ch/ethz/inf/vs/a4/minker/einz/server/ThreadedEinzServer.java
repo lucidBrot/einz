@@ -150,6 +150,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
             }
             this.sherLock.writeLock().lock();// for firstconnection, so that it doesn't change and we get two admins
             getServerManager().getSFLock().readLock().lock();
+            Debug.a_startTime = System.currentTimeMillis();
             EinzServerClientHandler ez = new EinzServerClientHandler(socket, this, this.getServerManager().getServerFunctionInterface(),firstconnection);
             getServerManager().getSFLock().readLock().unlock();
             Thread thread = new Thread(ez);
@@ -304,7 +305,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     }
 
     /**
-     * Waits for all clientHanlderThreads after kicking all clients. may take some time. You should consider running this method in a non-UI thread.
+     * Waits for all clientHanlderThreads after kicking all clients. may take some a_time. You should consider running this method in a non-UI thread.
      */
     public void shutdown() {
         if(getServerManager()==null) {

@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
@@ -188,7 +189,7 @@ public class EinzClient implements Runnable {
         // sleep a little after the connection is there, somehow this helps. If this is not there, the message is lost before the server is fully ready
         // this helps because above while loop ending does not mean that the server is ready, only that the connection is said to exist when socket.connect() has been called
         try {
-            sleep(1000);
+            sleep(Globals.CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED); // TODO: find a better way to determine the server is ready, maybe by making the server respond once it is ready, even before the getRegister message.
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

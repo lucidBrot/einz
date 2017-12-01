@@ -22,6 +22,10 @@ import static java.lang.Thread.sleep;
  */
 public class Debug {
 
+    public static long a_time = 0;
+    public static long a_startTime = 0;
+    public static long a_endTime = 0;
+
     /**
      * For debug purposes only, should not have side effects at all.
      * Prints the class of the given object as JSON
