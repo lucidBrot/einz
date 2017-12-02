@@ -23,7 +23,22 @@ import static java.lang.Thread.sleep;
 public class Debug {
 
     public static final boolean CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false;
-    public static final int SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = 30000; //[ms]
+    public static final int SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = 30000;//30000; //[ms]
+
+    // Debugging: Sony Xperia Z5 as client, Samsung galaxy tab as server, in wlan
+    // Client: Sony E6653 Android 7.1.1, API 25
+    // Server: Samsung GT-N5120 Android 4.4.2, API 19
+
+    // false and 30'000     works
+    // false and 0          works
+    // true and 0           works
+    // true and 30'000      works
+    // wtf... at least the first one should have failed
+
+    // reversing above client and server setup
+    // false and 0          works
+    // false and 30'000     works
+
 
 
     public static long a_time = 0;
@@ -37,7 +52,7 @@ public class Debug {
         if(!CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED)
             Log.w("Debug", "Using CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false");
         if(SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED>0)
-            Log.w("Debug", "Using SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = true");
+            Log.w("Debug", "Using SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = "+SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED);
     }
 
     /**

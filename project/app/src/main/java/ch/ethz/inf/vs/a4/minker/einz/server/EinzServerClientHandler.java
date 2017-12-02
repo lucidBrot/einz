@@ -56,6 +56,7 @@ public class EinzServerClientHandler implements Runnable{
 
         if(Debug.SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED > 0){
             try {
+                Log.d("ESCH", "Sleeping for "+Debug.SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED+" ms.");
                 sleep(Debug.SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED);
             } catch (InterruptedException e) {
                 Log.d("Debug", "Was interrupted while sleeping for debug purposes");
