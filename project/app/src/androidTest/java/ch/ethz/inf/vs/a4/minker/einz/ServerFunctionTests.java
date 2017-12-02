@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 
-import ch.ethz.inf.vs.a4.minker.einz.gamelogic.GameState;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 
 import static junit.framework.Assert.assertEquals;

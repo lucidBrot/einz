@@ -24,7 +24,7 @@ import static org.junit.Assert.*;
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
-public class ExampleUnitTest {
+public class MessagingTest {
 
    @Test
     public void parseGetStateOld() throws Exception {

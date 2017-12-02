@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,8 +15,8 @@ import java.util.Set;
 
 public class GameConfig {
 
-    public Set<BasicRule> allRules;
-    public Set<BasicGlobalRule> globalRules;
+    public List<BasicRule> allRules;
+    public List<BasicGlobalRule> globalRules;
     public Set<Card> allCardsInGame;
     public List<Participant> allParticipants;
 
@@ -27,9 +28,9 @@ public class GameConfig {
     public GameConfig(Map<Card, Integer> numberOfCardsInGame){
         this.allCardsInGame = new HashSet<>();
         this.rulePerCard = new HashMap<>();
-        this.allCardsInGame = new HashSet<>();
         this.allParticipants = new LinkedList<>();
-        this.allRules = new HashSet<>();
+        this.allRules = new ArrayList<>();
+        this.globalRules = new ArrayList<>();
 
         this.drawPile = new LinkedList<>();
 
