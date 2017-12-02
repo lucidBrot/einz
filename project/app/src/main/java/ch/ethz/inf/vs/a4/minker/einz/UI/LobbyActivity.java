@@ -142,7 +142,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
      * @param username
      * @param role
      */
-    private void addLobbyListUser(String username, String role) {
+    private void addLobbyListUser(final String username, String role) {
         LinearLayout lobbyList = findViewById(R.id.ll_lobbylist);
 
         CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_lobbylist_element, lobbyList, false);
@@ -184,7 +184,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
      * Sends kick request in new thread
      * @param username who to kick
      */
-    private void kick(String username) {
+    private void kick(final String username) {
         Runnable r = new Runnable() {
             @Override
             public void run() {

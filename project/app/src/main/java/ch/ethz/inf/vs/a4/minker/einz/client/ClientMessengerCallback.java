@@ -32,10 +32,11 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
     }
 
     @Override
-    public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
+    public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message_) {
         Log.d("ClientMessengerCallback", "received UpdateLobbyList");
         final ArrayList<String> players = new ArrayList<>();
         final ArrayList<String> spectators = new ArrayList<>();
+        final EinzMessage<EinzUpdateLobbyListMessageBody> message = message_;
         EinzUpdateLobbyListMessageBody body = message.getBody();
         HashMap<String, String> hashMap = body.getLobbylist();
 
@@ -76,7 +77,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
     @Override
     public void onRegisterFailure(EinzMessage<EinzRegisterFailureMessageBody> message) {
         Log.d("ClientMessengerCallback", "registration Failed");
-        EinzRegisterFailureMessageBody body = message.getBody();
+        final EinzRegisterFailureMessageBody body = message.getBody();
 
         Runnable runnable = new Runnable() {
             @Override
@@ -92,8 +93,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
     @Override
     public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message){
         EinzUnregisterResponseMessageBody body = message.getBody();
-        String username = body.getUsername();
-        String reason = body.getReason();
+        final String username = body.getUsername();
+        final String reason = body.getReason();
 
         Log.d("ClientMessengerCallback", username+" was unregistered. Reason: "+reason);
         // UI is updated later when we receive a LobbyListUpdatedMessage
