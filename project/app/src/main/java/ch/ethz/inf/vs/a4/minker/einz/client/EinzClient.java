@@ -194,9 +194,10 @@ public class EinzClient implements Runnable {
 
         // sleep a little after the connection is there, somehow this helps. If this is not there, the message is lost before the server is fully ready
         // this helps because above while loop ending does not mean that the server is ready, only that the connection is said to exist when socket.connect() has been called
-        if(Debug.CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED) { // for debugging
+        // EDIT: that's kinda wrong. it might also be the client who has not yet initialized the buffer, but that was a bug in checking if it was null
+        if(Debug.CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED) { // for debugging, no longer needed because of sendMessageRetryXTimes instead.
             try {
-                sleep(Globals.CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED); // TODO: find a better way to determine the server is ready, maybe by making the server respond once it is ready, even before the getRegister message.
+                sleep(Globals.CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

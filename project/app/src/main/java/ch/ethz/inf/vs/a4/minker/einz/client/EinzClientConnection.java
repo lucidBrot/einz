@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -153,7 +154,10 @@ public class EinzClientConnection implements Runnable {
                 socket.close();
             }
 
-        } catch (Exception e) { // errors about establishing connection
+        } catch (ConnectException e) {
+            // TODO: connection timeout when trying to establish it - inform user.
+        }
+        catch (Exception e) { // errors about establishing connection
 
             Log.e("EinzClientConnection", "Clientside Error (2)");
             e.printStackTrace();
@@ -215,7 +219,7 @@ public class EinzClientConnection implements Runnable {
                 sendMessage(message);
                 break;
             } catch (SendMessageFailureException e) {
-                Log.w("EinzClient", "failed to send register message");
+                Log.w("EinzClient", "failed to send register message (X="+X+")");
                 try {
                     sleep(100);
                 } catch (InterruptedException e1) {
