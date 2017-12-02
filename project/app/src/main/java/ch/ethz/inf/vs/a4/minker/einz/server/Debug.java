@@ -23,7 +23,7 @@ import static java.lang.Thread.sleep;
 public class Debug {
 
     public static final boolean CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false;
-    public static final int SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = 30000;//30000; //[ms]
+    public static final int SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = 5000;//30000; //[ms]
 
     // Debugging: Sony Xperia Z5 as client, Samsung galaxy tab as server, in wlan
     // Client: Sony E6653 Android 7.1.1, API 25
