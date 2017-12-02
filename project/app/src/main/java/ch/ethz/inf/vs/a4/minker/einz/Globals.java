@@ -3,7 +3,8 @@ package ch.ethz.inf.vs.a4.minker.einz;
 public class Globals {
     public static final String ENCODING = "UTF-8"; // the encoding for sending/receiving strings
     public static final long CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED = 500; // twice as long as I think the server will usually take to start after connection established
-                                                                                    // used in the clients that are not hosting
+    public static final int SERVER_SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET_ON_SHUTDOWN = 100; // the time running requests are given before the socket closes
+    // used in the clients that are not hosting
     // UTF-8 is the probable default of the JVM
     // UTF-32 could work too though
     // https://stackoverflow.com/questions/496321/utf-8-utf-16-and-utf-32

@@ -25,7 +25,6 @@ public class EinzServerClientHandler implements Runnable{
 
     private boolean spin = false;
     private boolean stopping = false;
-    private final int SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET = 100; // milisecs
     private boolean firstConnectionOnServer = false; // whether this user should be considered admin
 
     private ThreadedEinzServer parentEinzServer;
@@ -55,6 +54,14 @@ public class EinzServerClientHandler implements Runnable{
     public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer parentEinzServer, ServerFunctionDefinition serverFunctionDefinition, boolean firstConnectionOnServer) {
         Log.d("ESCH", "started new instance");
 
+        if(Debug.SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED > 0){
+            try {
+                sleep(Debug.SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED);
+            } catch (InterruptedException e) {
+                Log.d("Debug", "Was interrupted while sleeping for debug purposes");
+                e.printStackTrace();
+            }
+        }
         Debug.a_time = System.currentTimeMillis() - Debug.a_startTime;
 
         this.parentEinzServer = parentEinzServer;
@@ -202,7 +209,7 @@ public class EinzServerClientHandler implements Runnable{
 
         this.stopping = true;
         try {
-            sleep(SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET);
+            sleep(Globals.SERVER_SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET_ON_SHUTDOWN);
         } catch (InterruptedException e) {
             Log.e("ESCH/stopPatiently", "You interrupted my sleep (giving the other threads a_time to finish their actions): ");
             e.printStackTrace();

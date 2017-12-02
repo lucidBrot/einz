@@ -9,6 +9,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import org.json.JSONException;
 
@@ -188,13 +189,17 @@ public class EinzClient implements Runnable {
             // BUT: why is this the case? And why does it only sometimes work?
             //      below sleep was added after this comment
         }
+        Log.d("EinzClient", "socket thinks it is connected");
+
 
         // sleep a little after the connection is there, somehow this helps. If this is not there, the message is lost before the server is fully ready
         // this helps because above while loop ending does not mean that the server is ready, only that the connection is said to exist when socket.connect() has been called
-        try {
-            sleep(Globals.CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED); // TODO: find a better way to determine the server is ready, maybe by making the server respond once it is ready, even before the getRegister message.
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(Debug.CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED) { // for debugging
+            try {
+                sleep(Globals.CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED); // TODO: find a better way to determine the server is ready, maybe by making the server respond once it is ready, even before the getRegister message.
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         //</Bugfix>
     }

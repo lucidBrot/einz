@@ -22,9 +22,23 @@ import static java.lang.Thread.sleep;
  */
 public class Debug {
 
+    public static final boolean CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false;
+    public static final int SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = 30000; //[ms]
+
+
     public static long a_time = 0;
     public static long a_startTime = 0;
     public static long a_endTime = 0;
+
+    /**
+     * called at program start in order to inform Devs about debug settings that may be unintentional
+     */
+    public static void debug_printInitialWarnings(){
+        if(!CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED)
+            Log.w("Debug", "Using CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false");
+        if(SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED>0)
+            Log.w("Debug", "Using SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = true");
+    }
 
     /**
      * For debug purposes only, should not have side effects at all.
