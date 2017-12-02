@@ -190,11 +190,11 @@ public class EinzClientConnection implements Runnable {
      * Note: Closing a socket doesn't clear its connection state, which means this method will return true for a closed socket (see isClosed()) if it was successfuly connected prior to being closed.
      */
     public boolean isConnected() {
-        //return (this.socket != null && this.socket.isConnected());
+        return (this.socket != null && this.socket.isConnected());
 
 
         // old version. bad.
-        return (this.socket == null || this.socket.isConnected());
+        //return (this.socket == null || this.socket.isConnected());
     }
 
     public interface OnMessageReceived {
