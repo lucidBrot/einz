@@ -159,7 +159,7 @@ public class EinzClient implements Runnable {
 
                 //DEBUG
                 Log.d("EinzClient", "Trying to...");
-                connection.sendMessage(message);
+                connection.sendMessageRetryXTimes(5,message);
 
 
                 //simple logging:
@@ -228,7 +228,7 @@ public class EinzClient implements Runnable {
         EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
         EinzUnregisterRequestMessageBody body = new EinzUnregisterRequestMessageBody(this.username); // getting all the girls
         final EinzMessage<EinzUnregisterRequestMessageBody> message = new EinzMessage<>(header, body);
-        this.connection.sendMessage(message);
+        this.connection.sendMessageIgnoreFailures(message);
         Log.d("EinzClient/shutdown", "sent unregister message for "+this.username);
     }
 
@@ -236,7 +236,7 @@ public class EinzClient implements Runnable {
         EinzMessageHeader header = new EinzMessageHeader("registration", "Kick");
         EinzKickMessageBody body = new EinzKickMessageBody(username);
         final EinzMessage<EinzKickMessageBody> message = new EinzMessage<>(header, body);
-        this.connection.sendMessage(message);
+        this.connection.sendMessageRetryXTimes(5, message);
         Log.d("EinzClient/kick", "Sent kick request (kick "+username+")");
     }
 
