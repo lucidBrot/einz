@@ -174,6 +174,9 @@ public class KeepaliveScheduler implements Runnable {
         executorOut = Executors.newSingleThreadScheduledExecutor();
 
         // start the timers in new threads
+        //long a = System.currentTimeMillis();
+        //float b = a;
+        //Log.d("DEBUGERINO", "long: "+a+"\nfloat: "+b);
         this.lastOutTime = System.currentTimeMillis();
         launchOutTimeoutChecker();
         this.lastInTime = System.currentTimeMillis();
