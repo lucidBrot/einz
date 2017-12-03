@@ -4,6 +4,10 @@ As it turns out, there are difficulties that can cause the first message sent ov
 
 (Any time I mention `RegisterSuccess` below, it could also be `RegisterFailure` )
 
+Read the [Conclusion](#conclusion) first! This whole file turned out to be unneccesary.
+
+
+
 ## Current Implementation
 
 The Server-side view:
