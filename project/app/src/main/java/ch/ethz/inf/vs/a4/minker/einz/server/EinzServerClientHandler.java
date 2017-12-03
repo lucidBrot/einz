@@ -4,6 +4,7 @@ import android.util.Log;
 
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.SendMessageCallback;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +19,7 @@ import static java.lang.Thread.sleep;
 /**
  * This class handles one Connection per instance (thread)
  */
-public class EinzServerClientHandler implements Runnable{
+public class EinzServerClientHandler implements Runnable, SendMessageCallback{
 
     private PrintWriter bufferOut;
     public Socket socket;
