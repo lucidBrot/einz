@@ -43,6 +43,8 @@ They would have to be sent quite often though.
 
 We could also just be happy with the timeouts the gamestate hands out, but then we wouldn't know if it's the player or the network which is slow.
 
+<sub>(below paragraph seems not well thought-through)</sub>
+
 My preferred action would be to have server- and clientside one additional thread which just sends a keepalive packet every 400 ms. Assuming a slow network connection of 1000ms ping, we can set the timeout to (network delay + network delay on way back + 400 ms if we have just recently received the last keepalive packet) = 2400 ms until we decide that the client is not responding.
 We could also send the keepalive packet as response to a previous keepalive packet. Then we would estimate a maximum of 2*p for the way and no period time, because the peer should react almost instantly, as networking is way slower than calculating. (here, p stands for the maximum ping time to the server that we will allow) This way, we can tell after 2 seconds that a client has disconnected (for p=1000ms), instead of after the timeout until which a card would have had to be played (30 seconds or so). Also, we know whether it is the client or the player who is not reacting.
 
