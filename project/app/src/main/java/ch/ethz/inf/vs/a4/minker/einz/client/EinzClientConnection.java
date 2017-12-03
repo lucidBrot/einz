@@ -56,7 +56,6 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
                 EinzClientConnection.this.onKeepaliveTimeout();
             }
         });
-        this.keepaliveScheduler.runInParallel(); // run the timeout timers in background
 
     }
 
@@ -144,6 +143,9 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
                 bufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), Globals.ENCODING));
 
                 String mServerMessage;
+
+                this.keepaliveScheduler.runInParallel(); // run the timeout timers in background
+
                 //in this while the client listens for the messages sent by the server
                 while (spin) {
                     mServerMessage = bufferIn.readLine();
