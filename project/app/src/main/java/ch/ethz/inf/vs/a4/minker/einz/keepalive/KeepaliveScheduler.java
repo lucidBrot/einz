@@ -1,5 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.keepalive;
 
+import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
+
 import java.util.concurrent.*;
 
 /**
@@ -71,10 +74,17 @@ public class KeepaliveScheduler implements Runnable {
             public void run() {
                 float bonus = 0;
                 if(firstOutTime){bonus = timeout_initial_bonus;}
-                if(System.currentTimeMillis() - lastOutTime < timeout + bonus){
+                float temp = System.currentTimeMillis() - lastOutTime;
+                if(temp < timeout + bonus){
+                    if(Debug.logKeepalivePackets){
+                        Log.d("keepalive", "firstOutTime: "+firstOutTime+"\ntime passed: "+temp);
+                    }
                     // don't timeout yet, launch new execution
                     launchOutTimeoutChecker(); // yey recursion?!
                 } else {
+                    if(Debug.logKeepalivePackets){
+                        Log.d("keepalive", "TIMEOUT!\nfirstOutTime: "+firstOutTime+"\ntime passed: "+temp);
+                    }
                     onOutTimeout();
                 }
             }

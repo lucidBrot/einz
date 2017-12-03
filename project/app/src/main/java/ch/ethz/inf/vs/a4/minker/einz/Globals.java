@@ -24,6 +24,6 @@ public class Globals {
 
     // so UTF-8 should suffice for our purposes
 
-    public static final long KEEPALIVE_TIMEOUT = 1000; // how long without messages incoming until a timeout should be triggered
+    public static final long KEEPALIVE_TIMEOUT = 3000; // how long without messages incoming until a timeout should be triggered
     public static final long KEEPALIVE_INITIAL_BONUS =  100;
 }
