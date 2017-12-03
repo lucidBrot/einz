@@ -23,6 +23,7 @@ public class EinzNetworkingParser extends EinzParser{
             default:
                 Log.d("FurtherActionsParser", "Not a valid messagetype " + messagetype + " for EinzNetworkingParser");
                 return null;
+                //TODO: implement ping/pong
         }
     }
 

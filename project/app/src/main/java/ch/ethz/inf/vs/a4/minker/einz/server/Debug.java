@@ -45,6 +45,8 @@ public class Debug {
     public static long a_startTime = 0;
     public static long a_endTime = 0;
 
+    public static boolean logKeepalivePackets = true; // set to false to reduce log spam
+
     /**
      * called at program start in order to inform Devs about debug settings that may be unintentional
      */
@@ -53,6 +55,9 @@ public class Debug {
             Log.w("Debug", "Using CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false");
         if(SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED>0)
             Log.w("Debug", "Using SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = "+SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED);
+        if(logKeepalivePackets){
+            Log.w("Debug", "Log spam from keepalive packets is activated.");
+        }
     }
 
     /**
