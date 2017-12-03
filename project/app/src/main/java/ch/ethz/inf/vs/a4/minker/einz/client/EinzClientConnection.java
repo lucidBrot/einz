@@ -117,7 +117,8 @@ public class EinzClientConnection implements Runnable {
             Log.d("EinzClientConnection", "Connecting to " + serverIP + ":" + serverPort);
 
             //create a socket to make the connection with the server
-            socket = new Socket(serverAddr, serverPort);
+            socket = new Socket(serverAddr, serverPort); // TODO: set timeout on the connection establishing itself
+                                                        // see https://stackoverflow.com/a/4969788/2550406
 
             try {
 
