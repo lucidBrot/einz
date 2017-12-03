@@ -2,12 +2,12 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#ff4081</color>
 
     <color name="black_overlay">#66000000</color>
 
     <color name="orange_default">#FFBB34</color>
-    <color name="orange_dark">#FF8700</color>
+    <color name="orange_dark">#ff8700</color>
     <color name="orange_brown">#875A00</color>
 
     <color name="blue_default">#56B3FC</color>
