@@ -14,30 +14,10 @@ import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends FullscreenActivity implements View.OnClickListener {
 
-    public void makeFullscreen(){
-        if(getSupportActionBar() != null){
-            getSupportActionBar().hide(); // might cause NullPointerException if we don't have actionBar (IntelliJ warning)
-        }
-        if(getActionBar() != null){
-            getActionBar().hide();
-        }
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-
-        makeFullscreen();
-        //make fullscreen
-        View decorView = getWindow().getDecorView();
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -51,11 +31,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // log some warnings if debug variables have been set and possibly forgotten
         Debug.debug_printInitialWarnings();
-    }
-
-    public void onResume(){
-        super.onResume();
-        makeFullscreen();
     }
 
     @Override

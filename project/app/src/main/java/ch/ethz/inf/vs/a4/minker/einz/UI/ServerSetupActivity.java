@@ -22,32 +22,11 @@ import ch.ethz.inf.vs.a4.minker.einz.R;
  * This is to get a somewhat working app-flow as it should finally be.
  * Corresponds to screen 2 in our paper
  */
-public class ServerSetupActivity extends AppCompatActivity {
+public class ServerSetupActivity extends FullscreenActivity {
 
-
-    public void makeFullscreen(){
-        if(getSupportActionBar() != null){
-            getSupportActionBar().hide(); // might cause NullPointerException if we don't have actionBar (IntelliJ warning)
-        }
-        if(getActionBar() != null){
-            getActionBar().hide();
-        }
-
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
-                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
-
-        makeFullscreen();
-        //make fullscreen
-
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_server_setup);
@@ -86,11 +65,7 @@ public class ServerSetupActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onResume(){
-        super.onResume();
-        makeFullscreen();
-    }
+
 
     private void startLobbyAction(String username) {
         Log.d("ServerSetup", "username set to "+username);
