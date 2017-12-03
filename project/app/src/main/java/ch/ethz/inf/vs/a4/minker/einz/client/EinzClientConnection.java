@@ -79,6 +79,7 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
                 bufferOut.println(message);
                 bufferOut.flush();
             }
+            this.keepaliveScheduler.onAnyMessageSent();
         } else {
             Log.w("ClientConnection", "bufferOut was not available to send message "+message);
             throw new SendMessageFailureException("OutputBuffer was not ready to send the message. Please retry again when you are positive that it is not null (or has errors)");
