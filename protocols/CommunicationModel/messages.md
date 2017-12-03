@@ -147,7 +147,7 @@ Implemented by **server** and **client**.
 
 If no packet is received within some timeout, the connection is considered broken.
 
-The reason for this packet is that we cannot know whether a client disconnected unless we send to it. In the worst case, this would mean that we patiently wait some 30 seconds for a client to play, and only once we decide that this was too long and tell it that we disconnected it, we notice. To circumvent this, we send a keepalive packet back and forth and can thus make use of the `socket.setTimeout`, which only reacts to data packets, not to the tcp-internal keepalive packets.
+The reason for this packet is that we cannot know whether a client disconnected unless we send to it. In the worst case, this would mean that we patiently wait some 30 seconds for a client to play (gamelogic, if implemented at all), and only once we decide that this was too long and tell it that we disconnected it, we notice. To circumvent this, we send a keepalive packet back and forth and can thus make use of the `socket.setTimeout`, which only reacts to data packets, not to the tcp-internal keepalive packets.
 
 Implementing this packet is easily uncoupled from the rest of the packets and is thus a TODO for later.
 
@@ -155,10 +155,9 @@ Implementing this packet is easily uncoupled from the rest of the packets and is
 {
   "header":{
     "messagegroup":"networking",
-    "messagetype":"keepalive"
+    "messagetype":"KeepAlive"
   },
   "body":{
-    "timeout":"1000"
   }
 }
 ```
