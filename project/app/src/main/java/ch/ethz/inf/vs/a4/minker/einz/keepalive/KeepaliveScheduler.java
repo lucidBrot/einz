@@ -2,6 +2,10 @@ package ch.ethz.inf.vs.a4.minker.einz.keepalive;
 
 import java.util.concurrent.*;
 
+/**
+ * Handles sending and receiving keepalive packets. make sure to call onAnyMessageReceived and onAnyMessageSent when you do that.
+ * Start it by running a threads .start() method with this runnable as content.
+ */
 public class KeepaliveScheduler implements Runnable {
 
     private final long timeout;
@@ -142,6 +146,15 @@ public class KeepaliveScheduler implements Runnable {
         }
         executorIn.shutdown();
         executorOut.shutdown();
+    }
+
+    /**
+     * starts itself in a background thread. Returns a reference to that thread.
+     */
+    public Thread runInParallel(){
+        Thread t = new Thread(this);
+        t.start();
+        return t;
     }
 
     @Override
