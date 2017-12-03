@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity
-                android:name=".client.ClientActivity"
+                android:name=".UI.PlayerActivity"
                 android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen"/>
         <activity android:name=".server.ServerActivity"/>
         <activity

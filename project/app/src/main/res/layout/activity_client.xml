@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@android:color/holo_orange_dark"
     android:orientation="vertical"
-    tools:context="ch.ethz.inf.vs.a4.minker.einz.client.ClientActivity">
+    tools:context="ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity">
 
     <LinearLayout
         android:layout_width="match_parent"

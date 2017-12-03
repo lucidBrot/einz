@@ -9,9 +9,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import ch.ethz.inf.vs.a4.minker.einz.R;
-import ch.ethz.inf.vs.a4.minker.einz.UI.ClientSetupActivity;
-import ch.ethz.inf.vs.a4.minker.einz.UI.ServerSetupActivity;
-import ch.ethz.inf.vs.a4.minker.einz.client.ClientActivity;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
 
@@ -38,7 +35,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch(view.getId()){
             case R.id.btn_start_client:
                 // start client
-                Intent cintent = new Intent(this, ClientActivity.class);
+                Intent cintent = new Intent(this, PlayerActivity.class);
                 startActivity(cintent);
                 break;
             case R.id.btn_start_server:

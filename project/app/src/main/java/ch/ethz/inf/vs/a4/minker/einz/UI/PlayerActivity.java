@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz.client;
+package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.ClipData;
 import android.graphics.Canvas;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
-public class ClientActivity extends AppCompatActivity {
+public class PlayerActivity extends AppCompatActivity {
     private static final int NBR_ITEMS = 20;
     private GridLayout mGrid;
     private ImageView trayStack;
