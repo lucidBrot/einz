@@ -145,8 +145,7 @@ Similar to ping, but respond to receiving the keepalive packet by sending it bac
 
 Implemented by **server** and **client**.
 
-If no keepalive packet is received within some timeout, the connection is considered broken.
-`timeout` specified by the server in ms.
+If no packet is received within some timeout, the connection is considered broken.
 
 The reason for this packet is that we cannot know whether a client disconnected unless we send to it. In the worst case, this would mean that we patiently wait some 30 seconds for a client to play, and only once we decide that this was too long and tell it that we disconnected it, we notice. To circumvent this, we send a keepalive packet back and forth and can thus make use of the `socket.setTimeout`, which only reacts to data packets, not to the tcp-internal keepalive packets.
 
