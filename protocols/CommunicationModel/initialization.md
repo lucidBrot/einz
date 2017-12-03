@@ -108,6 +108,27 @@ If the client decided not to register itself, it shouldn't be sending messages t
   (This makes the argument that we only need a constant number of messages kinda irrelevant)
 * If the client went down during this process, we should also be able to rely on our `are you still there?` packets that we intend to implement.
 
+## Conclusion
+
+**Actually, all of the above is based on wrong premises**.
+
+I have now tested the old version (at tag bug1/initmsg) again and it turns out that it does not always work in the hotspot router model either. I originally believed that the server did not buffer messages during initialization. This is wrong: making the server sleep for 30 seconds during initialization does not make a difference at all.
+
+My original belief was that the registration process was consistently working in emulators and in a scenario where one device was also the router, but not if both were connected via a router. This belief was based on insufficient testing - actually, the registration also fails sometimes in the hotspot scenario.
+
+The actual problem was that the client tried to write to the output buffer before that was set up, thus losing the message before it even entered the network. That making the client slower helped makes also sense in this case. Why it consistently worked in the emulators could have to do with the fact that setting up the connection on localhost is so fast that the other thread which sends the registration message is very unlikely to be faster.
+
+See the code of EinzClient and EinzClientConnection for this, but basically the flow of the program was like this:
+
+1. start connecting in a background thread
+2. send the registration message
+
+If 1 completes fast enough, 2 works. It was intended that 2 would spin if the connection was not yet established, but this was a one-line bug in bug1/initmsg. In the next commit, 5b2c455, I fixed this 'accidentally' in the belief that the case where the output buffer was null had never occurred yet.
+
+**So we don't actually need this initialization protocol.**
+
+The bug seems to be completely fixed now at tag fix1/initmsg
+
 ***
 
 <sub>Eric Mink - 01.12.2017</sub>
