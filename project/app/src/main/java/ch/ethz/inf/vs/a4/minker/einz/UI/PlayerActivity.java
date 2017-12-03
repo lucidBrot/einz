@@ -35,39 +35,12 @@ public class PlayerActivity extends AppCompatActivity {
     private ImageView trayStack;
     private LayoutInflater inflater;
 
-    private final android.os.Handler mHideHandler = new android.os.Handler();
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            makeFullscreen();
-        }
-    };
-
-
 
     int[] cards;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         makeFullscreen();
-        //make fullscreen
-        View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener
-                (new View.OnSystemUiVisibilityChangeListener() {
-                    @Override
-                    public void onSystemUiVisibilityChange(int visibility) {
-                        // Note that system bars will only be "visible" if none of the
-                        // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
-                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                            // TODO: The system bars are visible. Make any desired
-                            // adjustments to your UI, such as showing the action bar or
-                            // other navigational controls.
-                            mHideHandler.removeCallbacks(mHideRunnable);
-                            mHideHandler.postDelayed(mHideRunnable, 2000);
-                        }
-                    }
-                });
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
@@ -95,10 +68,20 @@ public class PlayerActivity extends AppCompatActivity {
     }
 
     public void makeFullscreen(){
-        getSupportActionBar().hide(); // might cause NullPointerException if we don't have actionBar (IntelliJ warning)
+        if(getSupportActionBar() != null){
+            getSupportActionBar().hide(); // might cause NullPointerException if we don't have actionBar (IntelliJ warning)
+        }
+        if(getActionBar() != null){
+            getActionBar().hide();
+        }
 
-        getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
-    }
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION // hide nav bar
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN // hide status bar
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);    }
 
     public void onResume(){
         super.onResume();

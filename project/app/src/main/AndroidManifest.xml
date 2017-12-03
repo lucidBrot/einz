@@ -26,17 +26,16 @@
         <activity android:name=".server.ServerActivity"/>
         <activity
                 android:name=".UI.ServerSetupActivity"
-                android:configChanges="orientation|keyboardHidden|screenSize"
-                android:label="@string/title_activity_server_setup"
-                android:parentActivityName=".UI.MainActivity"
-                android:theme="@style/FullscreenTheme">
+                android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
                     android:value="ch.ethz.inf.vs.a4.minker.einz.UI.MainActivity"/>
         </activity>
         <activity android:name=".UI.LobbyActivity">
         </activity>
-        <activity android:name=".UI.ClientSetupActivity">
+        <activity
+            android:name=".UI.ClientSetupActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
         </activity>
     </application>
 

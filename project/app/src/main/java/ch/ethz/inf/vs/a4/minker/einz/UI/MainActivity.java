@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
 import ch.ethz.inf.vs.a4.minker.einz.R;
@@ -15,35 +16,28 @@ import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private final android.os.Handler mHideHandler = new android.os.Handler();
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            makeFullscreen();
-        }
-    };
-
     public void makeFullscreen(){
-        getSupportActionBar().hide(); // might cause NullPointerException if we don't have actionBar (IntelliJ warning)
-
-        getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        if(getSupportActionBar() != null){
+            getSupportActionBar().hide(); // might cause NullPointerException if we don't have actionBar (IntelliJ warning)
+        }
+        if(getActionBar() != null){
+            getActionBar().hide();
+        }
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+
         makeFullscreen();
         //make fullscreen
         View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener
-                (new View.OnSystemUiVisibilityChangeListener() {
-                    @Override
-                    public void onSystemUiVisibilityChange(int visibility) {
-                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-
-                            mHideHandler.removeCallbacks(mHideRunnable);
-                            mHideHandler.postDelayed(mHideRunnable, 2000);
-                        }
-                    }
-                });
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
