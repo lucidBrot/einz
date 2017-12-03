@@ -16,8 +16,8 @@ public class KeepaliveScheduler implements Runnable {
     private SendMessageCallback sendMessageCallback;
     private final OnKeepaliveTimeoutCallback onTimeoutCallback;
 
-    private float lastOutTime; // last time a message was sent
-    private float lastInTime; // last time a message was received
+    private long lastOutTime; // last time a message was sent
+    private long lastInTime; // last time a message was received
     private boolean firstInTime = true; // as long as this is true, the timeout will only trigger after the additional initial bonus
     private boolean firstOutTime = true; // dito
     private boolean inTimeoutTriggered = false; // whether there was a timeout regarding incoming messages.
@@ -74,16 +74,16 @@ public class KeepaliveScheduler implements Runnable {
             public void run() {
                 float bonus = 0;
                 if(firstOutTime){bonus = timeout_initial_bonus;}
-                float temp = System.currentTimeMillis() - lastOutTime;
-                if(temp < timeout + bonus){
+                long tempTime = System.currentTimeMillis() - lastOutTime;
+                if(tempTime < timeout + bonus){
                     if(Debug.logKeepalivePackets){
-                        Log.d("keepalive", "firstOutTime: "+firstOutTime+"\ntime passed: "+temp);
+                        Log.d("keepalive", "firstOutTime: "+firstOutTime+"\ntime passed: "+tempTime);
                     }
                     // don't timeout yet, launch new execution
                     launchOutTimeoutChecker(); // yey recursion?!
                 } else {
                     if(Debug.logKeepalivePackets){
-                        Log.d("keepalive", "TIMEOUT!\nfirstOutTime: "+firstOutTime+"\ntime passed: "+temp);
+                        Log.d("keepalive", "TIMEOUT!\nfirstOutTime: "+firstOutTime+"\ntime passed: "+tempTime);
                     }
                     onOutTimeout();
                 }
