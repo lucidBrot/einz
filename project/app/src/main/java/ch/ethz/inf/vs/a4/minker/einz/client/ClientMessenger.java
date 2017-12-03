@@ -44,6 +44,9 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
     @Override
     public void messageReceived(String message) { // TODO: handle errors
         Log.d("ClientMessenger", "received message: "+message);
+
+        // notify the keepalive
+
         EinzParser parser = null; // get parser based on the messages messagegroup
         try {
             parser = parserFactory.generateEinzParser(message);

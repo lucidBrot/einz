@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.OnKeepaliveTimeoutCallback;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.SendMessageCallback;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
@@ -35,6 +37,7 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
     private Socket socket;
     private EinzClientConnection.OnMessageReceived mMessageListener = null; // interface on message received
     private EinzClient parentClient;
+    KeepaliveScheduler keepaliveScheduler;
 
     /**
      * @param serverIP
@@ -46,7 +49,18 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
         this.serverPort = serverPort;
         this.mMessageListener = messageListener;
         this.parentClient = parentClient;
+        this.keepaliveScheduler = new KeepaliveScheduler(Globals.KEEPALIVE_TIMEOUT, Globals.KEEPALIVE_INITIAL_BONUS,
+                this, new OnKeepaliveTimeoutCallback() {
+            @Override
+            public void onKeepaliveTimeout() {
+                EinzClientConnection.this.onKeepaliveTimeout();
+            }
+        });
 
+    }
+
+    private void onKeepaliveTimeout() {
+        // TODO: onKeepaliveTimeout inform user that we lost connection
     }
 
     public EinzClientConnection(String serverIP, int serverPort, EinzClient parentClient) {
