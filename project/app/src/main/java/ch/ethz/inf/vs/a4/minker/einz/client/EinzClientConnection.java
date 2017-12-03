@@ -56,6 +56,7 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
                 EinzClientConnection.this.onKeepaliveTimeout();
             }
         });
+        this.keepaliveScheduler.runInParallel(); // run the timeout timers in background
 
     }
 
