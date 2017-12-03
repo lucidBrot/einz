@@ -20,6 +20,8 @@ public class KeepaliveScheduler implements Runnable {
     private ScheduledFuture<?> futureOut;
 
     /**
+     * Initializes the KeepaliveScheduler. Still need to start it later!
+     * After timeout milliseconds not receiving a message, a timeout will trigger. However, if the sending of a message on our side happens first, there will still be a socket IOException (AND then this timeout):
      * @param timeout The time in ms until the socket is closed unless there were incoming messages during this timespan.
      *                This is also the time in ms until this class sends a new keepalive message if there were no outgoing messages during this timespan.
      *                See protocols/server_thoughts.md on github for more details.
