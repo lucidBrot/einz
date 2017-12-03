@@ -15,6 +15,9 @@
 
     <color name="red_default">#FE4543</color>
     <color name="red_dark">#F32826</color>
+    <color name="red_darker">#9F0200</color>
+
+    <color name="red_wine">#870000</color>
 
     <color name="green_default">#1FFC35</color>
     <color name="green_dark">#06C619</color>

@@ -34,6 +34,7 @@ public class PlayerActivity extends AppCompatActivity {
     private GridLayout mGrid;
     private ImageView trayStack;
     private LayoutInflater inflater;
+
     private final android.os.Handler mHideHandler = new android.os.Handler();
     private final Runnable mHideRunnable = new Runnable() {
         @Override
@@ -66,6 +67,7 @@ public class PlayerActivity extends AppCompatActivity {
                         }
                     }
                 });
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
