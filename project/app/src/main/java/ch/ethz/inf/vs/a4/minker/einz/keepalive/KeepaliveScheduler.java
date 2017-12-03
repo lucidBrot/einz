@@ -130,7 +130,7 @@ public class KeepaliveScheduler implements Runnable {
     }
 
     /**
-     * stops the internal timeout timers
+     * stops the internal timeout timers. Blocks until done so.
      */
     private void onShuttingDown(){
         // stop the timers
@@ -140,6 +140,8 @@ public class KeepaliveScheduler implements Runnable {
         if(futureOut!=null){
             futureOut.cancel(false);
         }
+        executorIn.shutdown();
+        executorOut.shutdown();
     }
 
     @Override
