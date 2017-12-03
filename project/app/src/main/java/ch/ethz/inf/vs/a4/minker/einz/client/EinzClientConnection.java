@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.SendMessageCallback;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
@@ -20,7 +21,7 @@ import static java.lang.Thread.sleep;
 /**
  * call {@link #run} to actually connect
  */
-public class EinzClientConnection implements Runnable {
+public class EinzClientConnection implements Runnable, SendMessageCallback {
 
     private final String serverIP;
     private final int serverPort;

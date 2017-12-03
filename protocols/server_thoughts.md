@@ -103,6 +103,7 @@ Similarly, if the network is suddenly really slow, we will notice.
 TODO:
 
 * A Runnable that does all this and offers these functions. It takes the socket and the KEEPALIVE_TIMEOUT and KEEPALIVE_INITIAL_BONUS as parameters, as well as a callbackfunction for when the `keepaliveInTimer` hits zero
+* A KeepaliveSchedulerWrapper that makes it easy to run the functions on the keepalive thread.
 * A Parser for `networking` messagegroup
 * Registering the Parser in the networking parsermappings json
 * A Message for `keepalive`
