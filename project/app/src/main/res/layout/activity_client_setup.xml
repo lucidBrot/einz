@@ -41,6 +41,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:backgroundTint="@color/orange_brown"
+                    android:inputType="text"
                     android:hint="@string/tv_c_username"
                     android:maxLength="30"
                     android:maxLines="1"
