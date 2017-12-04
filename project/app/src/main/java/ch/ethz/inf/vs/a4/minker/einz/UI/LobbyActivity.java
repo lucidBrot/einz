@@ -168,7 +168,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
         // highlight admin
         if(username.equals(this.adminUsername)){
-            usercard.setCardBackgroundColor(Color.GREEN);
+            usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default));
         }
 
         if(this.host){
