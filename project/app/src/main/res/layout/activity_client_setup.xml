@@ -76,13 +76,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="6" />
-            ]
+
             <Button
                 android:id="@+id/btn_c_setup"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_weight="1"
                 android:background="@drawable/button_red"
+                android:text="@string/btn_c_setup"
                 android:textColor="@color/red_darker" />
 
             <Space
