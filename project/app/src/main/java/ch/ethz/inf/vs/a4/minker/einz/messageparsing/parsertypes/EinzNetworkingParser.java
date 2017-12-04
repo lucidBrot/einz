@@ -5,7 +5,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepAliveMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepaliveMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,9 +27,9 @@ public class EinzNetworkingParser extends EinzParser{
         }
     }
 
-    private EinzMessage<EinzKeepAliveMessageBody> parseKeepAlive(JSONObject message) {
+    private EinzMessage<EinzKeepaliveMessageBody> parseKeepAlive(JSONObject message) {
         EinzMessageHeader header = new EinzMessageHeader("networking", "keepalive");
-        EinzKeepAliveMessageBody body = new EinzKeepAliveMessageBody();
+        EinzKeepaliveMessageBody body = new EinzKeepaliveMessageBody();
         return new EinzMessage<>(header, body);
     }
 }
