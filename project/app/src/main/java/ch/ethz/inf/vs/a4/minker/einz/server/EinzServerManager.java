@@ -338,9 +338,13 @@ public class EinzServerManager {
 
             // and stop the corresponding client
             try {
-                esch.setConnectedUser(null);
-                esch.stopThreadPatiently();
-                Log.d("servMan/unReg", "stopped Thread of "+username);
+                if(esch!=null) {
+                    esch.setConnectedUser(null);
+                    esch.stopThreadPatiently();
+                    Log.d("servMan/unReg", "stopped Thread of " + username);
+                } else {
+                    Log.d("servMan/unReg", "there was no Thread of "+username+" that I could unregister");
+                }
             }catch(java.lang.NullPointerException e){
                 Log.d("servMan/unReg", "ESCH didn't exist anymore. (Did you maybe shut down the server?)");
                 e.printStackTrace();

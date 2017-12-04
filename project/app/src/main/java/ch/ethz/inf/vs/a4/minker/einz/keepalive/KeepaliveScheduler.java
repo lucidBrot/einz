@@ -48,7 +48,7 @@ public class KeepaliveScheduler implements Runnable {
      * Every time a message is sent or received, it stores the current time
      * in {@link ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler#lastInTime}
      * and {@link ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler#lastOutTime}.
-     *
+     * <p>
      * A parallel thread checks every CHECK_TIMEOUT ms whether a timeout should be triggered.
      * For this, using the Nyquist-Shannon theorem, CHECK_TIMEOUT must be at most half of INCOMING_TIMEOUT and/or SENDING_INTERVAL
      * That way, we will always notice within the INCOMING_TIMEOUT/SENDING_INTERVAL that we need to react.
@@ -64,7 +64,7 @@ public class KeepaliveScheduler implements Runnable {
     // ==> SENDING_INTERVAL = 800
     // ==> CHECK_OUT_INTERVAL = SENDING_INTERVAL/2
     // ==> CHECK_IN_INTERVAL = INCOMING_TIMEOUT/2
-            //</editor-fold>
+    //</editor-fold>
 
 
     private final long CHECK_OUT_INTERVAL;
@@ -80,7 +80,7 @@ public class KeepaliveScheduler implements Runnable {
     private long lastOutTime; // last time a message was sent
     private long lastInTime; // last time a message was received
     private boolean firstInTime = true; // as long as this is true, the timeout will only trigger after the additional initial bonus
-    private boolean firstOutTime = true; // dito
+
     private boolean inTimeoutTriggered = false; // whether there was a timeout regarding incoming messages.
     private ScheduledExecutorService executorIn; // timed threads to check timeout in and out
     private ScheduledExecutorService executorOut;
@@ -104,40 +104,41 @@ public class KeepaliveScheduler implements Runnable {
      * After timeout milliseconds not receiving a message, a timeout will trigger. However, if the sending of a message on our side happens first, there will still be a socket IOException (AND then this timeout):
      * Calculates internal things based on your specifications here.
      * This constructor will crash at runtime if you pass it retarded arguments!
-     * @param incomingTimeout The time in ms until the socket is closed unless there were incoming messages during this timespan.
-     *                This is also the time in ms until this class sends a new keepalive message if there were no outgoing messages during this timespan.
-     *                See protocols/server_thoughts.md on github for more details.
-     * @param maxSupportedPing The maximal ping that should still be able to reliably connect. Larger pings <i>might</i> work if they are still within the fluctuation region
-     * @param maxPingFluctuation (from the expected ping both up- and/or downwards)
+     *
+     * @param incomingTimeout     The time in ms until the socket is closed unless there were incoming messages during this timespan.
+     *                            This is also the time in ms until this class sends a new keepalive message if there were no outgoing messages during this timespan.
+     *                            See protocols/server_thoughts.md on github for more details.
+     * @param maxSupportedPing    The maximal ping that should still be able to reliably connect. Larger pings <i>might</i> work if they are still within the fluctuation region
+     * @param maxPingFluctuation  (from the expected ping both up- and/or downwards)
      * @param sendMessageCallback A interface to send messages to the other party.
-     * @param onTimeoutCallback A interface to be called when the keepalive timeout is triggered. You are responsible that this is run in the main thread if you need it to.
+     * @param onTimeoutCallback   A interface to be called when the keepalive timeout is triggered. You are responsible that this is run in the main thread if you need it to.
      */
-    public KeepaliveScheduler(long incomingTimeout, int maxSupportedPing, int maxPingFluctuation, SendMessageCallback sendMessageCallback, OnKeepaliveTimeoutCallback onTimeoutCallback){
+    public KeepaliveScheduler(long incomingTimeout, int maxSupportedPing, int maxPingFluctuation, SendMessageCallback sendMessageCallback, OnKeepaliveTimeoutCallback onTimeoutCallback) {
         INCOMING_TIMEOUT = incomingTimeout;
         MAX_SUPPORTED_PING = maxSupportedPing;
         MAX_PING_FLUCTUATION = maxPingFluctuation;
         this.sendMessageCallback = sendMessageCallback;
         this.onTimeoutCallback = onTimeoutCallback;
-        if(INCOMING_TIMEOUT < 0 || MAX_PING_FLUCTUATION < 0 || MAX_SUPPORTED_PING <0 || sendMessageCallback == null || onTimeoutCallback == null){
+        if (INCOMING_TIMEOUT < 0 || MAX_PING_FLUCTUATION < 0 || MAX_SUPPORTED_PING < 0 || sendMessageCallback == null || onTimeoutCallback == null) {
             throw new RuntimeException("Bad arguments for KeepaliveScheduler");
         }
 
         long initialBonus = MAX_SUPPORTED_PING - INCOMING_TIMEOUT;
-        if(initialBonus<0){
+        if (initialBonus < 0) {
             // no bonus needed
             INITIAL_BONUS = 0;
         } else {
             INITIAL_BONUS = initialBonus;
         }
 
-        SENDING_INTERVAL = INCOMING_TIMEOUT - 2L*MAX_PING_FLUCTUATION - Globals.KEEPALIVE_GRACE_PERIOD;
-        if(SENDING_INTERVAL <= 0){
+        SENDING_INTERVAL = INCOMING_TIMEOUT - 2L * MAX_PING_FLUCTUATION - Globals.KEEPALIVE_GRACE_PERIOD;
+        if (SENDING_INTERVAL <= 0) {
             // wtf are you doing
             throw new RuntimeException("Choose INCOMING_TIMEOUT for keepalive larger than 2*MAX_PING_FLUCTUATION!");
         }
 
-        CHECK_OUT_INTERVAL = SENDING_INTERVAL/2L;
-        CHECK_IN_INTERVAL = INCOMING_TIMEOUT/2L;
+        CHECK_OUT_INTERVAL = SENDING_INTERVAL / 2L;
+        CHECK_IN_INTERVAL = INCOMING_TIMEOUT / 2L;
     }
 
     /**
@@ -150,10 +151,11 @@ public class KeepaliveScheduler implements Runnable {
      * SENDING_INTERVAL = 800
      * CHECK_OUT_INTERVAL = SENDING_INTERVAL/2
      * CHECK_IN_INTERVAL = INCOMING_TIMEOUT/2
+     *
      * @param sendMessageCallback A interface to send messages to the other party.
-     * @param onTimeoutCallback A interface to be called when the keepalive timeout is triggered. You are responsible that this is run in the main thread if you need it to.
+     * @param onTimeoutCallback   A interface to be called when the keepalive timeout is triggered. You are responsible that this is run in the main thread if you need it to.
      */
-    public KeepaliveScheduler(SendMessageCallback sendMessageCallback, OnKeepaliveTimeoutCallback onTimeoutCallback){
+    public KeepaliveScheduler(SendMessageCallback sendMessageCallback, OnKeepaliveTimeoutCallback onTimeoutCallback) {
         this(Globals.KEEPALIVE_DEFAULT_INCOMING_TIMEOUT, Globals.KEEPALIVE_DEFAULT_MAX_SUPPORTED_PING, Globals.KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION,
                 sendMessageCallback, onTimeoutCallback);
     }
@@ -164,7 +166,10 @@ public class KeepaliveScheduler implements Runnable {
      * This function resets the keepaliveInTimer back to the specified timeout maximum.
      * (<br>Even if the message is a keepalive message, you will have to parse it)
      */
-    public void onAnyMessageReceived(){
+    public void onAnyMessageReceived() {
+        if (Debug.logKeepaliveSpam) {
+            Log.d("keepalive", "received anymessage.");
+        }
         this.firstInTime = false;
         this.lastInTime = System.currentTimeMillis();
     }
@@ -172,32 +177,26 @@ public class KeepaliveScheduler implements Runnable {
     /**
      * Sets the internal timeout timer for outgoing messages back to maximum and starts to countdown again.
      */
-    public void onAnyMessageSent(){
-        this.firstOutTime = false;
+    public void onAnyMessageSent() {
+        if (Debug.logKeepaliveSpam) {
+            Log.d("keepalive", "anymessage sent.");
+        }
         this.lastOutTime = System.currentTimeMillis();
     }
 
     /**
      * the checker should after every timeout countdown check if there was actually no new message sent since then. If yes, it will send a keepalive packet
      * There is always only one checker for out timeouts.
-     *
      */
-    private void launchOutTimeoutChecker(){
+    private void launchOutTimeoutChecker() {
         Runnable check = new Runnable() {
             @Override
             public void run() {
                 long tempTime = System.currentTimeMillis() - lastOutTime;
-                if(tempTime < SENDING_INTERVAL){
-                    if(Debug.logKeepaliveSpam){
-                        Log.d("keepalive", "firstOutTime: "+firstOutTime+"\ntime passed: "+tempTime);
-                    }
+                if (tempTime < SENDING_INTERVAL) {
                     // don't timeout yet, launch new execution
                     launchOutTimeoutChecker(); // yey recursion?!
                 } else {
-                    if(Debug.logKeepaliveSpam){
-                        Log.d("keepalive", "TIMEOUT!\nfirstOutTime: "+firstOutTime+"\ntime passed: "+tempTime);
-                    }
-
                     //send keepalive packet and restart launchOutTimeoutChecker
                     //launchOutTimeoutChecker is run in the same thread (executor) anyways, so it doesn't make a difference if we call it before or after onOutTimeout
                     onOutTimeout();
@@ -220,13 +219,16 @@ public class KeepaliveScheduler implements Runnable {
         // if not inTimeout
         // sendMessageCallback.sendMessage("keepalive");
 
-        if(!inTimeoutTriggered){ // if there was a timeout regarding incoming packets, then we don't need to send any more keepalive packets
+        if (!inTimeoutTriggered) { // if there was a timeout regarding incoming packets, then we don't need to send any more keepalive packets
             EinzMessage<EinzKeepaliveMessageBody> message = new EinzMessage<>(
                     new EinzMessageHeader("networking", "KeepAlive"),
                     new EinzKeepaliveMessageBody()
             );
             try {
                 sendMessageCallback.sendMessage(message);
+                if (Debug.logKeepalivePackets) {
+                    Log.d("keepalive", "sent keepalive.");
+                }
             } catch (SendMessageFailureException e) {
                 Log.i("KeepaliveScheduler", "Failed to send keepalive packet. Probably because the client buffer was not yet initialized (or no longer).");
                 e.printStackTrace();
@@ -241,16 +243,25 @@ public class KeepaliveScheduler implements Runnable {
      * the checker should after every timeout countdown check if there was actually no new message received since then. If yes, it will cause the timeout onTimeoutCallback to be called
      * There is always only one checker for in timeouts.
      */
-    private void launchInTimeoutChecker(){
+    private void launchInTimeoutChecker() {
         Runnable check = new Runnable() {
             @Override
             public void run() {
                 float bonus = 0;
-                if(firstInTime){bonus = INITIAL_BONUS;}
-                if(System.currentTimeMillis() - lastInTime < INCOMING_TIMEOUT + bonus){
+                if (firstInTime) {
+                    bonus = INITIAL_BONUS;
+                }
+                long tempTime = System.currentTimeMillis() - lastInTime;
+                if (tempTime < INCOMING_TIMEOUT + bonus) {
+                    if (Debug.logKeepaliveSpam) {
+                        Log.d("keepalive", "firstInTime: " + firstInTime + "\ntime passed: " + tempTime);
+                    }
                     // don't timeout yet, launch new execution
                     launchInTimeoutChecker(); // yey recursion?!
                 } else {
+                    if (Debug.logKeepaliveSpam) {
+                        Log.d("keepalive", "TIMEOUT! firstInTime: " + firstInTime + "\ntime passed: " + tempTime);
+                    }
                     onInTimeout();
                 }
             }
@@ -258,7 +269,9 @@ public class KeepaliveScheduler implements Runnable {
 
         // before the first message, give a bonus of INITIAL_BONUS
         long bonus = 0;
-        if(firstInTime){bonus = INITIAL_BONUS;}
+        if (firstInTime) {
+            bonus = INITIAL_BONUS;
+        }
         long time_in = bonus + CHECK_IN_INTERVAL;
         futureIn = executorIn.schedule(check, time_in, TimeUnit.MILLISECONDS);
 
@@ -274,22 +287,26 @@ public class KeepaliveScheduler implements Runnable {
     /**
      * stops the internal timeout timers. Blocks until done so.
      */
-    private void onShuttingDown(){
+    private void onShuttingDown() {
         // stop the timers
-        if(futureIn!=null){
+        if (futureIn != null) {
             futureIn.cancel(false);
         }
-        if(futureOut!=null){
+        if (futureOut != null) {
             futureOut.cancel(false);
         }
-        executorIn.shutdown();
-        executorOut.shutdown();
+        if (executorIn != null) {
+            executorIn.shutdown();
+        }
+        if (executorOut != null) {
+            executorOut.shutdown();
+        }
     }
 
     /**
      * starts itself in a background thread. Returns a reference to that thread.
      */
-    public Thread runInParallel(){
+    public Thread runInParallel() {
         Thread t = new Thread(this);
         t.start();
         return t;
@@ -297,6 +314,11 @@ public class KeepaliveScheduler implements Runnable {
 
     @Override
     public void run() {
+
+        if (!Debug.useKeepalive) {
+            return; // do not use keepalive
+        }
+
         // initialize executors that are used in launchOutTimeoutChecker and launchInTimeoutChecker
         executorIn = Executors.newSingleThreadScheduledExecutor();
         executorOut = Executors.newSingleThreadScheduledExecutor();

@@ -47,13 +47,14 @@ public class Debug {
 
     public static boolean logKeepalivePackets = true; // set to false to reduce log spam from receiving/sending keepalive packets
     public static boolean logKeepaliveSpam = true; // set to false to reduce log spam from triggering maybe-timeouts
+    public static boolean useKeepalive = true; // set true to use keepalive mechanisms
 
     /**
      * called at program start in order to inform Devs about debug settings that may be unintentional
      */
     public static void debug_printInitialWarnings(){
-        if(!CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED)
-            Log.w("Debug", "Using CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false");
+        if(CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED)
+            Log.w("Debug", "Using deprecated CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = true");
         if(SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED>0)
             Log.w("Debug", "Using SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = "+SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED);
         if(logKeepalivePackets){
