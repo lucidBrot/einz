@@ -24,53 +24,44 @@
         android:keepScreenOn="true"
         android:orientation="vertical">
 
-        <LinearLayout
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="10"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_weight="2" />
 
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="2" />
+        <EditText
+            android:id="@+id/et_s_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:backgroundTint="@color/orange_brown"
+            android:hint="@string/et_s_username"
+            android:imeActionLabel="@string/IME_start_server"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="@color/orange_brown" />
 
-            <EditText
-                android:id="@+id/et_s_username"
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:layout_weight=".5"
-                android:backgroundTint="@color/orange_brown"
-                android:hint="@string/et_s_username"
-                android:imeActionLabel="@string/IME_start_server"
-                android:imeOptions="actionDone"
-                android:inputType="text"
-                android:maxLines="1"
-                android:textColor="@color/orange_brown" />
+        <CheckBox
+            android:id="@+id/cb_s_observer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight=".5"
+            android:buttonTint="@color/orange_brown"
+            android:drawableTint="@color/orange_brown"
+            android:text="@string/observer"
+            android:textColor="@color/orange_brown" />
 
-            <CheckBox
-                android:id="@+id/cb_s_observer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:drawableTint="@color/orange_brown"
-                android:text="@string/observer"
-                android:textColor="@color/orange_brown"
-                android:buttonTint="@color/orange_brown"
-                 />
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="5" />
-
-        </LinearLayout>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="6" />
 
         <Button
             android:id="@+id/btn_s_setupactivity_start_server"
             style="?metaButtonBarButtonStyle"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="10dp"
             android:layout_weight="1"
             android:background="@drawable/button_red"
             android:text="@string/start_server"
@@ -79,7 +70,7 @@
 
         <Space
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1" />
 
     </LinearLayout>
