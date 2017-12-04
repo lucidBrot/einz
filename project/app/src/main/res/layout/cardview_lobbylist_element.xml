@@ -27,12 +27,12 @@
             android:gravity="center">
 
             <ImageView
-                android:id="@+id/icn_role"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:scaleType="center"
-                android:tint="@color/green_darker"
-                app:srcCompat="@drawable/ic_person_black_24dp" />
+                    android:id="@+id/icn_role"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleType="fitCenter"
+                    android:tint="@color/green_darker"
+                    app:srcCompat="@drawable/ic_person_black_24dp"/>
         </RelativeLayout>
 
         <LinearLayout

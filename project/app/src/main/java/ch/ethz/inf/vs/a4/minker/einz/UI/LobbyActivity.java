@@ -308,8 +308,10 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    server.shutdown();
-                    server=null;
+                    if(server!=null) {
+                        server.shutdown();
+                        server = null;
+                    }
                 }
             };
             /*//old version
@@ -323,8 +325,10 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    ourClient.shutdown(true);
-                    ourClient=null;
+                    if(ourClient!=null) {
+                        ourClient.shutdown(true);
+                        ourClient = null;
+                    }
                 }
             };
             //old version

@@ -37,6 +37,7 @@
                 android:backgroundTint="@color/orange_brown"
                 android:hint="@string/tv_c_username"
                 android:maxLength="30"
+                android:inputType="text"
                 android:maxLines="1"
                 android:textColor="@color/orange_brown" />
 
