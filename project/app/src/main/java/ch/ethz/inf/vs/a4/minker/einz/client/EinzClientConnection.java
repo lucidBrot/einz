@@ -37,7 +37,6 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
     private Socket socket;
     private EinzClientConnection.OnMessageReceived mMessageListener = null; // interface on message received
     private EinzClient parentClient;
-    KeepaliveScheduler keepaliveScheduler;
 
     /**
      * @param serverIP
@@ -49,16 +48,10 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
         this.serverPort = serverPort;
         this.mMessageListener = messageListener;
         this.parentClient = parentClient;
-        this.keepaliveScheduler = new KeepaliveScheduler(this, new OnKeepaliveTimeoutCallback() {
-            @Override
-            public void onKeepaliveTimeout() {
-                EinzClientConnection.this.onKeepaliveTimeout();
-            }
-        });
 
     }
 
-    private void onKeepaliveTimeout() {
+    void onKeepaliveTimeout() {
         // TODO: onKeepaliveTimeout inform user that we lost connection
     }
 
@@ -78,7 +71,7 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
                 bufferOut.println(message);
                 bufferOut.flush();
             }
-            this.keepaliveScheduler.onAnyMessageSent();
+            this.parentClient.keepaliveScheduler.onAnyMessageSent();
         } else {
             Log.w("ClientConnection", "bufferOut was not available to send message "+message);
             throw new SendMessageFailureException("OutputBuffer was not ready to send the message. Please retry again when you are positive that it is not null (or has errors)");
@@ -143,8 +136,6 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
                 bufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), Globals.ENCODING));
 
                 String mServerMessage;
-
-                this.keepaliveScheduler.runInParallel(); // run the timeout timers in background
 
                 //in this while the client listens for the messages sent by the server
                 while (spin) {

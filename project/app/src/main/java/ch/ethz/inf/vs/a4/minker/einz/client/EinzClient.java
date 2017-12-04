@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.OnKeepaliveTimeoutCallback;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
@@ -29,6 +31,7 @@ public class EinzClient implements Runnable {
      * true if the client was shutdown (but apparently still exists)
      */
     private boolean dead;
+    public KeepaliveScheduler keepaliveScheduler;
 
     public String getUsername() {
         return username;
@@ -57,8 +60,14 @@ public class EinzClient implements Runnable {
         this.appContext = appContext;
         this.lobbyUI = lobbyUI;
         this.actionCallbackInterface = new ClientMessengerCallback(lobbyUI, appContext, this);
-        this.clientMessenger = new ClientMessenger(appContext, this.actionCallbackInterface);
+        this.clientMessenger = new ClientMessenger(appContext, this.actionCallbackInterface, this);
         this.connection = new EinzClientConnection(serverIP, serverPort, clientMessenger, this);
+        this.keepaliveScheduler= new KeepaliveScheduler(EinzClient.this.connection, new OnKeepaliveTimeoutCallback() {
+            @Override
+            public void onKeepaliveTimeout() {
+                EinzClient.this.connection.onKeepaliveTimeout();
+            }
+        });
         this.username = username;
         this.role = role;
         this.isHost = isHost;
@@ -105,6 +114,8 @@ public class EinzClient implements Runnable {
             Log.d("EinzClient/run", "server is up methinks"); // if server is running on localhost, it told us when it was ready to accept connections
             // still need to spin until isConnected to make sure we do not send register message before connecting, thus losing that message
         }
+
+        this.keepaliveScheduler.runInParallel(); // run the timeout timers in background
 
         // send messages in background because android does not allow networking in main thread
          if(!isHost){ // if the server runs on the same device, it will tell the client when it is ready to receive the registrationmessage, and will execute onServersideHandlerReady

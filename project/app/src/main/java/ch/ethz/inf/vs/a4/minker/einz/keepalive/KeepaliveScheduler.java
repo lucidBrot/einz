@@ -137,7 +137,7 @@ public class KeepaliveScheduler implements Runnable {
             throw new RuntimeException("Choose INCOMING_TIMEOUT for keepalive larger than 2*MAX_PING_FLUCTUATION!");
         }
 
-        CHECK_OUT_INTERVAL = SENDING_INTERVAL / 2L;
+        CHECK_OUT_INTERVAL = SENDING_INTERVAL / 4L;
         CHECK_IN_INTERVAL = INCOMING_TIMEOUT / 2L;
     }
 
@@ -258,7 +258,7 @@ public class KeepaliveScheduler implements Runnable {
         Runnable check = new Runnable() {
             @Override
             public void run() {
-                float bonus = 0;
+                long bonus = 0;
                 if (firstInTime) {
                     bonus = INITIAL_BONUS;
                 }
