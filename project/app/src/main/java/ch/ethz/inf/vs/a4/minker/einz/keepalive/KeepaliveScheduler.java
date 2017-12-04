@@ -137,7 +137,7 @@ public class KeepaliveScheduler implements Runnable {
             throw new RuntimeException("Choose INCOMING_TIMEOUT for keepalive larger than 2*MAX_PING_FLUCTUATION!");
         }
 
-        CHECK_OUT_INTERVAL = SENDING_INTERVAL / 4L;
+        CHECK_OUT_INTERVAL = SENDING_INTERVAL / 2L;
         CHECK_IN_INTERVAL = INCOMING_TIMEOUT / 2L;
     }
 
@@ -237,7 +237,7 @@ public class KeepaliveScheduler implements Runnable {
                 }
             } catch (SendMessageFailureException e) {
                 Log.i("KeepaliveScheduler", "Failed to send keepalive packet. Probably because the client buffer was not yet initialized (or no longer).");
-                e.printStackTrace();
+                // e.printStackTrace();
                 // There should either be a first message sent anyways or the incoming connection should be failing as well,
                 // So we don't do anything here
             }

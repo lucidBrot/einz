@@ -65,7 +65,7 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
      *
      * @param message text entered by client
      */
-    public void sendMessage(String message) throws SendMessageFailureException {
+    public synchronized void sendMessage(String message) throws SendMessageFailureException {
         if (bufferOut != null && !bufferOut.checkError()) {
             synchronized (bufferMonitor) {
                 bufferOut.println(message);
@@ -87,7 +87,7 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
      * @param message
      * @see #sendMessage(String)
      */
-    public void sendMessage(JSONObject message) throws SendMessageFailureException {
+    public synchronized void sendMessage(JSONObject message) throws SendMessageFailureException {
         String msg = message.toString();
         // don't add \r\n because println
         sendMessage(msg);
@@ -103,7 +103,7 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
      * @see #sendMessage(JSONObject)
      * @see #sendMessage(String)
      */
-    public void sendMessage(EinzMessage message) throws SendMessageFailureException {
+    public synchronized void sendMessage(EinzMessage message) throws SendMessageFailureException {
         try {
             sendMessage(message.toJSON());
         } catch (JSONException e) {
