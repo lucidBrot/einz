@@ -366,7 +366,7 @@ public class EinzServerClientHandler implements Runnable, SendMessageCallback{
     private EinzAction parseMessage(String message){
         try {
             EinzParser einzParser = this.einzParserFactory.generateEinzParser(message);
-            EinzMessage<? extends EinzMessageBody> einzMessage = einzParser.parse(message); // TODO: implement parser, especially for when message is not valid
+            EinzMessage<? extends EinzMessageBody> einzMessage = einzParser.parse(message);
 
             //<Debug>
             /*EinzMessage einzMessage = new EinzMessage(

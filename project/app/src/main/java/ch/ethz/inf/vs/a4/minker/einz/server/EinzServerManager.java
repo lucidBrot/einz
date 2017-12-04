@@ -326,7 +326,7 @@ public class EinzServerManager {
                 if(role.equals("player")) {
                     serverFunctionInterface.removePlayer(new Player(username));
                 } else if(role.equals("specator")){
-                    // TODO: removeSpecator from fabian once the interface offers this
+                    // could inform fabian but he doesn't care
                 }
                 SFLock.writeLock().unlock();
             }
@@ -570,9 +570,8 @@ public class EinzServerManager {
         }
     }
 
-    public void specifyRules(ArrayList<BasicRule> ruleset) { //TODO: readwritelock on serverFunctionInterface
+    public void specifyRules(ArrayList<BasicRule> ruleset) {
         // TODO: RULES: specifyRules. How is the deck transmitted? in what format should I pass the rules?
-        // TODO: add message for endTurn Action to docs and implement
         // TODO: RULES: rulemessage
     }
 

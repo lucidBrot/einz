@@ -34,5 +34,5 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
         }
         body.put("ruleset",ruleset);
         return body;
-    }
+    } // TODO: specifyRules message and action, as well as sendRules or what it is called
 }
