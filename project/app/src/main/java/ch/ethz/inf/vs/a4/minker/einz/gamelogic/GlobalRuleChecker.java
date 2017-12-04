@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
@@ -116,6 +117,31 @@ public class GlobalRuleChecker {
     public static GlobalState checkOnPlayerFinished(GlobalState state, Player player, GameConfig gameConfig) {
         for (BasicGlobalRule r : gameConfig.globalRules) {
             state = r.onPlayerFinished(state, player);
+        }
+        return state;
+    }
+
+    /**
+     * Called after a card player decides to draw a card
+     * @param state
+     * @return
+     */
+    public static GlobalState checkOnDrawCard(GlobalState state, GameConfig gameConfig){
+        for (BasicGlobalRule r : gameConfig.globalRules) {
+            state = r.onDrawCard(state);
+        }
+        return state;
+    }
+
+    /**
+     * Called on any card the player plays.
+     * @param state
+     * @param played
+     * @return
+     */
+    public static GlobalState checkOnPlayAnyCard(GlobalState state, Card played, GameConfig gameConfig){
+        for (BasicGlobalRule r : gameConfig.globalRules) {
+            state = r.onPlayAnyCard(state, played);
         }
         return state;
     }

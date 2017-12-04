@@ -56,12 +56,6 @@ public class ServerFunction implements ServerFunctionDefinition {
         }
     }
 
-    public void initialiseStandardGame(ArrayList<Player> players, HashSet<Spectator> spectators) {
-        // Wieso eine arraylist und ein hashset?
-        // Weil wir die Spieler in geordneter Reihenfolge brauchen, die Zuschauer aber nicht.
-    }
-
-
     /**
      * initialises a new game
      *
@@ -121,6 +115,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState.addCardToDiscardPile(card);
             CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
             CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+            GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             return true;
         } else {
             return false;

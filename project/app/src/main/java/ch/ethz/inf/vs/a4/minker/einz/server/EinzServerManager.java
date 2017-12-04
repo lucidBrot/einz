@@ -98,7 +98,7 @@ public class EinzServerManager {
         this.gamePhaseStarted = true;
         userListLock.writeLock().unlock();
         SFLock.writeLock().lock();
-        getServerFunctionInterface().initialiseStandardGame(players, new HashSet<>(spectators)); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+        getServerFunctionInterface().initialiseStandardGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
         // TODO: not standard game but with rules, maybe call initialise earlier
         // TODO: send initGame to clients at some point. either here or on receiving specifyRules
         SFLock.writeLock().unlock();
