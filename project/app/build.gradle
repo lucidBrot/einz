@@ -59,4 +59,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.json:json:20080701'
     compile project(':libs:hotspotmanager')
+    compile 'com.android.support:recyclerview-v7:25.3.1'
 }
