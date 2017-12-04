@@ -27,5 +27,5 @@ public class Globals {
     public static final long KEEPALIVE_DEFAULT_INCOMING_TIMEOUT = 1000L; // how long without incoming messages incoming until a timeout should be triggered
     public static final int KEEPALIVE_DEFAULT_MAX_SUPPORTED_PING = 1000; // the maximally supported ping
     public static final int KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION = 100; // how much the ping may diverge up or down from the average, if the average is MAX_SUPPORTED_PING.
-
+    public static final long KEEPALIVE_GRACE_PERIOD = 100L; // some additional time difference between the time interval of sending a packet and the time interval of needing to receive it.
 }

@@ -37,8 +37,11 @@ public class KeepaliveScheduler implements Runnable {
     // So we choose MAX_SUPPORTED_PING and INCOMING_TIMEOUT, e.g. 1000 ms and 3000 ms
     // ==> INITIAL_BONUS = MAX_SUPPORTED_PING - INCOMING_TIMEOUT, i.e. for our example negative, thus no bonus is needed
     //
-    // And we chose MAX_PING_FLUCTUATION, e.g. 100 ms
+    // And we choose MAX_PING_FLUCTUATION, e.g. 100 ms
     // ==> SENDING_INTERVAL = INCOMING_TIMEOUT - 2*MAX_PING_FLUCTUATION, i.e for our example positive and thus possible: 2800 ms
+    //
+    // In a completely stable network, it is ok to have SENDING_INTERVAL equal INCOMING_TIMEOUT, but because messageparsing takes also some time,
+    // it would be better to also allow some GRACE_PERIOD difference.
 
     /**
      * Internally, the {@link ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler} does the following:
@@ -127,7 +130,7 @@ public class KeepaliveScheduler implements Runnable {
             INITIAL_BONUS = initialBonus;
         }
 
-        SENDING_INTERVAL = INCOMING_TIMEOUT - 2L*MAX_PING_FLUCTUATION;
+        SENDING_INTERVAL = INCOMING_TIMEOUT - 2L*MAX_PING_FLUCTUATION - Globals.KEEPALIVE_GRACE_PERIOD;
         if(SENDING_INTERVAL <= 0){
             // wtf are you doing
             throw new RuntimeException("Choose INCOMING_TIMEOUT for keepalive larger than 2*MAX_PING_FLUCTUATION!");
@@ -151,18 +154,8 @@ public class KeepaliveScheduler implements Runnable {
      * @param onTimeoutCallback A interface to be called when the keepalive timeout is triggered. You are responsible that this is run in the main thread if you need it to.
      */
     public KeepaliveScheduler(SendMessageCallback sendMessageCallback, OnKeepaliveTimeoutCallback onTimeoutCallback){
-        INCOMING_TIMEOUT = Globals.KEEPALIVE_DEFAULT_INCOMING_TIMEOUT;
-        MAX_SUPPORTED_PING = Globals.KEEPALIVE_DEFAULT_MAX_SUPPORTED_PING;
-        MAX_PING_FLUCTUATION = Globals.KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION;
-
-        this.INITIAL_BONUS = 0;
-        SENDING_INTERVAL = 800;
-
-        CHECK_OUT_INTERVAL = SENDING_INTERVAL/2L;
-        CHECK_IN_INTERVAL = INCOMING_TIMEOUT/2L;
-
-        this.sendMessageCallback = sendMessageCallback;
-        this.onTimeoutCallback = onTimeoutCallback;
+        this(Globals.KEEPALIVE_DEFAULT_INCOMING_TIMEOUT, Globals.KEEPALIVE_DEFAULT_MAX_SUPPORTED_PING, Globals.KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION,
+                sendMessageCallback, onTimeoutCallback);
     }
 
     /**
