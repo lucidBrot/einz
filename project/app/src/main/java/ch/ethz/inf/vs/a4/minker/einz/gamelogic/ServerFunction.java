@@ -23,6 +23,7 @@ import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.Spectator;
 import ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.ResetCardsToDrawRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.StartGameWithCardsRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.WinOnNoCardsRule;
 
@@ -193,6 +194,8 @@ public class ServerFunction implements ServerFunctionDefinition {
         for (CardColor cc : CardColor.values()) {
             result.assignRuleToCard(new ChangeDirectionRule(), new Card("temp", CardText.SWITCHORDER.type, CardText.SWITCHORDER, cc));
         }
+        result.assignRuleToCard(new ResetCardsToDrawRule(), new Card("temp", CardText.ZERO.type, CardText.ZERO, CardColor.BLUE));
+        //TODO: Change "assigned" dummy Card to something with prupose
         return result;
     }
 

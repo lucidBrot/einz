@@ -17,7 +17,7 @@ public class GlobalRuleChecker {
      * @param toKick The Player that should be kicked
      * @return
      */
-    public boolean checkIsValidKickPlayer(GlobalState state, Player toKick, GameConfig gameConfig) {
+    public static boolean checkIsValidKickPlayer(GlobalState state, Player toKick, GameConfig gameConfig) {
         return false;
     }
 
@@ -28,7 +28,7 @@ public class GlobalRuleChecker {
      * @param leaves The Player that wants to leave
      * @return
      */
-    public boolean checkIsValidLeaveGame(GlobalState state, Player leaves, GameConfig gameConfig) {
+    public static boolean checkIsValidLeaveGame(GlobalState state, Player leaves, GameConfig gameConfig) {
         return false;
     }
 
@@ -38,7 +38,7 @@ public class GlobalRuleChecker {
      * @param state
      * @return
      */
-    public boolean checkIsValidEndTurn(GlobalState state, GameConfig gameConfig) {
+    public static boolean checkIsValidEndTurn(GlobalState state, GameConfig gameConfig) {
         return false;
     }
 
@@ -49,7 +49,7 @@ public class GlobalRuleChecker {
      * @param player The Player to check if he finished
      * @return
      */
-    public boolean checkIsPlayerFinished(GlobalState state, Player player, GameConfig gameConfig) {
+    public static boolean checkIsPlayerFinished(GlobalState state, Player player, GameConfig gameConfig) {
         return false;
     }
 
@@ -60,7 +60,10 @@ public class GlobalRuleChecker {
      * @param state
      * @return
      */
-    public GlobalState checkOnKickPlayer(GlobalState state, GameConfig gameConfig) {
+    public static GlobalState checkOnKickPlayer(GlobalState state, GameConfig gameConfig) {
+        for (BasicGlobalRule r : gameConfig.globalRules) {
+            state = r.onKickPlayer(state);
+        }
         return state;
     }
 
@@ -70,7 +73,10 @@ public class GlobalRuleChecker {
      * @param state
      * @return
      */
-    public GlobalState checkOnLeaveGame(GlobalState state, GameConfig gameConfig) {
+    public static GlobalState checkOnLeaveGame(GlobalState state, GameConfig gameConfig) {
+        for (BasicGlobalRule r : gameConfig.globalRules) {
+            state = r.onLeaveGame(state);
+        }
         return state;
     }
 
@@ -93,7 +99,10 @@ public class GlobalRuleChecker {
      * @param state
      * @return
      */
-    public GlobalState checkOnEndTurn(GlobalState state, GameConfig gameConfig) {
+    public static GlobalState checkOnEndTurn(GlobalState state, GameConfig gameConfig) {
+        for (BasicGlobalRule r : gameConfig.globalRules) {
+            state = r.onEndTurn(state);
+        }
         return state;
     }
 
@@ -104,7 +113,10 @@ public class GlobalRuleChecker {
      * @param player The Player that has finished
      * @return
      */
-    public GlobalState checkOnPlayerFinished(GlobalState state, Player player, GameConfig gameConfig) {
+    public static GlobalState checkOnPlayerFinished(GlobalState state, Player player, GameConfig gameConfig) {
+        for (BasicGlobalRule r : gameConfig.globalRules) {
+            state = r.onPlayerFinished(state, player);
+        }
         return state;
     }
 }
