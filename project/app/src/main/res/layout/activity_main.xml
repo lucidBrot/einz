@@ -7,33 +7,131 @@
     tools:context="ch.ethz.inf.vs.a4.minker.einz.UI.MainActivity">
 
     <LinearLayout
-            android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/orange_default"
+        android:orientation="vertical">
+
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        <Button
-                android:text="@string/btn_s_host_game"
+            android:layout_height="0dp"
+            android:layout_weight=".5" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="2"
+            android:foregroundGravity="center">
+
+            <ImageView
+                android:id="@+id/imageView2"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/btn_s_host_game" android:layout_weight="1"/>
-        <Button
-                android:text="@string/btn_c_join_game"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                app:srcCompat="@drawable/logo_transparent" />
+
+        </FrameLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".5" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight=".1"
+            android:background="@color/orange_dark"
+            android:orientation="horizontal"></LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:background="@color/blue_default"
+            android:orientation="horizontal">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="3"
+                android:orientation="vertical">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight=".5" />
+
+                <Button
+                    android:id="@+id/btn_c_join_game"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight=".5"
+                    android:background="@drawable/button_red"
+                    android:text="@string/btn_c_join_game"
+                    android:textColor="@color/red_darker"></Button>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight=".5" />
+
+                <Button
+                    android:id="@+id/btn_s_host_game"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight=".5"
+                    android:background="@drawable/button_red"
+                    android:elevation="0dp"
+                    android:text="@string/btn_s_host_game"
+                    android:textColor="@color/red_darker" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight=".5" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btn_start_client"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:id="@+id/btn_c_join_game" android:layout_weight="1"></Button>
-    </LinearLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                  android:orientation="horizontal" android:layout_centerHorizontal="true"
-                  android:layout_alignParentBottom="true">
-        <Button
+                android:layout_height="wrap_content"
                 android:text="start client"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" tools:layout_editor_absoluteY="230dp"
-                tools:layout_editor_absoluteX="230dp" android:id="@+id/btn_start_client"/>
+                tools:layout_editor_absoluteX="230dp"
+                tools:layout_editor_absoluteY="230dp" />
 
-        <Button
+            <Button
+                android:id="@+id/btn_start_server"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="start server"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" tools:layout_editor_absoluteY="230dp"
-                tools:layout_editor_absoluteX="64dp" android:id="@+id/btn_start_server"/>
+                tools:layout_editor_absoluteX="64dp"
+                tools:layout_editor_absoluteY="230dp" />
 
+        </LinearLayout>
     </LinearLayout>
+
 
 </RelativeLayout>

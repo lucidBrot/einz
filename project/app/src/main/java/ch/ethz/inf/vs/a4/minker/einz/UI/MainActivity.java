@@ -5,20 +5,20 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Toast;
 
 import ch.ethz.inf.vs.a4.minker.einz.R;
-import ch.ethz.inf.vs.a4.minker.einz.UI.ClientSetupActivity;
-import ch.ethz.inf.vs.a4.minker.einz.UI.ServerSetupActivity;
-import ch.ethz.inf.vs.a4.minker.einz.client.ClientActivity;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends FullscreenActivity implements View.OnClickListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch(view.getId()){
             case R.id.btn_start_client:
                 // start client
-                Intent cintent = new Intent(this, ClientActivity.class);
+                Intent cintent = new Intent(this, PlayerActivity.class);
                 startActivity(cintent);
                 break;
             case R.id.btn_start_server:
