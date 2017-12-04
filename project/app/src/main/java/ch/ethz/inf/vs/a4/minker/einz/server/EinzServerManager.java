@@ -641,6 +641,7 @@ public class EinzServerManager {
         if(gamePhaseStarted){
             // TODO: get state from fabian
 
+
         } else {
             // TODO: return empty state in message
 
@@ -655,6 +656,7 @@ public class EinzServerManager {
         if(gamePhaseStarted) { // ignore otherwise
             getSFLock().writeLock().lock();
             // TODO: call fabians on finish turn
+
 
             getSFLock().writeLock().unlock();
             throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
