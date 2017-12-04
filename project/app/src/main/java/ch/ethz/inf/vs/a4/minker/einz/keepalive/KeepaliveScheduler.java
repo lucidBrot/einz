@@ -5,7 +5,7 @@ import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepaliveMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepAliveMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 
 import java.util.concurrent.*;
@@ -226,9 +226,9 @@ public class KeepaliveScheduler implements Runnable {
         // sendMessageCallback.sendMessage("keepalive");
 
         if (!inTimeoutTriggered) { // if there was a timeout regarding incoming packets, then we don't need to send any more keepalive packets
-            EinzMessage<EinzKeepaliveMessageBody> message = new EinzMessage<>(
+            EinzMessage<EinzKeepAliveMessageBody> message = new EinzMessage<>(
                     new EinzMessageHeader("networking", "KeepAlive"),
-                    new EinzKeepaliveMessageBody()
+                    new EinzKeepAliveMessageBody()
             );
             try {
                 sendMessageCallback.sendMessage(message);
