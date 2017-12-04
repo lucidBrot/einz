@@ -127,8 +127,7 @@ public class EinzServerClientHandler implements Runnable, SendMessageCallback{
             e.printStackTrace();
         }
 
-        this.keepaliveScheduler = new KeepaliveScheduler(Globals.KEEPALIVE_TIMEOUT, Globals.KEEPALIVE_INITIAL_BONUS,
-                this, new OnKeepaliveTimeoutCallback() {
+        this.keepaliveScheduler = new KeepaliveScheduler(this, new OnKeepaliveTimeoutCallback() {
             @Override
             public void onKeepaliveTimeout() {
                 Log.d("keepalive", "user lost connection");

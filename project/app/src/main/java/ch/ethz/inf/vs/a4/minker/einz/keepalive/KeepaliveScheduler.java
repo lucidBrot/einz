@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.keepalive;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
@@ -15,8 +16,61 @@ import java.util.concurrent.*;
  */
 public class KeepaliveScheduler implements Runnable {
 
-    private final long timeout;
-    private final long timeout_initial_bonus;
+    //<editor-fold desc="Comment on how the calculations work">
+    // After a message was received, the receiver waits INCOMING_TIMEOUT until the next message.
+    // So we have to send the next message INCOMING_TIMEOUT after the previous message, assuming the network is of stable speed.
+    // But because it is not, we need to state how much additional ping we want to allow, using the MAX_PING_FLUCTUATION
+    // when the network is suddenly faster and then slower, each by MAX_PING_FLUCTUATION, then the connection should still be considered (just) alive.
+    // So at worst fluctuation, the receiver will receive one packet at time t and one packet at time t+SENDING_INTERVAL+(2*MAX_PING_FLUCTUATION)
+    // This means we need to have
+    // SENDING_INTERVAL+2*MAX_PING_FLUCTUATION <= INCOMING_TIMEOUT
+    //
+    // And to support a maximal ping of MAX_PING_SUPPORTED we need to have
+    // MAX_PING_SUPPORTED <= INITIAL_INCOMING_TIMEOUT
+    // Because once the whole system is working, we always have a message underway, and no matter the toatal ping,
+    // there should always be a message incoming within the timespan supported (unless we have heavy fluctuation)
+    //
+    // To support MAX_PING_SUPPORTED, we need to ensure that the first message has the time to reach the target.
+    // We do this by initially giving more time until we get the first message:
+    // MAX_SUPPORTED_PING <= INCOMING_TIMEOUT + INITIAL_BONUS
+    //
+    // So we choose MAX_SUPPORTED_PING and INCOMING_TIMEOUT, e.g. 1000 ms and 3000 ms
+    // ==> INITIAL_BONUS = MAX_SUPPORTED_PING - INCOMING_TIMEOUT, i.e. for our example negative, thus no bonus is needed
+    //
+    // And we chose MAX_PING_FLUCTUATION, e.g. 100 ms
+    // ==> SENDING_INTERVAL = INCOMING_TIMEOUT - 2*MAX_PING_FLUCTUATION, i.e for our example positive and thus possible: 2800 ms
+
+    /**
+     * Internally, the {@link ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler} does the following:
+     * Every time a message is sent or received, it stores the current time
+     * in {@link ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler#lastInTime}
+     * and {@link ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler#lastOutTime}.
+     *
+     * A parallel thread checks every CHECK_TIMEOUT ms whether a timeout should be triggered.
+     * For this, using the Nyquist-Shannon theorem, CHECK_TIMEOUT must be at most half of INCOMING_TIMEOUT and/or SENDING_INTERVAL
+     * That way, we will always notice within the INCOMING_TIMEOUT/SENDING_INTERVAL that we need to react.
+     **/
+
+    // When choosing the INCOMING_TIMEOUT, it is a tradeoff between how fast we notice somebody has lost connection and how fast
+    // we need to send messages.
+    // I think a good compromise would be to notice loss of connection after one second:
+    // ==> INCOMING_TIMEOUT = 1000 (chosen)
+    // ==> MAX_SUPPORTED_PING = 1000 (chosen)
+    // ==> MAX_PING_FLUCTUATION = 100
+    // ==> INITIAL_BONUS = 0
+    // ==> SENDING_INTERVAL = 800
+    // ==> CHECK_OUT_INTERVAL = SENDING_INTERVAL/2
+    // ==> CHECK_IN_INTERVAL = INCOMING_TIMEOUT/2
+            //</editor-fold>
+
+
+    private final long CHECK_OUT_INTERVAL;
+    private final long CHECK_IN_INTERVAL;
+    private final long SENDING_INTERVAL;
+    private final long INCOMING_TIMEOUT;
+    private final int MAX_SUPPORTED_PING;
+    private final int MAX_PING_FLUCTUATION;
+    private final long INITIAL_BONUS; // only on the receiving part
     private SendMessageCallback sendMessageCallback;
     private final OnKeepaliveTimeoutCallback onTimeoutCallback;
 
@@ -30,20 +84,83 @@ public class KeepaliveScheduler implements Runnable {
     private ScheduledFuture<?> futureIn; // used to cancel the pending checks
     private ScheduledFuture<?> futureOut;
 
+
+    // When choosing the INCOMING_TIMEOUT, it is a tradeoff between how fast we notice somebody has lost connection and how fast
+    // we need to send messages.
+    // I think a good compromise would be to notice loss of connection after one second. Example:
+    // ==> INCOMING_TIMEOUT = 1000 (chosen)
+    // ==> MAX_SUPPORTED_PING = 1000 (chosen)
+    // ==> MAX_PING_FLUCTUATION = 100
+    // ==> INITIAL_BONUS = 0
+    // ==> SENDING_INTERVAL = 800
+    // ==> CHECK_OUT_INTERVAL = SENDING_INTERVAL/.2
+    // ==> CHECK_IN_INTERVAL = INCOMING_TIMEOUT/.2
+
     /**
      * Initializes the KeepaliveScheduler. Still need to start it later!
      * After timeout milliseconds not receiving a message, a timeout will trigger. However, if the sending of a message on our side happens first, there will still be a socket IOException (AND then this timeout):
-     * @param timeout The time in ms until the socket is closed unless there were incoming messages during this timespan.
+     * Calculates internal things based on your specifications here.
+     * This constructor will crash at runtime if you pass it retarded arguments!
+     * @param incomingTimeout The time in ms until the socket is closed unless there were incoming messages during this timespan.
      *                This is also the time in ms until this class sends a new keepalive message if there were no outgoing messages during this timespan.
      *                See protocols/server_thoughts.md on github for more details.
-     * @param timeout_initial_bonus The first timer will start counting down from <literal>timeout + timeout_initial_bonus</literal> in case you want to give the initialization phase more time without instantly timing out.
+     * @param maxSupportedPing The maximal ping that should still be able to reliably connect. Larger pings <i>might</i> work if they are still within the fluctuation region
+     * @param maxPingFluctuation (from the expected ping both up- and/or downwards)
      * @param sendMessageCallback A interface to send messages to the other party.
      * @param onTimeoutCallback A interface to be called when the keepalive timeout is triggered. You are responsible that this is run in the main thread if you need it to.
      */
-    public KeepaliveScheduler(long timeout, long timeout_initial_bonus, SendMessageCallback sendMessageCallback, OnKeepaliveTimeoutCallback onTimeoutCallback){
+    public KeepaliveScheduler(long incomingTimeout, int maxSupportedPing, int maxPingFluctuation, SendMessageCallback sendMessageCallback, OnKeepaliveTimeoutCallback onTimeoutCallback){
+        INCOMING_TIMEOUT = incomingTimeout;
+        MAX_SUPPORTED_PING = maxSupportedPing;
+        MAX_PING_FLUCTUATION = maxPingFluctuation;
+        this.sendMessageCallback = sendMessageCallback;
+        this.onTimeoutCallback = onTimeoutCallback;
+        if(INCOMING_TIMEOUT < 0 || MAX_PING_FLUCTUATION < 0 || MAX_SUPPORTED_PING <0 || sendMessageCallback == null || onTimeoutCallback == null){
+            throw new RuntimeException("Bad arguments for KeepaliveScheduler");
+        }
 
-        this.timeout = timeout;
-        this.timeout_initial_bonus = timeout_initial_bonus;
+        long initialBonus = MAX_SUPPORTED_PING - INCOMING_TIMEOUT;
+        if(initialBonus<0){
+            // no bonus needed
+            INITIAL_BONUS = 0;
+        } else {
+            INITIAL_BONUS = initialBonus;
+        }
+
+        SENDING_INTERVAL = INCOMING_TIMEOUT - 2L*MAX_PING_FLUCTUATION;
+        if(SENDING_INTERVAL <= 0){
+            // wtf are you doing
+            throw new RuntimeException("Choose INCOMING_TIMEOUT for keepalive larger than 2*MAX_PING_FLUCTUATION!");
+        }
+
+        CHECK_OUT_INTERVAL = SENDING_INTERVAL/2L;
+        CHECK_IN_INTERVAL = INCOMING_TIMEOUT/2L;
+    }
+
+    /**
+     * chooses default settings (see Globals.java):
+     * Example:
+     * INCOMING_TIMEOUT = 1000 (chosen)
+     * MAX_SUPPORTED_PING = 1000 (chosen)
+     * MAX_PING_FLUCTUATION = 100
+     * INITIAL_BONUS = 0
+     * SENDING_INTERVAL = 800
+     * CHECK_OUT_INTERVAL = SENDING_INTERVAL/2
+     * CHECK_IN_INTERVAL = INCOMING_TIMEOUT/2
+     * @param sendMessageCallback A interface to send messages to the other party.
+     * @param onTimeoutCallback A interface to be called when the keepalive timeout is triggered. You are responsible that this is run in the main thread if you need it to.
+     */
+    public KeepaliveScheduler(SendMessageCallback sendMessageCallback, OnKeepaliveTimeoutCallback onTimeoutCallback){
+        INCOMING_TIMEOUT = Globals.KEEPALIVE_DEFAULT_INCOMING_TIMEOUT;
+        MAX_SUPPORTED_PING = Globals.KEEPALIVE_DEFAULT_MAX_SUPPORTED_PING;
+        MAX_PING_FLUCTUATION = Globals.KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION;
+
+        this.INITIAL_BONUS = 0;
+        SENDING_INTERVAL = 800;
+
+        CHECK_OUT_INTERVAL = SENDING_INTERVAL/2L;
+        CHECK_IN_INTERVAL = INCOMING_TIMEOUT/2L;
+
         this.sendMessageCallback = sendMessageCallback;
         this.onTimeoutCallback = onTimeoutCallback;
     }
@@ -76,10 +193,8 @@ public class KeepaliveScheduler implements Runnable {
         Runnable check = new Runnable() {
             @Override
             public void run() {
-                float bonus = 0;
-                if(firstOutTime){bonus = timeout_initial_bonus;}
                 long tempTime = System.currentTimeMillis() - lastOutTime;
-                if(tempTime < timeout + bonus){
+                if(tempTime < SENDING_INTERVAL){
                     if(Debug.logKeepaliveSpam){
                         Log.d("keepalive", "firstOutTime: "+firstOutTime+"\ntime passed: "+tempTime);
                     }
@@ -98,11 +213,7 @@ public class KeepaliveScheduler implements Runnable {
             }
         };
 
-        // before the first message, give a bonus of timeout_initial_bonus
-        long bonus = 0;
-        if(firstOutTime){bonus = timeout_initial_bonus;}
-        long time_out = bonus + timeout;
-        futureOut = executorOut.schedule(check, time_out, TimeUnit.MILLISECONDS);
+        futureOut = executorOut.schedule(check, CHECK_OUT_INTERVAL, TimeUnit.MILLISECONDS);
 
         // the task is now scheduled. after the timeout will it check whether it should actually trigger a timeout.
         // the ScheduledFuture could be used to cancel this again
@@ -142,8 +253,8 @@ public class KeepaliveScheduler implements Runnable {
             @Override
             public void run() {
                 float bonus = 0;
-                if(firstInTime){bonus = timeout_initial_bonus;}
-                if(System.currentTimeMillis() - lastInTime < timeout + bonus){
+                if(firstInTime){bonus = INITIAL_BONUS;}
+                if(System.currentTimeMillis() - lastInTime < INCOMING_TIMEOUT + bonus){
                     // don't timeout yet, launch new execution
                     launchInTimeoutChecker(); // yey recursion?!
                 } else {
@@ -152,10 +263,10 @@ public class KeepaliveScheduler implements Runnable {
             }
         };
 
-        // before the first message, give a bonus of timeout_initial_bonus
+        // before the first message, give a bonus of INITIAL_BONUS
         long bonus = 0;
-        if(firstInTime){bonus = timeout_initial_bonus;}
-        long time_in = bonus + timeout;
+        if(firstInTime){bonus = INITIAL_BONUS;}
+        long time_in = bonus + CHECK_IN_INTERVAL;
         futureIn = executorIn.schedule(check, time_in, TimeUnit.MILLISECONDS);
 
         // the task is now scheduled. after the timeout will it check whether it should actually trigger a timeout.

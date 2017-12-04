@@ -24,43 +24,8 @@ public class Globals {
 
     // so UTF-8 should suffice for our purposes
 
-    public static final long KEEPALIVE_INCOMING_TIMEOUT = 3000; // how long without incoming messages incoming until a timeout should be triggered
-    public static final long KEEPALIVE_INITIAL_BONUS = ; // is added on the first message received timeout
-    public static final long KEEPALIVE_OUTGOING_TIMEOUT =;
-    public static final long KEEPALIVE_MAX_PING_FLUCTUATION;// how much in positive and negative direction the ping may fluctuate at most
-    public static final long KEEPALIVE_SENDING_INTERVAL = ; // how often to send a keepalive packet
-        // ^this is so because we need to send early enough that the whole time it takes the packet to reach the other end is still supported
-        // After a message was received, the receiver waits INCOMING_TIMEOUT until the next message.
-        // So we have to send the next message INCOMING_TIMEOUT after the previous message, assuming the network is of stable speed.
-        // But because it is not, we need to state how much additional ping we want to allow, using the MAX_PING_FLUCTUATION
-        // when the network is suddenly faster and then slower, each by MAX_PING_FLUCTUATION, then the connection should still be considered (just) alive.
-        // So at worst fluctuation, the receiver will receive one packet at time t and one packet at time t+SENDING_INTERVAL+(2*MAX_PING_FLUCTUATION)
-        // This means we need to have
-        // SENDING_INTERVAL+2*MAX_PING_FLUCTUATION <= INCOMING_TIMEOUT
-        //
-        // And to support a maximal ping of MAX_PING_SUPPORTED we need to have
-        // MAX_PING_SUPPORTED <= INITIAL_INCOMING_TIMEOUT
-        // Because once the whole system is working, we always have a message underway, and no matter the toatal ping,
-        // there should always be a message incoming within the timespan supported (unless we have heavy fluctuation)
-        //
-        // To support MAX_PING_SUPPORTED, we need to ensure that the first message has the time to reach the target.
-        // We do this by initially giving more time until we get the first message:
-        // MAX_SUPPORTED_PING <= INCOMING_TIMEOUT + INITIAL_BONUS
-        //
-        // So we choose MAX_SUPPORTED_PING and INCOMING_TIMEOUT, e.g. 1000 ms and 3000 ms
-        // ==> INITIAL_BONUS = MAX_SUPPORTED_PING - INCOMING_TIMEOUT, i.e. for our example negative, thus no bonus is needed
-        //
-        // And we chose MAX_PING_FLUCTUATION, e.g. 100 ms
-        // ==> SENDING_INTERVAL = INCOMING_TIMEOUT - 2*MAX_PING_FLUCTUATION, i.e for our example positive and thus possible: 2800 ms
-    public static final long KEEPALIVE_
-    /**
-     * Internally, the {@link ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler} does the following:
-     * Every time a message is sent or received, it stores the current time
-     * in {@link ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler#lastInTime}
-     * and {@link ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler#lastOutTime}.
-     *
-     * A parallel thread checks every CHECK_TIMEOUT ms whether a timeout should be triggered.
-     * For this, using the Nyquist-Shannon theorem, CHECK_TIMEOUT must be at most half of INCOMING_TIMEOUT and/or SENDING_INTERVAL
-     *
-     **/
+    public static final long KEEPALIVE_DEFAULT_INCOMING_TIMEOUT = 1000L; // how long without incoming messages incoming until a timeout should be triggered
+    public static final int KEEPALIVE_DEFAULT_MAX_SUPPORTED_PING = 1000; // the maximally supported ping
+    public static final int KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION = 100; // how much the ping may diverge up or down from the average, if the average is MAX_SUPPORTED_PING.
+
 }
