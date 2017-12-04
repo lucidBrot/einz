@@ -131,7 +131,7 @@ public class KeepaliveScheduler implements Runnable {
             INITIAL_BONUS = initialBonus;
         }
 
-        SENDING_INTERVAL = INCOMING_TIMEOUT/2L - 2L * MAX_PING_FLUCTUATION - Globals.KEEPALIVE_GRACE_PERIOD; // TODO: reason about this
+        SENDING_INTERVAL = INCOMING_TIMEOUT/2L - 2L * MAX_PING_FLUCTUATION - Globals.KEEPALIVE_GRACE_PERIOD;
         if (SENDING_INTERVAL <= 0) {
             // wtf are you doing
             throw new RuntimeException("Choose INCOMING_TIMEOUT for keepalive larger than 2*MAX_PING_FLUCTUATION!");
@@ -206,7 +206,7 @@ public class KeepaliveScheduler implements Runnable {
                         Log.d("keepalive", "TimeOUTOUT!\ntempTime: "+tempTime);
                     }
                     onOutTimeout();
-                    // TODO: does this recursion filling the stack need to be considered in terms of memory?
+                    // does this recursion filling the stack need to be considered in terms of memory?
                 }
             }
         };
