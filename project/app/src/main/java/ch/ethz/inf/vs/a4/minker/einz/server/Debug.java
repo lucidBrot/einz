@@ -45,7 +45,8 @@ public class Debug {
     public static long a_startTime = 0;
     public static long a_endTime = 0;
 
-    public static boolean logKeepalivePackets = true; // set to false to reduce log spam
+    public static boolean logKeepalivePackets = true; // set to false to reduce log spam from receiving/sending keepalive packets
+    public static boolean logKeepaliveSpam = true; // set to false to reduce log spam from triggering maybe-timeouts
 
     /**
      * called at program start in order to inform Devs about debug settings that may be unintentional

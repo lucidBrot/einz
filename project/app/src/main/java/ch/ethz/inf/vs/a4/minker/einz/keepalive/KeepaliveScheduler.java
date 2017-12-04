@@ -1,6 +1,10 @@
 package ch.ethz.inf.vs.a4.minker.einz.keepalive;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepaliveMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 
 import java.util.concurrent.*;
@@ -76,16 +80,20 @@ public class KeepaliveScheduler implements Runnable {
                 if(firstOutTime){bonus = timeout_initial_bonus;}
                 long tempTime = System.currentTimeMillis() - lastOutTime;
                 if(tempTime < timeout + bonus){
-                    if(Debug.logKeepalivePackets){
+                    if(Debug.logKeepaliveSpam){
                         Log.d("keepalive", "firstOutTime: "+firstOutTime+"\ntime passed: "+tempTime);
                     }
                     // don't timeout yet, launch new execution
                     launchOutTimeoutChecker(); // yey recursion?!
                 } else {
-                    if(Debug.logKeepalivePackets){
+                    if(Debug.logKeepaliveSpam){
                         Log.d("keepalive", "TIMEOUT!\nfirstOutTime: "+firstOutTime+"\ntime passed: "+tempTime);
                     }
+
+                    //send keepalive packet and restart launchOutTimeoutChecker
+                    //launchOutTimeoutChecker is run in the same thread (executor) anyways, so it doesn't make a difference if we call it before or after onOutTimeout
                     onOutTimeout();
+                    launchOutTimeoutChecker(); // TODO: does this recursion filling the stack need to be considered in terms of memory?
                 }
             }
         };
@@ -104,9 +112,25 @@ public class KeepaliveScheduler implements Runnable {
      * send new keepalive message
      */
     private void onOutTimeout() {
-        // TODO: send keepalive message
+        // send keepalive message:
         // if not inTimeout
         // sendMessageCallback.sendMessage("keepalive");
+
+        if(!inTimeoutTriggered){ // if there was a timeout regarding incoming packets, then we don't need to send any more keepalive packets
+            EinzMessage<EinzKeepaliveMessageBody> message = new EinzMessage<>(
+                    new EinzMessageHeader("networking", "KeepAlive"),
+                    new EinzKeepaliveMessageBody()
+            );
+            try {
+                sendMessageCallback.sendMessage(message);
+            } catch (SendMessageFailureException e) {
+                Log.i("KeepaliveScheduler", "Failed to send keepalive packet. Probably because the client buffer was not yet initialized (or no longer).");
+                e.printStackTrace();
+                // There should either be a first message sent anyways or the incoming connection should be failing as well,
+                // So we don't do anything here
+            }
+
+        } // (else die silently)
     }
 
     /**
