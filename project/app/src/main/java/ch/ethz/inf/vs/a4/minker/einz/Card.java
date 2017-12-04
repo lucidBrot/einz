@@ -22,9 +22,9 @@ public class Card {
 
     public Card (String ID, String name, CardText text, CardColor color){
         this.ID = ID;
+        this.name = name;
         this.text = text;
         this.color = color;
-        this.name = name;
     }
 
     public CardText getText() {

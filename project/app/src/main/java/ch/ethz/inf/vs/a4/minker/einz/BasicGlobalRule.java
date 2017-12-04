@@ -14,6 +14,7 @@ public abstract class BasicGlobalRule extends BasicRule {
 
     /**
      * Determines if a player can be kicked
+     *
      * @param state
      * @param toKick The Player that should be kicked
      * @return
@@ -24,16 +25,18 @@ public abstract class BasicGlobalRule extends BasicRule {
 
     /**
      * Determines if a player can leave. Somehow useless because a player can still cut the connection.
+     *
      * @param state
      * @param leaves The Player that wants to leave
      * @return
      */
-    public boolean isValidLeaveGame(GlobalState state, Player leaves){
+    public boolean isValidLeaveGame(GlobalState state, Player leaves) {
         return false;
     }
 
     /**
      * Determines if the player can end his turn.
+     *
      * @param state
      * @return
      */
@@ -43,6 +46,7 @@ public abstract class BasicGlobalRule extends BasicRule {
 
     /**
      * Determines if a player has finished the game and can be removed from the game cycle. This is a winning condition.
+     *
      * @param state
      * @param player The Player to check if he finished
      * @return
@@ -52,28 +56,29 @@ public abstract class BasicGlobalRule extends BasicRule {
     }
 
 
-
-
     /**
      * Called after a player got kicked
+     *
      * @param state
      * @return
      */
-    public GlobalState onKickPlayer(GlobalState state){
+    public GlobalState onKickPlayer(GlobalState state) {
         return state;
     }
 
     /**
      * Called after a player leavers the game
+     *
      * @param state
      * @return
      */
-    public GlobalState onLeaveGame(GlobalState state){
+    public GlobalState onLeaveGame(GlobalState state) {
         return state;
     }
 
     /**
      * Called before the game starts to setup the game state.
+     *
      * @param state
      * @return
      */
@@ -83,6 +88,7 @@ public abstract class BasicGlobalRule extends BasicRule {
 
     /**
      * Called after a player ended his turn.
+     *
      * @param state
      * @return
      */
@@ -92,11 +98,31 @@ public abstract class BasicGlobalRule extends BasicRule {
 
     /**
      * Called after a player satisfies a winning condition
+     *
      * @param state
      * @param player The Player that has finished
      * @return
      */
-    public GlobalState onPlayerFinished(GlobalState state, Player player){
+    public GlobalState onPlayerFinished(GlobalState state, Player player) {
+        return state;
+    }
+
+    /**
+     * Called after a card player decides to draw a card
+     * @param state
+     * @return
+     */
+    public GlobalState onDrawCard(GlobalState state){
+        return state;
+    }
+
+    /**
+     * Called on any card the player plays.
+     * @param state
+     * @param played
+     * @return
+     */
+    public GlobalState onPlayAnyCard(GlobalState state, Card played){
         return state;
     }
 }

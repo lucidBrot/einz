@@ -56,6 +56,7 @@ public class GameConfig {
             ruleSet = new HashSet<>();
             rulePerCard.put(card, ruleSet);
         }
+        rule.assignedTo = card;
         ruleSet.add(rule);
         allRules.add(rule);
     }
@@ -66,7 +67,7 @@ public class GameConfig {
     }
 
     public Set<BasicCardRule> getRulesForCard(Card card){
-        return rulePerCard.get(card);
+        return new HashSet<>(rulePerCard.get(card));
     }
 
     public List<Card> getShuffledDrawPile(){
