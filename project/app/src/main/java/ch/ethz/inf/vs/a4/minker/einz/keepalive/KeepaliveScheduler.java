@@ -131,7 +131,7 @@ public class KeepaliveScheduler implements Runnable {
             INITIAL_BONUS = initialBonus;
         }
 
-        SENDING_INTERVAL = INCOMING_TIMEOUT - 2L * MAX_PING_FLUCTUATION - Globals.KEEPALIVE_GRACE_PERIOD;
+        SENDING_INTERVAL = INCOMING_TIMEOUT/2L - 2L * MAX_PING_FLUCTUATION - Globals.KEEPALIVE_GRACE_PERIOD; // TODO: reason about this
         if (SENDING_INTERVAL <= 0) {
             // wtf are you doing
             throw new RuntimeException("Choose INCOMING_TIMEOUT for keepalive larger than 2*MAX_PING_FLUCTUATION!");
@@ -195,12 +195,18 @@ public class KeepaliveScheduler implements Runnable {
                 long tempTime = System.currentTimeMillis() - lastOutTime;
                 if (tempTime < SENDING_INTERVAL) {
                     // don't timeout yet, launch new execution
+                    if(Debug.logKeepaliveSpam){
+                        Log.d("keepalive", "Not yet time to timeoutOut.\ntempTime: "+tempTime);
+                    }
                     launchOutTimeoutChecker(); // yey recursion?!
                 } else {
                     //send keepalive packet and restart launchOutTimeoutChecker
                     //launchOutTimeoutChecker is run in the same thread (executor) anyways, so it doesn't make a difference if we call it before or after onOutTimeout
+                    if(Debug.logKeepaliveSpam){
+                        Log.d("keepalive", "TimeOUTOUT!\ntempTime: "+tempTime);
+                    }
                     onOutTimeout();
-                    launchOutTimeoutChecker(); // TODO: does this recursion filling the stack need to be considered in terms of memory?
+                    // TODO: does this recursion filling the stack need to be considered in terms of memory?
                 }
             }
         };
@@ -236,7 +242,12 @@ public class KeepaliveScheduler implements Runnable {
                 // So we don't do anything here
             }
 
-        } // (else die silently)
+            launchOutTimeoutChecker();
+        } else { // (else die silently)
+            if (Debug.logKeepaliveSpam) {
+                Log.d("keeaplive", "timeout in was triggered so I'm not reacting to timeout out");
+            }
+        }
     }
 
     /**
@@ -254,13 +265,13 @@ public class KeepaliveScheduler implements Runnable {
                 long tempTime = System.currentTimeMillis() - lastInTime;
                 if (tempTime < INCOMING_TIMEOUT + bonus) {
                     if (Debug.logKeepaliveSpam) {
-                        Log.d("keepalive", "firstInTime: " + firstInTime + "\ntime passed: " + tempTime);
+                        Log.d("keepalive", "firstInTime: " + firstInTime + "\ntime passed: " + tempTime+"\nlastIn: "+lastInTime);
                     }
                     // don't timeout yet, launch new execution
                     launchInTimeoutChecker(); // yey recursion?!
                 } else {
                     if (Debug.logKeepaliveSpam) {
-                        Log.d("keepalive", "TIMEOUT! firstInTime: " + firstInTime + "\ntime passed: " + tempTime);
+                        Log.d("keepalive", "TIMEOUT! firstInTime: " + firstInTime + "\ntime passed: " + tempTime+"\nlastIn: "+lastInTime);
                     }
                     onInTimeout();
                 }
