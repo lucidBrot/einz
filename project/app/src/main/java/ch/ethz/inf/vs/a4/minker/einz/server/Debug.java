@@ -45,8 +45,8 @@ public class Debug {
     public static long a_startTime = 0;
     public static long a_endTime = 0;
 
-    public static boolean logKeepalivePackets = true; // set to false to reduce log spam from receiving/sending keepalive packets
-    public static boolean logKeepaliveSpam = true; // set to false to reduce log spam from triggering maybe-timeouts
+    public static boolean logKeepalivePackets = false; // set to false to reduce log spam from receiving/sending keepalive packets
+    public static boolean logKeepaliveSpam = false; // set to false to reduce log spam from triggering maybe-timeouts
     public static boolean useKeepalive = true; // set true to use keepalive mechanisms
 
     /**
@@ -59,6 +59,13 @@ public class Debug {
             Log.w("Debug", "Using SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = "+SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED);
         if(logKeepalivePackets){
             Log.w("Debug", "Log spam from keepalive packets is activated.");
+        }
+        if(!useKeepalive){
+            Log.w("Debug", "useKeepalive is turned off.");
+        } else {
+            if(!logKeepaliveSpam && !logKeepalivePackets){
+                Log.w("Debug", "using Keepalive but without debug logging for it.");
+            }
         }
     }
 

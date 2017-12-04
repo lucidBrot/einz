@@ -8,6 +8,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKickAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnmappedAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -124,6 +125,7 @@ public class EinzActionFactory {
      * @return null if mapping does not exist, else the Class you want
      */
     public Class<? extends EinzAction> getMapping(EinzMessage e){
+        if(Debug.logKeepalivePackets || !e.getBody().getClass().toString().equals("ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepaliveMessageBody"));
         Log.d("ActionFactory", "Getting mapping for body text "+e.getBody().getClass());
         Class temp = this.dictionary.get(e.getBody().getClass());
         if(temp == null) {Log.d("ActionFactory", "Mapping was requested but not registered before");}
@@ -154,7 +156,10 @@ public class EinzActionFactory {
 
             EinzAction ret = mapping.getDeclaredConstructor(ServerFunctionDefinition.class, EinzServerManager.class, message.getClass(), String.class, EinzServerClientHandler.class, ClientActionCallbackInterface.class, Object.class).newInstance(sInterface, sManager, message, issuedBy, this.clientHandler, this.clientActionCallbackInterface, this.completelyCustomObject);
 
-            Log.d("ActionFactory","successfully generated action of text "+ret.getClass());
+            if(Debug.logKeepalivePackets || !ret.getClass().toString().equals("class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKeepaliveAction")) {
+                // don't log this if this is a keepalive packet unless logging is activated in Debug.java
+                Log.d("ActionFactory", "successfully generated action of text " + ret.getClass());
+            }
 
             return ret;
         } catch (InstantiationException e) {
