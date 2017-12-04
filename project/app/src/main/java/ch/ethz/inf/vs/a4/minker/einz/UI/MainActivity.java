@@ -12,6 +12,7 @@ import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.UI.ClientSetupActivity;
 import ch.ethz.inf.vs.a4.minker.einz.UI.ServerSetupActivity;
 import ch.ethz.inf.vs.a4.minker.einz.client.ClientActivity;
+import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -27,6 +28,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // below: the non-debug listeners
         findViewById(R.id.btn_s_host_game).setOnClickListener(this);
         findViewById(R.id.btn_c_join_game).setOnClickListener(this);
+
+        // log some warnings if debug variables have been set and possibly forgotten
+        Debug.debug_printInitialWarnings();
     }
 
     @Override

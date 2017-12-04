@@ -657,4 +657,30 @@ public class EinzServerManager {
             throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
         }
     }
+
+    public void onCustomAction(String issuedByPlayer, EinzMessage message) {
+        if(gamePhaseStarted){
+            getSFLock().writeLock().lock();
+            // TODO: call fabians method
+            getSFLock().writeLock().unlock();
+
+            throw new RuntimeException(new TodoException("Fabian plis implement"));
+        } else {
+
+            try {
+                JSONObject failBody = new JSONObject().put("success", "false");
+                EinzMessageHeader header = new EinzMessageHeader("furtheractions", "customActionResponse");
+                EinzCustomActionMessageBody body = new EinzCustomActionMessageBody(failBody);
+                EinzMessage<EinzCustomActionMessageBody> msg = new EinzMessage<>(header, body);
+                server.sendMessageToUser(issuedByPlayer, msg);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                // shouldn't happen
+            } catch (UserNotRegisteredException e) {
+                e.printStackTrace();
+                // who cares
+            }
+
+        }
+    }
 }

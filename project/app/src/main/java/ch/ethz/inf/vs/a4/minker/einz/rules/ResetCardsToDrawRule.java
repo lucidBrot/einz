@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules;
 
 import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 
@@ -8,7 +9,7 @@ import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
  * Created by Fabian on 01.12.2017.
  */
 
-public class ResetCardsToDrawRule extends BasicCardRule {
+public class ResetCardsToDrawRule extends BasicGlobalRule {
 
     @Override
     public String getName() {

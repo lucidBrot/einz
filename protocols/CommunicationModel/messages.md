@@ -857,10 +857,23 @@ sent by the **server**
     "messagetype":"CustomActionResponse"
   },
   "body":{
+    "success":"true"
     "custom parameter of the rule":{ a custom JSONObject},
   }
 }
 ```
+
+This content will be as follows if it is not appropriate to respond to it e.g. because the game is not running:
+
+```json
+"body":{
+  "success":"false"
+}
+```
+
+
+
+
 
 ### FinishTurn
 

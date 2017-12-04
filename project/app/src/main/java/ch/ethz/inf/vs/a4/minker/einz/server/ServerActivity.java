@@ -73,7 +73,13 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
     public void onBackPressed() {
         super.onBackPressed();
         // stop server on back button
-        getServer().shutdown();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                getServer().shutdown();
+            }
+        }).start();
+
     }
 
     @Override

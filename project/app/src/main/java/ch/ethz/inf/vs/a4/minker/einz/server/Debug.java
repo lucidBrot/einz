@@ -22,6 +22,39 @@ import static java.lang.Thread.sleep;
  */
 public class Debug {
 
+    public static final boolean CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false;
+    public static final int SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = 0; //[ms]
+
+    // Debugging: Sony Xperia Z5 as client, Samsung galaxy tab as server, in wlan
+    // Client: Sony E6653 Android 7.1.1, API 25
+    // Server: Samsung GT-N5120 Android 4.4.2, API 19
+
+    // false and 30'000     works
+    // false and 0          works
+    // true and 0           works
+    // true and 30'000      works
+    // wtf... at least the first one should have failed
+
+    // reversing above client and server setup
+    // false and 0          works
+    // false and 30'000     works
+
+
+
+    public static long a_time = 0;
+    public static long a_startTime = 0;
+    public static long a_endTime = 0;
+
+    /**
+     * called at program start in order to inform Devs about debug settings that may be unintentional
+     */
+    public static void debug_printInitialWarnings(){
+        if(!CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED)
+            Log.w("Debug", "Using CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false");
+        if(SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED>0)
+            Log.w("Debug", "Using SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = "+SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED);
+    }
+
     /**
      * For debug purposes only, should not have side effects at all.
      * Prints the class of the given object as JSON
@@ -141,7 +174,7 @@ public class Debug {
                     e.printStackTrace();
                 }
 
-                /* // send bad message
+                // send bad message
                 EinzMessageHeader header = new EinzMessageHeader("registration", "alösdkjf");
                 EinzKickFailureMessageBody badBody = new EinzKickFailureMessageBody("roger", "lol this is a bad message");
                 EinzMessage<EinzKickFailureMessageBody> emsg = new EinzMessage<>(header, badBody);
@@ -149,7 +182,8 @@ public class Debug {
                     tc.sendMessage(emsg.toJSON().toString());
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }*/
+                }
+                
 
                 tc.sendMessage(Debug.debug_getUnregisterMessage("clemi"));
             }

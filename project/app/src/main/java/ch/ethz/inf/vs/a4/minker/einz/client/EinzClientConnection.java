@@ -3,11 +3,15 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -54,12 +58,15 @@ public class EinzClientConnection implements Runnable {
      *
      * @param message text entered by client
      */
-    public void sendMessage(String message) {
+    public void sendMessage(String message) throws SendMessageFailureException {
         if (bufferOut != null && !bufferOut.checkError()) {
             synchronized (bufferMonitor) {
                 bufferOut.println(message);
                 bufferOut.flush();
             }
+        } else {
+            Log.w("ClientConnection", "bufferOut was not available to send message "+message);
+            throw new SendMessageFailureException("OutputBuffer was not ready to send the message. Please retry again when you are positive that it is not null (or has errors)");
         }
     }
 
@@ -72,7 +79,7 @@ public class EinzClientConnection implements Runnable {
      * @param message
      * @see #sendMessage(String)
      */
-    public void sendMessage(JSONObject message) {
+    public void sendMessage(JSONObject message) throws SendMessageFailureException {
         String msg = message.toString();
         // don't add \r\n because println
         sendMessage(msg);
@@ -88,7 +95,7 @@ public class EinzClientConnection implements Runnable {
      * @see #sendMessage(JSONObject)
      * @see #sendMessage(String)
      */
-    public void sendMessage(EinzMessage message) {
+    public void sendMessage(EinzMessage message) throws SendMessageFailureException {
         try {
             sendMessage(message.toJSON());
         } catch (JSONException e) {
@@ -135,7 +142,7 @@ public class EinzClientConnection implements Runnable {
                     }
                 }
 
-            } catch (Exception e) {
+            } catch (Exception e) { // errors about keeping connection
 
                 Log.e("EinzClientConnection", "Clientside Error.");
                 e.printStackTrace();
@@ -147,7 +154,10 @@ public class EinzClientConnection implements Runnable {
                 socket.close();
             }
 
-        } catch (Exception e) {
+        } catch (ConnectException e) {
+            // TODO: connection timeout when trying to establish it - inform user.
+        }
+        catch (Exception e) { // errors about establishing connection
 
             Log.e("EinzClientConnection", "Clientside Error (2)");
             e.printStackTrace();
@@ -176,7 +186,8 @@ public class EinzClientConnection implements Runnable {
             bufferIn = null;
             bufferOut = null;
 
-            this.parentClient.onClientConnectionDead();
+            if(this.parentClient!=null)
+                this.parentClient.onClientConnectionDead();
 
         }
         // TODO: is it ok to abort like this?
@@ -187,7 +198,40 @@ public class EinzClientConnection implements Runnable {
      * Note: Closing a socket doesn't clear its connection state, which means this method will return true for a closed socket (see isClosed()) if it was successfuly connected prior to being closed.
      */
     public boolean isConnected() {
-        return (this.socket == null || this.socket.isConnected());
+        return (this.socket != null && this.socket.isConnected());
+
+
+        // old version. bad.
+        //return (this.socket == null || this.socket.isConnected());
+    }
+
+    public void sendMessageIgnoreFailures(EinzMessage<EinzUnregisterRequestMessageBody> message) {
+        try {
+            this.sendMessage(message);
+        } catch (SendMessageFailureException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessageRetryXTimes(int X, EinzMessage<? extends EinzMessageBody> message) {
+        while (X>0) { // try 5 times to send the message. Otherwise we failed
+            try {
+                sendMessage(message);
+                break;
+            } catch (SendMessageFailureException e) {
+                Log.w("EinzClient", "failed to send register message (X="+X+")");
+                try {
+                    sleep(100);
+                } catch (InterruptedException e1) {
+                    // whatever
+                }
+                X--;
+            }
+        }
+        if(X<=0){
+            // we failed to register because the message buffer out was still null or something like that, but after trying de facto waiting for 100*5 ms, it should have worked.
+            Log.w("ClientConnection", "Retried 5 times and slept for a total of 500 ms but the buffer is still unable to send");
+        }
     }
 
     public interface OnMessageReceived {

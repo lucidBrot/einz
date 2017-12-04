@@ -107,4 +107,22 @@ public abstract class BasicGlobalRule extends BasicRule {
         return state;
     }
 
+    /**
+     * Called after a card player decides to draw a card
+     * @param state
+     * @return
+     */
+    public GlobalState onDrawCard(GlobalState state){
+        return state;
+    }
+
+    /**
+     * Called on any card the player plays.
+     * @param state
+     * @param played
+     * @return
+     */
+    public GlobalState onPlayAnyCard(GlobalState state, Card played){
+        return state;
+    }
 }

@@ -111,7 +111,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
             // start client. Because we specify "host" as false, the client will automatically register
             this.ourClient = new EinzClient(this.serverIP, this.serverPort, getApplicationContext(), this.username, this.role, false, this);
-            this.ourClient.run();
+            new Thread(this.ourClient).start();
         }
 
         ///debug_populate_lobbylist();
@@ -142,7 +142,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
      * @param username
      * @param role
      */
-    private void addLobbyListUser(String username, String role) {
+    private void addLobbyListUser(final String username, String role) {
         LinearLayout lobbyList = findViewById(R.id.ll_lobbylist);
 
         CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_lobbylist_element, lobbyList, false);
@@ -184,7 +184,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
      * Sends kick request in new thread
      * @param username who to kick
      */
-    private void kick(String username) {
+    private void kick(final String username) {
         Runnable r = new Runnable() {
             @Override
             public void run() {
@@ -449,6 +449,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     private void connectClientToLocalServer() {
         this.ourClient = new EinzClient(this.serverIP, this.serverPort, this.getApplicationContext(), this.username, this.role, this.host, this);
         this.ourClient.run();
+        ///new Thread(this.ourClient).start();
         // from now on, the client has the program flow and needs to update the UI appropriately
     }
 }

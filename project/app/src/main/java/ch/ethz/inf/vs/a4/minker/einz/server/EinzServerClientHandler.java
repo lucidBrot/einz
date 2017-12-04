@@ -25,7 +25,6 @@ public class EinzServerClientHandler implements Runnable{
 
     private boolean spin = false;
     private boolean stopping = false;
-    private final int SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET = 100; // milisecs
     private boolean firstConnectionOnServer = false; // whether this user should be considered admin
 
     private ThreadedEinzServer parentEinzServer;
@@ -38,7 +37,7 @@ public class EinzServerClientHandler implements Runnable{
 
 
     private ServerFunctionDefinition serverInterface; // used to call EinzActions
-    private EinzParserFactory einzParserFactory; // reuse factories instead of recreating every time
+    private EinzParserFactory einzParserFactory; // reuse factories instead of recreating every a_time
     private EinzActionFactory einzActionFactory;
 
     // identify this connection by its user as soon as this is available
@@ -55,6 +54,17 @@ public class EinzServerClientHandler implements Runnable{
     public EinzServerClientHandler(Socket clientSocket, ThreadedEinzServer parentEinzServer, ServerFunctionDefinition serverFunctionDefinition, boolean firstConnectionOnServer) {
         Log.d("ESCH", "started new instance");
 
+        if(Debug.SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED > 0){
+            try {
+                Log.d("ESCH", "Sleeping for "+Debug.SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED+" ms.");
+                sleep(Debug.SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED);
+            } catch (InterruptedException e) {
+                Log.d("Debug", "Was interrupted while sleeping for debug purposes");
+                e.printStackTrace();
+            }
+        }
+        Debug.a_time = System.currentTimeMillis() - Debug.a_startTime;
+
         this.parentEinzServer = parentEinzServer;
         parentEinzServer.incNumClients();
         this.firstConnectionOnServer = firstConnectionOnServer;
@@ -62,6 +72,26 @@ public class EinzServerClientHandler implements Runnable{
         this.socket = clientSocket;
         this.socketLock = new ReentrantReadWriteLock(true);
         this.serverInterface = serverFunctionDefinition;
+
+        // initialize socket stuff
+        // done this early to make sure it's soon-ishly able to buffer
+        inp = null;
+        brinp = null;
+        try {
+            inp = socket.getInputStream();
+            brinp = new BufferedReader(new InputStreamReader(inp, Globals.ENCODING));
+            bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), Globals.ENCODING)), true);
+            out = new DataOutputStream(socket.getOutputStream());
+        } catch (IOException e) {
+            Log.e("ESCH", "Failed to initialize run(). Aborting");
+            e.printStackTrace();
+
+        }
+
+        Debug.a_endTime = System.currentTimeMillis() - Debug.a_startTime; // about 180 ms
+        long time_until_constructor_called = Debug.a_time;
+        long time_from_constructor_until_socket_up = Debug.a_endTime - time_until_constructor_called; // about 10 ms
+
         this.einzParserFactory = new EinzParserFactory();
         this.einzActionFactory = new EinzActionFactory(serverInterface, this.parentEinzServer.getServerManager(), this);
 
@@ -92,19 +122,6 @@ public class EinzServerClientHandler implements Runnable{
             e.printStackTrace();
         }
 
-        // initialize socket stuff
-        inp = null;
-        brinp = null;
-        try {
-            inp = socket.getInputStream();
-            brinp = new BufferedReader(new InputStreamReader(inp, Globals.ENCODING));
-            bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), Globals.ENCODING)), true);
-            out = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            Log.e("ESCH", "Failed to initialize run(). Aborting");
-            e.printStackTrace();
-
-        }
     }
 
 
@@ -193,9 +210,9 @@ public class EinzServerClientHandler implements Runnable{
 
         this.stopping = true;
         try {
-            sleep(SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET);
+            sleep(Globals.SERVER_SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET_ON_SHUTDOWN);
         } catch (InterruptedException e) {
-            Log.e("ESCH/stopPatiently", "You interrupted my sleep (giving the other threads time to finish their actions): ");
+            Log.e("ESCH/stopPatiently", "You interrupted my sleep (giving the other threads a_time to finish their actions): ");
             e.printStackTrace();
         }
         socketWriteLock.lock();

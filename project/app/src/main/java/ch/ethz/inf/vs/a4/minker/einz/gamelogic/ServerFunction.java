@@ -43,6 +43,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param players the players in the game, the players play in the order in which they are in the
      *                ArrayList (lowest index plays first)
      */
+
     public void initialiseStandardGame(ArrayList<Player> players) {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
@@ -55,6 +56,12 @@ public class ServerFunction implements ServerFunctionDefinition {
         }
     }
 
+    public void initialiseStandardGame(ArrayList<Player> players, HashSet<Spectator> spectators) {
+        // Wieso eine arraylist und ein hashset?
+        // Weil wir die Spieler in geordneter Reihenfolge brauchen, die Zuschauer aber nicht.
+    }
+
+
     /**
      * initialises a new game
      *
@@ -66,6 +73,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param globalRules set of global rules with which the game is played
      * @param cardRules   card rules with the card they should apply to
      */
+
     public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
                                Map<BasicCardRule, Card> cardRules) {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
@@ -189,13 +197,12 @@ public class ServerFunction implements ServerFunctionDefinition {
         //Add all necessary GlobalRules: (StartGameWithCardsRule, WinOnNoCardsRule)
         result.addGlobalRule(new StartGameWithCardsRule());
         result.addGlobalRule(new WinOnNoCardsRule());
+        result.addGlobalRule(new ResetCardsToDrawRule());
 
         //Add all necessary CardRules: (ChangeDirectionRule)
         for (CardColor cc : CardColor.values()) {
             result.assignRuleToCard(new ChangeDirectionRule(), new Card("temp", CardText.SWITCHORDER.type, CardText.SWITCHORDER, cc));
         }
-        result.assignRuleToCard(new ResetCardsToDrawRule(), new Card("temp", CardText.ZERO.type, CardText.ZERO, CardColor.BLUE));
-        //TODO: Change "assigned" dummy Card to something with prupose
         return result;
     }
 
