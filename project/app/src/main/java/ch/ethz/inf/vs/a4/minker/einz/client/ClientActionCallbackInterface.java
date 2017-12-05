@@ -17,4 +17,7 @@ public interface ClientActionCallbackInterface {
     // TODO implement:
     void onKickFailure (EinzMessage<EinzKickFailureMessageBody> message);
     void onInitGame (EinzMessage<EinzInitGameMessageBody> message);
+    void onDrawCardsSuccess (EinzMessage<EinzDrawCardsMessageBody> message);
+    void onDrawCardsFailure (EinzMessage<EinzDrawCardsFailureMessageBody> message);
+
 }

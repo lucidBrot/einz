@@ -31,6 +31,6 @@ public class EinzInitGameAction extends EinzAction {
      */
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onInitGame(getMessage());
     }
 }

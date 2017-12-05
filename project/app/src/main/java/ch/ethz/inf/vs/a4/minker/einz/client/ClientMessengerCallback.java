@@ -140,6 +140,16 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         // TODO: implement onInitGame
     }
 
+    @Override
+    public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsMessageBody> message) {
+        // TODO: implement onDrawCardsSuccess
+    }
+
+    @Override
+    public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
+        // TODO: implement onDrawCardsFailure
+    }
+
     private void runOnMainThread(Runnable runnable) {
         Handler mainHandler = new Handler(this.applicationContext.getMainLooper());
         mainHandler.post(runnable);
