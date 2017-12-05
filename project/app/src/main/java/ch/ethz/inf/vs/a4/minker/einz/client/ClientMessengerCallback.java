@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
@@ -12,15 +13,47 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class ClientMessengerCallback implements ClientActionCallbackInterface {
-    private final LobbyUIInterface lobbyUI; // TODO: implement reactions to messages
+    @Nullable
+    private LobbyUIInterface lobbyUI; // can be null if the corresponding Activity does not exist anymore
+    @Nullable
+    private GameUIInterface gameUI; // can be null if the corresponding Activity does not exist yet/anymore
     private final Context applicationContext;
     private final EinzClient parentClient;
 
 
     public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface, Context appContext, EinzClient parentClient) {
+        this.gameUI = null;
         this.lobbyUI = lobbyUIInterface;
         this.applicationContext = appContext;
         this.parentClient = parentClient;
+    }
+
+    public void setGameUI(GameUIInterface gameUI){
+        this.gameUI = gameUI;
+    }
+
+    /**
+     * Remember to set this to null again if the parameter stops existing
+     */
+    public void setLobbyUI(LobbyUIInterface lobbyUI){
+        this.lobbyUI = lobbyUI;
+    }
+
+    /**
+     * set {@link #lobbyUI} to null and {@link #gameUI} to the parameter.
+     * @param gameUI The Activity implementing the {@link GameUIInterface}
+     */
+    public void setGameUIAndDisableLobbyUI(GameUIInterface gameUI){
+        setGameUI(gameUI);
+        setLobbyUI(null);
+    }
+
+    public LobbyUIInterface getLobbyUI() {
+        return lobbyUI;
+    }
+
+    public GameUIInterface getGameUI() {
+        return gameUI;
     }
 
     @Override
@@ -61,8 +94,10 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                lobbyUI.setAdmin(message.getBody().getAdmin());
-                lobbyUI.setLobbyList(players, spectators);
+                if(lobbyUI!=null) { // TODO: update lobby list if it changes during the game
+                    lobbyUI.setAdmin(message.getBody().getAdmin());
+                    lobbyUI.setLobbyList(players, spectators);
+                }
             }
         };
 
@@ -79,7 +114,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                lobbyUI.onRegistrationFailed(body);
+                if(lobbyUI!=null) { // ignore the incoming registerFailure message if we're already in the game phase... That could only happen if we were registered, then unregistered during the game and tried to reregister but failed...
+                    lobbyUI.onRegistrationFailed(body);
+                }
             }
         };
 
