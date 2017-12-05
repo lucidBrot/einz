@@ -570,9 +570,22 @@ public class EinzServerManager {
         }
     }
 
-    public void specifyRules(ArrayList<BasicRule> ruleset) {
-        // TODO: RULES: specifyRules. How is the deck transmitted? in what format should I pass the rules?
-        // TODO: RULES: rulemessage
+    public void specifyRules(JSONObject cardRules, JSONArray globalRules) {
+        // TODO: RULES: send initGame message and tell fabian about these
+        // but why must I specify the deck? TODO: find out if I should convert the cards to a deck.
+        getSFLock().writeLock().lock();
+        /*getServerFunctionInterface().initialiseGame(
+
+        );*/
+
+        ArrayList<String> turnOrder = new ArrayList<>(); // TODO: generate turn-Order by fabian
+        getSFLock().writeLock().unlock();
+        EinzMessageHeader header = new EinzMessageHeader("startgame", "InitGame");
+
+        EinzInitGameMessageBody body = new EinzInitGameMessageBody(cardRules, globalRules, turnOrder);
+        EinzMessage<EinzInitGameMessageBody> message = new EinzMessage<>(header, body);
+        broadcastMessageToAllPlayers(message);
+        broadcastMessageToAllSpectators(message);
     }
 
     /**
