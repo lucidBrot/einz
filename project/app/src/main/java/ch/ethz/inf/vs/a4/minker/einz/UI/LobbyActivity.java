@@ -42,6 +42,9 @@ import java.util.Locale;
 
 import static java.lang.Thread.sleep;
 
+// How to send a message:
+// this.getConnection().sendMessage()
+
 /**
  * Lobby List. corresponds to screen 3 in our proposal.
  * Can be started either from the server device or from a client-only device.
@@ -122,7 +125,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         this.backgroundThread.start();
         this.backgroundLooper = this.backgroundThread.getLooper();
         this.backgroundHandler = new Handler(this.backgroundLooper);
-
 
     }
 

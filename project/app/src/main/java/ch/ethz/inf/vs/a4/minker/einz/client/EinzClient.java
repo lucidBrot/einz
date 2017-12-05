@@ -134,6 +134,10 @@ public class EinzClient implements Runnable {
         this.clientMessenger.messageReceived("{\"header\":{\"messagegroup\":\"registration\",\"messagetype\":\"RegisterSuccess\"},\"body\":{\"role\":\""+this.role+"\",\"username\":\""+this.username+"\"}}");
     }
 
+    public EinzClientConnection getConnection() {
+        return connection;
+    }
+
     /**
      * starts a new thread and sends the registration message from there. username and role as specified when this client was constructed.
      */
