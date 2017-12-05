@@ -42,5 +42,5 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
         body.put("cardRules",this.cardRules);
         body.put("globalRules", this.globalRules);
         return body;
-    } 
+    }
 }

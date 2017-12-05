@@ -38,8 +38,8 @@ public class EinzSpecifyRulesAction extends EinzAction {
     public void run() {
         if(getServerManager().isRegisteredAdmin(getIssuedByPlayer())){
             // if admin and registered aka allowed to specify rules
-            getServerManager().specifyRules(body.getRuleset());
-            // TODO: send rules out
+            getServerManager().specifyRules(body.getCardRules(), body.getGlobalRules());
+
         } else {
             String admin = getServerManager().getAdminUsername();
             admin = (admin==null)?"null":admin;
