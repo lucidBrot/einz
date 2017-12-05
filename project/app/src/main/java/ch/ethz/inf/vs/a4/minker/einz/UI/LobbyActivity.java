@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.Image;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
@@ -169,6 +170,12 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // highlight admin
         if(username.equals(this.adminUsername)){
             usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default));
+            ((ImageView)usercard.findViewById(R.id.icn_role)).setColorFilter(getResources().getColor(R.color.red_darker));
+            ((ImageView)usercard.findViewById(R.id.btn_lobby_kick)).setColorFilter(getResources().getColor(R.color.red_darker));
+            ((TextView)usercard.findViewById(R.id.tv_lobbylist_username)).setTextColor(getResources().getColor(R.color.red_darker));
+            ((TextView)usercard.findViewById(R.id.tv_lobbylist_role)).setTextColor(getResources().getColor(R.color.red_darker));
+
+
         }
 
         if(this.host){
