@@ -2,10 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzRegisterSuccessAction;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 
 public interface ClientActionCallbackInterface {
     // TODO: add the functions you use
@@ -16,4 +13,7 @@ public interface ClientActionCallbackInterface {
     public void onRegisterFailure(EinzMessage<EinzRegisterFailureMessageBody> message);
 
     void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message);
+
+    // TODO implement mapping
+    void onKickFailure (EinzMessage<EinzKickFailureMessageBody> message);
 }

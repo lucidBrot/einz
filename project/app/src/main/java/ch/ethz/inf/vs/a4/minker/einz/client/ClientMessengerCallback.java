@@ -6,10 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,6 +127,12 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
         // TODO: notify user either now or on updatelobbylist that somebody left and why (maybe not with a toast, or is toast fine?)
 
+    }
+
+    @Override
+    public void onKickFailure(EinzMessage<EinzKickFailureMessageBody> message) {
+        // TODO: implement this method, probably add a function onKickFailure to LobbyUI Interface and the game-in-progress UI
+        Log.d("CliMesssegnerCallback", "onKickFailure");
     }
 
     private void runOnMainThread(Runnable runnable) {
