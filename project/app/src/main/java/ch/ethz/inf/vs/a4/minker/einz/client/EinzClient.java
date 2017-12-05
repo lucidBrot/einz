@@ -138,6 +138,10 @@ public class EinzClient implements Runnable {
         return connection;
     }
 
+    public ClientActionCallbackInterface getActionCallbackInterface() {
+        return actionCallbackInterface;
+    }
+
     /**
      * starts a new thread and sends the registration message from there. username and role as specified when this client was constructed.
      */

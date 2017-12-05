@@ -29,6 +29,17 @@ import java.util.ArrayList;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
+// How to get Messages:
+// get the intent extra that is a reference to ourClient
+// make PlayerActivity implement GameUIInterface
+// call ourClient.getClientActionCallbackInterface().setGameUI(this)
+// ...
+// profit
+// Now the client will - so clemens will - call you on these events
+
+// How to send Messages:
+// ourClient.getConnection().sendMessage() should do
+
 public class PlayerActivity extends FullscreenActivity {
     private static final int NBR_ITEMS = 20;
     private GridLayout mGrid;

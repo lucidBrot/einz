@@ -3,6 +3,9 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 
+/**
+ * The methods that the Game Activity should implement
+ */
 public interface GameUIInterface {
     //commented out with three slashes should not happen during the game phase
     ///void onRegisterSuccess(EinzMessage<EinzRegisterSuccessMessageBody> message);
@@ -28,6 +31,10 @@ public interface GameUIInterface {
     void onSendState(EinzMessage<EinzSendStateMessageBody> message);
 
     void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message);
+
+    void onCustomActionResponse(EinzMessage<EinzCustomActionMessageBody> message);
+
+    void onGameOver (EinzMessage<EinzGameOverMessageBody> message);
 
     // TODO: customActionRule..?
 }

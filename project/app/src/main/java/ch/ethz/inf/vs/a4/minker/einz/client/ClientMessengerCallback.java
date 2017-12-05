@@ -12,7 +12,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ClientMessengerCallback implements ClientActionCallbackInterface {
+public class ClientMessengerCallback implements ClientActionCallbackInterface { // TODO: make sure to always cover the case where gameUI and/or lobbyUI are null
     @Nullable
     private LobbyUIInterface lobbyUI; // can be null if the corresponding Activity does not exist anymore
     @Nullable
@@ -21,6 +21,11 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
     private final EinzClient parentClient;
 
 
+    /**
+     * @param lobbyUIInterface make sure to call {@link #setGameUIAndDisableLobbyUI(GameUIInterface)} after destroying the lobby
+     * @param appContext just the Context of the application, for toasts and stuff
+     * @param parentClient the client, duh.
+     */
     public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface, Context appContext, EinzClient parentClient) {
         this.gameUI = null;
         this.lobbyUI = lobbyUIInterface;
@@ -101,7 +106,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
             }
         };
 
-        runOnMainThread(runnable);
+        runOnMainThread(runnable); // this is important because
+                                    // a) to access the UI, this is needed
+                                    // b) to be sure the Activity still exists after checking
         Log.d("ClientMessengerCallback", "updated LobbyList");
 
     }

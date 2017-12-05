@@ -301,6 +301,18 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     }
 
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        this.ourClient.getActionCallbackInterface().setLobbyUI(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.ourClient.getActionCallbackInterface().setLobbyUI(null); // make sure no callbacks to this activity are executed
+    }
+
     /**
      * stops server if there is one on this device. <br>
      *     stops client.
