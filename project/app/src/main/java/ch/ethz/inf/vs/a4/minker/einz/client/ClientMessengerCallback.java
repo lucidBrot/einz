@@ -6,10 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -130,6 +127,57 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
         // TODO: notify user either now or on updatelobbylist that somebody left and why (maybe not with a toast, or is toast fine?)
 
+    }
+
+    @Override
+    public void onKickFailure(EinzMessage<EinzKickFailureMessageBody> message) {
+        // TODO: implement this method, probably add a function onKickFailure to LobbyUI Interface and the game-in-progress UI
+        Log.d("CliMesssegnerCallback", "onKickFailure");
+    }
+
+    @Override
+    public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
+        // TODO: implement onInitGame
+    }
+
+    @Override
+    public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsMessageBody> message) {
+        // TODO: implement onDrawCardsSuccess
+    }
+
+    @Override
+    public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
+        // TODO: implement onDrawCardsFailure
+    }
+
+    @Override
+    public void onPlayCardResponse(EinzMessage<EinzPlayCardMessageBody> message) {
+        // TODO: implement onPlayCardResponse
+    }
+
+    @Override
+    public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
+        // TODO: implement onSendState
+    }
+
+    @Override
+    public void onShowToast(EinzMessage<EinzShowToastMessageBody> message) {
+        Toast.makeText(applicationContext, message.getBody().getToast(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message) {
+        // TODO: implement onPlayerFinished
+    }
+
+    @Override
+    public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
+        // TODO: implement onGameOver
+    }
+
+    @Override
+    public void onCustomActionResponse(EinzMessage<EinzCustomActionResponseMessageBody> message) {
+        // TODO: implement onCustomActionResponse
     }
 
     private void runOnMainThread(Runnable runnable) {

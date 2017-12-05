@@ -7,7 +7,7 @@ import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 
-public class EinzDrawCardsResponseAction extends EinzAction {
+public class EinzDrawCardsSuccessAction extends EinzAction {
     /**
      * @param sInterface
      * @param serverManager
@@ -15,14 +15,14 @@ public class EinzDrawCardsResponseAction extends EinzAction {
      * @param issuedByPlayer
      * @param issuedByClientHandler
      */
-    public EinzDrawCardsResponseAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
+    public EinzDrawCardsSuccessAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
     }
 
     /**
      * compatibility for new actionfactory (for client)
      */
-    public EinzDrawCardsResponseAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+    public EinzDrawCardsSuccessAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
     }
 
@@ -31,6 +31,6 @@ public class EinzDrawCardsResponseAction extends EinzAction {
      */
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onDrawCardsSuccess(getMessage());
     }
 }

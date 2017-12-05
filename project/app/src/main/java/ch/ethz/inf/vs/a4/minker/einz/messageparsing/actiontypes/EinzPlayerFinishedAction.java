@@ -33,6 +33,6 @@ public class EinzPlayerFinishedAction extends EinzAction {
 
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onPlayerFinished(getMessage());
     }
 }

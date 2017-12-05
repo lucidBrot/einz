@@ -1,13 +1,13 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes;
 
 import ch.ethz.inf.vs.a4.minker.einz.client.ClientActionCallbackInterface;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
-import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 
-public class EinzInitGameAction extends EinzAction {
+public class EinzDrawCardsFailureAction extends EinzAction {
     /**
      * @param sInterface
      * @param serverManager
@@ -15,14 +15,14 @@ public class EinzInitGameAction extends EinzAction {
      * @param issuedByPlayer
      * @param issuedByClientHandler
      */
-    public EinzInitGameAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
+    public EinzDrawCardsFailureAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler) {
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler);
     }
 
     /**
      * compatibility for new actionfactory (for client)
      */
-    public EinzInitGameAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
+    public EinzDrawCardsFailureAction(ServerFunctionDefinition sInterface, EinzServerManager serverManager, EinzMessage params, String issuedByPlayer, EinzServerClientHandler issuedByClientHandler, ClientActionCallbackInterface clientActionCallbackInterface, Object completelyCustom){
         super(sInterface, serverManager, params, issuedByPlayer, issuedByClientHandler, clientActionCallbackInterface, completelyCustom);
     }
 
@@ -31,6 +31,6 @@ public class EinzInitGameAction extends EinzAction {
      */
     @Override
     public void run() {
-        getClientActionCallbackInterface().onInitGame(getMessage());
+        getClientActionCallbackInterface().onDrawCardsFailure(getMessage());
     }
 }

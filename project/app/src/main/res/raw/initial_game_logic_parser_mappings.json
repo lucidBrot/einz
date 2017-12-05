@@ -15,6 +15,18 @@
   {
       "messagegroup": "furtheractions",
       "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzFurtherActionsParser"
+  },
+  {
+      "messagegroup": "endgame",
+      "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzEndGameParser"
+  },
+  {
+      "messagegroup": "stateinfo",
+      "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzStateInfoParser"
+  },
+  {
+      "messagegroup": "toast",
+      "mapstoparser": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.EinzToastParser"
   }
   ]
 }

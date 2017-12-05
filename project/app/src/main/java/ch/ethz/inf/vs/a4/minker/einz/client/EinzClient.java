@@ -179,6 +179,18 @@ public class EinzClient implements Runnable {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+
+                // DEBUG: trigger kick failure message
+                //<Debug>
+                /*
+                try {
+                    connection.sendMessage(Debug.debug_getFailingKickMessage());
+                } catch (SendMessageFailureException e) {
+                    Log.d("EinzClient/DEBUG", "failed to send bad kick message :(");
+                    e.printStackTrace();
+                }
+                */
+                //</Debug>
             }
         })).start();
     }
