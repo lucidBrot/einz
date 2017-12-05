@@ -45,6 +45,7 @@ The sources worth mentioning:
 > by Nick Russler
 >
 > https://github.com/nickrussler/Android-Wifi-Hotspot-Manager-Class
+> Available under Apache License 2.0
 
 To find out whether the server is currently running a hotspot, because our implementation might otherwise return the mobile carrier IP when WiFi is turned off.
 
