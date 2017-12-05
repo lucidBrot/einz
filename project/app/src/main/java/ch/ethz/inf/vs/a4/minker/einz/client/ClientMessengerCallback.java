@@ -155,6 +155,31 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         // TODO: implement onPlayCardResponse
     }
 
+    @Override
+    public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
+        // TODO: implement onSendState
+    }
+
+    @Override
+    public void onShowToast(EinzMessage<EinzShowToastMessageBody> message) {
+        Toast.makeText(applicationContext, message.getBody().getToast(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message) {
+        // TODO: implement onPlayerFinished
+    }
+
+    @Override
+    public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
+        // TODO: implement onGameOver
+    }
+
+    @Override
+    public void onCustomActionResponse(EinzMessage<EinzCustomActionResponseMessageBody> message) {
+        // TODO: implement onCustomActionResponse
+    }
+
     private void runOnMainThread(Runnable runnable) {
         Handler mainHandler = new Handler(this.applicationContext.getMainLooper());
         mainHandler.post(runnable);

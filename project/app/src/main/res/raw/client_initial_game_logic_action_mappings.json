@@ -15,6 +15,22 @@
 		{
 		  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody",
 		  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardResponseAction"
+		},
+		{
+		  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMessageBody",
+		  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzShowToastAction"
+		},
+		{
+		  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody",
+		  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayerFinishedAction"
+		},
+		{
+		  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody",
+		  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzGameOverAction"
+		},
+		{
+		  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody",
+		  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzCustomActionResponseAction"
 		}
 	]
 }
