@@ -33,6 +33,6 @@ public class EinzPlayCardResponseAction extends EinzAction {
 
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onPlayCardResponse(getMessage());
     }
 }

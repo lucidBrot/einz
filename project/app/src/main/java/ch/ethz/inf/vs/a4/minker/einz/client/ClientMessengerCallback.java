@@ -150,6 +150,11 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         // TODO: implement onDrawCardsFailure
     }
 
+    @Override
+    public void onPlayCardResponse(EinzMessage<EinzPlayCardMessageBody> message) {
+        // TODO: implement onPlayCardResponse
+    }
+
     private void runOnMainThread(Runnable runnable) {
         Handler mainHandler = new Handler(this.applicationContext.getMainLooper());
         mainHandler.post(runnable);

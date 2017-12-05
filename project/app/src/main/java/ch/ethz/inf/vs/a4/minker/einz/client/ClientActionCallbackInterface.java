@@ -5,7 +5,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzRegisterSucc
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 
 public interface ClientActionCallbackInterface {
-    // TODO: add the functions you use
+
     public void onRegisterSuccess(EinzMessage<EinzRegisterSuccessMessageBody> message);
 
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message);
@@ -19,5 +19,10 @@ public interface ClientActionCallbackInterface {
     void onInitGame (EinzMessage<EinzInitGameMessageBody> message);
     void onDrawCardsSuccess (EinzMessage<EinzDrawCardsMessageBody> message);
     void onDrawCardsFailure (EinzMessage<EinzDrawCardsFailureMessageBody> message);
-
+    void onPlayCardResponse (EinzMessage<EinzPlayCardMessageBody> message);
+    void onSendState ( EinzMessage<EinzSendStateMessageBody> message);
+    // void onShowToast
+    // void onPlayerfinished
+    // void onGameOver
+    // void CustomActionResponse
 }

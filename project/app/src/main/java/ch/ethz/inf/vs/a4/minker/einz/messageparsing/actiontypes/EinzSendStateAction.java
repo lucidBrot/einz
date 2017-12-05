@@ -34,6 +34,6 @@ public class EinzSendStateAction extends EinzAction {
 
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onSendState(getMessage());
     }
 }
