@@ -135,6 +135,11 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         Log.d("CliMesssegnerCallback", "onKickFailure");
     }
 
+    @Override
+    public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
+        // TODO: implement onInitGame
+    }
+
     private void runOnMainThread(Runnable runnable) {
         Handler mainHandler = new Handler(this.applicationContext.getMainLooper());
         mainHandler.post(runnable);

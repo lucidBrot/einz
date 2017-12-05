@@ -328,4 +328,10 @@ public class Debug {
         }
     }
 
+    public static EinzMessage debug_getFailingKickMessage() {
+        EinzMessageHeader header=new EinzMessageHeader("registration","Kick" );
+        EinzKickMessageBody body = new EinzKickMessageBody("some яаndom user who should not exist, in order to trigger a kick failure message");
+        EinzMessage<EinzKickMessageBody> message = new EinzMessage<>(header, body);
+        return message;
+    }
 }

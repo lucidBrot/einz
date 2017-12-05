@@ -14,6 +14,7 @@ public interface ClientActionCallbackInterface {
 
     void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message);
 
-    // TODO implement mapping
+    // TODO implement:
     void onKickFailure (EinzMessage<EinzKickFailureMessageBody> message);
+    void onInitGame (EinzMessage<EinzInitGameMessageBody> message);
 }
