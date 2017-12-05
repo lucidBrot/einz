@@ -43,7 +43,7 @@ import java.util.Locale;
 import static java.lang.Thread.sleep;
 
 // How to send a message:
-// this.getConnection().sendMessage()
+// this.ourClient.getConnection().sendMessage()
 
 /**
  * Lobby List. corresponds to screen 3 in our proposal.
