@@ -14,8 +14,11 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
 
     private final JSONObject cardRules; // contains a list of JSONObjects, each having id and parameters - for every CardID
     private final JSONArray globalRules; // contains a list of JSONObjects, each having id and parameters
-    private HashMap<Card, ArrayList<BasicCardRule>> parsedCardRules;
-    private HashMap<Card, Integer> cardNumbers;
+    private boolean neverParsedCardRulesBefore = true; private boolean neverParsedGlobalRulesBefore = true;
+    private boolean lastCardRulesResult; private boolean lastGlobalRulesResult;
+    private HashMap<Card, ArrayList<BasicCardRule>> parsedCardRules = new HashMap<>();
+    private HashMap<Card, Integer> cardNumbers = new HashMap<>();
+    private ArrayList<BasicGlobalRule> parsedGlobalRules = new ArrayList<>();
 
     // card rules list as actual list of JSONObjects. Those contain id and params of the rules
 
@@ -54,8 +57,11 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
     /**
      * @return false if failed, else true
      * Parses what it needs to later access that
-     */
-    private boolean parseFurther(){
+     */ // TODO: test this function
+    private boolean parseCardRulesFurther(){
+        if(!neverParsedCardRulesBefore){ // only recalculate if never calculated before. because the variables are final
+            return lastCardRulesResult;
+        }
         HashMap<Card, ArrayList<BasicCardRule>> parsedCardRules = new HashMap<>();
         HashMap<Card, Integer> cardNumbers = new HashMap<>();
         CardLoader cl = new CardLoader();
@@ -89,5 +95,61 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
             return false;
         }
         return true;
+    }
+
+    /**
+     * @return null if something went wrong. If null, you should probably inform the admin with a toast.
+     * This method could also return an empty HashMap, if there was no error but the content was empty.
+     */
+    public HashMap<Card, Integer> getCardNumbers(){
+        if(!parseCardRulesFurther()){
+            return null;
+        }
+
+        // use side-effect of parseCardRulesFurther
+        return this.cardNumbers;
+    }
+
+    /**
+     * @return null if something went wrong. If null, you should probably inform the admin with a toast.
+     * This method could also return an empty HashMap, if there was no error but the content was empty.
+     */
+    public HashMap<Card, ArrayList<BasicCardRule>> getParsedCardRules(){
+        if(!parseCardRulesFurther()){
+            return null;
+        }
+        return this.parsedCardRules;
+    }
+
+    private boolean parseGlobalRulesFurther(){
+        if(!neverParsedGlobalRulesBefore){
+            return lastGlobalRulesResult;
+        }
+
+        ArrayList<BasicGlobalRule> globalRules = new ArrayList<>();
+        CardLoader cl = new CardLoader();
+        RuleLoader rl = new RuleLoader();
+
+        try{
+        for(int i=0; i<this.globalRules.length(); i++){
+            JSONObject o = this.globalRules.getJSONObject(i);
+            String id = o.getString("id");
+            JSONObject object = o.getJSONObject("parameters");
+            BasicGlobalRule rule =(BasicGlobalRule) rl.getInstanceOfRule("id");
+            globalRules.add(rule);
+        }
+        this.parsedGlobalRules = globalRules;
+        return true;}
+        catch(Exception e){
+            return false;
+        }
+    }
+
+    private ArrayList<BasicGlobalRule> getGlobalParsedRules(){
+        if(!parseGlobalRulesFurther()){
+            return null;
+        }
+
+        return this.parsedGlobalRules;
     }
 }
