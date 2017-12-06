@@ -271,7 +271,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
         }
 
-        //Send everyone theyr state
+        //Send everyone their state
         MessageSender.sendStateToAll(threadedEinzServer, globalState);
 
 
