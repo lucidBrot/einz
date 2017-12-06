@@ -69,7 +69,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      */
 
     public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
-                               Map<BasicCardRule, Card> cardRules) {
+                               Map<Card, ArrayList<BasicCardRule>> cardRules) {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
         } else {
@@ -81,9 +81,12 @@ public class ServerFunction implements ServerFunctionDefinition {
             for (BasicGlobalRule r : globalRules) {
                 gameConfig.addGlobalRule(r);
             }
-            for (BasicCardRule r : cardRules.keySet()) {
-                gameConfig.assignRuleToCard(r, cardRules.get(r));
+            for (Card c : cardRules.keySet()) { // TODO: Fabian, please check if this still works as intended. I rewrote this loop because of the new parameter form of cardRules
+                for(BasicCardRule r : cardRules.get(c)) {
+                    gameConfig.assignRuleToCard(r, c);
+                }
             }
+
         }
     }
 
