@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz.client;
+package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.ClipData;
 import android.graphics.Canvas;
@@ -29,43 +29,28 @@ import java.util.ArrayList;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
-public class ClientActivity extends AppCompatActivity {
+// How to get Messages:
+// get the intent extra that is a reference to ourClient
+// make PlayerActivity implement GameUIInterface
+// call ourClient.getClientActionCallbackInterface().setGameUI(this)
+// ...
+// profit
+// Now the client will - so clemens will - call you on these events
+
+// How to send Messages:
+// ourClient.getConnection().sendMessage() should do
+
+public class PlayerActivity extends FullscreenActivity {
     private static final int NBR_ITEMS = 20;
     private GridLayout mGrid;
     private ImageView trayStack;
     private LayoutInflater inflater;
-    private final android.os.Handler mHideHandler = new android.os.Handler();
-    private final Runnable mHideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            makeFullscreen();
-        }
-    };
-
 
 
     int[] cards;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        makeFullscreen();
-        //make fullscreen
-        View decorView = getWindow().getDecorView();
-        decorView.setOnSystemUiVisibilityChangeListener
-                (new View.OnSystemUiVisibilityChangeListener() {
-                    @Override
-                    public void onSystemUiVisibilityChange(int visibility) {
-                        // Note that system bars will only be "visible" if none of the
-                        // LOW_PROFILE, HIDE_NAVIGATION, or FULLSCREEN flags are set.
-                        if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                            // TODO: The system bars are visible. Make any desired
-                            // adjustments to your UI, such as showing the action bar or
-                            // other navigational controls.
-                            mHideHandler.removeCallbacks(mHideRunnable);
-                            mHideHandler.postDelayed(mHideRunnable, 2000);
-                        }
-                    }
-                });
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
 
@@ -91,17 +76,6 @@ public class ClientActivity extends AppCompatActivity {
             mGrid.addView(itemView);
         }
     }
-
-    public void makeFullscreen(){
-        getSupportActionBar().hide(); // might cause NullPointerException if we don't have actionBar (IntelliJ warning)
-
-        getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
-    }
-
-    public void onResume(){
-        super.onResume();
-        makeFullscreen();
-        }
 
     class LongPressListener implements View.OnTouchListener {
 

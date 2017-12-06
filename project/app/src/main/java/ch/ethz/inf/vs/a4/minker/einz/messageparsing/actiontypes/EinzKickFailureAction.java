@@ -31,6 +31,6 @@ public class EinzKickFailureAction extends EinzAction {
      */
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onKickFailure(getMessage());
     }
 }

@@ -1,10 +1,14 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
 public class Globals {
-    public static final String ENCODING = "UTF-8"; // the encoding for sending/receiving strings
+    // only if Debug.CLIENT_SLEEP_AFTER... is activated
     public static final long CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED = 500; // twice as long as I think the server will usually take to start after connection established
+
     public static final int SERVER_SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET_ON_SHUTDOWN = 100; // the time running requests are given before the socket closes
     // used in the clients that are not hosting
+
+
+    public static final String ENCODING = "UTF-8"; // the encoding for sending/receiving strings
     // UTF-8 is the probable default of the JVM
     // UTF-32 could work too though
     // https://stackoverflow.com/questions/496321/utf-8-utf-16-and-utf-32
@@ -23,4 +27,9 @@ public class Globals {
 //    In long: see Wikipedia: UTF-8, UTF-16, and UTF-32.
 
     // so UTF-8 should suffice for our purposes
+
+    public static final long KEEPALIVE_DEFAULT_INCOMING_TIMEOUT = 10000L; // how long without incoming messages incoming until a timeout should be triggered
+    public static final int KEEPALIVE_DEFAULT_MAX_SUPPORTED_PING = 1000; // the maximally supported ping. Setting this higher increases the internal initial bonus time
+    public static final int KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION = 100; // how much the ping may diverge up or down from the average, if the average is MAX_SUPPORTED_PING.
+    public static final long KEEPALIVE_GRACE_PERIOD = 100L; // some additional time difference between the time interval of sending a packet and the time interval of needing to receive it.
 }

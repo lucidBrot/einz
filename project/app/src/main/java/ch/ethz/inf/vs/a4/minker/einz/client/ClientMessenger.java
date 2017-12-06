@@ -21,10 +21,10 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
     private EinzParserFactory parserFactory;
     private EinzActionFactory actionFactory;
     private Context appContext;
-    private EinzClientConnection clientConnection;
     private ClientActionCallbackInterface actionsCallback;
+    private final EinzClient parentClient;
 
-    public ClientMessenger(Context appContext, ClientActionCallbackInterface callbackInterface){
+    public ClientMessenger(Context appContext, ClientActionCallbackInterface callbackInterface, EinzClient parentClient){
         // initialize local variables
         this.appContext = appContext;
         this.parserFactory = new EinzParserFactory();
@@ -35,6 +35,7 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
         initializeParserFactory(); // from messagegroup to Parser
         initializeActionFactory(); // from Message Object to Action Object
 
+        this.parentClient = parentClient;
     }
 
     /**
@@ -44,6 +45,10 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
     @Override
     public void messageReceived(String message) { // TODO: handle errors
         Log.d("ClientMessenger", "received message: "+message);
+
+        // notify the keepalive
+        parentClient.keepaliveScheduler.onAnyMessageReceived();
+
         EinzParser parser = null; // get parser based on the messages messagegroup
         try {
             parser = parserFactory.generateEinzParser(message);

@@ -4,12 +4,21 @@ import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
+import org.json.JSONObject;
 
 /**
  * Created by Fabian on 01.12.2017.
  */
 
 public class ResetCardsToDrawRule extends BasicGlobalRule {
+    /**
+     * Not yet implemented!
+     * @param parameters
+     */
+    @Override
+    public void setParameters(JSONObject parameters) {
+
+    }
 
     @Override
     public String getName() {

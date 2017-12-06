@@ -38,21 +38,17 @@ public class EinzStartGameParser extends EinzParser {
 
     private EinzMessage<EinzInitGameMessageBody> parseInitGame(JSONObject message) throws JSONException {
         EinzMessageHeader mheader = new EinzMessageHeader("startgame", "InitGame");
-        ArrayList<BasicRule> ruleset=new ArrayList<>();
         JSONObject body = message.getJSONObject("body");
-        JSONObject jruleset = body.getJSONObject("ruleset");
-        for(int i = 0; i<jruleset.names().length(); i++) {
-            // #cardtag
-            /// BasicRule rule = new BasicRule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
-            /// ruleset.add(rule);
-        }
+
         JSONArray jturnOrder = body.getJSONArray("turn-order");
         ArrayList<String> turnOrder = new ArrayList<>();
         for(int i = 0; i<jturnOrder.length(); i++){
             turnOrder.add(jturnOrder.getString(i));
         }
 
-        EinzInitGameMessageBody mbody = new EinzInitGameMessageBody(ruleset, turnOrder);
+        JSONObject jruleset = body.getJSONObject("cardRules");
+        JSONArray jrulesetGlobal = body.getJSONArray("globalRules");
+        EinzInitGameMessageBody mbody = new EinzInitGameMessageBody(jruleset, jrulesetGlobal, turnOrder);
 
         return new EinzMessage<>(mheader, mbody);
     }
@@ -67,16 +63,10 @@ public class EinzStartGameParser extends EinzParser {
     private EinzMessage<EinzSpecifyRulesMessageBody> parseSpecifyRules(JSONObject message) throws JSONException {
         JSONObject body = message.getJSONObject("body");
         EinzMessageHeader mheader = new EinzMessageHeader("startgame", "SpecifyRules");
-        ArrayList<BasicRule> ruleset=new ArrayList<>();
-        JSONObject jruleset = body.getJSONObject("ruleset");
-        // there are SO many ways to iterate over a json object
-        // https://stackoverflow.com/questions/9151619/how-to-iterate-over-a-jsonobject
-        for(int i = 0; i<jruleset.names().length(); i++) {
-            /// BasicRule rule = new BasicRule(jruleset.names().getString(i), jruleset.getJSONObject(jruleset.names().getString(i)));
-            /// ruleset.add(rule);
-            // #cardtag
-        }
-        EinzSpecifyRulesMessageBody mbody = new EinzSpecifyRulesMessageBody(ruleset);
+        JSONObject jruleset = body.getJSONObject("cardRules");
+        JSONArray jrulesetGlobal = body.getJSONArray("globalRules");
+
+        EinzSpecifyRulesMessageBody mbody = new EinzSpecifyRulesMessageBody(jruleset, jrulesetGlobal);
         return new EinzMessage<>(mheader, mbody);
 
     }

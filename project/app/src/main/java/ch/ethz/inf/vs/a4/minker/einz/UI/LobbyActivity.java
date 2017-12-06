@@ -15,9 +15,11 @@ import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import ch.ethz.inf.vs.a4.minker.einz.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.TodoException;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
@@ -41,6 +43,9 @@ import java.util.Locale;
 
 import static java.lang.Thread.sleep;
 
+// How to send a message:
+// this.ourClient.getConnection().sendMessage()
+
 /**
  * Lobby List. corresponds to screen 3 in our proposal.
  * Can be started either from the server device or from a client-only device.
@@ -53,7 +58,7 @@ import static java.lang.Thread.sleep;
  *    "serverPort" - int -   on which port the server is listening
  *    "serverIP" - String -  at which IP the server is located
  */
-public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface, View.OnClickListener, ServerActivityCallbackInterface {
+public class LobbyActivity extends FullscreenActivity implements LobbyUIInterface, View.OnClickListener, ServerActivityCallbackInterface {
     // implement some interface so that the client can update this
 
     private ThreadedEinzServer server; // there should be only one
@@ -85,14 +90,15 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
         if(this.host) {
             startServer();
-            ((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.YELLOW); // CYAN for client, Yellow for server. yey.
-
+            //((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.YELLOW); // CYAN for client, Yellow for server. yey.
+            findViewById(R.id.btn_start_game).setVisibility(View.VISIBLE);
             // wait for server to tell us it's ready so we can connect in onLocalServerReady()
         } else {
             // still display the IP/PORT info so that they can tell their friends
 
             /// Option to hide the infobox
             ///((CardView) findViewById(R.id.cv_lobby_server_info)).setVisibility(View.GONE);
+            findViewById(R.id.btn_start_game).setVisibility(View.GONE);
 
             // get info
             this.serverPort = intent.getIntExtra("serverPort",-1);
@@ -101,7 +107,7 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             String ip = "IP: "+this.serverIP; String p = "PORT: "+String.valueOf(this.serverPort);
             ((TextView) findViewById(R.id.tv_lobby_ip)).setText(ip);
             ((TextView) findViewById(R.id.tv_lobby_port)).setText(p);
-            ((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.CYAN); // CYAN for client, Yellow for server. yey.
+            //((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.CYAN); // CYAN for client, Yellow for server. yey.
 
             // this client will only be shown in the list once the server told it that it was registered.
 
@@ -120,7 +126,6 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         this.backgroundThread.start();
         this.backgroundLooper = this.backgroundThread.getLooper();
         this.backgroundHandler = new Handler(this.backgroundLooper);
-
 
     }
 
@@ -154,10 +159,19 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
         // set text
         tv_username.setText(username);
         tv_role.setText(role);
+        ImageView iconRole = usercard.findViewById(R.id.icn_role);
+
+        if(role.contains("spectator")){
+            iconRole.setImageResource(R.drawable.ic_spectator_black_24dp);
+        } else if(role.contains("player")) {
+            iconRole.setImageResource(R.drawable.ic_person_black_24dp);
+        } else {
+
+        }
 
         // highlight admin
         if(username.equals(this.adminUsername)){
-            usercard.setCardBackgroundColor(Color.GREEN);
+            usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default));
         }
 
         if(this.host){
@@ -177,6 +191,8 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
 
         // add view
         lobbyList.addView(usercard);
+
+
     }
 
     /**
@@ -285,6 +301,18 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
     }
 
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        this.ourClient.getActionCallbackInterface().setLobbyUI(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        this.ourClient.getActionCallbackInterface().setLobbyUI(null); // make sure no callbacks to this activity are executed
+    }
+
     /**
      * stops server if there is one on this device. <br>
      *     stops client.
@@ -295,8 +323,10 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    server.shutdown();
-                    server=null;
+                    if(server!=null) {
+                        server.shutdown();
+                        server = null;
+                    }
                 }
             };
             /*//old version
@@ -310,8 +340,10 @@ public class LobbyActivity extends AppCompatActivity implements LobbyUIInterface
             Runnable r = new Runnable() {
                 @Override
                 public void run() {
-                    ourClient.shutdown(true);
-                    ourClient=null;
+                    if(ourClient!=null) {
+                        ourClient.shutdown(true);
+                        ourClient = null;
+                    }
                 }
             };
             //old version

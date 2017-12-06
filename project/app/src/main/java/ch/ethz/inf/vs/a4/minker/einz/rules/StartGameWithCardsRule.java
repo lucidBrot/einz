@@ -8,12 +8,21 @@ import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.ParametizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
+import org.json.JSONObject;
 
 /**
  * Created by Josua on 11/24/17.
  */
 
 public class StartGameWithCardsRule extends BasicGlobalRule implements ParametizedRule{
+    /**
+     * Not yet implemented!
+     * @param parameters
+     */
+    @Override
+    public void setParameters(JSONObject parameters) {
+
+    }
 
     private int startCards = 7;
 

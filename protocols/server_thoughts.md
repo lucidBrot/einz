@@ -43,6 +43,8 @@ They would have to be sent quite often though.
 
 We could also just be happy with the timeouts the gamestate hands out, but then we wouldn't know if it's the player or the network which is slow.
 
+<sub>(below paragraph seems not well thought-through)</sub>
+
 My preferred action would be to have server- and clientside one additional thread which just sends a keepalive packet every 400 ms. Assuming a slow network connection of 1000ms ping, we can set the timeout to (network delay + network delay on way back + 400 ms if we have just recently received the last keepalive packet) = 2400 ms until we decide that the client is not responding.
 We could also send the keepalive packet as response to a previous keepalive packet. Then we would estimate a maximum of 2*p for the way and no period time, because the peer should react almost instantly, as networking is way slower than calculating. (here, p stands for the maximum ping time to the server that we will allow) This way, we can tell after 2 seconds that a client has disconnected (for p=1000ms), instead of after the timeout until which a card would have had to be played (30 seconds or so). Also, we know whether it is the client or the player who is not reacting.
 
@@ -60,7 +62,54 @@ The keepalive message should be registered in the ParserFactory and ActionFactor
 }
 ```
 
+We don't use `socket.setSoTimeout()` because that would constantly require incoming messages and otherwise close the socket. Doing that would work, but might entangle the code for the timeout more with the rest of the codebase than neccessary. Instead, running our own timer only between keepalive packets would be completely independent of the gamelogic messaging and the registration messaging. But: it would generate more traffic than neccessary.
+If we reset the timeout timer also on any other traffic, we still fulfill our purpose of noticing whether the other is still there. So here's what we want to do:
 
+**on any message received**
+
+1. reset the `keepaliveInTimer` back to maximum (<span style="color:blue">KEEPALIVE_TIMEOUT</span>)
+2. If it is a `keepalive` packet, capture it and do not pass it on to the gamelogic. Just parse it and probably do nothing.
+   If it is a different packet, let the program flow as it did until now.
+
+**on any message sent**
+
+1. reset the `keepaliveOutTimer` back to <span style="color:blue">KEEPALIVE_TIMEOUT</span>
+
+**when the `keepaliveInTimer` hits 0** 
+
+1. The other party has lost connection. 
+2. If we should do something, call the callbackFunction specified at the start of the connection.
+   * Serverside: Inform all clients that this client has lost connection
+   * Clientside: Change the UI such that the user knows they have lost connection.
+3. Close the socket and associated resources (buffers or the like)
+
+**when the `keepaliveOutTimer` hits 0**
+
+1. We have not sent a message in quite some time (in <span style="color:blue">KEEPALIVE_TIMEOUT</span> ms to be exact), so it's time to send a `keepalive` packet.
+
+**on shutting down**
+
+1. Stop all timers
+
+**on starting up**
+
+1. Start all timers. Possibly with an additional <span style="color:blue">KEEPALIVE_INITIAL_BONUS</span> time to the timer to make sure we don't think we lost connection before we even started.
+
+The <span style="color:blue">KEEPALIVE_TIMEOUT</span> should be larger or equal to the maximal ping we want to support. Setting it to 1000ms should be good enough: We would notice after a second that somebody had disconnected. We don't need to calculate the time it takes the packet to reach us into this, because even if the packet is still on its way, the peer should send the next if the timer ran out. This way, we only need to allow  <span style="color:blue">KEEPALIVE_TIMEOUT</span> between packets.
+
+It could happen that the time a packet takes to reach us is larger than  <span style="color:blue">KEEPALIVE_TIMEOUT</span>. In this case, the first timer will already run out. That's fine.
+Similarly, if the network is suddenly really slow, we will notice.
+
+TODO:
+
+* A Runnable that does all this and offers these functions. It takes the socket and the KEEPALIVE_TIMEOUT and KEEPALIVE_INITIAL_BONUS as parameters, as well as a callbackfunction for when the `keepaliveInTimer` hits zero
+* A KeepaliveSchedulerWrapper that makes it easy to run the functions on the keepalive thread.
+* A Parser for `networking` messagegroup
+* Registering the Parser in the networking parsermappings json
+* A Message for `keepalive`
+* Registering the Message in the json actionmappings
+* starting the runnable as soon as the socket is connected, both client and serverside
+* stopping the runnable when the server or client shuts down
 
 ## Concurrency and Multithreading
 

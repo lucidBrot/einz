@@ -91,7 +91,7 @@ Within the program, messagegroup and messagetype might be null if the mapping wa
   > [ShowToast](#showtoast)
 
 
-* endGame
+* endgame
 
   > [PlayerFinished](#playerfinished), [GameOver](#gameover)
 
@@ -145,10 +145,9 @@ Similar to ping, but respond to receiving the keepalive packet by sending it bac
 
 Implemented by **server** and **client**.
 
-If no keepalive packet is received within some timeout, the connection is considered broken.
-`timeout` specified by the server in ms.
+If no packet is received within some timeout, the connection is considered broken.
 
-The reason for this packet is that we cannot know whether a client disconnected unless we send to it. In the worst case, this would mean that we patiently wait some 30 seconds for a client to play, and only once we decide that this was too long and tell it that we disconnected it, we notice. To circumvent this, we send a keepalive packet back and forth and can thus make use of the `socket.setTimeout`, which only reacts to data packets, not to the tcp-internal keepalive packets.
+The reason for this packet is that we cannot know whether a client disconnected unless we send to it. In the worst case, this would mean that we patiently wait some 30 seconds for a client to play (gamelogic, if implemented at all), and only once we decide that this was too long and tell it that we disconnected it, we notice. To circumvent this, we send a keepalive packet back and forth and can thus make use of the `socket.setTimeout`, which only reacts to data packets, not to the tcp-internal keepalive packets.
 
 Implementing this packet is easily uncoupled from the rest of the packets and is thus a TODO for later.
 
@@ -156,10 +155,9 @@ Implementing this packet is easily uncoupled from the rest of the packets and is
 {
   "header":{
     "messagegroup":"networking",
-    "messagetype":"keepalive"
+    "messagetype":"KeepAlive"
   },
   "body":{
-    "timeout":"1000"
   }
 }
 ```
@@ -367,9 +365,12 @@ The **admin client** informs the server what rules it chose. The rule is only pa
 
 Since every rule might have dynamic parameters, they are all stored as JSONObject where only their name is guaranteed to be available.
 
-`ruleset` : *JSONObject containing non-uniform JSONObjects*
+Some rules refer to cards, some rules should be applied globally.
+For the `cardRules`, there is a list of rules with their parameters for all cards. For the `globalRules`, every rule is only listed once.
 
-> The identifier of the JSONObject is also the identifier of the [rule](#rule)
+The rule *must* have `id` and `parameters` . For any card not having rules applied to it specifically, and  with no entry provided, it will be assumed that it is not supposed to be in the deck. Otherwise, there must be a `number` in the card's object to specify how often the card should be in the deck. (The deck will be re-shuffled once it is empty)
+
+> See also [rule](#rules)
 
 ```json
 {
@@ -378,17 +379,27 @@ Since every rule might have dynamic parameters, they are all stored as JSONObjec
     "messagetype":"SpecifyRules"
   },
   "body":{
-    "ruleset":{
-        "startWithXCards":{
-          "x":"7"
-        },
-       "instantWinOnCardXPlayed":{
-          "cardcolor":"green",
-          "cardnum":"3"
-       },
-      "exodia":{},
-      "handicap":{"arr":[{"chris":"100"},{"roger":"-10"}]}
-	}
+    "cardRules":{
+      "someCardID":{
+        "rulelist":[
+          {"id":"instantWinOnCardPlayed", "parameters":{}},
+          {"id":"chooseColorCard", "parameters":{"param1":"lulz",
+                                                "lolcat":"foobar"}}
+          ],
+        "number":"3"
+    },
+      "otherCardID":{
+          "number":"7",
+          "rulelist":[
+          {"id":"instantWinOnCardPlayed", "parameters":{}}
+        ]
+      }
+    },
+    "globalRules":[
+        {"id":"startWithXCards","parameters":{"x":"7"},
+        {"id":"exodia","parameters":{}},
+        {"id":"handicap","parameters":{"arr":[{"chris":"100"},{"roger":"-10"}]}}
+	]
   }
 }
 ```
@@ -418,9 +429,9 @@ The **Server** sends this to the Client. No response from the Client required.
 
 `turn-order` : *JSONArray of usernames as Strings* 
 
-`ruleset` : *JSONOBject containing non-uniform JSONObjects*
+`ruleset` : *JSONObject containing the body of [SpecifyRules](#specifyrules) *
 
-> The identifier of the JSONObject is also the identifier of the [rule](#rule)
+> See also [rule](#rules)
 
 ```Json
 {
@@ -430,16 +441,22 @@ The **Server** sends this to the Client. No response from the Client required.
   },
   "body":{
     "ruleset":{
-        "startWithXCards":{
-          "x":"7"
-        },
-       "instantWinOnCardXPlayed":{
-          "cardcolor":"green",
-          "cardnum":"3"
-       },
-      "exodia":{},
-      "handicap":{"arr":[{"chris":"100"},{"roger":"-10"}]}
-	},
+      "cardRules":{
+        "someCardID":[
+          {"id":"instantWinOnCardPlayed", "parameters":{}},
+          {"id":"chooseColorCard", "parameters":{"param1":"lulz",
+                                                "lolcat":"foobar"}}
+        ],
+        "otherCardID":[
+          {"id":"instantWinOnCardPlayed", "parameters":{}}
+        ]
+      },
+      "globalRules":[
+          {"id":"startWithXCards","parameters":{"x":"7"},
+          {"id":"exodia","parameters":{}},
+          {"id":"handicap","parameters":{"arr":[{"chris":"100"},{"roger":"-10"}]}}
+      ]
+    },
     "turn-order":[
       "sisisilvia",
       "faeglas",
@@ -455,7 +472,7 @@ Note that the example rules here were spontaneously written and might not be spe
 
 ## DrawCards
 
-Request to draw new cards. The Server will return as many cards as the minimum of cards drawable that is not 0, or 0 as a sign of failure.
+Request to draw new cards. The Server will return as many cards as the minimum of cards drawable that is not 0.
 
 The **Client** sends this request. The Server checks whether the Client is allowed to draw this many cards and hands back the appropriate amount of cards later using [**DrawCardsResponse**](#drawcardsresponse).
 
@@ -684,7 +701,7 @@ After this, the server will remove the player from the turn order list and let i
 ```Json
 {
   "header":{
-    "messagegroup":"endGame",
+    "messagegroup":"endgame",
     "messagetype":"PlayerFinished"
   },
   "body":{
@@ -702,7 +719,7 @@ points: *JSONObject of Players and points*
 ```Json
 {
 	"header": {
-		"messagegroup": "endGame",
+		"messagegroup": "endgame",
 		"messagetype": "GameOver"
 	},
   "body": {
@@ -898,3 +915,21 @@ is ignored by the server if the game is not running.
 All we know as of 16.11.2017 is that Rules should have an identifier String.
 
 It would probably make sense to include some compatibility notes for use with other rules.
+
+State of 05.12.2017: There are two kind of rules.
+
+* Those that apply to a specific card (or multiple)
+* Those that apply globally
+
+A rule is only specified by its identifier and maybe some parameters, already provided as a jsonObject. The parameters are specific to the rule and only parsed to a JSON Object
+
+```json
+{
+  "id":"never gonna give you up, never gonna let you down",
+  "parameters":{
+    "never":"gonna run around",
+    "and desert":"you"
+  }
+}
+```
+

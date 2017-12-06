@@ -33,6 +33,6 @@ public class EinzShowToastAction extends EinzAction {
 
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onShowToast(getMessage());
     }
 }

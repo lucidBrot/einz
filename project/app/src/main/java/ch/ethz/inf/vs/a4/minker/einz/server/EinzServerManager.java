@@ -326,7 +326,7 @@ public class EinzServerManager {
                 if(role.equals("player")) {
                     serverFunctionInterface.removePlayer(new Player(username));
                 } else if(role.equals("specator")){
-                    // TODO: removeSpecator from fabian once the interface offers this
+                    // could inform fabian but he doesn't care
                 }
                 SFLock.writeLock().unlock();
             }
@@ -338,9 +338,13 @@ public class EinzServerManager {
 
             // and stop the corresponding client
             try {
-                esch.setConnectedUser(null);
-                esch.stopThreadPatiently();
-                Log.d("servMan/unReg", "stopped Thread of "+username);
+                if(esch!=null) {
+                    esch.setConnectedUser(null);
+                    esch.stopThreadPatiently();
+                    Log.d("servMan/unReg", "stopped Thread of " + username);
+                } else {
+                    Log.d("servMan/unReg", "there was no Thread of "+username+" that I could unregister");
+                }
             }catch(java.lang.NullPointerException e){
                 Log.d("servMan/unReg", "ESCH didn't exist anymore. (Did you maybe shut down the server?)");
                 e.printStackTrace();
@@ -516,6 +520,48 @@ public class EinzServerManager {
         userListLock.readLock().unlock();
     }
 
+    public ArrayList<String> getPlayers(){
+        userListLock.readLock().lock();
+        ArrayList<String> retList = new ArrayList<>();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
+                continue;
+
+            retList.add(username);
+        }
+        userListLock.readLock().unlock();
+        return retList;
+    }
+
+    public ArrayList<Player> getPlayersAsPlayers(){
+        userListLock.readLock().lock();
+        ArrayList<Player> retList = new ArrayList<>();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
+                continue;
+
+            retList.add(new Player(username));
+        }
+        userListLock.readLock().unlock();
+        return retList;
+    }
+
+    public ArrayList<String> getSpectators(){
+        userListLock.readLock().lock();
+        ArrayList<String> retList = new ArrayList<>();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
+                continue;
+
+            retList.add(username);
+        }
+        userListLock.readLock().unlock();
+        return retList;
+    }
+
     public void broadcastMessageToAllSpectators(EinzMessage<? extends EinzMessageBody> message) {
         for(String username : getRegisteredClientRoles().keySet()){
             if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
@@ -566,10 +612,10 @@ public class EinzServerManager {
         }
     }
 
-    public void specifyRules(ArrayList<BasicRule> ruleset) { //TODO: readwritelock on serverFunctionInterface
-        // TODO: RULES: specifyRules. How is the deck transmitted? in what format should I pass the rules?
-        // TODO: add message for endTurn Action to docs and implement
-        // TODO: RULES: rulemessage
+    public void specifyRules(EinzSpecifyRulesMessageBody body) {
+        getSFLock().writeLock().lock();
+        getServerFunctionInterface().initialiseGame(getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());
+        getSFLock().writeLock().unlock();
     }
 
     /**
@@ -638,6 +684,7 @@ public class EinzServerManager {
         if(gamePhaseStarted){
             // TODO: get state from fabian
 
+
         } else {
             // TODO: return empty state in message
 
@@ -652,6 +699,7 @@ public class EinzServerManager {
         if(gamePhaseStarted) { // ignore otherwise
             getSFLock().writeLock().lock();
             // TODO: call fabians on finish turn
+
 
             getSFLock().writeLock().unlock();
             throw new RuntimeException(new TodoException("Fabi plis inplinimt"));

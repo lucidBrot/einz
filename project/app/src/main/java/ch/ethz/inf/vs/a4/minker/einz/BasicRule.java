@@ -30,6 +30,8 @@ public abstract class BasicRule {
      */
     public abstract String getDescription();
 
+    public abstract void setParameters(JSONObject parameters);
+
 
     public JSONObject getContentAsJSON() {
         return new JSONObject();

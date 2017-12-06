@@ -23,6 +23,6 @@ public class EinzCustomActionResponseAction extends EinzAction {
 
     @Override
     public void run() {
-
+        getClientActionCallbackInterface().onCustomActionResponse(getMessage());
     }
 }

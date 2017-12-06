@@ -7,6 +7,7 @@ import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
+import org.json.JSONObject;
 
 /**
  * Created by Josua on 11/24/17.
@@ -22,6 +23,15 @@ public class ChangeDirectionRule extends BasicCardRule {
     @Override
     public String getDescription() {
         return "Reverses the order of the players.";
+    }
+
+    /**
+     * Not yet implemented!
+     * @param parameters
+     */
+    @Override
+    public void setParameters(JSONObject parameters) {
+
     }
 
     @Override

@@ -97,8 +97,9 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param cardRules   card rules with the card they should apply to
      */
 
-    public void initialiseGame(List<Player> players, Map<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
-                               Map<Card, List<BasicCardRule>> cardRules) {
+
+    public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
+                               Map<Card, ArrayList<BasicCardRule>> cardRules) {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
         } else {

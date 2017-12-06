@@ -2,28 +2,64 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
+import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterSuccessMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ClientMessengerCallback implements ClientActionCallbackInterface {
-    private final LobbyUIInterface lobbyUI; // TODO: implement reactions to messages
+public class ClientMessengerCallback implements ClientActionCallbackInterface { // TODO: make sure to always cover the case where gameUI and/or lobbyUI are null
+    @Nullable
+    private LobbyUIInterface lobbyUI; // can be null if the corresponding Activity does not exist anymore
+    @Nullable
+    private GameUIInterface gameUI; // can be null if the corresponding Activity does not exist yet/anymore
     private final Context applicationContext;
     private final EinzClient parentClient;
 
 
+    /**
+     * @param lobbyUIInterface make sure to call {@link #setGameUIAndDisableLobbyUI(GameUIInterface)} after destroying the lobby
+     * @param appContext just the Context of the application, for toasts and stuff
+     * @param parentClient the client, duh.
+     */
     public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface, Context appContext, EinzClient parentClient) {
+        this.gameUI = null;
         this.lobbyUI = lobbyUIInterface;
         this.applicationContext = appContext;
         this.parentClient = parentClient;
+    }
+
+    public void setGameUI(GameUIInterface gameUI){
+        this.gameUI = gameUI;
+    }
+
+    /**
+     * Remember to set this to null again if the parameter stops existing
+     */
+    public void setLobbyUI(LobbyUIInterface lobbyUI){
+        this.lobbyUI = lobbyUI;
+    }
+
+    /**
+     * set {@link #lobbyUI} to null and {@link #gameUI} to the parameter.
+     * @param gameUI The Activity implementing the {@link GameUIInterface}
+     */
+    public void setGameUIAndDisableLobbyUI(GameUIInterface gameUI){
+        setGameUI(gameUI);
+        setLobbyUI(null);
+    }
+
+    public LobbyUIInterface getLobbyUI() {
+        return lobbyUI;
+    }
+
+    public GameUIInterface getGameUI() {
+        return gameUI;
     }
 
     @Override
@@ -64,12 +100,16 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                lobbyUI.setAdmin(message.getBody().getAdmin());
-                lobbyUI.setLobbyList(players, spectators);
+                if(lobbyUI!=null) { // TODO: update lobby list if it changes during the game
+                    lobbyUI.setAdmin(message.getBody().getAdmin());
+                    lobbyUI.setLobbyList(players, spectators);
+                }
             }
         };
 
-        runOnMainThread(runnable);
+        runOnMainThread(runnable); // this is important because
+                                    // a) to access the UI, this is needed
+                                    // b) to be sure the Activity still exists after checking
         Log.d("ClientMessengerCallback", "updated LobbyList");
 
     }
@@ -82,7 +122,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                lobbyUI.onRegistrationFailed(body);
+                if(lobbyUI!=null) { // ignore the incoming registerFailure message if we're already in the game phase... That could only happen if we were registered, then unregistered during the game and tried to reregister but failed...
+                    lobbyUI.onRegistrationFailed(body);
+                }
             }
         };
 
@@ -130,6 +172,57 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
         // TODO: notify user either now or on updatelobbylist that somebody left and why (maybe not with a toast, or is toast fine?)
 
+    }
+
+    @Override
+    public void onKickFailure(EinzMessage<EinzKickFailureMessageBody> message) {
+        // TODO: implement this method, probably add a function onKickFailure to LobbyUI Interface and the game-in-progress UI
+        Log.d("CliMesssegnerCallback", "onKickFailure");
+    }
+
+    @Override
+    public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
+        // TODO: implement onInitGame
+    }
+
+    @Override
+    public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsMessageBody> message) {
+        // TODO: implement onDrawCardsSuccess
+    }
+
+    @Override
+    public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
+        // TODO: implement onDrawCardsFailure
+    }
+
+    @Override
+    public void onPlayCardResponse(EinzMessage<EinzPlayCardMessageBody> message) {
+        // TODO: implement onPlayCardResponse
+    }
+
+    @Override
+    public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
+        // TODO: implement onSendState
+    }
+
+    @Override
+    public void onShowToast(EinzMessage<EinzShowToastMessageBody> message) {
+        Toast.makeText(applicationContext, message.getBody().getToast(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message) {
+        // TODO: implement onPlayerFinished
+    }
+
+    @Override
+    public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
+        // TODO: implement onGameOver
+    }
+
+    @Override
+    public void onCustomActionResponse(EinzMessage<EinzCustomActionResponseMessageBody> message) {
+        // TODO: implement onCustomActionResponse
     }
 
     private void runOnMainThread(Runnable runnable) {

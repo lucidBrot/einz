@@ -15,6 +15,10 @@
 	{
 	  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody",
 	  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzStartGameAction"
+	},
+	{
+	  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepaliveMessageBody",
+	  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKeepaliveAction"
 	}
   ]
 }

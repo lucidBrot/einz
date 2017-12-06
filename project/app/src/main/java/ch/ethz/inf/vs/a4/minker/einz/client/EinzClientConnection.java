@@ -2,6 +2,9 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.OnKeepaliveTimeoutCallback;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.SendMessageCallback;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
@@ -20,7 +23,7 @@ import static java.lang.Thread.sleep;
 /**
  * call {@link #run} to actually connect
  */
-public class EinzClientConnection implements Runnable {
+public class EinzClientConnection implements Runnable, SendMessageCallback {
 
     private final String serverIP;
     private final int serverPort;
@@ -48,6 +51,10 @@ public class EinzClientConnection implements Runnable {
 
     }
 
+    void onKeepaliveTimeout() {
+        // TODO: onKeepaliveTimeout inform user that we lost connection
+    }
+
     public EinzClientConnection(String serverIP, int serverPort, EinzClient parentClient) {
         this(serverIP, serverPort, null, parentClient);
     }
@@ -58,12 +65,13 @@ public class EinzClientConnection implements Runnable {
      *
      * @param message text entered by client
      */
-    public void sendMessage(String message) throws SendMessageFailureException {
+    public synchronized void sendMessage(String message) throws SendMessageFailureException {
         if (bufferOut != null && !bufferOut.checkError()) {
             synchronized (bufferMonitor) {
                 bufferOut.println(message);
                 bufferOut.flush();
             }
+            this.parentClient.keepaliveScheduler.onAnyMessageSent();
         } else {
             Log.w("ClientConnection", "bufferOut was not available to send message "+message);
             throw new SendMessageFailureException("OutputBuffer was not ready to send the message. Please retry again when you are positive that it is not null (or has errors)");
@@ -79,7 +87,7 @@ public class EinzClientConnection implements Runnable {
      * @param message
      * @see #sendMessage(String)
      */
-    public void sendMessage(JSONObject message) throws SendMessageFailureException {
+    public synchronized void sendMessage(JSONObject message) throws SendMessageFailureException {
         String msg = message.toString();
         // don't add \r\n because println
         sendMessage(msg);
@@ -95,7 +103,7 @@ public class EinzClientConnection implements Runnable {
      * @see #sendMessage(JSONObject)
      * @see #sendMessage(String)
      */
-    public void sendMessage(EinzMessage message) throws SendMessageFailureException {
+    public synchronized void sendMessage(EinzMessage message) throws SendMessageFailureException {
         try {
             sendMessage(message.toJSON());
         } catch (JSONException e) {
@@ -117,7 +125,8 @@ public class EinzClientConnection implements Runnable {
             Log.d("EinzClientConnection", "Connecting to " + serverIP + ":" + serverPort);
 
             //create a socket to make the connection with the server
-            socket = new Socket(serverAddr, serverPort);
+            socket = new Socket(serverAddr, serverPort); // TODO: set timeout on the connection establishing itself
+                                                        // see https://stackoverflow.com/a/4969788/2550406
 
             try {
 
@@ -128,6 +137,7 @@ public class EinzClientConnection implements Runnable {
                 bufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), Globals.ENCODING));
 
                 String mServerMessage;
+
                 //in this while the client listens for the messages sent by the server
                 while (spin) {
                     mServerMessage = bufferIn.readLine();

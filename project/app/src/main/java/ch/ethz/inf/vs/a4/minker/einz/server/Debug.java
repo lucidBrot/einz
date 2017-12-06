@@ -45,14 +45,28 @@ public class Debug {
     public static long a_startTime = 0;
     public static long a_endTime = 0;
 
+    public static boolean logKeepalivePackets = false; // set to false to reduce log spam from receiving/sending keepalive packets, including the messages from actionfactory
+    public static boolean logKeepaliveSpam = false; // set to false to reduce log spam from triggering maybe-timeouts and more verbose debug output
+    public static boolean useKeepalive = true; // set true to use keepalive mechanisms
+
     /**
      * called at program start in order to inform Devs about debug settings that may be unintentional
      */
     public static void debug_printInitialWarnings(){
-        if(!CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED)
-            Log.w("Debug", "Using CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = false");
+        if(CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED)
+            Log.w("Debug", "Using deprecated CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED = true");
         if(SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED>0)
             Log.w("Debug", "Using SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED = "+SERVER_SLEEP_AFTER_CONNECTION_ESTABLISHED);
+        if(logKeepalivePackets){
+            Log.w("Debug", "Log spam from keepalive packets is activated.");
+        }
+        if(!useKeepalive){
+            Log.w("Debug", "useKeepalive is turned off.");
+        } else {
+            if(!logKeepaliveSpam && !logKeepalivePackets){
+                Log.w("Debug", "using Keepalive but without debug logging for it.");
+            }
+        }
     }
 
     /**
@@ -314,4 +328,10 @@ public class Debug {
         }
     }
 
+    public static EinzMessage debug_getFailingKickMessage() {
+        EinzMessageHeader header=new EinzMessageHeader("registration","Kick" );
+        EinzKickMessageBody body = new EinzKickMessageBody("some яаndom user who should not exist, in order to trigger a kick failure message");
+        EinzMessage<EinzKickMessageBody> message = new EinzMessage<>(header, body);
+        return message;
+    }
 }

@@ -15,6 +15,18 @@
 	{
 	  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody",
 	  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnregisterResponseAction"
+	},
+	{
+	  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepaliveMessageBody",
+	  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKeepaliveAction"
+	},
+	{
+	  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody",
+	  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKickFailureAction"
+	},
+	{
+	  "messagebodyclass": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody",
+	  "mapstoaction": "class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction"
 	}
   ]
 }

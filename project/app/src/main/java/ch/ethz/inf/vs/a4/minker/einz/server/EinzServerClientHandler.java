@@ -4,6 +4,9 @@ import android.util.Log;
 
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.OnKeepaliveTimeoutCallback;
+import ch.ethz.inf.vs.a4.minker.einz.keepalive.SendMessageCallback;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +21,7 @@ import static java.lang.Thread.sleep;
 /**
  * This class handles one Connection per instance (thread)
  */
-public class EinzServerClientHandler implements Runnable{
+public class EinzServerClientHandler implements Runnable, SendMessageCallback{
 
     private PrintWriter bufferOut;
     public Socket socket;
@@ -43,6 +46,8 @@ public class EinzServerClientHandler implements Runnable{
     // identify this connection by its user as soon as this is available
     private String connectedUser = null; // is set on register and never unset because when the client disconnects, this thread is stopped
     private String latestUser = null; // is only null if there was never a username
+
+    KeepaliveScheduler keepaliveScheduler;
 
     /**
      * Listens on {@param clientSocket} for incoming messages and provides an interface {@link ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler#sendMessage(String)} for sending to the client associated with this socket.
@@ -122,6 +127,13 @@ public class EinzServerClientHandler implements Runnable{
             e.printStackTrace();
         }
 
+        this.keepaliveScheduler = new KeepaliveScheduler(this, new OnKeepaliveTimeoutCallback() {
+            @Override
+            public void onKeepaliveTimeout() {
+                Log.d("keepalive", "user lost connection");
+                onClientDisconnected(); // involves trying to tell that client that he disconnected
+            }
+        });
     }
 
 
@@ -156,6 +168,7 @@ public class EinzServerClientHandler implements Runnable{
         String line;
         spin = true;
         boolean firstround = true;
+        this.keepaliveScheduler.runInParallel(); // run timeout timers in background
 
         while (spin) {
             try {
@@ -167,12 +180,14 @@ public class EinzServerClientHandler implements Runnable{
                     socketWriteLock.lock();
                     socket.close();
                     socketWriteLock.unlock();
+                    Log.d("ESCH", "user sent QUIT or null. Closing connection...");
                     onClientDisconnected();
                     stopThreadPatiently();
                     Log.d("ESCH", "closed clientSocket");
                     return;
                 } else {
                     Log.d("ESCH", "received line: "+line);
+                    this.keepaliveScheduler.onAnyMessageReceived();
                     if(parentEinzServer.DEBUG_ECHO) sendMessage("Your Package was: "+line + "\r\n"); // echo back the same packet // T/ODO: don't echo back
                     runAction(parseMessage(line));
 
@@ -235,7 +250,6 @@ public class EinzServerClientHandler implements Runnable{
      */
     private void onClientDisconnected(){
         if(!stopping && spin) {
-            Log.d("ESCH/clientDisconnected", "IOException on socket - user probably lost connection");
             parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
             parentEinzServer.decNumClients();
         }
@@ -293,6 +307,8 @@ public class EinzServerClientHandler implements Runnable{
             */
 
         socketWriteLock.unlock();
+
+        this.keepaliveScheduler.onAnyMessageSent();
     }
 
     /**
@@ -350,7 +366,7 @@ public class EinzServerClientHandler implements Runnable{
     private EinzAction parseMessage(String message){
         try {
             EinzParser einzParser = this.einzParserFactory.generateEinzParser(message);
-            EinzMessage<? extends EinzMessageBody> einzMessage = einzParser.parse(message); // TODO: implement parser, especially for when message is not valid
+            EinzMessage<? extends EinzMessageBody> einzMessage = einzParser.parse(message);
 
             //<Debug>
             /*EinzMessage einzMessage = new EinzMessage(
