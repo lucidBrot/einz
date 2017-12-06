@@ -1,12 +1,21 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules;
 
 import ch.ethz.inf.vs.a4.minker.einz.*;
+import org.json.JSONObject;
 
 /**
  * Created by Josua on 11/27/17.
  */
 
 public class WishColorRule extends BasicCardRule {
+    /**
+     * Not yet implemented!
+     * @param parameters
+     */
+    @Override
+    public void setParameters(JSONObject parameters) {
+
+    }
 
     private CardColor wishedColor = null;
 

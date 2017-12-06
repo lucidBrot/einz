@@ -4,6 +4,7 @@ import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
+import org.json.JSONObject;
 
 /**
  * Created by Josua on 11/24/17.
@@ -12,6 +13,14 @@ import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 public class DrawTwoCardsRule extends BasicCardRule{
 
     private boolean assignedCardPlayed = false;
+    /**
+     * Not yet implemented!
+     * @param parameters
+     */
+    @Override
+    public void setParameters(JSONObject parameters) {
+
+    }
 
     @Override
     public String getName() {

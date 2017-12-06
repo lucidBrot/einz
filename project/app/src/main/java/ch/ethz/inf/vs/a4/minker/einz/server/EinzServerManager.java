@@ -577,6 +577,7 @@ public class EinzServerManager {
         /*getServerFunctionInterface().initialiseGame(
 
         );*/
+        getServerFunctionInterface().initialiseGame();
 
         ArrayList<String> turnOrder = new ArrayList<>(); // TODO: generate turn-Order by fabian
         getSFLock().writeLock().unlock();

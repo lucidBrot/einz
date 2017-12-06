@@ -366,11 +366,9 @@ The **admin client** informs the server what rules it chose. The rule is only pa
 Since every rule might have dynamic parameters, they are all stored as JSONObject where only their name is guaranteed to be available.
 
 Some rules refer to cards, some rules should be applied globally.
-For the cardRules, there is a list of rules with their parameters for all cards. For the globalRules, every rule is only listed once.
+For the `cardRules`, there is a list of rules with their parameters for all cards. For the `globalRules`, every rule is only listed once.
 
-The rule *must* have `id` and `parameters` . For any card not having rules applied to it specifically, and  with no entry provided, it will be assumed that it is not supposed to be in the deck. Otherwise, there must be a number to specify how often the card should be in the deck proportionally...?
-
-TODO: @Fabian how should I specify the number of cards? And what are the params for initializeGame? And I need the turn order to send it, or will you do this after specifyRules?
+The rule *must* have `id` and `parameters` . For any card not having rules applied to it specifically, and  with no entry provided, it will be assumed that it is not supposed to be in the deck. Otherwise, there must be a `number` in the card's object to specify how often the card should be in the deck. (The deck will be re-shuffled once it is empty)
 
 > See also [rule](#rules)
 
@@ -382,14 +380,20 @@ TODO: @Fabian how should I specify the number of cards? And what are the params 
   },
   "body":{
     "cardRules":{
-      "someCardID":[
-        {"id":"instantWinOnCardPlayed", "parameters":{}},
-        {"id":"chooseColorCard", "parameters":{"param1":"lulz",
-                                              "lolcat":"foobar"}}
-      ],
-      "otherCardID":[
-        {"id":"instantWinOnCardPlayed", "parameters":{}}
-      ]
+      "someCardID":{
+        "rulelist":[
+          {"id":"instantWinOnCardPlayed", "parameters":{}},
+          {"id":"chooseColorCard", "parameters":{"param1":"lulz",
+                                                "lolcat":"foobar"}}
+          ],
+        "number":"3"
+    },
+      "otherCardID":{
+          "number":"7",
+          "rulelist":[
+          {"id":"instantWinOnCardPlayed", "parameters":{}}
+        ]
+      }
     },
     "globalRules":[
         {"id":"startWithXCards","parameters":{"x":"7"},
