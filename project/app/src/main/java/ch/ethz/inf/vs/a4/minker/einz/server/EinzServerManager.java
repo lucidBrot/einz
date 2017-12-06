@@ -520,6 +520,34 @@ public class EinzServerManager {
         userListLock.readLock().unlock();
     }
 
+    public ArrayList<String> getPlayers(){
+        userListLock.readLock().lock();
+        ArrayList<String> retList = new ArrayList<>();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
+                continue;
+
+            retList.add(username);
+        }
+        userListLock.readLock().unlock();
+        return retList;
+    }
+
+    public ArrayList<String> getSpectators(){
+        userListLock.readLock().lock();
+        ArrayList<String> retList = new ArrayList<>();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
+                continue;
+
+            retList.add(username);
+        }
+        userListLock.readLock().unlock();
+        return retList;
+    }
+
     public void broadcastMessageToAllSpectators(EinzMessage<? extends EinzMessageBody> message) {
         for(String username : getRegisteredClientRoles().keySet()){
             if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
@@ -570,14 +598,14 @@ public class EinzServerManager {
         }
     }
 
-    public void specifyRules(JSONObject cardRules, JSONArray globalRules) {
+    public void specifyRules(JSONObject cardRules, JSONArray globalRules) { // TODO: add complete message here and rewrite this function
         // TODO: RULES: send initGame message and tell fabian about these
         // but why must I specify the deck? TODO: find out if I should convert the cards to a deck.
         getSFLock().writeLock().lock();
         /*getServerFunctionInterface().initialiseGame(
 
         );*/
-        getServerFunctionInterface().initialiseGame();
+        getServerFunctionInterface().initialiseGame(getPlayers(), cardNums, etc);
 
         ArrayList<String> turnOrder = new ArrayList<>(); // TODO: generate turn-Order by fabian
         getSFLock().writeLock().unlock();
