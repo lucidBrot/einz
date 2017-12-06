@@ -534,6 +534,20 @@ public class EinzServerManager {
         return retList;
     }
 
+    public ArrayList<Player> getPlayersAsPlayers(){
+        userListLock.readLock().lock();
+        ArrayList<Player> retList = new ArrayList<>();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
+                continue;
+
+            retList.add(new Player(username));
+        }
+        userListLock.readLock().unlock();
+        return retList;
+    }
+
     public ArrayList<String> getSpectators(){
         userListLock.readLock().lock();
         ArrayList<String> retList = new ArrayList<>();
@@ -598,23 +612,10 @@ public class EinzServerManager {
         }
     }
 
-    public void specifyRules(JSONObject cardRules, JSONArray globalRules) { // TODO: add complete message here and rewrite this function
-        // TODO: RULES: send initGame message and tell fabian about these
-        // but why must I specify the deck? TODO: find out if I should convert the cards to a deck.
+    public void specifyRules(EinzSpecifyRulesMessageBody body) {
         getSFLock().writeLock().lock();
-        /*getServerFunctionInterface().initialiseGame(
-
-        );*/
-        getServerFunctionInterface().initialiseGame(getPlayers(), cardNums, etc);
-
-        ArrayList<String> turnOrder = new ArrayList<>(); // TODO: generate turn-Order by fabian
+        getServerFunctionInterface().initialiseGame(getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());
         getSFLock().writeLock().unlock();
-        EinzMessageHeader header = new EinzMessageHeader("startgame", "InitGame");
-
-        EinzInitGameMessageBody body = new EinzInitGameMessageBody(cardRules, globalRules, turnOrder);
-        EinzMessage<EinzInitGameMessageBody> message = new EinzMessage<>(header, body);
-        broadcastMessageToAllPlayers(message);
-        broadcastMessageToAllSpectators(message);
     }
 
     /**

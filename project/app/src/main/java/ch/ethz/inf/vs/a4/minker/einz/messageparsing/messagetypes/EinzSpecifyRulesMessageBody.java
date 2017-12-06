@@ -145,7 +145,7 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
         }
     }
 
-    private ArrayList<BasicGlobalRule> getGlobalParsedRules(){
+    public ArrayList<BasicGlobalRule> getGlobalParsedRules(){
         if(!parseGlobalRulesFurther()){
             return null;
         }

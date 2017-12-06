@@ -35,7 +35,7 @@ public interface ServerFunctionDefinition {
      * @param globalRules set of global rules with which the game is played
      * @param cardRules card rules with the card they should apply to
      */
-    public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules, Map<BasicCardRule, Card> cardRules);
+    public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules, Map<Card, ArrayList<BasicCardRule>> cardRules);
 
     /**
      * Don't know yet what this does exactly
