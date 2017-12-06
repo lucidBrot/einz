@@ -1,8 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
+import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzRegisterSuccessAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 
 public interface ClientActionCallbackInterface {
