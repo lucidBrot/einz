@@ -42,7 +42,7 @@ public class EinzGameOverMessageBody extends EinzMessageBody {
 /*
 {
 	"header": {
-		"messagegroup": "endGame",
+		"messagegroup": "endgame",
 		"messagetype": "GameOver"
 	},
   "body": {

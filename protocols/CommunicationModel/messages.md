@@ -91,7 +91,7 @@ Within the program, messagegroup and messagetype might be null if the mapping wa
   > [ShowToast](#showtoast)
 
 
-* endGame
+* endgame
 
   > [PlayerFinished](#playerfinished), [GameOver](#gameover)
 
@@ -701,7 +701,7 @@ After this, the server will remove the player from the turn order list and let i
 ```Json
 {
   "header":{
-    "messagegroup":"endGame",
+    "messagegroup":"endgame",
     "messagetype":"PlayerFinished"
   },
   "body":{
@@ -719,7 +719,7 @@ points: *JSONObject of Players and points*
 ```Json
 {
 	"header": {
-		"messagegroup": "endGame",
+		"messagegroup": "endgame",
 		"messagetype": "GameOver"
 	},
   "body": {

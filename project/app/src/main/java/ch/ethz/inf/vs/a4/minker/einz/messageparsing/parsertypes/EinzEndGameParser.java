@@ -36,7 +36,7 @@ public class EinzEndGameParser extends EinzParser {
     }
 
     private EinzMessage parsePlayerFinished(JSONObject message) throws JSONException {
-        EinzMessageHeader emh = new EinzMessageHeader("endGame", "PlayerFinished");
+        EinzMessageHeader emh = new EinzMessageHeader("endgame", "PlayerFinished");
         JSONObject body = message.getJSONObject("body");
         String username = body.getString("username");
         EinzMessageBody emb = new EinzPlayerFinishedMessageBody(username);
@@ -46,7 +46,7 @@ public class EinzEndGameParser extends EinzParser {
     }
 
     private EinzMessage parseGameOver(JSONObject message) throws JSONException {
-        EinzMessageHeader emh = new EinzMessageHeader("endGame", "GameOver");
+        EinzMessageHeader emh = new EinzMessageHeader("endgame", "GameOver");
         JSONObject body = message.getJSONObject("body");
         JSONObject pointsJSON = body.getJSONObject("points");
         HashMap<String, String> points = new HashMap<>();

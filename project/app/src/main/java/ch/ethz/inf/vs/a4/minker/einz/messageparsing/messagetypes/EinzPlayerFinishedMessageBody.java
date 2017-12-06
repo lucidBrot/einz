@@ -31,7 +31,7 @@ public class EinzPlayerFinishedMessageBody extends EinzMessageBody {
 /*
 {
   "header":{
-    "messagegroup":"endGame",
+    "messagegroup":"endgame",
     "messagetype":"PlayerFinished"
   },
   "body":{
