@@ -54,6 +54,7 @@ public class GlobalState {
         this.players = orderOfPlayers;
         this.finishedPlayers = new ArrayList<>();
         this.drawPile = new LinkedList<>();
+        this.discardPile = new LinkedList<>();
     }
 
     /**
