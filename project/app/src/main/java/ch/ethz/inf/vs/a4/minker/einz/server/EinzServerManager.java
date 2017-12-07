@@ -3,10 +3,13 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.Player;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.Spectator;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.GlobalStateParser;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.PlayerState;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,7 +103,6 @@ public class EinzServerManager {
         SFLock.writeLock().lock();
         getServerFunctionInterface().initialiseStandardGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
         // TODO: not standard game but with rules, maybe call initialise earlier
-        // TODO: send initGame to clients at some point. either here or on receiving specifyRules
         SFLock.writeLock().unlock();
     }
 
@@ -520,6 +522,48 @@ public class EinzServerManager {
         userListLock.readLock().unlock();
     }
 
+    public ArrayList<String> getPlayers(){
+        userListLock.readLock().lock();
+        ArrayList<String> retList = new ArrayList<>();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
+                continue;
+
+            retList.add(username);
+        }
+        userListLock.readLock().unlock();
+        return retList;
+    }
+
+    public ArrayList<Player> getPlayersAsPlayers(){
+        userListLock.readLock().lock();
+        ArrayList<Player> retList = new ArrayList<>();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("player"))
+                continue;
+
+            retList.add(new Player(username));
+        }
+        userListLock.readLock().unlock();
+        return retList;
+    }
+
+    public ArrayList<String> getSpectators(){
+        userListLock.readLock().lock();
+        ArrayList<String> retList = new ArrayList<>();
+        for(String username : getRegisteredClientRoles().keySet()){
+
+            if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
+                continue;
+
+            retList.add(username);
+        }
+        userListLock.readLock().unlock();
+        return retList;
+    }
+
     public void broadcastMessageToAllSpectators(EinzMessage<? extends EinzMessageBody> message) {
         for(String username : getRegisteredClientRoles().keySet()){
             if(!getRegisteredClientRoles().get(username).toLowerCase().equals("spectator"))
@@ -570,22 +614,10 @@ public class EinzServerManager {
         }
     }
 
-    public void specifyRules(JSONObject cardRules, JSONArray globalRules) {
-        // TODO: RULES: send initGame message and tell fabian about these
-        // but why must I specify the deck? TODO: find out if I should convert the cards to a deck.
+    public void specifyRules(EinzSpecifyRulesMessageBody body) {
         getSFLock().writeLock().lock();
-        /*getServerFunctionInterface().initialiseGame(
-
-        );*/
-
-        ArrayList<String> turnOrder = new ArrayList<>(); // TODO: generate turn-Order by fabian
+        getServerFunctionInterface().initialiseGame(getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());
         getSFLock().writeLock().unlock();
-        EinzMessageHeader header = new EinzMessageHeader("startgame", "InitGame");
-
-        EinzInitGameMessageBody body = new EinzInitGameMessageBody(cardRules, globalRules, turnOrder);
-        EinzMessage<EinzInitGameMessageBody> message = new EinzMessage<>(header, body);
-        broadcastMessageToAllPlayers(message);
-        broadcastMessageToAllSpectators(message);
     }
 
     /**
@@ -651,25 +683,36 @@ public class EinzServerManager {
         getSFLock().readLock().lock();
         EinzMessageHeader header = new EinzMessageHeader("stateinfo", "StateInfo");
 
+        GlobalStateParser globalState=null;
+        PlayerState playerState=null;
+
         if(gamePhaseStarted){
             // TODO: get state from fabian
-
+            throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
 
         } else {
-            // TODO: return empty state in message
+
+            globalState = null;
+            playerState = null;
 
         }
-        //EinzSendStateMessageBody body = new EinzSendStateMessageBody();
-
+        EinzSendStateMessageBody body = new EinzSendStateMessageBody(globalState, playerState);
+        EinzMessage<EinzSendStateMessageBody> msg = new EinzMessage<>(header, body);
         getSFLock().readLock().unlock();
-        throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
+        try {
+            server.sendMessageToUser(issuedByPlayer, msg);
+        } catch (UserNotRegisteredException e) {
+            Log.i("ServerManager/getState", "Unregistered user "+issuedByPlayer+" requested his state");
+        } catch (JSONException e) {
+            e.printStackTrace(); // this should not happen
+        }
+
     }
 
     public void onFinishTurn(String issuedByPlayer) {
         if(gamePhaseStarted) { // ignore otherwise
             getSFLock().writeLock().lock();
             // TODO: call fabians on finish turn
-
 
             getSFLock().writeLock().unlock();
             throw new RuntimeException(new TodoException("Fabi plis inplinimt"));

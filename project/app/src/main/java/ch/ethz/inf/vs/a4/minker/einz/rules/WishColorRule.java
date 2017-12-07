@@ -1,6 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules;
 
-import ch.ethz.inf.vs.a4.minker.einz.*;
+import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.GlobalState;
+import org.json.JSONObject;
 
 /**
  * Created by Josua on 11/27/17.
@@ -10,7 +13,7 @@ public class WishColorRule extends BasicCardRule{
 
     private CardColor wishedColor = null;
 
-    private boolean wished = false; // #bamboozled TODO
+    private boolean wished = false;
 
     @Override
     public String getName() {

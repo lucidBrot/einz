@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;

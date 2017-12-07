@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
@@ -260,6 +261,9 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         if(serverActivityCallbackInterface!=null)
             serverActivityCallbackInterface.updateNumClientsUI(numClients);
         this.sherLock.writeLock().unlock();
+        if(this.numClients<=0){
+            this.shutdown();
+        }
     }
 
     /**
@@ -318,7 +322,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         getServerManager().serverShuttingDownGracefully = true;
         Log.d("EinzServer/shutdown", "stopped listening for incoming connections.");
         this.sherLock.writeLock().lock();
-        getServerManager().kickAllAndCloseSockets(); // TODO: dEBUG: why are clients not informed?
+        getServerManager().kickAllAndCloseSockets();
         Log.d("EinzServer/shutdown", "closed all sockets");
         // waiting because clientHandlerThreads might still need this server
         for(Thread t : this.clientHandlerBiMap.keySet()){

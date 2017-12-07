@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
+import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;

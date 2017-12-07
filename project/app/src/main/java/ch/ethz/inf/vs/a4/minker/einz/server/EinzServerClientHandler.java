@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
 
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
@@ -252,8 +253,10 @@ public class EinzServerClientHandler implements Runnable, SendMessageCallback{
         if(!stopping && spin) {
             parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
             parentEinzServer.decNumClients();
+        } else {
+            parentEinzServer.decNumClients();
         }
-        parentEinzServer.decNumClients();
+        keepaliveScheduler.onShuttingDown();
     }
 
     /**

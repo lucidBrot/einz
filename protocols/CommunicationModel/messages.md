@@ -91,7 +91,7 @@ Within the program, messagegroup and messagetype might be null if the mapping wa
   > [ShowToast](#showtoast)
 
 
-* endGame
+* endgame
 
   > [PlayerFinished](#playerfinished), [GameOver](#gameover)
 
@@ -366,11 +366,9 @@ The **admin client** informs the server what rules it chose. The rule is only pa
 Since every rule might have dynamic parameters, they are all stored as JSONObject where only their name is guaranteed to be available.
 
 Some rules refer to cards, some rules should be applied globally.
-For the cardRules, there is a list of rules with their parameters for all cards. For the globalRules, every rule is only listed once.
+For the `cardRules`, there is a list of rules with their parameters for all cards. For the `globalRules`, every rule is only listed once.
 
-The rule *must* have `id` and `parameters` . For any card not having rules applied to it specifically, and  with no entry provided, it will be assumed that it is not supposed to be in the deck. Otherwise, there must be a number to specify how often the card should be in the deck proportionally...?
-
-TODO: @Fabian how should I specify the number of cards? And what are the params for initializeGame? And I need the turn order to send it, or will you do this after specifyRules?
+The rule *must* have `id` and `parameters` . For any card not having rules applied to it specifically, and  with no entry provided, it will be assumed that it is not supposed to be in the deck. Otherwise, there must be a `number` in the card's object to specify how often the card should be in the deck. (The deck will be re-shuffled once it is empty)
 
 > See also [rule](#rules)
 
@@ -382,14 +380,20 @@ TODO: @Fabian how should I specify the number of cards? And what are the params 
   },
   "body":{
     "cardRules":{
-      "someCardID":[
-        {"id":"instantWinOnCardPlayed", "parameters":{}},
-        {"id":"chooseColorCard", "parameters":{"param1":"lulz",
-                                              "lolcat":"foobar"}}
-      ],
-      "otherCardID":[
-        {"id":"instantWinOnCardPlayed", "parameters":{}}
-      ]
+      "someCardID":{
+        "rulelist":[
+          {"id":"instantWinOnCardPlayed", "parameters":{}},
+          {"id":"chooseColorCard", "parameters":{"param1":"lulz",
+                                                "lolcat":"foobar"}}
+          ],
+        "number":"3"
+    },
+      "otherCardID":{
+          "number":"7",
+          "rulelist":[
+          {"id":"instantWinOnCardPlayed", "parameters":{}}
+        ]
+      }
     },
     "globalRules":[
         {"id":"startWithXCards","parameters":{"x":"7"},
@@ -555,7 +559,8 @@ The **Client** can request to play a card. The Server will play the card if it i
 >
 > ```json
 > {
->   "ID":"cardID1337"
+>   "ID":"cardID1337",
+>   "origin":"xxx1337baclemenxXx"
 > }
 > ```
 
@@ -569,7 +574,8 @@ The **Client** can request to play a card. The Server will play the card if it i
   },
   "body":{
     "card":{
-      "ID":"cardID1337"
+      "ID":"cardID1337",
+      "origin":"~stack"
     }
   }
 }
@@ -649,7 +655,9 @@ The states will be empty if there was a GetState request while not appropriate -
       ],
       "possibleactions":
         [
-        "leaveGame", "drawCards", "playCard"
+          {"actionName":"leaveGame","parameters":{}},
+          {"actionName":"drawCards", "parameters":{}},
+          {"actionName":"playCard", "parameters":{"playableCards":["cardID1", "cardID1337"]}}
         ]
     }
   }
@@ -697,7 +705,7 @@ After this, the server will remove the player from the turn order list and let i
 ```Json
 {
   "header":{
-    "messagegroup":"endGame",
+    "messagegroup":"endgame",
     "messagetype":"PlayerFinished"
   },
   "body":{
@@ -715,7 +723,7 @@ points: *JSONObject of Players and points*
 ```Json
 {
 	"header": {
-		"messagegroup": "endGame",
+		"messagegroup": "endgame",
 		"messagetype": "GameOver"
 	},
   "body": {
@@ -757,7 +765,7 @@ The state is defined as containing the global state and the personal player stat
 >
 > The cards contain origin, though not really needed because the client can usually figure out where the new handcards came from by looking at [PlayCardResponse](#playcardresponse)
 
-`possibleactions` :*JSONArray of Strings*
+`possibleactions` :*JSONArray of JSONObjects that represent possible player actions*
 
 > Player State: Unordered. What [actions](#possibleactions) this player can choose from.
 
@@ -780,10 +788,12 @@ The state is defined as containing the global state and the personal player stat
     "hand":[
       {"ID":"cardID03", "origin":"Eric"}
     ],
-    "possibleactions":
-      [
-      "leaveGame", "drawCards", "playCard"
-      ]
+  "possibleactions":
+        [
+          {"actionName":"leaveGame","parameters":{}},
+          {"actionName":"drawCards", "parameters":{}},
+          {"actionName":"playCard", "parameters":{"playableCards":["cardID1", "cardID1337"]}}
+        ]
   }
 }
 ```
@@ -830,14 +840,31 @@ Action-IDs the client can choose from and should support:
 
   > Inform the server that we want to kick a player
   > [Kick](#kick)
+  >
+  > The parameters do not contain the players he can kick, because if he can kick, he can kick all.
 
 + "playCard" (cardID)
 
   > Inform the server which card we would like to play
   > [PlayCard](#PlayCard)
+  >
+  > The parameters is a JSONArray of Card-IDs Strings
 
 
 Possibly in the future supported: "transferServer"
+
+Every possible Action has the option to provide parameters custom to that action. E.g. the playCard action needs to know what cards can be played:
+
+```json
+{"playCard":
+ {
+   "actionName":"playableCards",
+   "parameters":["cardID1", "cardID1337"]
+ }
+}
+```
+
+
 
 ## FurtherActions
 

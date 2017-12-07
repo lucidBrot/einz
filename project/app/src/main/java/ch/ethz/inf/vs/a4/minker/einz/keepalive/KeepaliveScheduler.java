@@ -6,7 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepaliveMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 
 import java.util.concurrent.*;
 
@@ -298,7 +298,7 @@ public class KeepaliveScheduler implements Runnable {
     /**
      * stops the internal timeout timers. Blocks until done so.
      */
-    private void onShuttingDown() {
+    public void onShuttingDown() {
         // stop the timers
         if (futureIn != null) {
             futureIn.cancel(false);
@@ -312,6 +312,7 @@ public class KeepaliveScheduler implements Runnable {
         if (executorOut != null) {
             executorOut.shutdown();
         }
+        Log.d("keepalive", "shut down KeepaliveScheduler.");
     }
 
     /**

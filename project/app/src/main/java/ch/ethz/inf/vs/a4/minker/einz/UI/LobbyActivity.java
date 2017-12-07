@@ -2,13 +2,11 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.text.format.Formatter;
@@ -19,20 +17,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import ch.ethz.inf.vs.a4.minker.einz.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.R;
-import ch.ethz.inf.vs.a4.minker.einz.TodoException;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
-import info.whitebyte.hotspotmanager.ClientScanResult;
-import info.whitebyte.hotspotmanager.FinishScanListener;
 import info.whitebyte.hotspotmanager.WifiApManager;
 
-import java.lang.reflect.Array;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -76,7 +69,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private String adminUsername; // which user was chosen as admin by the server
     private Looper backgroundLooper;
     private Handler backgroundHandler; // use this to schedule background tasks
-    // TODO: what if the host is not the first user to connect? stop server and restart?
+    // Q: what if the host is not the first user to connect? stop server and restart?
+    // A: No. the host is almost the first to connect unless somebody is able to pinpoint very exactly when to connect,
+    //    because the server tells the host client that it needs to connect
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +170,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
 
         if(this.host){
-            // show kick button // TODO: hide kick button for admin user
+            // show kick button // TODO: hide kick button for kicking the admin user itself?
             View kickButtonFrame = usercard.findViewById(R.id.fl_lobby_kick_frame);
             kickButtonFrame.setVisibility(View.VISIBLE);
             // setup onclick listener
@@ -290,7 +285,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     @Override
     public void onClick(View view) {
         //TODO: button to start game if you're the host, handle the onclick
-        //TODO: kick player buttons if you're the host
         //TODO: settings if you're the host
     }
 
@@ -310,7 +304,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     @Override
     protected void onStop() {
         super.onStop();
-        this.ourClient.getActionCallbackInterface().setLobbyUI(null); // make sure no callbacks to this activity are executed
+        if(this.ourClient != null && this.ourClient.getActionCallbackInterface()!=null){
+            this.ourClient.getActionCallbackInterface().setLobbyUI(null); // make sure no callbacks to this activity are executed
+        }
     }
 
     /**

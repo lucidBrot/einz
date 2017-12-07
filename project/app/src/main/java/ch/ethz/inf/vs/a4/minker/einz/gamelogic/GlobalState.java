@@ -1,11 +1,11 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
+import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -54,6 +54,7 @@ public class GlobalState {
         this.players = orderOfPlayers;
         this.finishedPlayers = new ArrayList<>();
         this.drawPile = new LinkedList<>();
+        this.discardPile = new LinkedList<>();
     }
 
     /**

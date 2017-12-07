@@ -1,6 +1,5 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
-import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,6 +13,12 @@ public class EinzInitGameMessageBody extends EinzMessageBody{
     private final JSONArray globalRules;
     private final ArrayList<String> turnOrder;
 
+    /**
+     * <img src="../../../../../../../../../../../../../../protocols/docScreenshots/InitGameJSON.png"/>
+     * @param cardRules
+     * @param globalRules
+     * @param turnOrder
+     */
     public EinzInitGameMessageBody(JSONObject cardRules, JSONArray globalRules, ArrayList<String> turnOrder) {
         this.turnOrder = turnOrder;
         this.cardRules = cardRules;

@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -23,6 +24,7 @@ import java.util.Enumeration;
 import java.util.Locale;
 
 /**
+ * this class is for DEBUG
  * This Activity starts the server and manages the Serverside UI
  */
 public class ServerActivity extends AppCompatActivity implements View.OnClickListener, ServerActivityCallbackInterface {
@@ -45,7 +47,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
 
         serverLogicInterface = new ServerFunction(); // Fabians Part
 
-        server = new ThreadedEinzServer(this.getApplicationContext(),8080,this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
+        server = new ThreadedEinzServer(this.getApplicationContext(),8080,this, serverLogicInterface); // 8080 is needed for debug client.
         serverThread = new Thread(server);
         // run server to listen to clients only when button pressed
 

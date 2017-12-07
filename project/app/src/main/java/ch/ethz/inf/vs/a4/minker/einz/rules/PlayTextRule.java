@@ -1,15 +1,22 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules;
 
-import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.GlobalState;
+import org.json.JSONObject;
 
 /**
  * Created by Josua on 11/24/17.
  */
 
 public class PlayTextRule extends BasicCardRule {
+    /**
+     * Not yet implemented!
+     * @param parameters
+     */
+    @Override
+    public void setParameters(JSONObject parameters) {
+
+    }
 
     @Override
     public String getName() {

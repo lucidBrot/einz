@@ -1,4 +1,6 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
+
+import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 
 import java.util.ArrayList;
 import java.util.List;

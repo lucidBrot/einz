@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.rules;
 
 import org.json.JSONObject;
 
@@ -30,9 +30,4 @@ public abstract class BasicRule {
      */
     public abstract String getDescription();
 
-
-    public JSONObject getContentAsJSON() {
-        return new JSONObject();
-        // #cardtag
-    }
 }

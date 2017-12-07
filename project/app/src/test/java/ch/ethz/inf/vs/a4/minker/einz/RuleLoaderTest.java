@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import ch.ethz.inf.vs.a4.minker.einz.rules.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.RuleLoader;
 import org.json.JSONArray;
 import org.junit.Test;
 
