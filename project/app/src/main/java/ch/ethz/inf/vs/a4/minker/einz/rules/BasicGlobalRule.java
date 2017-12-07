@@ -2,8 +2,8 @@ package ch.ethz.inf.vs.a4.minker.einz.rules;
 
 
 import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
-import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.Player;
 
 /**
  * Basic rule class for rules not applicable to cards.

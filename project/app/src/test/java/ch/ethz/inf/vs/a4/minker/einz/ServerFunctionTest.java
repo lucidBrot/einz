@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.Player;
 import org.junit.Test;
 
 import java.util.ArrayList;

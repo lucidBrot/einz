@@ -4,7 +4,6 @@ import ch.ethz.inf.vs.a4.minker.einz.rules.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.rules.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 
 /**
  * Created by Fabian on 01.12.2017.

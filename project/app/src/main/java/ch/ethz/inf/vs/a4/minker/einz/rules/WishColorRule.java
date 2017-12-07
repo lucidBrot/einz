@@ -1,8 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules;
 
-import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.GlobalState;
 import org.json.JSONObject;
 
 /**

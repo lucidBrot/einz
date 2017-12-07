@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import java.util.HashMap;
 import java.util.HashSet;

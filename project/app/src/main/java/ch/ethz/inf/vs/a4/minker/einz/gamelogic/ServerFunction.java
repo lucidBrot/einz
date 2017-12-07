@@ -14,8 +14,6 @@ import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.cards.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.rules.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.NextTurnRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.ResetCardsToDrawRule;
