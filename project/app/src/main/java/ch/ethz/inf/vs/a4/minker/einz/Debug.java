@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz.server;
+package ch.ethz.inf.vs.a4.minker.einz;
 
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.cards.Card;

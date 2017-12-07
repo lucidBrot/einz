@@ -2,16 +2,13 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.widget.Toast;
 
 import ch.ethz.inf.vs.a4.minker.einz.R;
-import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
 
 public class MainActivity extends FullscreenActivity implements View.OnClickListener {
