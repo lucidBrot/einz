@@ -4,7 +4,6 @@ import java.util.List;
 
 import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.ParametizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import org.json.JSONObject;
 
