@@ -43,7 +43,7 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
      * @param message
      */
     @Override
-    public void messageReceived(String message) { // TODO: handle errors
+    public void messageReceived(String message) { 
         Log.d("ClientMessenger", "received message: "+message);
 
         // notify the keepalive
@@ -53,19 +53,25 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
         try {
             parser = parserFactory.generateEinzParser(message);
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            Log.e("ClientMessenger", "Message seems to be invalid JSON.");
+            return;
         }
         EinzMessage<? extends EinzMessageBody> einzMessage  = null; // get a message object
 
         try {
             einzMessage = parser.parse(message);
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            Log.e("ClientMessenger", "Failed to parse message");
+            return;
         }
         EinzAction einzAction = actionFactory.generateEinzAction(einzMessage, null); // get action
         // einzAction is runnable. it contains the code that should handle this incoming message
         if(einzAction==null) {
             // invalid message is invalid af. Ignore
+            Log.w("ClientMessenger", "Invalid Message");
+            return;
         }else {
             einzAction.run(); // TODO: write into the corresponding EinzAction subclasses what they should do on run()
             // maybe you'll want to call functions defined somewhere else, e.g. in here.
