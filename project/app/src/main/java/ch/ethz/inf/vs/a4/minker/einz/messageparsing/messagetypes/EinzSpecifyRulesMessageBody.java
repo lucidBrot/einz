@@ -57,7 +57,7 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
     /**
      * @return false if failed, else true
      * Parses what it needs to later access that
-     */ // TODO: test this function
+     **/
     private boolean parseCardRulesFurther(){
         if(!neverParsedCardRulesBefore){ // only recalculate if never calculated before. because the variables are final
             return lastCardRulesResult;

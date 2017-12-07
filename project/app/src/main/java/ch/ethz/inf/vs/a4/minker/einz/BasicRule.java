@@ -35,6 +35,6 @@ public abstract class BasicRule {
 
     public JSONObject getContentAsJSON() {
         return new JSONObject();
-        // #cardtag
+        // TODO: implement this if needed
     }
 }

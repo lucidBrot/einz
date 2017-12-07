@@ -55,12 +55,13 @@ public class EinzStateInfoParser extends EinzParser {
                 numcardsinhand.put(name, num);
             }
             JSONArray stackJSON = globalstateJSON.getJSONArray("stack");
+            CardLoader cardLoader = new CardLoader();
             ArrayList<Card> stack = new ArrayList<>();
             for (int i = 0; i < stackJSON.length(); i++) {
                 JSONObject cardJSON = stackJSON.getJSONObject(i);
                 String ID = cardJSON.getString("ID");
                 String origin = cardJSON.getString("origin");
-                Card card = new Card("temp", "test", CardText.CHANGECOLOR, CardColor.BLUE); // TODO: #cardtag . Also, don't forget to add card origin everywhere in the parsers
+                Card card = new Card(ID, origin);
                 stack.add(card);
             }
             String whoseturn = globalstateJSON.getString("whoseturn");
@@ -78,8 +79,7 @@ public class EinzStateInfoParser extends EinzParser {
                 JSONObject cardJSON = handJSON.getJSONObject(i);
                 String ID = cardJSON.getString("ID");
                 String origin = cardJSON.getString("origin");
-                Card card = new Card(ID, "test", CardText.CHANGECOLOR, CardColor.BLUE); // temp code to make the program compile
-                // #cardtag
+                Card card = new Card(ID, origin); // temp code to make the program compile
                 hand.add(card);
             }
             JSONArray possibleactionsJSON = playerstateJSON.getJSONArray("possibleactions");

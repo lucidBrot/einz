@@ -51,9 +51,7 @@ public class EinzDrawParser extends EinzParser {
         ArrayList<Card> cards = new ArrayList<>();
         for(int i=0; i< jcards.length();i++){
             JSONObject myCard = jcards.getJSONObject(i);
-            // TODO: Change all the tagged code pieces (commented out) once the Card resolver is implemented
-            // #cardtag
-            /// cards.add(new Card(myCard.getString("ID"), myCard.getString("origin"))); // TODO: should parsing be done here or in "Card.java"?
+            cards.add(new Card(myCard.getString("ID"), myCard.getString("origin")));
         }
         return new EinzMessage<>(header, new EinzDrawCardsSuccessMessageBody(cards));
     }

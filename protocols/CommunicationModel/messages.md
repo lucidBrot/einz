@@ -559,7 +559,8 @@ The **Client** can request to play a card. The Server will play the card if it i
 >
 > ```json
 > {
->   "ID":"cardID1337"
+>   "ID":"cardID1337",
+>   "origin":"xxx1337baclemenxXx"
 > }
 > ```
 
@@ -573,7 +574,8 @@ The **Client** can request to play a card. The Server will play the card if it i
   },
   "body":{
     "card":{
-      "ID":"cardID1337"
+      "ID":"cardID1337",
+      "origin":"~stack"
     }
   }
 }
@@ -619,7 +621,7 @@ The [response](#sendstate) will usually also be sent without being requested - e
 }
 ```
 
-## SendState
+##SendState
 
 The **server** sends this after being asked via [GetState](#getstate) or when appropriate, i.e. some player did something or the state changed for some other reason.
 
@@ -847,10 +849,6 @@ Action-IDs the client can choose from and should support:
   > [PlayCard](#PlayCard)
   >
   > The parameters is a JSONArray of Card-IDs Strings
-
-+ "finishTurn"
-
-  > Inform the server that we would like to end our turn
 
 
 Possibly in the future supported: "transferServer"

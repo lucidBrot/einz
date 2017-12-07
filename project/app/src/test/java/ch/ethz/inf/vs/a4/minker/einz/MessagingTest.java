@@ -322,7 +322,7 @@ public class MessagingTest {
                 "    ]\n" +
                 "  }\n" +
                 "}";
-        parser_test(msg); // #cardtag this test still fails.
+        parser_test(msg); // TODO: #cardtag this test still fails.
     }
 
     @Test
