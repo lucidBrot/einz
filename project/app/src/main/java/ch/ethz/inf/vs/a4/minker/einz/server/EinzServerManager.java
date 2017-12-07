@@ -612,8 +612,6 @@ public class EinzServerManager {
         }
     }
 
-    // TODO: stop server when admin loses connection (kicks himself or so.
-
     public void specifyRules(EinzSpecifyRulesMessageBody body) {
         getSFLock().writeLock().lock();
         getServerFunctionInterface().initialiseGame(getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());

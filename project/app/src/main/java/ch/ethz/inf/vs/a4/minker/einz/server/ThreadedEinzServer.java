@@ -260,6 +260,9 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         if(serverActivityCallbackInterface!=null)
             serverActivityCallbackInterface.updateNumClientsUI(numClients);
         this.sherLock.writeLock().unlock();
+        if(this.numClients<=0){
+            this.shutdown();
+        }
     }
 
     /**
