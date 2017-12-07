@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
+import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,10 +18,10 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
 
 public class EinzSendStateMessageBody extends EinzMessageBody {
 
-    private final GlobalStateParser globalstate;
+    private final GlobalState globalstate;
     private final PlayerState playerstate;
 
-    public GlobalStateParser getGlobalstate() {
+    public GlobalState getGlobalstate() {
         return globalstate;
     }
 
@@ -28,7 +29,7 @@ public class EinzSendStateMessageBody extends EinzMessageBody {
         return playerstate;
     }
 
-    public EinzSendStateMessageBody(GlobalStateParser globalstate, PlayerState playerstate){
+    public EinzSendStateMessageBody(GlobalState globalstate, PlayerState playerstate){
         this.playerstate = playerstate;
         this.globalstate = globalstate;
     }

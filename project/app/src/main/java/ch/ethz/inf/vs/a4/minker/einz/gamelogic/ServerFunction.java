@@ -97,6 +97,10 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param cardRules   card rules with the card they should apply to
      */
 
+    // TODO: offer getState(username) function that returns the globalstate and the playerstate (or maybe two functions for this)
+    // TODO: offer onFinishTurn(username) function
+    // TODO: offer onCustomAction(user, message) function
+
 
     public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
                                Map<Card, ArrayList<BasicCardRule>> cardRules) {
