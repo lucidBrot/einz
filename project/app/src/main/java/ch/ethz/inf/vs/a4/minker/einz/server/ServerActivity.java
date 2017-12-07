@@ -23,6 +23,7 @@ import java.util.Enumeration;
 import java.util.Locale;
 
 /**
+ * this class is for DEBUG
  * This Activity starts the server and manages the Serverside UI
  */
 public class ServerActivity extends AppCompatActivity implements View.OnClickListener, ServerActivityCallbackInterface {
@@ -45,7 +46,7 @@ public class ServerActivity extends AppCompatActivity implements View.OnClickLis
 
         serverLogicInterface = new ServerFunction(); // Fabians Part
 
-        server = new ThreadedEinzServer(this.getApplicationContext(),8080,this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove port specification
+        server = new ThreadedEinzServer(this.getApplicationContext(),8080,this, serverLogicInterface); // 8080 is needed for debug client.
         serverThread = new Thread(server);
         // run server to listen to clients only when button pressed
 

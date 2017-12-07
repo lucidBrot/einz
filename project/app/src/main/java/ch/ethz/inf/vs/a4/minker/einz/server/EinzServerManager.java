@@ -7,6 +7,7 @@ import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalStateParser;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -681,7 +682,7 @@ public class EinzServerManager {
         getSFLock().readLock().lock();
         EinzMessageHeader header = new EinzMessageHeader("stateinfo", "StateInfo");
 
-        GlobalState globalState=null;
+        GlobalStateParser globalState=null;
         PlayerState playerState=null;
 
         if(gamePhaseStarted){
