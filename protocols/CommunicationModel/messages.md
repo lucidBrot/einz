@@ -653,7 +653,9 @@ The states will be empty if there was a GetState request while not appropriate -
       ],
       "possibleactions":
         [
-        "leaveGame", "drawCards", "playCard"
+          {"leaveGame":{}},
+          {"drawCards":{}},
+          {"playCard":{"playableCards":["cardID1", "cardID1337"]}}
         ]
     }
   }
@@ -761,7 +763,7 @@ The state is defined as containing the global state and the personal player stat
 >
 > The cards contain origin, though not really needed because the client can usually figure out where the new handcards came from by looking at [PlayCardResponse](#playcardresponse)
 
-`possibleactions` :*JSONArray of Strings*
+`possibleactions` :*JSONArray of JSONObjects that represent possible player actions*
 
 > Player State: Unordered. What [actions](#possibleactions) this player can choose from.
 
@@ -784,10 +786,12 @@ The state is defined as containing the global state and the personal player stat
     "hand":[
       {"ID":"cardID03", "origin":"Eric"}
     ],
-    "possibleactions":
-      [
-      "leaveGame", "drawCards", "playCard"
-      ]
+  "possibleactions":
+        [
+          {"leaveGame":{}},
+          {"drawCards":{}},
+          {"playCard":{"playableCards":["cardID1", "cardID1337"]}}
+        ]
   }
 }
 ```
@@ -842,6 +846,18 @@ Action-IDs the client can choose from and should support:
 
 
 Possibly in the future supported: "transferServer"
+
+Every possible Action has the option to provide parameters custom to that action. E.g. the playCard action needs to know what cards can be played:
+
+```json
+{"playCard":
+ {
+   "playableCards":["cardID1", "cardID1337"]
+ }
+}
+```
+
+
 
 ## FurtherActions
 
