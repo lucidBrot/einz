@@ -43,7 +43,8 @@ public class MessageSender {
         for (Player p: playersOrdered){
             turnOrder.add(p.getName());
         }
-        
+
+        //TODO: Eric wat?
         /*
         EinzInitGameMessageBody body = new EinzInitGameMessageBody(ruleSet, turnOrder);
         EinzMessage<EinzInitGameMessageBody> message = new EinzMessage<>(header, body);
