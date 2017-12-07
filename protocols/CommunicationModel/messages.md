@@ -653,7 +653,9 @@ The states will be empty if there was a GetState request while not appropriate -
       ],
       "possibleactions":
         [
-        "leaveGame", "drawCards", "playCard"
+          {"actionName":"leaveGame","parameters":{}},
+          {"actionName":"drawCards", "parameters":{}},
+          {"actionName":"playCard", "parameters":{"playableCards":["cardID1", "cardID1337"]}}
         ]
     }
   }
@@ -761,7 +763,7 @@ The state is defined as containing the global state and the personal player stat
 >
 > The cards contain origin, though not really needed because the client can usually figure out where the new handcards came from by looking at [PlayCardResponse](#playcardresponse)
 
-`possibleactions` :*JSONArray of Strings*
+`possibleactions` :*JSONArray of JSONObjects that represent possible player actions*
 
 > Player State: Unordered. What [actions](#possibleactions) this player can choose from.
 
@@ -784,10 +786,12 @@ The state is defined as containing the global state and the personal player stat
     "hand":[
       {"ID":"cardID03", "origin":"Eric"}
     ],
-    "possibleactions":
-      [
-      "leaveGame", "drawCards", "playCard"
-      ]
+  "possibleactions":
+        [
+          {"actionName":"leaveGame","parameters":{}},
+          {"actionName":"drawCards", "parameters":{}},
+          {"actionName":"playCard", "parameters":{"playableCards":["cardID1", "cardID1337"]}}
+        ]
   }
 }
 ```
@@ -834,14 +838,31 @@ Action-IDs the client can choose from and should support:
 
   > Inform the server that we want to kick a player
   > [Kick](#kick)
+  >
+  > The parameters do not contain the players he can kick, because if he can kick, he can kick all.
 
 + "playCard" (cardID)
 
   > Inform the server which card we would like to play
   > [PlayCard](#PlayCard)
+  >
+  > The parameters is a JSONArray of Card-IDs Strings
 
 
 Possibly in the future supported: "transferServer"
+
+Every possible Action has the option to provide parameters custom to that action. E.g. the playCard action needs to know what cards can be played:
+
+```json
+{"playCard":
+ {
+   "actionName":"playableCards",
+   "parameters":["cardID1", "cardID1337"]
+ }
+}
+```
+
+
 
 ## FurtherActions
 

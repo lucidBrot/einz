@@ -46,7 +46,7 @@ public class EinzStateInfoParser extends EinzParser {
         //get globalstate
         JSONObject globalstateJSON = body.getJSONObject("globalstate");
         JSONObject numcardsinhandJSON = globalstateJSON.getJSONObject("numcardsinhand");
-        HashMap<String, String> numcardsinhand = new HashMap();
+        HashMap<String, String> numcardsinhand = new HashMap<>();
         Iterator keys = numcardsinhandJSON.keys();
         while (keys.hasNext()) {
             String name = (String) keys.next();
@@ -59,7 +59,7 @@ public class EinzStateInfoParser extends EinzParser {
             JSONObject cardJSON = stackJSON.getJSONObject(i);
             String ID = cardJSON.getString("ID");
             String origin = cardJSON.getString("origin");
-            Card card = new Card("temp", "test", CardText.CHANGECOLOR, CardColor.BLUE); // #cardtag . Also, don't forget to add card origin everywhere in the parsers
+            Card card = new Card("temp", "test", CardText.CHANGECOLOR, CardColor.BLUE); // TODO: #cardtag . Also, don't forget to add card origin everywhere in the parsers
             stack.add(card);
         }
         String whoseturn = globalstateJSON.getString("whoseturn");
@@ -79,9 +79,9 @@ public class EinzStateInfoParser extends EinzParser {
             hand.add(card);
         }
         JSONArray possibleactionsJSON = playerstateJSON.getJSONArray("possibleactions");
-        ArrayList<String> possibleactions = new ArrayList<>();
+        ArrayList<JSONObject> possibleactions = new ArrayList<>();
         for (int i = 0; i < possibleactionsJSON.length(); i++) {
-            String action = possibleactionsJSON.getString(i);
+            JSONObject action = possibleactionsJSON.getJSONObject(i);
             possibleactions.add(action);
         }
         PlayerState playerstate = new PlayerState(hand, possibleactions);

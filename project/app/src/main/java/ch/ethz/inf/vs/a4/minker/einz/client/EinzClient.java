@@ -255,6 +255,7 @@ public class EinzClient implements Runnable {
         if(unregisterFirst &&!this.dead) {sendUnregisterRequest();}
         this.connection.stopClient();
         this.dead = true;
+        this.keepaliveScheduler.onShuttingDown();
     }
 
     private void sendUnregisterRequest() {

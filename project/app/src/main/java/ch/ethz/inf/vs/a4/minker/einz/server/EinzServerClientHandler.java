@@ -252,8 +252,10 @@ public class EinzServerClientHandler implements Runnable, SendMessageCallback{
         if(!stopping && spin) {
             parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
             parentEinzServer.decNumClients();
+        } else {
+            parentEinzServer.decNumClients();
         }
-        parentEinzServer.decNumClients();
+        keepaliveScheduler.onShuttingDown();
     }
 
     /**
