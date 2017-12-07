@@ -2,6 +2,9 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
 import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.rules.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.RuleLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

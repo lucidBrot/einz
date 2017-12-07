@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,12 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
-import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.CardText;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.rules.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule;

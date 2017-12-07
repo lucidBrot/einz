@@ -2,9 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.rules;
 
 import java.util.List;
 
-import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import org.json.JSONObject;
