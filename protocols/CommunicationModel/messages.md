@@ -653,9 +653,9 @@ The states will be empty if there was a GetState request while not appropriate -
       ],
       "possibleactions":
         [
-          {"leaveGame":{}},
-          {"drawCards":{}},
-          {"playCard":{"playableCards":["cardID1", "cardID1337"]}}
+          {"actionName":"leaveGame","parameters":{}},
+          {"actionName":"drawCards", "parameters":{}},
+          {"actionName":"playCard", "parameters":{"playableCards":["cardID1", "cardID1337"]}}
         ]
     }
   }
@@ -788,9 +788,9 @@ The state is defined as containing the global state and the personal player stat
     ],
   "possibleactions":
         [
-          {"leaveGame":{}},
-          {"drawCards":{}},
-          {"playCard":{"playableCards":["cardID1", "cardID1337"]}}
+          {"actionName":"leaveGame","parameters":{}},
+          {"actionName":"drawCards", "parameters":{}},
+          {"actionName":"playCard", "parameters":{"playableCards":["cardID1", "cardID1337"]}}
         ]
   }
 }
@@ -852,7 +852,8 @@ Every possible Action has the option to provide parameters custom to that action
 ```json
 {"playCard":
  {
-   "playableCards":["cardID1", "cardID1337"]
+   "actionName":"playableCards",
+   "parameters":["cardID1", "cardID1337"]
  }
 }
 ```
