@@ -316,13 +316,13 @@ public class MessagingTest {
                 "  },\n" +
                 "  \"body\":{\n" +
                 "    \"cards\":[\n" +
-                "      {\"ID\":\"cardID1\",\"origin\":\"talon\"},\n" +
-                "      {\"ID\":\"cardID3\",\"origin\":\"talon\"},\n" +
-                "      {\"ID\":\"cardID1\",\"origin\":\"talon\"}\n" +
+                "      {\"ID\":\"cardID1337\",\"origin\":\"~talon\"},\n" +
+                "      {\"ID\":\"cardID1337\",\"origin\":\"~unspecified\"},\n" +
+                "      {\"ID\":\"cardID1337\",\"origin\":\"alfred\"}\n" +
                 "    ]\n" +
                 "  }\n" +
                 "}";
-        parser_test(msg); // TODO: #cardtag this test still fails.
+        parser_test(msg);
     }
 
     @Test

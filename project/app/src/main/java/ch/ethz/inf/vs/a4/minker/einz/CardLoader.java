@@ -17,9 +17,15 @@ public class CardLoader {
 
     public CardLoader(){
         cardMapping = new HashMap<>();
+        // TODO: remove this debug mapping
+        cardMapping.put("cardID1337", new CardAttributeContainer("DEBUG",CardText.DEBUG, CardColor.BLUE, "DebugImage.jpg-inexistent"));
     }
 
-    public Card getCardInstance(String cardID){
+    /**
+     * @param cardID
+     * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings
+     */
+    public Card getCardInstance(String cardID) {
         if(!cardMapping.containsKey(cardID)){
             return null;
         }

@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import ch.ethz.inf.vs.a4.minker.einz.cards.UnmappedCardIDException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,6 +46,7 @@ public class Card {
      */
     public Card (String ID, String origin){
         Card card = new CardLoader().getCardInstance(ID);
+        if(card == null) throw new RuntimeException(new UnmappedCardIDException("ID: "+ID)); // most probable cause
         this.ID=card.ID;
         this.name=card.name;
         this.text=card.text;
