@@ -838,11 +838,15 @@ Action-IDs the client can choose from and should support:
 
   > Inform the server that we want to kick a player
   > [Kick](#kick)
+  >
+  > The parameters do not contain the players he can kick, because if he can kick, he can kick all.
 
 + "playCard" (cardID)
 
   > Inform the server which card we would like to play
   > [PlayCard](#PlayCard)
+  >
+  > The parameters is a JSONArray of Card-IDs Strings
 
 
 Possibly in the future supported: "transferServer"

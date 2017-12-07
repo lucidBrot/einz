@@ -133,8 +133,8 @@ public class MessageSender {
                 possibleActions.add(action.name);
             }
 
-            PlayerState playerState = new PlayerState((ArrayList) p.hand, possibleActions);
-            EinzSendStateMessageBody body = new EinzSendStateMessageBody(parser, playerState);
+            PlayerState playerState;// = new PlayerState((ArrayList) p.hand, possibleActions); // TODO: possibleActions is now a list of JSONObjects
+            /*EinzSendStateMessageBody body = new EinzSendStateMessageBody(parser, playerState);
             EinzMessage<EinzSendStateMessageBody> message = new EinzMessage<>(header, body);
             try {
                 tes.sendMessageToUser(p.getName(), message);
@@ -142,16 +142,18 @@ public class MessageSender {
                 //ignore and continue
             } catch (JSONException e) {
                 throw new RuntimeException(e);
-            }
+            }*/
         }
 
         //send the spectators all the same message
         ArrayList<String> possibleActions = new ArrayList<>();
         possibleActions.add(PlayerAction.LEAVE_GAME.name);
-        PlayerState spectatorState = new PlayerState(new ArrayList<Card>(), possibleActions); //Send each spectator an empty list as his "hand"
-        EinzSendStateMessageBody body = new EinzSendStateMessageBody(parser, spectatorState);
+
+        // TODO: possibleActions is now a list of JSONObjects
+        PlayerState spectatorState;// = new PlayerState(new ArrayList<Card>(), possibleActions); //Send each spectator an empty list as his "hand"
+        /*EinzSendStateMessageBody body = new EinzSendStateMessageBody(parser, spectatorState);
         EinzMessage<EinzSendStateMessageBody> message = new EinzMessage<>(header, body);
-        tes.getServerManager().broadcastMessageToAllSpectators(message);
+        tes.getServerManager().broadcastMessageToAllSpectators(message);*/
 
     }
 
