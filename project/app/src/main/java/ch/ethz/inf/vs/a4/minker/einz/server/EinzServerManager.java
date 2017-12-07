@@ -691,7 +691,7 @@ public class EinzServerManager {
 
         } else {
 
-            globalState = null; // TODO: does this cause bugs when parsing? What should be done in case of game not ready instead?
+            globalState = null;
             playerState = null;
 
         }

@@ -76,7 +76,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private String adminUsername; // which user was chosen as admin by the server
     private Looper backgroundLooper;
     private Handler backgroundHandler; // use this to schedule background tasks
-    // TODO: what if the host is not the first user to connect? stop server and restart?
+    // Q: what if the host is not the first user to connect? stop server and restart?
+    // A: No. the host is almost the first to connect unless somebody is able to pinpoint very exactly when to connect,
+    //    because the server tells the host client that it needs to connect
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +177,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
 
         if(this.host){
-            // show kick button // TODO: hide kick button for admin user
+            // show kick button // TODO: hide kick button for kicking the admin user itself?
             View kickButtonFrame = usercard.findViewById(R.id.fl_lobby_kick_frame);
             kickButtonFrame.setVisibility(View.VISIBLE);
             // setup onclick listener
@@ -290,7 +292,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     @Override
     public void onClick(View view) {
         //TODO: button to start game if you're the host, handle the onclick
-        //TODO: kick player buttons if you're the host
         //TODO: settings if you're the host
     }
 
