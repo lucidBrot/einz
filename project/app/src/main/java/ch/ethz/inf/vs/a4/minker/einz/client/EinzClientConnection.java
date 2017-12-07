@@ -200,7 +200,6 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
                 this.parentClient.onClientConnectionDead();
 
         }
-        // TODO: is it ok to abort like this?
     }
 
     /**

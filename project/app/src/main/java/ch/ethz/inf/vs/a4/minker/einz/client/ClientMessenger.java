@@ -43,7 +43,7 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
      * @param message
      */
     @Override
-    public void messageReceived(String message) { 
+    public void messageReceived(String message) {
         Log.d("ClientMessenger", "received message: "+message);
 
         // notify the keepalive

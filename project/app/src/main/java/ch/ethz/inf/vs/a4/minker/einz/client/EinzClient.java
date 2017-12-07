@@ -124,7 +124,7 @@ public class EinzClient implements Runnable {
              sendRegistrationMessage();
          }
 
-        // TODO: all other messages
+        // TODO: send all other messages
     }
 
     private void debug_fakeReceiveUpdateLobbyList() {
