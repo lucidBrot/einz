@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -17,7 +18,7 @@ public class Card {
 
     private final String name;
 
-    public String origin;
+    public String origin = CardOrigin.UNSPECIFIED.value; // origin can be any of CardOrigin or a username
 
 
     public Card (String ID, String name, CardText text, CardColor color){
@@ -26,6 +27,35 @@ public class Card {
         this.text = text;
         this.color = color;
     }
+
+    /**
+     *
+     * @param ID
+     * @param name
+     * @param text
+     * @param color
+     * @param origin origin can be any of CardOrigin or a username
+     */
+    public Card (String ID, String name, CardText text, CardColor color, String origin){
+        this(ID, name, text, color);
+        this.origin = origin;
+    }
+    /**
+    * param origin origin can be any of CardOrigin or a username
+     */
+    public Card (String ID, String origin){
+        Card card = new CardLoader().getCardInstance(ID);
+        this.ID=card.ID;
+        this.name=card.name;
+        this.text=card.text;
+        this.color=card.color;
+        this.origin=origin;
+    }
+
+    public String getOrigin() {
+        return origin;
+    }
+
 
     public CardText getText() {
         return text;
@@ -46,8 +76,15 @@ public class Card {
         return ID;
     }
 
-    public JSONObject toJSON(){ // TODO: implement toJSON
-        return null;
+    public JSONObject toJSON(){
+        JSONObject card = new JSONObject();
+        try {
+            card.put("ID", this.ID);
+            card.put("origin", this.origin);
+        } catch (JSONException e) {
+            e.printStackTrace(); // this will not happen. EVER.
+        }
+        return card;
     }
 
 }
