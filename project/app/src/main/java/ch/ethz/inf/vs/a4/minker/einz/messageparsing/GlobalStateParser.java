@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
+package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
 import org.json.JSONArray;
 import org.json.JSONException;

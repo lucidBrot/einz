@@ -18,8 +18,8 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFa
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalStateParser;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.GlobalStateParser;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.PlayerState;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import ch.ethz.inf.vs.a4.minker.einz.server.UserNotRegisteredException;
 
