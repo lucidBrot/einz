@@ -2,7 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import ch.ethz.inf.vs.a4.minker.einz.rules.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.BasicRule;
-import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.rules.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 

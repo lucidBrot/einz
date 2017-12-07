@@ -1,6 +1,5 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.cards;
 
-import ch.ethz.inf.vs.a4.minker.einz.cards.UnmappedCardIDException;
 import org.json.JSONException;
 import org.json.JSONObject;
 

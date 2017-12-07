@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules;
 
-import ch.ethz.inf.vs.a4.minker.einz.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.cards.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import org.json.JSONObject;
 

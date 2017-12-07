@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
-import ch.ethz.inf.vs.a4.minker.einz.*;
+import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.cards.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.rules.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.BasicGlobalRule;

@@ -7,7 +7,7 @@ import java.util.Map;
 
 import ch.ethz.inf.vs.a4.minker.einz.rules.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.BasicGlobalRule;
-import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 /**

@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.a4.minker.einz;
+package ch.ethz.inf.vs.a4.minker.einz.cards;
 
 /**
  * origin can be any of these or a username

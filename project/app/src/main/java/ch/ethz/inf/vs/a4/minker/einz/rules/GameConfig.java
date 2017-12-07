@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules;
 
-import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.Participant;
 
 import java.util.ArrayList;

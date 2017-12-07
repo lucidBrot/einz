@@ -6,7 +6,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
 
 /**
  * Created by silvia on 11/17/17.
