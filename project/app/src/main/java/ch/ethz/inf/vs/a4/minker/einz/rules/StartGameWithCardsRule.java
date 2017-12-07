@@ -4,16 +4,15 @@ import java.util.List;
 
 import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.ParametizedRule;
+import ch.ethz.inf.vs.a4.minker.einz.ParametrizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 
 /**
  * Created by Josua on 11/24/17.
  */
 
-public class StartGameWithCardsRule extends BasicGlobalRule implements ParametizedRule{
+public class StartGameWithCardsRule extends BasicGlobalRule implements ParametrizedRule {
 
     private int startCards = 7;
 

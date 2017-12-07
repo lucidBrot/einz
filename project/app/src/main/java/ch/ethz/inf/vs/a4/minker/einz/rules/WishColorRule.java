@@ -6,7 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.*;
  * Created by Josua on 11/27/17.
  */
 
-public class WishColorRule extends BasicCardRule {
+public class WishColorRule extends BasicCardRule{
 
     private CardColor wishedColor = null;
 
@@ -30,6 +30,7 @@ public class WishColorRule extends BasicCardRule {
     @Override
     public GlobalState onPlayAssignedCard(GlobalState state, Card played) {
         wished = true;
+
         return state;
     }
 
@@ -40,4 +41,5 @@ public class WishColorRule extends BasicCardRule {
         }
         return state;
     }
+
 }
