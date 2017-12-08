@@ -32,7 +32,7 @@ public class Card {
         this.name = name;
         this.text = text;
         this.color = color;
-        this.resourceGroup = resourceName;
+        this.resourceGroup = resourceGroup;
         this.resourceName = resourceName;
     }
 
@@ -105,6 +105,12 @@ public class Card {
 
     public int getImageRessourceID(Context context){
         return context.getResources().getIdentifier(resourceName, resourceGroup, context.getPackageName());
+    }
+
+    @Override
+    public String toString(){
+
+        return "Card(" + ID + ", " + color + ", " + text + ")";
     }
 
     public JSONObject toJSON(){

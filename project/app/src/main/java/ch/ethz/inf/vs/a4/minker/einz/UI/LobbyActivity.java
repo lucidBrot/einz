@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
@@ -136,6 +137,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             }
         });
 
+
+
     }
 
     /**
@@ -158,8 +161,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // thus not for EinzClient
         Intent intent = new Intent(this, PlayerActivity.class);
         Log.w("LobbyActivity", "If you get a deadlock, it is here");
-        EinzConstants.ourClientGlobalLck.lock(); // DANGER ZONE
-        EinzConstants.ourClientGlobal = this.ourClient;
+        EinzSingleton.getInstance().setEinzClient(this.ourClient);
         // unlock on receive in PlayerActivity
         startActivity(intent);
 

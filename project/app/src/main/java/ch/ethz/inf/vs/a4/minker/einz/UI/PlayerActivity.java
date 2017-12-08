@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
@@ -72,9 +73,7 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
         initCards();
 
         //<UglyHack>
-        this.ourClient = EinzConstants.ourClientGlobal; // DANGER ZONE
-        EinzConstants.ourClientGlobalLck.unlock();
-        //</UglyHack>
+        this.ourClient = EinzSingleton.getInstance().getEinzClient();
 
         inflater = LayoutInflater.from(this);
 
