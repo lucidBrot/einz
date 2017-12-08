@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
 import android.util.Log;
+
+import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity;
@@ -15,6 +17,8 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterR
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import org.json.JSONException;
+
+import java.util.ArrayList;
 
 import static java.lang.Thread.sleep;
 
@@ -279,5 +283,9 @@ public class EinzClient implements Runnable {
     public void startGameUI() {
         //TODO: create new GameUI and start the Game
         //actionCallbackInterface.setGameUI(initializedGameUI);
+    }
+
+    public void setHand(ArrayList<Card> hand) {
+        //TODO: get new hand, compare it to the old one and update new elements
     }
 }

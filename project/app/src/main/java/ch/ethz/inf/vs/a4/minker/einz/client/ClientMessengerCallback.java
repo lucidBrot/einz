@@ -183,7 +183,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
         parentClient.setHand(hand);
 
-        parentClient.setActions(actions);
+        //parentClient.setActions(actions);
 
 
         String[] optiones = new String[5];
