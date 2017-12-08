@@ -1,7 +1,10 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
+import java.util.ArrayList;
+
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
 /**
  * The methods that the Game Activity should implement
@@ -35,6 +38,10 @@ public interface GameUIInterface {
     void onCustomActionResponse(EinzMessage<EinzCustomActionMessageBody> message);
 
     void onGameOver (EinzMessage<EinzGameOverMessageBody> message);
+
+    void setHand(ArrayList<Card> hand);
+
+    void setActions(ArrayList<String> actions);
 
     // TODO: customActionRule..?
 }

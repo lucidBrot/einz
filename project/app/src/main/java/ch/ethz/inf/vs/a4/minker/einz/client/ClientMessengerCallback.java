@@ -228,9 +228,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
-        /*
+        
         ArrayList<Card> hand = message.getBody().getPlayerState().getHand();
-        ArrayList<String> actions = message.getBody().getPlayerState().getPossibleActions();
+        ArrayList<String> actions = null; // = message.getBody().getPlayerState().getPossibleActions();
 
         gameUI.setHand(hand); // TODO: Chris would need to implement this
 
@@ -238,7 +238,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
 
         String[] optiones = new String[5];
-        */
+        
         // TODO: implement onSendState
     }
 
