@@ -225,7 +225,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        Card card = new Card("temp", ct.type, ct, cc); // TODO: #cardtag replace "temp"
+                        Card card = new Card("temp", ct.type, ct, cc, "", ""); // TODO: #cardtag replace "temp"
                         numberOfCardsInGame.put(card, 2);
                         allCardsInGame.add(card);
                     }
@@ -255,7 +255,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         //Add all necessary CardRules: (ChangeDirectionRule)
         for (CardColor cc : CardColor.values()) {
             if (cc != CardColor.NONE) {
-                result.assignRuleToCard(new ChangeDirectionRule(), new Card("temp", CardText.SWITCHORDER.type, CardText.SWITCHORDER, cc));
+                result.assignRuleToCard(new ChangeDirectionRule(), new Card("temp", CardText.SWITCHORDER.type, CardText.SWITCHORDER, cc, "", ""));
             }
         }
         return result;
