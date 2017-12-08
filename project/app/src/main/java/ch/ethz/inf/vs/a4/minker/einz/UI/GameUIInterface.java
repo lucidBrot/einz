@@ -35,7 +35,7 @@ public interface GameUIInterface {
 
     void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message);
 
-    void onCustomActionResponse(EinzMessage<EinzCustomActionMessageBody> message);
+    void onCustomActionResponse(EinzMessage<EinzCustomActionResponseMessageBody> message);
 
     void onGameOver (EinzMessage<EinzGameOverMessageBody> message);
 
