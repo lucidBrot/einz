@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
@@ -121,6 +122,33 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         this.backgroundThread.start();
         this.backgroundLooper = this.backgroundThread.getLooper();
         this.backgroundHandler = new Handler(this.backgroundLooper);
+
+        findViewById(R.id.btn_start_game).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onStartGameButtonClick();
+            }
+        });
+
+    }
+
+    /**
+     * Called by the onClickListener of the startGame button
+     */
+    private void onStartGameButtonClick(){
+        if(!this.host)
+            return;
+        // TODO: ignore successive button clicks
+        // TODO: send startGame message before that activity starts
+        // <UglyHack>
+        // read EinzConstants.ourClientGlobal's javadocs to understand this. Basically, I cannot implement parcelable for PrintWriter, and
+        // thus not for EinzClient
+        Intent intent = new Intent(this, PlayerActivity.class);
+        Log.w("LobbyActivity", "If you get a deadlock, it is here");
+        EinzConstants.ourClientGlobalLck.lock(); // DANGER ZONE
+        EinzConstants.ourClientGlobal = this.ourClient;
+        // unlock on receive in PlayerActivity
+        startActivity(intent);
 
     }
 

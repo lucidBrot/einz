@@ -22,7 +22,14 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.R;
+import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
+import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,11 +47,15 @@ import java.util.logging.LogRecord;
 // How to send Messages:
 // ourClient.getConnection().sendMessage() should do
 
-public class PlayerActivity extends FullscreenActivity {
+/**
+ * putExtra requires a parcelable, so instead pass the client via Globals
+ */
+public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onResume - register this activity at client
     private static final int NBR_ITEMS = 20;
     private GridLayout mGrid;
     private ImageView trayStack;
     private LayoutInflater inflater;
+    private EinzClient ourClient;
 
 
     int[] cards;
@@ -59,6 +70,11 @@ public class PlayerActivity extends FullscreenActivity {
         mGrid = findViewById(R.id.grid_layout);
         mGrid.setOnDragListener(new DragListener());
         initCards();
+
+        //<UglyHack>
+        this.ourClient = EinzConstants.ourClientGlobal; // DANGER ZONE
+        EinzConstants.ourClientGlobalLck.unlock();
+        //</UglyHack>
 
         inflater = LayoutInflater.from(this);
 
