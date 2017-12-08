@@ -9,7 +9,6 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.text.format.Formatter;
@@ -20,19 +19,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.R;
-import ch.ethz.inf.vs.a4.minker.einz.TodoException;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
+import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
-import info.whitebyte.hotspotmanager.ClientScanResult;
-import info.whitebyte.hotspotmanager.FinishScanListener;
 import info.whitebyte.hotspotmanager.WifiApManager;
 
-import java.lang.reflect.Array;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -42,6 +42,9 @@ import java.util.Enumeration;
 import java.util.Locale;
 
 import static java.lang.Thread.sleep;
+
+// How to send a message:
+// this.ourClient.getConnection().sendMessage()
 
 /**
  * Lobby List. corresponds to screen 3 in our proposal.
@@ -73,7 +76,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private String adminUsername; // which user was chosen as admin by the server
     private Looper backgroundLooper;
     private Handler backgroundHandler; // use this to schedule background tasks
-    // TODO: what if the host is not the first user to connect? stop server and restart?
+    // Q: what if the host is not the first user to connect? stop server and restart?
+    // A: No. the host is almost the first to connect unless somebody is able to pinpoint very exactly when to connect,
+    //    because the server tells the host client that it needs to connect
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +129,39 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         this.backgroundLooper = this.backgroundThread.getLooper();
         this.backgroundHandler = new Handler(this.backgroundLooper);
 
+        findViewById(R.id.btn_start_game).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onStartGameButtonClick();
+            }
+        });
+
+    }
+
+    /**
+     * Called by the onClickListener of the startGame button
+     */
+    private void onStartGameButtonClick(){
+        if(!this.host)
+            return;
+        // TODO: ignore successive button clicks
+
+
+        // send startGame message before that activity starts
+        EinzMessageHeader header = new EinzMessageHeader("startgame", "StartGame");
+        EinzStartGameMessageBody body = new EinzStartGameMessageBody();
+        EinzMessage<EinzStartGameMessageBody> startGameMessage = new EinzMessage<>(header, body);
+        this.ourClient.getConnection().sendMessageRetryXTimes(5, startGameMessage);
+
+        // <UglyHack>
+        // read EinzConstants.ourClientGlobal's javadocs to understand this. Basically, I cannot implement parcelable for PrintWriter, and
+        // thus not for EinzClient
+        Intent intent = new Intent(this, PlayerActivity.class);
+        Log.w("LobbyActivity", "If you get a deadlock, it is here");
+        EinzConstants.ourClientGlobalLck.lock(); // DANGER ZONE
+        EinzConstants.ourClientGlobal = this.ourClient;
+        // unlock on receive in PlayerActivity
+        startActivity(intent);
 
     }
 
@@ -179,7 +217,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
 
         if(this.host){
-            // show kick button // TODO: hide kick button for admin user
+            // show kick button // TODO: hide kick button for kicking the admin user itself?
             View kickButtonFrame = usercard.findViewById(R.id.fl_lobby_kick_frame);
             kickButtonFrame.setVisibility(View.VISIBLE);
             // setup onclick listener
@@ -294,7 +332,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     @Override
     public void onClick(View view) {
         //TODO: button to start game if you're the host, handle the onclick
-        //TODO: kick player buttons if you're the host
         //TODO: settings if you're the host
     }
 
@@ -304,6 +341,20 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         cleanupActivity();
     }
 
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        this.ourClient.getActionCallbackInterface().setLobbyUI(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(this.ourClient != null && this.ourClient.getActionCallbackInterface()!=null){
+            this.ourClient.getActionCallbackInterface().setLobbyUI(null); // make sure no callbacks to this activity are executed
+        }
+    }
 
     /**
      * stops server if there is one on this device. <br>

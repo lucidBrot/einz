@@ -2,7 +2,8 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 
 import android.util.Log;
 
-import ch.ethz.inf.vs.a4.minker.einz.Globals;
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.OnKeepaliveTimeoutCallback;
@@ -84,8 +85,8 @@ public class EinzServerClientHandler implements Runnable, SendMessageCallback{
         brinp = null;
         try {
             inp = socket.getInputStream();
-            brinp = new BufferedReader(new InputStreamReader(inp, Globals.ENCODING));
-            bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), Globals.ENCODING)), true);
+            brinp = new BufferedReader(new InputStreamReader(inp, EinzConstants.ENCODING));
+            bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), EinzConstants.ENCODING)), true);
             out = new DataOutputStream(socket.getOutputStream());
         } catch (IOException e) {
             Log.e("ESCH", "Failed to initialize run(). Aborting");
@@ -225,7 +226,7 @@ public class EinzServerClientHandler implements Runnable, SendMessageCallback{
 
         this.stopping = true;
         try {
-            sleep(Globals.SERVER_SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET_ON_SHUTDOWN);
+            sleep(EinzConstants.SERVER_SLEEP_TIME_BETWEEN_STOP_LISTENING_AND_CLOSE_SOCKET_ON_SHUTDOWN);
         } catch (InterruptedException e) {
             Log.e("ESCH/stopPatiently", "You interrupted my sleep (giving the other threads a_time to finish their actions): ");
             e.printStackTrace();
@@ -252,8 +253,10 @@ public class EinzServerClientHandler implements Runnable, SendMessageCallback{
         if(!stopping && spin) {
             parentEinzServer.getServerManager().unregisterUser(latestUser, "timeout", "server");
             parentEinzServer.decNumClients();
+        } else {
+            parentEinzServer.decNumClients();
         }
-        parentEinzServer.decNumClients();
+        keepaliveScheduler.onShuttingDown();
     }
 
     /**

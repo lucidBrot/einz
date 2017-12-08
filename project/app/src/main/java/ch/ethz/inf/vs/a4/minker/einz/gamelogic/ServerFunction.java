@@ -2,30 +2,26 @@ package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
-import java.util.Stack;
 
-import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
-import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
-import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardColor;
-import ch.ethz.inf.vs.a4.minker.einz.CardText;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
-import ch.ethz.inf.vs.a4.minker.einz.Spectator;
-import ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.ResetCardsToDrawRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.StartGameWithCardsRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.WinOnNoCardsRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ChangeDirectionRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ResetCardsToDrawRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.StartGameWithCardsRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WinOnNoCardsRule;
+import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
 /**
  * Created by Fabian on 23.11.2017.
@@ -33,9 +29,38 @@ import ch.ethz.inf.vs.a4.minker.einz.rules.WinOnNoCardsRule;
 
 public class ServerFunction implements ServerFunctionDefinition {
 
+    private ThreadedEinzServer threadedEinzServer;
     private GlobalState globalState;
     private GameConfig gameConfig;
-    private final static int MAX_NUMBER_OF_PLAYERS = 20;
+    private final int MAX_NUMBER_OF_PLAYERS;
+
+    /**
+     * Doesn't initalise the threadedEinzServer!
+     * Only used for debugging
+     * Use one of the other constructors
+     */
+    public ServerFunction(){
+        this.MAX_NUMBER_OF_PLAYERS = 20;
+    }
+
+    /**
+     * @param threadedEinzServer the ThreadedEinzServer that holds the list of players and spectators
+     *                           to send messages to during the game
+     */
+    public ServerFunction(ThreadedEinzServer threadedEinzServer) {
+        this.threadedEinzServer = threadedEinzServer;
+        this.MAX_NUMBER_OF_PLAYERS = 20;
+    }
+
+    /**
+     * @param threadedEinzServer the ThreadedEinzServer that holds the list of players and spectators
+     *                           to send messages to during the game
+     * @param maxNumberOfPlayers the maximum number of Players allowed in a game
+     */
+    public ServerFunction(ThreadedEinzServer threadedEinzServer, int maxNumberOfPlayers) {
+        this.threadedEinzServer = threadedEinzServer;
+        this.MAX_NUMBER_OF_PLAYERS = maxNumberOfPlayers;
+    }
 
     /**
      * initialises a new game with standard cards and rules
@@ -48,11 +73,13 @@ public class ServerFunction implements ServerFunctionDefinition {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
         } else {
-            globalState = new GlobalState(10, players); // #cardtag
+            globalState = new GlobalState(10, players);
             this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
             globalState.nextPlayer = players.get(0); //There currently is no active player, nextplayer will start the game in startGame
+            MessageSender.sendInitGameToAll(threadedEinzServer, (ArrayList) gameConfig.allRules,
+                    (ArrayList) globalState.getPlayersOrdered());
         }
     }
 
@@ -68,22 +95,33 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param cardRules   card rules with the card they should apply to
      */
 
+    // TODO: offer getState(username) function that returns the globalstate and the playerstate (or maybe two functions for this)
+    // TODO: offer onFinishTurn(username) function
+    // TODO: offer onCustomAction(user, message) function
+
+
     public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
-                               Map<BasicCardRule, Card> cardRules) {
+                               Map<Card, ArrayList<BasicCardRule>> cardRules) {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
         } else {
             gameConfig = new GameConfig(deck);
-            gameConfig.allCardsInGame.addAll(deck.keySet());
+            //gameConfig.allCardsInGame.addAll(deck.keySet()); -> already done in GameConfig
             for (Player p : players) {
                 gameConfig.addParticipant(p);
             }
             for (BasicGlobalRule r : globalRules) {
                 gameConfig.addGlobalRule(r);
             }
-            for (BasicCardRule r : cardRules.keySet()) {
-                gameConfig.assignRuleToCard(r, cardRules.get(r));
+            for (Card c : cardRules.keySet()) {
+                for (BasicCardRule r: cardRules.get(c)){
+                    gameConfig.assignRuleToCard(r, c);
+                }
             }
+            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
+            globalState.nextPlayer = players.get(0); //There currently is no active player, nextplayer will start the game in startGame
+            MessageSender.sendInitGameToAll(threadedEinzServer, (ArrayList) gameConfig.allRules,
+                    (ArrayList) globalState.getPlayersOrdered());
         }
     }
 
@@ -94,8 +132,10 @@ public class ServerFunction implements ServerFunctionDefinition {
      * Lets the players start playing
      */
     public void startGame() {
+        // TODO: gameConfig is null here
         GlobalRuleChecker.checkOnStartGame(globalState, gameConfig);
         globalState.nextTurn(); //Sets the active player to the one specified in initialiseGame
+        onChange();
     }
 
     /**
@@ -110,34 +150,44 @@ public class ServerFunction implements ServerFunctionDefinition {
         if (!globalState.getActivePlayer().equals(p)) {
             return false; //TODO: Check in rules whether its a players turn
         }
-        if (CardRuleChecker.checkIsValidPlayCard(globalState, card, gameConfig)) {
+        if (!CardRuleChecker.checkIsValidPlayCard(globalState, card, gameConfig)) {
+            MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
+            return false;
+        } else {
             p.hand.remove(card);
             globalState.addCardToDiscardPile(card);
             CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
             CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+            MessageSender.sendPlayCardResponse(p, threadedEinzServer, true);
+
+            onChange();
             return true;
-        } else {
-            return false;
         }
     }
 
     /**
      * OnDrawCard Rules get applied after the player draws cards
+     *
      * @param p the player that wants to draw cards
      * @return the Cards that player draws, if he is not allowed to draw cards returns null.
      */
     public ArrayList<Card> drawCards(Player p) {
         if (!globalState.getActivePlayer().equals(p)) {
+            MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "It is not your turn.");
             return null; //TODO: Check in rules whether its a players turn
         }
-        if (CardRuleChecker.checkIsValidDrawCards(globalState, gameConfig)){
+        if (!CardRuleChecker.checkIsValidDrawCards(globalState, gameConfig)) {
+            MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "A rule doesn't allow you to draw cards.");
+            return null;
+        } else {
             ArrayList<Card> result = (ArrayList) globalState.drawCards(globalState.getCardsToDraw());
             p.hand.addAll(result);
             CardRuleChecker.checkOnDrawCard(globalState, gameConfig);
+            MessageSender.sendDrawCardResponseSuccess(p, threadedEinzServer, result);
+
+            onChange();
             return result;
-        } else {
-            return null;
         }
     }
 
@@ -156,13 +206,15 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param player the player to be removed
      */
     public void removePlayer(Player player) {
-
-        //TODO: save removed players in a List to create leaderboard at endGame()
-
+        globalState.setPlayerFinished(player);
+        GlobalRuleChecker.checkOnPlayerFinished(globalState, player, gameConfig);
+        //TODO: don't let player finsih but remove him
     }
 
     /**
      * This function is not listed in the interface and is just used inside this class
+     * Still under construction
+     * Gets finished once list of possible rules we want to have is (nearly) complete
      *
      * @return a new GameConfig with a standard deck consisting of 112 cards and the standard rules
      */
@@ -170,35 +222,62 @@ public class ServerFunction implements ServerFunctionDefinition {
         Map<Card, Integer> numberOfCardsInGame = new HashMap<>();
         Set<Card> allCardsInGame = new HashSet<>();
         for (CardText ct : CardText.values()) {
-            if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR) {
+            if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        Card card = new Card("temp", ct.type, ct, cc); // #cardtag replace "temp"
+                        Card card = new Card("temp", ct.type, ct, cc); // TODO: #cardtag replace "temp"
                         numberOfCardsInGame.put(card, 2);
                         allCardsInGame.add(card);
                     }
                 }
             } else {
+                /*
+                don't add these cards yet
+                TODO: add them later (except the debug card)
                 Card card = new Card("temp", ct.type, ct, CardColor.NONE); // #cardtag
                 numberOfCardsInGame.put(card, 4);
                 allCardsInGame.add(card);
+                 */
             }
         }
         GameConfig result = new GameConfig(numberOfCardsInGame);
-        result.allCardsInGame = allCardsInGame;
+        //gameConfig.allCardsInGame.addAll(deck.keySet()); -> already done in GameConfig
         for (Player p : players) {
             result.addParticipant(p);
         }
+
         //Add all necessary GlobalRules: (StartGameWithCardsRule, WinOnNoCardsRule)
         result.addGlobalRule(new StartGameWithCardsRule());
         result.addGlobalRule(new WinOnNoCardsRule());
         result.addGlobalRule(new ResetCardsToDrawRule());
+        result.addGlobalRule(new NextTurnRule());
 
         //Add all necessary CardRules: (ChangeDirectionRule)
         for (CardColor cc : CardColor.values()) {
-            result.assignRuleToCard(new ChangeDirectionRule(), new Card("temp", CardText.SWITCHORDER.type, CardText.SWITCHORDER, cc));
+            if (cc != CardColor.NONE) {
+                result.assignRuleToCard(new ChangeDirectionRule(), new Card("temp", CardText.SWITCHORDER.type, CardText.SWITCHORDER, cc));
+            }
         }
         return result;
+    }
+
+    /**
+     * things to do whenever anything in the game changes
+     */
+    private void onChange() {
+
+        //Check if any player has finished
+        for (Player p : globalState.getPlayersOrdered()) {
+            if (GlobalRuleChecker.checkIsPlayerFinished(globalState, p, gameConfig)) {
+                globalState.setPlayerFinished(p);
+                MessageSender.sendPlayerFinishedToAll(p, threadedEinzServer);
+            }
+        }
+
+        //Send everyone their state
+        MessageSender.sendStateToAll(threadedEinzServer, globalState);
+
+
     }
 
 }

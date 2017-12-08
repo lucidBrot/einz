@@ -7,6 +7,10 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+
 /**
  * Created by Josua on 11/28/17.
  */
@@ -19,7 +23,11 @@ public class CardLoader {
         cardMapping = new HashMap<>();
     }
 
-    public Card getCardInstance(String cardID){
+    /**
+     * @param cardID
+     * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings
+     */
+    public Card getCardInstance(String cardID) {
         if(!cardMapping.containsKey(cardID)){
             return null;
         }

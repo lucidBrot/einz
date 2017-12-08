@@ -2,11 +2,12 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
-
-import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
+import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
@@ -14,16 +15,53 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class ClientMessengerCallback implements ClientActionCallbackInterface {
-    private final LobbyUIInterface lobbyUI; // TODO: implement reactions to messages
+public class ClientMessengerCallback implements ClientActionCallbackInterface { // TODO: make sure to always cover the case where gameUI and/or lobbyUI are null
+    @Nullable
+    private LobbyUIInterface lobbyUI; // can be null if the corresponding Activity does not exist anymore
+    @Nullable
+    private GameUIInterface gameUI; // can be null if the corresponding Activity does not exist yet/anymore
     private final Context applicationContext;
     private final EinzClient parentClient;
 
 
+    /**
+     * @param lobbyUIInterface make sure to call {@link #setGameUIAndDisableLobbyUI(GameUIInterface)} after destroying the lobby
+     * @param appContext just the Context of the application, for toasts and stuff
+     * @param parentClient the client, duh.
+     */
     public ClientMessengerCallback(LobbyUIInterface lobbyUIInterface, Context appContext, EinzClient parentClient) {
+        this.gameUI = null;
         this.lobbyUI = lobbyUIInterface;
         this.applicationContext = appContext;
         this.parentClient = parentClient;
+    }
+
+    public void setGameUI(GameUIInterface gameUI){
+        this.gameUI = gameUI;
+    }
+
+    /**
+     * Remember to set this to null again if the parameter stops existing
+     */
+    public void setLobbyUI(LobbyUIInterface lobbyUI){
+        this.lobbyUI = lobbyUI;
+    }
+
+    /**
+     * set {@link #lobbyUI} to null and {@link #gameUI} to the parameter.
+     * @param gameUI The Activity implementing the {@link GameUIInterface}
+     */
+    public void setGameUIAndDisableLobbyUI(GameUIInterface gameUI){
+        setGameUI(gameUI);
+        setLobbyUI(null);
+    }
+
+    public LobbyUIInterface getLobbyUI() {
+        return lobbyUI;
+    }
+
+    public GameUIInterface getGameUI() {
+        return gameUI;
     }
 
     @Override
@@ -64,12 +102,16 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                lobbyUI.setAdmin(message.getBody().getAdmin());
-                lobbyUI.setLobbyList(players, spectators);
+                if(lobbyUI!=null) { // TODO: update lobby list if it changes during the game
+                    lobbyUI.setAdmin(message.getBody().getAdmin());
+                    lobbyUI.setLobbyList(players, spectators);
+                }
             }
         };
 
-        runOnMainThread(runnable);
+        runOnMainThread(runnable); // this is important because
+                                    // a) to access the UI, this is needed
+                                    // b) to be sure the Activity still exists after checking
         Log.d("ClientMessengerCallback", "updated LobbyList");
 
     }
@@ -82,7 +124,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                lobbyUI.onRegistrationFailed(body);
+                if(lobbyUI!=null) { // ignore the incoming registerFailure message if we're already in the game phase... That could only happen if we were registered, then unregistered during the game and tried to reregister but failed...
+                    lobbyUI.onRegistrationFailed(body);
+                }
             }
         };
 
@@ -143,7 +187,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                parentClient.startGameUI();
+                startGameUI();
             }
         };
 
@@ -153,16 +197,22 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
     }
 
+    private void startGameUI() {
+        //TODO: create new GameUI and start the Game
+        //actionCallbackInterface.setGameUI(initializedGameUI);
+    }
+
     @Override
     public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsMessageBody> message) {
         //nothing to do here?
+        //except of course to call Chris' gameUI.onDrawCardsSuccess or maybe directly his function to update the hand
         // TODO: implement onDrawCardsSuccess
     }
 
     @Override
     public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
         String reason = message.getBody().getReason();
-        Toast.makeText(this.applicationContext,"You're not able to draw a card because " + reason, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this.applicationContext,"You're not able to draw a card because " + reason, Toast.LENGTH_SHORT).show(); // if this fails, it is because you need to run this in the main thread
         // TODO: implement onDrawCardsFailure
     }
 
@@ -177,16 +227,17 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
     @Override
     public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
-
+        /*
         ArrayList<Card> hand = message.getBody().getPlayerState().getHand();
         ArrayList<String> actions = message.getBody().getPlayerState().getPossibleActions();
 
-        parentClient.setHand(hand);
+        gameUI.setHand(hand); // TODO: Chris would need to implement this
 
-        parentClient.setActions(actions);
+        gameUI.setActions(actions); // TODO: Chris would need to implement this
 
 
         String[] optiones = new String[5];
+        */
         // TODO: implement onSendState
     }
 

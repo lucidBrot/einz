@@ -3,13 +3,9 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import ch.ethz.inf.vs.a4.minker.einz.Card;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalStateParser;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.GlobalStateParser;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.PlayerState;
 
 /**
  * Created by silvia on 11/17/17.

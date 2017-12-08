@@ -4,11 +4,8 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.client.ClientActionCallbackInterface;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzKickAction;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzUnmappedAction;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerManager;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -125,7 +122,7 @@ public class EinzActionFactory {
      * @return null if mapping does not exist, else the Class you want
      */
     public Class<? extends EinzAction> getMapping(EinzMessage e){
-        if(Debug.logKeepalivePackets || !e.getBody().getClass().toString().equals("ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepaliveMessageBody"));
+        if(Debug.logKeepalivePackets || !e.getBody().getClass().toString().equals("class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKeepaliveMessageBody"));
         Log.d("ActionFactory", "Getting mapping for body text "+e.getBody().getClass());
         Class temp = this.dictionary.get(e.getBody().getClass());
         if(temp == null) {Log.d("ActionFactory", "Mapping was requested but not registered before");}
