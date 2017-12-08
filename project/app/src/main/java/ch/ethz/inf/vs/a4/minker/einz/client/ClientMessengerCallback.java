@@ -137,7 +137,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
     @Override
     public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
+        parentClient.startGameUI();
         // TODO: implement onInitGame
+
     }
 
     @Override
@@ -147,11 +149,13 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
     @Override
     public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
+        String reason = message.getBody().getReason();
+        Toast.makeText(this.applicationContext,"You're not able to draw a card because " + reason, Toast.LENGTH_SHORT).show();
         // TODO: implement onDrawCardsFailure
     }
 
     @Override
-    public void onPlayCardResponse(EinzMessage<EinzPlayCardMessageBody> message) {
+    public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
         // TODO: implement onPlayCardResponse
     }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Globals;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
+import ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.OnKeepaliveTimeoutCallback;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -273,5 +274,10 @@ public class EinzClient implements Runnable {
      */
     void onClientConnectionDead() {
         this.dead=true;
+    }
+
+    public void startGameUI() {
+        //TODO: create new GameUI and start the Game
+        //actionCallbackInterface.setGameUI(initializedGameUI);
     }
 }
