@@ -203,10 +203,11 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     }
 
     @Override
-    public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsMessageBody> message) {
+    public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsSuccessMessageBody> message) {
         //nothing to do here?
         //except of course to call Chris' gameUI.onDrawCardsSuccess or maybe directly his function to update the hand
         // TODO: implement onDrawCardsSuccess
+        gameUI.onDrawCardsSuccess(message);
     }
 
     @Override

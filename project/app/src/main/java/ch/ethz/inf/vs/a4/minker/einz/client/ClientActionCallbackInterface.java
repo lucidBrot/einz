@@ -23,7 +23,7 @@ public interface ClientActionCallbackInterface {
 
     void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
 
-    void onDrawCardsSuccess(EinzMessage<EinzDrawCardsMessageBody> message);
+    void onDrawCardsSuccess(EinzMessage<EinzDrawCardsSuccessMessageBody> message);
 
     void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message);
 

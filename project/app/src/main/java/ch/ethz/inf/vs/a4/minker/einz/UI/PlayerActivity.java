@@ -3,38 +3,36 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 import android.content.ClipData;
 import android.graphics.Canvas;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.support.v7.widget.GridLayout;
-import android.util.Log;
 import android.view.Display;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
-import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
-import org.json.JSONException;
-import org.json.JSONObject;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 // How to get Messages:
 // get the intent extra that is a reference to ourClient
@@ -50,15 +48,16 @@ import java.util.logging.LogRecord;
 /**
  * putExtra requires a parcelable, so instead pass the client via Globals
  */
-public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onResume - register this activity at client
+public class PlayerActivity extends FullscreenActivity implements GameUIInterface { // TODO: onStop and onResume - register this activity at client
     private static final int NBR_ITEMS = 20;
     private GridLayout mGrid;
     private ImageView trayStack;
     private LayoutInflater inflater;
     private EinzClient ourClient;
+    private int cardHeight,cardWidth;
 
-
-    int[] cards;
+    ArrayList<Integer> cardDrawables;
+    ArrayList<Card> cards;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +71,8 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
         initCards();
 
         //<UglyHack>
-        this.ourClient = EinzConstants.ourClientGlobal; // DANGER ZONE
-        EinzConstants.ourClientGlobalLck.unlock();
+        //this.ourClient = EinzConstants.ourClientGlobal; // DANGER ZONE
+        //EinzConstants.ourClientGlobalLck.unlock();
         //</UglyHack>
 
         inflater = LayoutInflater.from(this);
@@ -81,16 +80,140 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getRealSize(size);
-        for (int i = 0; i < NBR_ITEMS; i++) {
+
+        cardWidth  = (size.x / mGrid.getColumnCount());
+        cardHeight = (size.y / (3*mGrid.getRowCount()));
+
+        //add cardDrawables to mgrid
+        for (int i = 0; i < cardDrawables.size(); i++) {
             final View itemView = inflater.inflate(R.layout.card_view, mGrid, false);
             ImageView localImgView = (ImageView) itemView;
-            localImgView.setImageResource(cards[i]);
-            localImgView.getLayoutParams().width  = (size.x / mGrid.getColumnCount());
-            localImgView.getLayoutParams().height = (size.y / (3*mGrid.getRowCount()));
-            System.out.println("TESTESTOUT" + mGrid.getMeasuredHeight());
+            localImgView.setImageResource(cardDrawables.get(i));
+            localImgView.getLayoutParams().width  = cardWidth;
+            localImgView.getLayoutParams().height = cardHeight;
+
             itemView.setOnTouchListener(new LongPressListener());
             mGrid.addView(itemView);
         }
+    }
+
+    private int calculateNewIndex(float x, float y) {
+        // calculate which column to move to
+        final float cellWidth = mGrid.getWidth() / mGrid.getColumnCount();
+        final int column = (int)(x / cellWidth);
+
+        // calculate which row to move to
+        final float cellHeight = mGrid.getHeight() / mGrid.getRowCount();
+        final int row = (int)Math.floor(y / cellHeight);
+
+        // the items in the GridLayout is organized as a wrapping list
+        // and not as an actual grid, so this is how to get the new index
+        int index = row * mGrid.getColumnCount() + column;
+        if (index >= mGrid.getChildCount()) {
+            index = mGrid.getChildCount() - 1;
+        }
+
+        return index;
+    }
+
+    private void addCard(Card cardAdded){
+        cards.add(cardAdded);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getRealSize(size);
+
+        //add cardDrawables to mgrid
+        final View itemView = inflater.inflate(R.layout.card_view, mGrid, false);
+        ImageView localImgView = (ImageView) itemView;
+
+        localImgView.setTag(cardAdded);
+
+        //localImgView.setImageResource(cardAdded.getImageResourceID());
+        localImgView.getLayoutParams().width  = cardWidth;
+        localImgView.getLayoutParams().height = cardHeight;
+        itemView.setOnTouchListener(new LongPressListener());
+        mGrid.addView(itemView);
+    }
+
+    private void initCards(){
+        cardDrawables = new ArrayList<>();
+        cardDrawables.add(R.drawable.card_einz_blue);
+        cardDrawables.add(R.drawable.card_take2_red);
+        cardDrawables.add(R.drawable.card_take4);
+        cardDrawables.add(R.drawable.card_rev_green);
+        cardDrawables.add(R.drawable.card_4_red);
+        cardDrawables.add(R.drawable.card_2_yellow);
+        cardDrawables.add(R.drawable.card_skip_red);
+        cardDrawables.add(R.drawable.card_7_green);
+        cardDrawables.add(R.drawable.card_2_red);
+        cardDrawables.add(R.drawable.card_8_blue);
+        cardDrawables.add(R.drawable.card_einz_blue);
+        cardDrawables.add(R.drawable.card_take2_red);
+        cardDrawables.add(R.drawable.card_take4);
+        cardDrawables.add(R.drawable.card_rev_green);
+        cardDrawables.add(R.drawable.card_4_red);
+        cardDrawables.add(R.drawable.card_2_yellow);
+        cardDrawables.add(R.drawable.card_skip_red);
+        cardDrawables.add(R.drawable.card_7_green);
+        cardDrawables.add(R.drawable.card_2_red);
+        cardDrawables.add(R.drawable.card_8_blue);
+    }
+
+    @Override
+    public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
+
+    }
+
+    @Override
+    public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message) {
+
+    }
+
+    @Override
+    public void onShowToast(EinzMessage<EinzShowToastMessageBody> message) {
+
+    }
+
+    @Override
+    public void onKickFailure(EinzMessage<EinzKickFailureMessageBody> message) {
+
+    }
+
+    @Override
+    public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsSuccessMessageBody> message) {
+        //message.getBody().getCards();
+
+    }
+
+    @Override
+    public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
+
+    }
+
+    @Override
+    public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
+
+    }
+
+    @Override
+    public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
+
+    }
+
+    @Override
+    public void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message) {
+
+    }
+
+    @Override
+    public void onCustomActionResponse(EinzMessage<EinzCustomActionMessageBody> message) {
+
+    }
+
+    @Override
+    public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
+
     }
 
     class LongPressListener implements View.OnTouchListener {
@@ -187,8 +310,8 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
                 canvas.scale(2,2);
                 canvas.translate(0,0);
                 view.draw(canvas);
-                }
             }
+        }
     }
 
     class TrayDragListener implements View.OnDragListener {
@@ -204,7 +327,12 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
                         break;
                     case DragEvent.ACTION_DROP:
                         ImageView tmpView = (ImageView) view;
+
                         trayStack.setImageDrawable(tmpView.getDrawable());
+
+                        //remove card from inner cardlist
+                        cards.remove((Card) tmpView.getTag());
+                        //remove card from View
                         mGrid.removeView(view);
                         view.setVisibility(View.VISIBLE);
 
@@ -221,49 +349,5 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
             }
             return false;
         }
-    }
-
-    private int calculateNewIndex(float x, float y) {
-        // calculate which column to move to
-        final float cellWidth = mGrid.getWidth() / mGrid.getColumnCount();
-        final int column = (int)(x / cellWidth);
-
-        // calculate which row to move to
-        final float cellHeight = mGrid.getHeight() / mGrid.getRowCount();
-        final int row = (int)Math.floor(y / cellHeight);
-
-        // the items in the GridLayout is organized as a wrapping list
-        // and not as an actual grid, so this is how to get the new index
-        int index = row * mGrid.getColumnCount() + column;
-        if (index >= mGrid.getChildCount()) {
-            index = mGrid.getChildCount() - 1;
-        }
-
-        return index;
-    }
-
-
-    private void initCards(){
-        cards = new int[20];
-        cards[0] = R.drawable.card_einz_blue;
-        cards[1] = R.drawable.card_take2_red;
-        cards[2] = R.drawable.card_take4;
-        cards[3] = R.drawable.card_rev_green;
-        cards[4] = R.drawable.card_4_red;
-        cards[5] = R.drawable.card_2_yellow;
-        cards[6] = R.drawable.card_skip_red;
-        cards[7] = R.drawable.card_7_green;
-        cards[8] = R.drawable.card_2_red;
-        cards[9] = R.drawable.card_8_blue;
-        cards[10] = R.drawable.card_einz_blue;
-        cards[11] = R.drawable.card_take2_red;
-        cards[12] = R.drawable.card_take4;
-        cards[13] = R.drawable.card_rev_green;
-        cards[14] = R.drawable.card_4_red;
-        cards[15] = R.drawable.card_2_yellow;
-        cards[16] = R.drawable.card_skip_red;
-        cards[17] = R.drawable.card_7_green;
-        cards[18] = R.drawable.card_2_red;
-        cards[19] = R.drawable.card_8_blue;
     }
 }
