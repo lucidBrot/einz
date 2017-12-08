@@ -1,32 +1,32 @@
 [
   {
-    "ID":"yellow_0", "name":"Yellow 0", "text":"ZERO", "color":"YELLOW", "image":"@drawable/card_0_yellow"
+    "ID":"yellow_0", "name":"Yellow 0", "text":"ZERO", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_0_yellow"
   },
   {
-    "ID":"yellow_1", "name":"Yellow 1", "text":"ONE", "color":"YELLOW", "image":"@drawable/card_1_yellow"
+    "ID":"yellow_1", "name":"Yellow 1", "text":"ONE", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_1_yellow"
   },
   {
-    "ID":"yellow_2", "name":"Yellow 2", "text":"TWO", "color":"YELLOW", "image":"@drawable/card_2_yellow"
+    "ID":"yellow_2", "name":"Yellow 2", "text":"TWO", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_2_yellow"
   },
   {
-    "ID":"yellow_3", "name":"Yellow 3", "text":"THREE", "color":"YELLOW", "image":"@drawable/card_3_yellow"
+    "ID":"yellow_3", "name":"Yellow 3", "text":"THREE", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_3_yellow"
   },
   {
-    "ID":"yellow_4", "name":"Yellow 4", "text":"FOUR", "color":"YELLOW", "image":"@drawable/card_4_yellow"
+    "ID":"yellow_4", "name":"Yellow 4", "text":"FOUR", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_4_yellow"
   },
   {
-    "ID":"yellow_5", "name":"Yellow 5", "text":"FIVE", "color":"YELLOW", "image":"@drawable/card_5_yellow"
+    "ID":"yellow_5", "name":"Yellow 5", "text":"FIVE", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_5_yellow"
   },
   {
-    "ID":"yellow_6", "name":"Yellow 6", "text":"SIX", "color":"YELLOW", "image":"@drawable/card_6_yellow"
+    "ID":"yellow_6", "name":"Yellow 6", "text":"SIX", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_6_yellow"
   },
   {
-    "ID":"yellow_7", "name":"Yellow 7", "text":"SEVEN", "color":"YELLOW", "image":"@drawable/card_7_yellow"
+    "ID":"yellow_7", "name":"Yellow 7", "text":"SEVEN", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_7_yellow"
   },
   {
-    "ID":"yellow_8", "name":"Yellow 8", "text":"EIGHT", "color":"YELLOW", "image":"@drawable/card_8_yellow"
+    "ID":"yellow_8", "name":"Yellow 8", "text":"EIGHT", "color":"YELLOW", "resourceGroup":"drawable","resourceName":"card_8_yellow"
   },
   {
-    "ID":"yellow_9", "name":"Yellow 9", "text":"NINE", "color":"YELLOW", "image":"@drawable/card_9_yellow"
+    "ID":"yellow_9", "name":"Yellow 9", "text":"NINE", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_9_yellow"
   }
 ]

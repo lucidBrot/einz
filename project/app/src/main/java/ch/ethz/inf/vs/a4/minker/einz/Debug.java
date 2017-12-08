@@ -292,7 +292,7 @@ public class Debug {
 
     private static String debug_getPlayCardMessage() {
         EinzMessageHeader header=new EinzMessageHeader("playcard","PlayCard" );
-        Card card = new Card("card.lul.id", "bla", CardText.DEBUG, CardColor.BLUE);
+        Card card = new Card("card.lul.id", "bla", CardText.DEBUG, CardColor.BLUE, "", "");
         EinzMessageBody body  = new EinzPlayCardMessageBody(card);
         EinzMessage message = new EinzMessage<>(header, body);
         try {

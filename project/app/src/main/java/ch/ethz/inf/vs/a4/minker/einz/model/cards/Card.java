@@ -1,9 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz.model.cards;
 
+import android.content.Context;
+
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 
 /**
  * Created by Fabian on 11.11.2017.
@@ -20,14 +20,20 @@ public class Card {
 
     private final String name;
 
+    private final String resourceName;
+
+    private final String resourceGroup;
+
     public String origin = CardOrigin.UNSPECIFIED.value; // origin can be any of CardOrigin or a username
 
 
-    public Card (String ID, String name, CardText text, CardColor color){
+    public Card (String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName){
         this.ID = ID;
         this.name = name;
         this.text = text;
         this.color = color;
+        this.resourceGroup = resourceName;
+        this.resourceName = resourceName;
     }
 
     /**
@@ -38,8 +44,8 @@ public class Card {
      * @param color
      * @param origin origin can be any of CardOrigin or a username
      */
-    public Card (String ID, String name, CardText text, CardColor color, String origin){
-        this(ID, name, text, color);
+    public Card (String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName, String origin){
+        this(ID, name, text, color, resourceGroup, resourceName);
         this.origin = origin;
     }
 
@@ -54,6 +60,8 @@ public class Card {
         this.text = null;
         this.color = null;
         this.name = "";
+        this.resourceGroup = "";
+        this.resourceName = "";
     }
 //    /**
 //    * param origin origin can be any of CardOrigin or a username
@@ -92,6 +100,11 @@ public class Card {
 
     public String getID() {
         return ID;
+    }
+
+
+    public int getImageRessourceID(Context context){
+        return context.getResources().getIdentifier(resourceName, resourceGroup, context.getPackageName());
     }
 
     public JSONObject toJSON(){
