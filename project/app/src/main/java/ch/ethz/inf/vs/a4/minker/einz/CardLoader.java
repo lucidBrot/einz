@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import com.google.common.io.Resources;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,7 +34,7 @@ public class CardLoader {
             return null;
         }
         CardAttributeContainer params = cardMapping.get(cardID);
-        return new Card(cardID, params.name, params.text, params.color);
+        return new Card(cardID, params.name, params.text, params.color, params.resourceGroup, params.resourceName);
     }
 
 
@@ -46,12 +48,13 @@ public class CardLoader {
                 String name = cardObject.getString("name");
                 String text = cardObject.getString("text");
                 String color = cardObject.getString("color");
-                String image = cardObject.getString("image");
+                String resourceGroup = cardObject.getString("resourceGroup");
+                String resourceName = cardObject.getString("resourceName");
 
                 CardText cardText = CardText.valueOf(text);
                 CardColor cardColor = CardColor.valueOf(color);
 
-                CardAttributeContainer params = new CardAttributeContainer(name, cardText, cardColor, image);
+                CardAttributeContainer params = new CardAttributeContainer(name, cardText, cardColor, resourceGroup, resourceName);
                 cardMapping.put(ID, params);
             } catch (IllegalArgumentException e){
                 e.printStackTrace();
@@ -63,13 +66,15 @@ public class CardLoader {
         public String name;
         public CardText text;
         public CardColor color;
-        public String image;
+        public String resourceGroup;
+        public String resourceName;
 
-        public CardAttributeContainer(String name, CardText text, CardColor color, String image){
+        CardAttributeContainer(String name, CardText text, CardColor color, String resourceGroup, String resourceName){
             this.name = name;
             this.text = text;
             this.color = color;
-            this.image = image;
+            this.resourceGroup = resourceGroup;
+            this.resourceName = resourceName;
         }
     }
 

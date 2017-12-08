@@ -38,6 +38,7 @@ public class EinzConstants {
     public static final int KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION = 100; // how much the ping may diverge up or down from the average, if the average is MAX_SUPPORTED_PING.
     public static final long KEEPALIVE_GRACE_PERIOD = 100L; // some additional time difference between the time interval of sending a packet and the time interval of needing to receive it.
 
+    // Yikes, please NOOOO!!! Don't do this!!!
     /** passing complex object to new activities is cancer, so we use a global variable
      * make sure to never use this when starting multiple clients on the same device.
      * Always lock this as a safety mechanism
