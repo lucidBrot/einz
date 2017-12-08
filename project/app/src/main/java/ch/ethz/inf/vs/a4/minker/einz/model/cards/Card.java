@@ -32,7 +32,7 @@ public class Card {
         this.name = name;
         this.text = text;
         this.color = color;
-        this.resourceGroup = resourceName;
+        this.resourceGroup = resourceGroup;
         this.resourceName = resourceName;
     }
 

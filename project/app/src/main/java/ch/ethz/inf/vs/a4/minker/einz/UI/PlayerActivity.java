@@ -14,6 +14,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.common.collect.Ordering;
+
 import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
@@ -31,8 +33,12 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMe
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 
 import java.util.ArrayList;
+import java.util.Collections;
+
 
 // How to get Messages:
 // get the intent extra that is a reference to ourClient
@@ -68,7 +74,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         trayStack.setOnDragListener(new TrayDragListener());
         mGrid = findViewById(R.id.grid_layout);
         mGrid.setOnDragListener(new DragListener());
-        initCards();
 
         //<UglyHack>
         //this.ourClient = EinzConstants.ourClientGlobal; // DANGER ZONE
@@ -83,6 +88,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         cardWidth  = (size.x / mGrid.getColumnCount());
         cardHeight = (size.y / (3*mGrid.getRowCount()));
+        initCards();
 
         //add cardDrawables to mgrid
         for (int i = 0; i < cardDrawables.size(); i++) {
@@ -129,7 +135,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         localImgView.setTag(cardAdded);
 
-        //localImgView.setImageResource(cardAdded.getImageResourceID());
+        localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext()));
         localImgView.getLayoutParams().width  = cardWidth;
         localImgView.getLayoutParams().height = cardHeight;
         itemView.setOnTouchListener(new LongPressListener());
@@ -138,6 +144,24 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     private void initCards(){
         cardDrawables = new ArrayList<>();
+        cards = new ArrayList<>();
+
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+
+        /*
+
         cardDrawables.add(R.drawable.card_einz_blue);
         cardDrawables.add(R.drawable.card_take2_red);
         cardDrawables.add(R.drawable.card_take4);
@@ -157,8 +181,32 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         cardDrawables.add(R.drawable.card_skip_red);
         cardDrawables.add(R.drawable.card_7_green);
         cardDrawables.add(R.drawable.card_2_red);
-        cardDrawables.add(R.drawable.card_8_blue);
+        cardDrawables.add(R.drawable.card_8_blue);*/
     }
+
+    public boolean checkCardsStillValid(ArrayList<Card> cardlist){
+        if(cardlist.size() != cards.size()){
+            return false;
+        }
+
+        ArrayList<String> stringOfOwnCards = new ArrayList<>();
+        ArrayList<String> stringOfGotCards = new ArrayList<>();
+
+        for(Card currCard:cards){
+            stringOfOwnCards.add(currCard.getID());
+        }
+
+        for(Card currCard:cardlist){
+            stringOfGotCards.add(currCard.getID());
+        }
+
+        Collections.sort(stringOfGotCards);
+        Collections.sort(stringOfOwnCards);
+
+        return(stringOfGotCards.equals(stringOfOwnCards));
+    }
+
+    
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
@@ -341,7 +389,10 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                         trayStack.setImageDrawable(tmpView.getDrawable());
 
                         //remove card from inner cardlist
+
                         cards.remove((Card) tmpView.getTag());
+                        //System.out.println(cards);
+
                         //remove card from View
                         mGrid.removeView(view);
                         view.setVisibility(View.VISIBLE);
