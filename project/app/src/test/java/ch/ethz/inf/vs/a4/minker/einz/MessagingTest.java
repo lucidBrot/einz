@@ -365,11 +365,11 @@ public class MessagingTest {
                 "  },\n" +
                 "  \"body\":{\n" +
                 "    \"globalstate\":{\n" +
-                "      \"numcardsinhand\":{\n" +
-                "        \"Eric\":\"3\",\n" +
-                "        \"Rip\":\"100\",\n" +
-                "        \"Ric\":\"2\"\n" +
-                "      },\n" +
+                "      \"numcardsinhand\":[\n" +
+                "        {\"name\":\"Eric\", \"handSize\":\"3\"},\n" +
+                "        {\"name\":\"Rip\",\"handSize\":\"100\"},\n" +
+                "        {\"name\":\"Ric\",\"handSize\":\"2\"}\n" +
+                "      ],\n" +
                 "      \"stack\":[\n" +
                 "        {\"ID\":\"cardID01\", \"origin\":\"~talon\"},\n" +
                 "        {\"ID\":\"cardID1337\", \"origin\":\"Rip\"}\n" +
