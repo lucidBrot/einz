@@ -216,6 +216,16 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     }
 
+    @Override
+    public void setHand(ArrayList<Card> hand) {
+
+    }
+
+    @Override
+    public void setActions(ArrayList<String> actions) {
+
+    }
+
     class LongPressListener implements View.OnTouchListener {
 
         /*@Override
