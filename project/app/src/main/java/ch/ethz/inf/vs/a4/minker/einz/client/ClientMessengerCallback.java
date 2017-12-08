@@ -201,13 +201,38 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         //nothing to do here?
         //except of course to call Chris' gameUI.onDrawCardsSuccess or maybe directly his function to update the hand
         // TODO: implement onDrawCardsSuccess
-        gameUI.onDrawCardsSuccess(message);
+
+        final EinzMessage<EinzDrawCardsSuccessMessageBody> msg = message;
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                EinzMessage<EinzDrawCardsSuccessMessageBody> msg2 =msg;
+                gameUI.onDrawCardsSuccess(msg2);
+            }
+        };
+
+        runOnMainThread(runnable);
+
+
     }
 
     @Override
     public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
         String reason = message.getBody().getReason();
-        Toast.makeText(this.applicationContext,"You're not able to draw a card because " + reason, Toast.LENGTH_SHORT).show(); // if this fails, it is because you need to run this in the main thread
+        Toast.makeText(this.applicationContext,"You're not able to draw a card because " + reason, Toast.LENGTH_SHORT).show();
+        final EinzMessage<EinzDrawCardsFailureMessageBody> msg = message;
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                EinzMessage<EinzDrawCardsFailureMessageBody> msg2 =msg;
+                gameUI.onDrawCardsFailure(msg2);
+            }
+        };
+
+        runOnMainThread(runnable);
+
         // TODO: implement onDrawCardsFailure
     }
 
@@ -223,13 +248,25 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     @Override
     public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
         
-        ArrayList<Card> hand = message.getBody().getPlayerState().getHand();
-        ArrayList<String> actions = new ArrayList<>();
-        actions = message.getBody().getPlayerState().getPossibleActionsNames();
+        final ArrayList<Card> handtemp = message.getBody().getPlayerState().getHand();
+        final ArrayList<String> actionstemp = message.getBody().getPlayerState().getPossibleActionsNames();
 
 
-        gameUI.setHand(hand); // TODO: Chris would need to implement this
-        gameUI.setActions(actions); // TODO: Chris would need to implement this
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                if(gameUI!=null) {
+                    ArrayList<Card> hand = handtemp;
+                    ArrayList<String> actions = actionstemp;
+
+                    gameUI.setHand(hand); // TODO: Chris would need to implement this
+                    gameUI.setActions(actions); // TODO: Chris would need to implement this
+                }
+            }
+        };
+
+        runOnMainThread(runnable);
+
 
     }
 
@@ -240,19 +277,51 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message) {
-        gameUI.onPlayerFinished(message);
+
+        final EinzMessage<EinzPlayerFinishedMessageBody> msg = message;
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                EinzMessage<EinzPlayerFinishedMessageBody> msg2 = msg;
+                gameUI.onPlayerFinished(msg2);
+            }
+        };
+
+        runOnMainThread(runnable);
+
         // TODO: implement onPlayerFinished
     }
 
     @Override
     public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
-        gameUI.onGameOver(message);
+
+        final EinzMessage<EinzGameOverMessageBody> msg = message;
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                EinzMessage<EinzGameOverMessageBody> msg2 = msg;
+                gameUI.onGameOver(msg2);
+            }
+        };
+
+        runOnMainThread(runnable);
+
         // TODO: implement onGameOver
     }
 
     @Override
     public void onCustomActionResponse(EinzMessage<EinzCustomActionResponseMessageBody> message) {
-        gameUI.onCustomActionResponse(message);
+        final EinzMessage<EinzCustomActionResponseMessageBody> msg = message;
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                EinzMessage<EinzCustomActionResponseMessageBody> msg2 = msg;
+                gameUI.onCustomActionResponse(msg2);
+            }
+        };
         // TODO: implement onCustomActionResponse
     }
 
