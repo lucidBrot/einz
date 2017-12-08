@@ -24,7 +24,7 @@ public class EinzSendStateMessageBody extends EinzMessageBody {
         return playerstate;
     }
 
-    public EinzSendStateMessageBody(GlobalStateParser globalstate, PlayerState playerstate){
+    public EinzSendStateMessageBody(GlobalStateParser globalstate, PlayerState playerstate) {
         this.playerstate = playerstate;
         this.globalstate = globalstate;
     }
@@ -40,35 +40,3 @@ public class EinzSendStateMessageBody extends EinzMessageBody {
     }
 }
 
-/*
-{
-  "header":{
-    "messagegroup":"stateinfo",
-    "messagetype":"SendState"
-  },
-  "body":{
-    "globalstate":{
-      "numcardsinhand":{
-        "Eric":"3",
-        "Rip":"100",
-        "Ric":"2"
-      },
-      "stack":[
-        {"ID":"cardID01", "origin":"~talon"},
-        {"ID":"cardID1337", "origin":"Rip"}
-      ],
-      "whoseturn":"Ric",
-      "drawxcardsmin":"2"
-    },
-    "playerstate":{
-      "hand":[
-        {"ID":"cardID03", "origin":"Eric"}
-      ],
-      "possibleactions":
-        [
-        "leaveGame", "drawCards", "playCard"
-        ]
-    }
-  }
-}
- */
