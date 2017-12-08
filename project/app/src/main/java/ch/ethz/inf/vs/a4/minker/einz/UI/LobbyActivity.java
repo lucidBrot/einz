@@ -153,7 +153,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         EinzMessage<EinzStartGameMessageBody> startGameMessage = new EinzMessage<>(header, body);
         this.ourClient.getConnection().sendMessageRetryXTimes(5, startGameMessage);
 
-        // <UglyHack>
+        // <UglyHack> // TODO: remove this part because clemens calls this
         // read EinzConstants.ourClientGlobal's javadocs to understand this. Basically, I cannot implement parcelable for PrintWriter, and
         // thus not for EinzClient
         Intent intent = new Intent(this, PlayerActivity.class);
