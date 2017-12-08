@@ -40,8 +40,8 @@ public class WishColorRule extends BasicCardRule {
             options.add(color.color);
         }
 
-        String result = config.getClientCallbackService().getSelectionFromPlayer(state.getActivePlayer(), options);
-        wishedColor = CardColor.valueOf(result);
+        /*String result = config.getClientCallbackService().getSelectionFromPlayer(state.getActivePlayer(), options);
+        wishedColor = CardColor.valueOf(result);*/ // TODO: did not compile
         return state;
     }
 

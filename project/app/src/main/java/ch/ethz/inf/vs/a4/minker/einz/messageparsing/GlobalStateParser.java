@@ -61,12 +61,15 @@ public class GlobalStateParser {
 
     public JSONObject toJSON() throws JSONException {
         //build numcardsinhand object
-        JSONObject numcardsinhandJSON = new JSONObject();
+        JSONArray numcardsinhandJSON = new JSONArray();
         HashMap<String, String> numcardsinhand = getNumCardsInHand();
         for (Map.Entry<String, String> entry : numcardsinhand.entrySet()) {
             String name = entry.getKey();
             String number = entry.getValue();
-            numcardsinhandJSON.put(name, number);
+            JSONObject player = new JSONObject();
+            player.put("handSize",number);
+            player.put("name", name);
+            numcardsinhandJSON.put(player);
         }
         //build stack object
         JSONArray stackJSON = new JSONArray();
