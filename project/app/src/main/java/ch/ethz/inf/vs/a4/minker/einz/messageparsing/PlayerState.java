@@ -19,15 +19,19 @@ public class PlayerState {
 
     public PlayerState(ArrayList<Card> hand, ArrayList<JSONObject> possibleActionsJSON) throws JSONException {
         this.hand = hand;
+        this.possibleActionsNames = new ArrayList<>();
+        this.possibleActions = new ArrayList<>();
         for(JSONObject possibleAction : possibleActionsJSON){
             if(!possibleAction.has("parameters")){
                 possibleAction.put("parameters", new JSONArray()); // create empty parameters field if not existent
             } else {
-                JSONArray tempParams = possibleAction.getJSONArray("parameters"); // triggers exception if not a jsonArray
+                JSONObject tempParams = possibleAction.getJSONObject("parameters"); // triggers exception if not a jsonArray
                 // so now we can guarantee that every object in this.possibleActions has the fields parameters and actionName
             }
             this.possibleActionsNames.add(possibleAction.getString("actionName"));
+            this.possibleActions.add(possibleAction);
         }
+
     }
 
     public ArrayList<Card> getHand() {

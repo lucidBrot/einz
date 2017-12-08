@@ -383,7 +383,9 @@ public class MessagingTest {
                 "      ],\n" +
                 "      \"possibleactions\":\n" +
                 "        [\n" +
-                "        \"leaveGame\", \"drawCards\", \"playCard\"\n" +
+                "          {\"actionName\":\"leaveGame\",\"parameters\":{}},\n" +
+                "          {\"actionName\":\"drawCards\", \"parameters\":{}},\n" +
+                "          {\"actionName\":\"playCard\", \"parameters\":{\"playableCards\":[\"cardID1\", \"cardID1337\"]}}\n" +
                 "        ]\n" +
                 "    }\n" +
                 "  }\n" +
