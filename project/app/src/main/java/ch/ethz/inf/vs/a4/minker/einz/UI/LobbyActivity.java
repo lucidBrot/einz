@@ -20,9 +20,13 @@ import android.widget.Toast;
 import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
+import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import info.whitebyte.hotspotmanager.WifiApManager;
@@ -139,7 +143,14 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         if(!this.host)
             return;
         // TODO: ignore successive button clicks
-        // TODO: send startGame message before that activity starts
+
+
+        // send startGame message before that activity starts
+        EinzMessageHeader header = new EinzMessageHeader("startgame", "StartGame");
+        EinzStartGameMessageBody body = new EinzStartGameMessageBody();
+        EinzMessage<EinzStartGameMessageBody> startGameMessage = new EinzMessage<>(header, body);
+        this.ourClient.getConnection().sendMessageRetryXTimes(5, startGameMessage);
+
         // <UglyHack>
         // read EinzConstants.ourClientGlobal's javadocs to understand this. Basically, I cannot implement parcelable for PrintWriter, and
         // thus not for EinzClient

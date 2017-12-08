@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
 
+import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,5 +39,16 @@ public class EinzMessage<BODYTYPE extends EinzMessageBody> {
         msg.put("header", this.header.toJSON());
         msg.put("body", this.body.toJSON());
         return msg;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return this.toJSON().toString();
+        } catch (JSONException e) {
+            Log.w("EinzMessage", "Failed to convert message to String");
+            e.printStackTrace();
+        }
+        return super.toString();
     }
 }

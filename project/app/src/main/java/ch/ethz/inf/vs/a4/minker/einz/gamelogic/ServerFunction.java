@@ -132,6 +132,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * Lets the players start playing
      */
     public void startGame() {
+        // TODO: gameConfig is null here
         GlobalRuleChecker.checkOnStartGame(globalState, gameConfig);
         globalState.nextTurn(); //Sets the active player to the one specified in initialiseGame
         onChange();
