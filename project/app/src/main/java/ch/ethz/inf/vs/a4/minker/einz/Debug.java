@@ -1,9 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
-import ch.ethz.inf.vs.a4.minker.einz.cards.CardColor;
-import ch.ethz.inf.vs.a4.minker.einz.cards.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;

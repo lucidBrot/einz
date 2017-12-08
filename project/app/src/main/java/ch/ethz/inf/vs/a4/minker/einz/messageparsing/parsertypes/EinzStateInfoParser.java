@@ -2,8 +2,8 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
 
-import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
-import ch.ethz.inf.vs.a4.minker.einz.cards.CardLoader;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import org.json.JSONArray;
 import org.json.JSONException;

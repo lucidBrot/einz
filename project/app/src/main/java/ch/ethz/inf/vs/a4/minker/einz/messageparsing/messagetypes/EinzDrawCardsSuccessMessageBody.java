@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
-import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import org.json.JSONArray;
 import org.json.JSONException;

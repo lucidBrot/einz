@@ -1,10 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
 
-import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
-import ch.ethz.inf.vs.a4.minker.einz.cards.CardColor;
-import ch.ethz.inf.vs.a4.minker.einz.cards.CardLoader;
-import ch.ethz.inf.vs.a4.minker.einz.cards.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import org.json.JSONArray;
 import org.junit.Test;
 

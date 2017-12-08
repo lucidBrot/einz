@@ -2,7 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.Globals;
+import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.OnKeepaliveTimeoutCallback;
@@ -229,7 +229,7 @@ public class EinzClient implements Runnable {
         // EDIT: that's kinda wrong. it might also be the client who has not yet initialized the buffer, but that was a bug in checking if it was null
         if(Debug.CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED) { // for debugging, no longer needed because of sendMessageRetryXTimes instead.
             try {
-                sleep(Globals.CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED);
+                sleep(EinzConstants.CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

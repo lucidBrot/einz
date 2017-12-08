@@ -1,13 +1,11 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.Globals;
-import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
-import ch.ethz.inf.vs.a4.minker.einz.keepalive.OnKeepaliveTimeoutCallback;
+
+import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.SendMessageCallback;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.server.EinzServerClientHandler;
 import org.json.JSONException;
@@ -131,10 +129,10 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
             try {
 
                 //sends the message to the server
-                bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), Globals.ENCODING)), true);
+                bufferOut = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), EinzConstants.ENCODING)), true);
 
                 //receives the message which the server sends back
-                bufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), Globals.ENCODING));
+                bufferIn = new BufferedReader(new InputStreamReader(socket.getInputStream(), EinzConstants.ENCODING));
 
                 String mServerMessage;
 

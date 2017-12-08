@@ -5,9 +5,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import ch.ethz.inf.vs.a4.minker.einz.rules.BasicCardRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.BasicGlobalRule;
-import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
 /**
  * Created by Fabian on 09.11.2017.
