@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.Debug;
-import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivity;
+import ch.ethz.inf.vs.a4.minker.einz.server.Debug_ServerActivity;
 
 public class MainActivity extends FullscreenActivity implements View.OnClickListener {
 
@@ -40,7 +40,7 @@ public class MainActivity extends FullscreenActivity implements View.OnClickList
                 break;
             case R.id.btn_start_server:
                 // start server
-                Intent sintent = new Intent(this, ServerActivity.class);
+                Intent sintent = new Intent(this, Debug_ServerActivity.class);
                 startActivity(sintent);
                 break;
 

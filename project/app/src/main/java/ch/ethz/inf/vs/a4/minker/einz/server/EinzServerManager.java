@@ -158,7 +158,7 @@ public class EinzServerManager {
     }
 
     private boolean isInvalidUsername(String username){
-        return (username.equals("") || username.equals("server"));
+        return (username.equals("") || username.equals("server") || username.contains("~"));
     }
 
     private boolean isLobbyFull(){

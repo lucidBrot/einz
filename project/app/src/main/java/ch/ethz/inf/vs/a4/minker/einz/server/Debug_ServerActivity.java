@@ -27,7 +27,7 @@ import java.util.Locale;
  * this class is for DEBUG
  * This Activity starts the server and manages the Serverside UI
  */
-public class ServerActivity extends AppCompatActivity implements View.OnClickListener, ServerActivityCallbackInterface {
+public class Debug_ServerActivity extends AppCompatActivity implements View.OnClickListener, ServerActivityCallbackInterface {
 
     public static ThreadedEinzServer getServer() {
         return server;
