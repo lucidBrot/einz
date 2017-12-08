@@ -6,6 +6,9 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.support.v7.widget.GridLayout;
 import android.view.Display;
 import android.view.DragEvent;
@@ -19,6 +22,7 @@ import com.google.common.collect.Ordering;
 import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
+import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
@@ -65,11 +69,18 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     ArrayList<Integer> cardDrawables;
     ArrayList<Card> cards;
+    private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
+    private Looper backgroundLooper;
+    private Handler backgroundHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_client);
+
+        this.backgroundThread.start();
+        this.backgroundLooper = this.backgroundThread.getLooper();
+        this.backgroundHandler = new Handler(this.backgroundLooper);
 
         trayStack = findViewById(R.id.tray_stack);
         trayStack.setOnDragListener(new TrayDragListener());
@@ -207,7 +218,20 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         return(stringOfGotCards.equals(stringOfOwnCards));
     }
 
-    
+    public void playCard(final Card playedCard){
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ourClient.getConnection().sendMessage(
+                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}}}");
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+    }
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
