@@ -4,6 +4,9 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
+
+import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
@@ -137,13 +140,22 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
     @Override
     public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
-        parentClient.startGameUI();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                parentClient.startGameUI();
+            }
+        };
+
+        runOnMainThread(runnable);
+        Log.d("CliMesssegnerCallback", "Game Initialized");
         // TODO: implement onInitGame
 
     }
 
     @Override
     public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsMessageBody> message) {
+        //nothing to do here?
         // TODO: implement onDrawCardsSuccess
     }
 
@@ -156,11 +168,25 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface {
 
     @Override
     public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
+        String success = message.getBody().getSuccess();
+        if (!success.equals(true)){
+            Toast.makeText(applicationContext, "You are not allowed to play this card", Toast.LENGTH_SHORT).show();
+        }
         // TODO: implement onPlayCardResponse
     }
 
     @Override
     public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
+
+        ArrayList<Card> hand = message.getBody().getPlayerState().getHand();
+        ArrayList<String> actions = message.getBody().getPlayerState().getPossibleActions();
+
+        parentClient.setHand(hand);
+
+        parentClient.setActions(actions);
+
+
+        String[] optiones = new String[5];
         // TODO: implement onSendState
     }
 
