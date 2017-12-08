@@ -8,17 +8,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ch.ethz.inf.vs.a4.minker.einz.rules.BasicCardRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.BasicGlobalRule;
-import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
-import ch.ethz.inf.vs.a4.minker.einz.cards.CardColor;
-import ch.ethz.inf.vs.a4.minker.einz.cards.CardText;
-import ch.ethz.inf.vs.a4.minker.einz.rules.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.NextTurnRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.ResetCardsToDrawRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.StartGameWithCardsRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.WinOnNoCardsRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ChangeDirectionRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ResetCardsToDrawRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.StartGameWithCardsRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WinOnNoCardsRule;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
 /**

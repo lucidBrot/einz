@@ -1,7 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
-import ch.ethz.inf.vs.a4.minker.einz.rules.BasicRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.RuleLoader;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayColorRule;
+
 import org.json.JSONArray;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class RuleLoaderTest {
     public void testLoad(){
         RuleLoader loader = new RuleLoader();
         JSONArray arr = new JSONArray();
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayColorRule");
         try{
             loader.loadRules(arr);
         } catch (Exception e){
@@ -28,7 +29,7 @@ public class RuleLoaderTest {
         }
         System.out.println(loader.getRulesNames());
         BasicRule loadedRule = loader.getInstanceOfRule("Play Color on Color");
-        assertTrue("Not an instance of the right class", loadedRule instanceof ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule);
+        assertTrue("Not an instance of the right class", loadedRule instanceof PlayColorRule);
 
     }
 
@@ -36,15 +37,15 @@ public class RuleLoaderTest {
     public void testMultiple(){
         RuleLoader loader = new RuleLoader();
         JSONArray arr = new JSONArray();
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule");
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.DrawTwoCardsRule");
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.GameEndsOnWinRule");
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.PlayAlwaysRule");
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule");
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.PlayTextRule");
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.StartGameWithCardsRule");
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.WinOnNoCardsRule");
-        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.WishColorRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ChangeDirectionRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.DrawTwoCardsRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.GameEndsOnWinRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayAlwaysRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayColorRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayTextRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.StartGameWithCardsRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WinOnNoCardsRule");
+        arr.put("ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WishColorRule");
         try {
             loader.loadRules(arr);
         } catch (Exception e){

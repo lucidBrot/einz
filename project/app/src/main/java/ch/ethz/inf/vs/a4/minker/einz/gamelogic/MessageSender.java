@@ -6,8 +6,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import ch.ethz.inf.vs.a4.minker.einz.rules.BasicRule;
-import ch.ethz.inf.vs.a4.minker.einz.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.PlayerAction;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;

@@ -1,7 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.keepalive;
 
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.Globals;
+import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
@@ -131,7 +131,7 @@ public class KeepaliveScheduler implements Runnable {
             INITIAL_BONUS = initialBonus;
         }
 
-        SENDING_INTERVAL = INCOMING_TIMEOUT/2L - 2L * MAX_PING_FLUCTUATION - Globals.KEEPALIVE_GRACE_PERIOD;
+        SENDING_INTERVAL = INCOMING_TIMEOUT/2L - 2L * MAX_PING_FLUCTUATION - EinzConstants.KEEPALIVE_GRACE_PERIOD;
         if (SENDING_INTERVAL <= 0) {
             // wtf are you doing
             throw new RuntimeException("Choose INCOMING_TIMEOUT for keepalive larger than 2*MAX_PING_FLUCTUATION!");
@@ -142,7 +142,7 @@ public class KeepaliveScheduler implements Runnable {
     }
 
     /**
-     * chooses default settings (see Globals.java):
+     * chooses default settings (see EinzConstants.java):
      * Example:
      * INCOMING_TIMEOUT = 1000 (chosen)
      * MAX_SUPPORTED_PING = 1000 (chosen)
@@ -156,7 +156,7 @@ public class KeepaliveScheduler implements Runnable {
      * @param onTimeoutCallback   A interface to be called when the keepalive timeout is triggered. You are responsible that this is run in the main thread if you need it to.
      */
     public KeepaliveScheduler(SendMessageCallback sendMessageCallback, OnKeepaliveTimeoutCallback onTimeoutCallback) {
-        this(Globals.KEEPALIVE_DEFAULT_INCOMING_TIMEOUT, Globals.KEEPALIVE_DEFAULT_MAX_SUPPORTED_PING, Globals.KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION,
+        this(EinzConstants.KEEPALIVE_DEFAULT_INCOMING_TIMEOUT, EinzConstants.KEEPALIVE_DEFAULT_MAX_SUPPORTED_PING, EinzConstants.KEEPALIVE_DEFAULT_MAX_PING_FLUCTUATION,
                 sendMessageCallback, onTimeoutCallback);
     }
 
