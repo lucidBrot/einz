@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
+
+import ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
@@ -184,23 +186,15 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                startGameUI();
-            }
-        };
+        if (gameUI!=null) {
+            gameUI = new PlayerActivity();
+        }
 
-        runOnMainThread(runnable);
         Log.d("CliMesssegnerCallback", "Game Initialized");
         // TODO: implement onInitGame
 
     }
 
-    private void startGameUI() {
-        //TODO: create new GameUI and start the Game
-        //actionCallbackInterface.setGameUI(initializedGameUI);
-    }
 
     @Override
     public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsSuccessMessageBody> message) {
@@ -230,16 +224,13 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
         
         ArrayList<Card> hand = message.getBody().getPlayerState().getHand();
-        ArrayList<String> actions = null; // = message.getBody().getPlayerState().getPossibleActions();
+        ArrayList<String> actions = new ArrayList<>();
+        actions = message.getBody().getPlayerState().getPossibleActionsNames();
+
 
         gameUI.setHand(hand); // TODO: Chris would need to implement this
-
         gameUI.setActions(actions); // TODO: Chris would need to implement this
 
-
-        String[] optiones = new String[5];
-        
-        // TODO: implement onSendState
     }
 
     @Override
@@ -249,16 +240,19 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message) {
+        gameUI.onPlayerFinished(message);
         // TODO: implement onPlayerFinished
     }
 
     @Override
     public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
+        gameUI.onGameOver(message);
         // TODO: implement onGameOver
     }
 
     @Override
     public void onCustomActionResponse(EinzMessage<EinzCustomActionResponseMessageBody> message) {
+        gameUI.onCustomActionResponse(message);
         // TODO: implement onCustomActionResponse
     }
 
