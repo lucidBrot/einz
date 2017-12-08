@@ -870,6 +870,12 @@ Every possible Action has the option to provide parameters custom to that action
 
 Depending on the rules, we need additional messages. E.g. when the user plays a card that allows them to choose a colour, they will get a state where something like "choose color" is a  (custom) possible action. To reply to the server, the rule must handle sending/receiving custom messages, i.e. [CustomAction](#customaction) on the client side and [CustomActionResponse](#customactionresponse) to respond from the server.
 
+
+
+`ruleName` identifies the Rule to the method that decides what to do when receiving this message - i.e. which rule to execute.
+
+See also [Custom Rule Actions](#custom-rule-actions)
+
 ### CustomAction
 
 sent by the **client**
@@ -881,7 +887,8 @@ sent by the **client**
     "messagetype":"CustomAction"
   },
   "body":{
-    "custom parameter of the rule":{ a custom JSONObject},
+    "ruleName":"TheRule27",
+    "custom parameter of the rule":{ a custom JSONObject}
   }
 }
 ```
@@ -897,8 +904,9 @@ sent by the **server**
     "messagetype":"CustomActionResponse"
   },
   "body":{
-    "success":"true"
-    "custom parameter of the rule":{ a custom JSONObject},
+    "ruleName":"TheRule27",
+    "success":"true",
+    "custom parameter of the rule":{ a custom JSONObject}
   }
 }
 ```
@@ -956,3 +964,8 @@ A rule is only specified by its identifier and maybe some parameters, already pr
 }
 ```
 
+
+
+## Custom Rule Actions
+
+List here which rules require which parameter format.

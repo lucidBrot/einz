@@ -1,15 +1,13 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
+import ch.ethz.inf.vs.a4.minker.einz.model.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
-import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.model.Player;
-import ch.ethz.inf.vs.a4.minker.einz.model.PlayerAction;
-import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
