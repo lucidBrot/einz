@@ -23,7 +23,7 @@ public interface GameUIInterface {
 
     void onKickFailure(EinzMessage<EinzKickFailureMessageBody> message);
 
-    ///void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
+    //void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
 
     void onDrawCardsSuccess(EinzMessage<EinzDrawCardsSuccessMessageBody> message);
 

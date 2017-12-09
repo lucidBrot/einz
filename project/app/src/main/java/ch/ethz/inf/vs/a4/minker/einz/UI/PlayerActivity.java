@@ -26,6 +26,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActio
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
@@ -175,10 +176,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take3"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
 
         /*
-
         cardDrawables.add(R.drawable.card_einz_blue);
         cardDrawables.add(R.drawable.card_take2_red);
         cardDrawables.add(R.drawable.card_take4);
@@ -250,6 +250,10 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         });
     }
 
+    public void clearHand(){
+        //TODO IMPLEMENT
+    }
+
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
@@ -273,8 +277,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsSuccessMessageBody> message) {
-        //message.getBody().getCards();
-
+        for (Card currCard:message.getBody().getCards()){
+            addCard(currCard);
+        }
     }
 
     @Override
@@ -347,7 +352,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                 }
                 return true;
             }
-
 
             return false;
         }
