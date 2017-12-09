@@ -17,18 +17,13 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.google.common.collect.Ordering;
-
-import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody;
@@ -64,6 +59,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private static final int NBR_ITEMS = 20;
     private GridLayout mGrid;
     private ImageView trayStack;
+    private ImageView drawPile;
     private LayoutInflater inflater;
     private EinzClient ourClient;
     private int cardHeight,cardWidth;
@@ -77,7 +73,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_client);
+        setContentView(R.layout.acitivity_player);
 
         this.backgroundThread.start();
         this.backgroundLooper = this.backgroundThread.getLooper();
@@ -85,10 +81,15 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         trayStack = findViewById(R.id.tray_stack);
         trayStack.setOnDragListener(new TrayDragListener());
-        mGrid = findViewById(R.id.grid_layout);
-        mGrid.setOnDragListener(new DragListener());
 
-        
+        drawPile = findViewById(R.id.draw_pile);
+        drawPile.setOnTouchListener(new DrawCardListener());
+        drawPile.setTag("drawCard");
+
+        mGrid = findViewById(R.id.grid_layout);
+        mGrid.setOnDragListener(new HandDragListener());
+
+
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
 
         inflater = LayoutInflater.from(this);
@@ -102,6 +103,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         initCards();
 
         //add cardDrawables to mgrid
+        /*
         for (int i = 0; i < cardDrawables.size(); i++) {
             final View itemView = inflater.inflate(R.layout.card_view, mGrid, false);
             ImageView localImgView = (ImageView) itemView;
@@ -109,9 +111,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             localImgView.getLayoutParams().width  = cardWidth;
             localImgView.getLayoutParams().height = cardHeight;
 
-            itemView.setOnTouchListener(new LongPressListener());
+            itemView.setOnTouchListener(new DragCardListener());
             mGrid.addView(itemView);
-        }
+        }*/
     }
 
     private int calculateNewIndex(float x, float y) {
@@ -149,8 +151,12 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext()));
         localImgView.getLayoutParams().width  = cardWidth;
         localImgView.getLayoutParams().height = cardHeight;
-        itemView.setOnTouchListener(new LongPressListener());
+        itemView.setOnTouchListener(new DragCardListener());
         mGrid.addView(itemView);
+    }
+
+    private void setTopPlayPileCard(Card cardPlaced){
+        trayStack.setImageResource(cardPlaced.getImageRessourceID(getApplicationContext()));
     }
 
     private void initCards(){
@@ -158,18 +164,18 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         cards = new ArrayList<>();
 
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_red"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_yellow"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_green"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_red"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_yellow"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_green"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take3"));
 
         /*
 
@@ -229,8 +235,21 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                 }
             }
         });
-
     }
+
+    public void drawCard(){
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ourClient.getConnection().sendMessage("{\"header\":{\"messagegroup\":\"draw\",\"messagetype\":\"DrawCards\"},\"body\":{}}");
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
@@ -298,7 +317,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     }
 
-    class LongPressListener implements View.OnTouchListener {
+    class DragCardListener implements View.OnTouchListener {
 
         /*@Override
         public boolean onLongClick(View view) {
@@ -334,11 +353,33 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         }
     }
 
-    class DragListener implements View.OnDragListener {
+    class DrawCardListener implements View.OnTouchListener {
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+
+            if (motionEvent.getAction()==MotionEvent.ACTION_DOWN) {
+                final ClipData data = ClipData.newPlainText("", "");
+
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    view.startDragAndDrop(data, shadowBuilder, view, 0);
+                } else {
+                    view.startDrag(data, shadowBuilder, view, 0);
+                }
+                return true;
+            }
+
+
+            return false;
+        }
+    }
+
+    class HandDragListener implements View.OnDragListener {
         @Override
         public boolean onDrag(View v, DragEvent event) {
             final View view = (View) event.getLocalState();
-            if (view != null && view instanceof ImageView) {
+            if (view != null && view instanceof ImageView && view.getTag() instanceof Card) {
 
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
@@ -366,6 +407,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                         break;
                 }
                 return true;
+
+            } else if (view != null && view instanceof ImageView && view.getTag().equals("drawCard")) {
+                switch (event.getAction()) {
+
+                    case DragEvent.ACTION_DROP:
+                        drawCard();
+                        System.out.println("drew card");
+
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+
+                        break;
+                    default:
+                        break;
+                }
+                return true;
             }
             return false;
         }
@@ -381,7 +438,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             final View view = getView();
             if (view != null) {
                 shadowSize.set(view.getWidth()*2, view.getHeight()*2);
-                shadowTouchPoint.set(shadowSize.x / 2, shadowSize.y + shadowSize.y / 2);
+                shadowTouchPoint.set(shadowSize.x / 2, shadowSize.y);
             }
         }
 
@@ -400,7 +457,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         @Override
         public boolean onDrag(View v, DragEvent event) {
             final View view = (View) event.getLocalState();
-            if (view != null && view instanceof ImageView) {
+            if (view != null && view instanceof ImageView && view.getTag() instanceof Card) {
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_LOCATION:
                         // do nothing if hovering above own position
@@ -410,8 +467,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     case DragEvent.ACTION_DROP:
                         ImageView tmpView = (ImageView) view;
 
-                        trayStack.setImageDrawable(tmpView.getDrawable());
-
+                        setTopPlayPileCard((Card)tmpView.getTag());
                         //remove card from inner cardlist
 
                         cards.remove((Card) tmpView.getTag());
