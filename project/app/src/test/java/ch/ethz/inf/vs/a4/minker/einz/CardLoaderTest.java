@@ -94,6 +94,5 @@ public class CardLoaderTest {
         assertFalse(tested3Card == tested3CardAgain);
         assertTrue(tested3Card.getColor() == tested3CardAgain.getColor());
         assertTrue(tested3Card.getText() == tested3CardAgain.getText());
-
     }
 }

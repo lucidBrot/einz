@@ -15,11 +15,9 @@ import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.*;
 import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
@@ -129,12 +127,17 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         this.backgroundLooper = this.backgroundThread.getLooper();
         this.backgroundHandler = new Handler(this.backgroundLooper);
 
-        findViewById(R.id.btn_start_game).setOnClickListener(new View.OnClickListener() {
+        Button startGameButton = (Button) findViewById(R.id.btn_start_game);
+        startGameButton.setEnabled(true);
+        startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                view.setEnabled(false);
                 onStartGameButtonClick();
             }
         });
+
+
 
     }
 
@@ -147,19 +150,25 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // TODO: ignore successive button clicks
 
 
+
         // send startGame message before that activity starts
         EinzMessageHeader header = new EinzMessageHeader("startgame", "StartGame");
         EinzStartGameMessageBody body = new EinzStartGameMessageBody();
-        EinzMessage<EinzStartGameMessageBody> startGameMessage = new EinzMessage<>(header, body);
-        this.ourClient.getConnection().sendMessageRetryXTimes(5, startGameMessage);
+        final EinzMessage<EinzStartGameMessageBody> startGameMessage = new EinzMessage<>(header, body);
+        Runnable startGame = new Runnable() {
+            @Override
+            public void run() {
+                ourClient.getConnection().sendMessageRetryXTimes(5, startGameMessage);
+            }
+        };
+        this.backgroundHandler.post(startGame);
 
-        // <UglyHack>
+        // <UglyHack> // TODO: remove this part because clemens calls this
         // read EinzConstants.ourClientGlobal's javadocs to understand this. Basically, I cannot implement parcelable for PrintWriter, and
         // thus not for EinzClient
         Intent intent = new Intent(this, PlayerActivity.class);
         Log.w("LobbyActivity", "If you get a deadlock, it is here");
-        EinzConstants.ourClientGlobalLck.lock(); // DANGER ZONE
-        EinzConstants.ourClientGlobal = this.ourClient;
+        EinzSingleton.getInstance().setEinzClient(this.ourClient);
         // unlock on receive in PlayerActivity
         startActivity(intent);
 

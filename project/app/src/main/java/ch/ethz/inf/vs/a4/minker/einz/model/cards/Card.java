@@ -107,6 +107,12 @@ public class Card {
         return context.getResources().getIdentifier(resourceName, resourceGroup, context.getPackageName());
     }
 
+    @Override
+    public String toString(){
+
+        return "Card(" + ID + ", " + color + ", " + text + ")";
+    }
+
     public JSONObject toJSON(){
         JSONObject card = new JSONObject();
         try {
