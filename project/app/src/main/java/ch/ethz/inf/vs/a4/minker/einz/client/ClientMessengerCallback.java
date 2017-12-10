@@ -24,6 +24,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     private GameUIInterface gameUI; // can be null if the corresponding Activity does not exist yet/anymore
     private final Context applicationContext;
     private final EinzClient parentClient;
+    private String previousPlayer = "~";
 
 
     /**
@@ -246,7 +247,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     }
 
     @Override
-    public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
+    public void onSendState(final EinzMessage<EinzSendStateMessageBody> message) {
         
         final ArrayList<Card> handtemp = message.getBody().getPlayerState().getHand();
         final ArrayList<String> actionstemp = message.getBody().getPlayerState().getPossibleActionsNames();
@@ -259,8 +260,14 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                     ArrayList<Card> hand = handtemp;
                     ArrayList<String> actions = actionstemp;
 
-                    gameUI.setHand(hand); // TODO: Chris would need to implement this
-                    gameUI.setActions(actions); // TODO: Chris would need to implement this
+                    gameUI.setHand(hand);
+                    gameUI.setActions(actions);
+
+                    String whoseCurrentTurn = message.getBody().getGlobalstate().getWhoseTurn();
+                    if(whoseCurrentTurn.equals(parentClient.getUsername()) && !whoseCurrentTurn.equals(previousPlayer)){
+                        gameUI.startOfYourTurn();
+                        previousPlayer = whoseCurrentTurn;
+                    }
                 }
             }
         };

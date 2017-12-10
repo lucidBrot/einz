@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.ClipData;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
@@ -26,7 +28,6 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActio
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
@@ -65,8 +66,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private EinzClient ourClient;
     private int cardHeight,cardWidth;
 
-    ArrayList<Integer> cardDrawables;
-    ArrayList<Card> cards;
+    ArrayList<Integer> cardDrawables = new ArrayList<>();
+    ArrayList<Card> cards = new ArrayList<>();
+    ArrayList<String> availableActions = new ArrayList<>();
     private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
     private Looper backgroundLooper;
     private Handler backgroundHandler;
@@ -161,9 +163,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     private void initCards(){
-        cardDrawables = new ArrayList<>();
-        cards = new ArrayList<>();
-
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_blue"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_einz_yellow"));
@@ -256,6 +255,16 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         cardDrawables.clear();
     }
 
+    public void addToHand(ArrayList<Card> addedCards){
+        for (Card currCard:addedCards){
+            addCard(currCard);
+        }
+    }
+
+    public void setAvailableActions(ArrayList<String> actions){
+        availableActions = actions;
+    }
+
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
@@ -269,7 +278,12 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onShowToast(EinzMessage<EinzShowToastMessageBody> message) {
+        Context context = getApplicationContext();
+        CharSequence text = message.getBody().getToast();
+        int duration = Toast.LENGTH_SHORT;
 
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     @Override
@@ -279,9 +293,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsSuccessMessageBody> message) {
-        for (Card currCard:message.getBody().getCards()){
-            addCard(currCard);
-        }
+        addToHand(message.getBody().getCards());
     }
 
     @Override
@@ -316,12 +328,25 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void setHand(ArrayList<Card> hand) {
-
+        if(!checkCardsStillValid(hand)){
+            clearHand();
+            addToHand(hand);
+        }
     }
 
     @Override
     public void setActions(ArrayList<String> actions) {
+        setAvailableActions(actions);
+    }
 
+    @Override
+    public void startOfYourTurn() {
+        Context context = getApplicationContext();
+        CharSequence text = "It's your turn " + ourClient.getUsername();
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
     }
 
     class DragCardListener implements View.OnTouchListener {

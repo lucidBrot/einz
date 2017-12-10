@@ -43,5 +43,7 @@ public interface GameUIInterface {
 
     void setActions(ArrayList<String> actions);
 
+    void startOfYourTurn();
+
     // TODO: customActionRule..?
 }
