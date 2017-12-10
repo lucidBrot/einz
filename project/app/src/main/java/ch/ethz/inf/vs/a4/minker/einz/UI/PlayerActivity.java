@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -49,6 +50,8 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+
+import static java.lang.Thread.sleep;
 
 
 // How to get Messages:
@@ -199,9 +202,20 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final View itemView = inflater.inflate(R.layout.card_view, mGrid, false);
         ImageView localImgView = (ImageView) itemView;
 
+        // added this temporary fix for the OOM error problem
+        // TODO: add permanent fix
+        // https://stackoverflow.com/a/13415604/2550406
+        /*((BitmapDrawable)localImgView.getDrawable()).getBitmap().recycle();
+        try {
+            sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+        //</temp>
+
         localImgView.setTag(cardAdded);
 
-        localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext()));
+        localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext())); // TODO: @Chris fix OOM error
         localImgView.getLayoutParams().width  = cardWidth;
         localImgView.getLayoutParams().height = cardHeight;
         itemView.setOnTouchListener(new DragCardListener());

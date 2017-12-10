@@ -1,11 +1,13 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
@@ -186,21 +188,23 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onInitGame(final EinzMessage<EinzInitGameMessageBody> message) {
-        if (gameUI!=null) {
-            gameUI = new PlayerActivity();
+        if (gameUI==null && lobbyUI!=null) { // @Clemens I completely rewrote this section. I hope you're fine with this
+            runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    lobbyUI.startGameUIWithThisAsContext();
+                }
+            });
         }
 
-        Log.d("CliMesssegnerCallback", "Game Initialized");
+        Log.d("CliMesssengerCallback", "Game Initialized");
         // TODO: implement onInitGame
-
-        final EinzMessage<EinzInitGameMessageBody> msg = message;
 
 
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                EinzMessage<EinzInitGameMessageBody> msg2 =msg;
-                gameUI.onInitGame(msg2);
+                gameUI.onInitGame(message);
             }
         };
 
