@@ -2,17 +2,14 @@ package ch.ethz.inf.vs.a4.minker.einz;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.PlayColorRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.ParameterType;
+import ch.ethz.inf.vs.a4.minker.einz.model.ParametrizedRule;
 
 /**
  * Created by Josua on 11/22/17.
@@ -22,6 +19,7 @@ public class RuleLoader {
 
     private Map<String, String> ruleMapping;
     private Map<String, String> ruleDescription;
+    private Map<String, Map<String, ParameterType>> ruleParameters;
 
 
     public RuleLoader(){
@@ -42,6 +40,10 @@ public class RuleLoader {
         return null;
     }
 
+    public Set<String> getRulesNames(){
+        return ruleMapping.keySet();
+    }
+
     public String getDescriptionOfRule(String ruleName){
         if(!ruleDescription.containsKey(ruleName)){
             return null;
@@ -49,8 +51,11 @@ public class RuleLoader {
         return ruleDescription.get(ruleName);
     }
 
-    public Set<String> getRulesNames(){
-        return ruleMapping.keySet();
+    public Map<String, ParameterType> getParameters(String ruleName){
+        if(!ruleParameters.containsKey(ruleName)){
+            return null;
+        }
+        return ruleParameters.get(ruleName);
     }
 
     public void  loadRules(JSONArray rulesClasses) throws JSONException{
@@ -61,6 +66,9 @@ public class RuleLoader {
                 BasicRule rule = (BasicRule) ruleClass.newInstance();
                 ruleMapping.put(rule.getName(), ruleClassName);
                 ruleDescription.put(rule.getName(), rule.getDescription());
+                if(rule instanceof ParametrizedRule) {
+                    ruleParameters.put(rule.getName(), ((ParametrizedRule)rule).getParameterTypes());
+                }
             } catch (ClassNotFoundException |
                     InstantiationException |
                     IllegalAccessException |

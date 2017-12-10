@@ -316,13 +316,13 @@ public class MessagingTest {
                 "  },\n" +
                 "  \"body\":{\n" +
                 "    \"cards\":[\n" +
-                "      {\"ID\":\"cardID1\",\"origin\":\"talon\"},\n" +
-                "      {\"ID\":\"cardID3\",\"origin\":\"talon\"},\n" +
-                "      {\"ID\":\"cardID1\",\"origin\":\"talon\"}\n" +
+                "      {\"ID\":\"cardID1337\",\"origin\":\"~talon\"},\n" +
+                "      {\"ID\":\"cardID1337\",\"origin\":\"~unspecified\"},\n" +
+                "      {\"ID\":\"cardID1337\",\"origin\":\"alfred\"}\n" +
                 "    ]\n" +
                 "  }\n" +
                 "}";
-        parser_test(msg); // #cardtag this test still fails.
+        parser_test(msg);
     }
 
     @Test
@@ -365,11 +365,11 @@ public class MessagingTest {
                 "  },\n" +
                 "  \"body\":{\n" +
                 "    \"globalstate\":{\n" +
-                "      \"numcardsinhand\":{\n" +
-                "        \"Eric\":\"3\",\n" +
-                "        \"Rip\":\"100\",\n" +
-                "        \"Ric\":\"2\"\n" +
-                "      },\n" +
+                "      \"numcardsinhand\":[\n" +
+                "        {\"name\":\"Eric\", \"handSize\":\"3\"},\n" +
+                "        {\"name\":\"Rip\",\"handSize\":\"100\"},\n" +
+                "        {\"name\":\"Ric\",\"handSize\":\"2\"}\n" +
+                "      ],\n" +
                 "      \"stack\":[\n" +
                 "        {\"ID\":\"cardID01\", \"origin\":\"~talon\"},\n" +
                 "        {\"ID\":\"cardID1337\", \"origin\":\"Rip\"}\n" +
@@ -383,7 +383,9 @@ public class MessagingTest {
                 "      ],\n" +
                 "      \"possibleactions\":\n" +
                 "        [\n" +
-                "        \"leaveGame\", \"drawCards\", \"playCard\"\n" +
+                "          {\"actionName\":\"leaveGame\",\"parameters\":{}},\n" +
+                "          {\"actionName\":\"drawCards\", \"parameters\":{}},\n" +
+                "          {\"actionName\":\"playCard\", \"parameters\":{\"playableCards\":[\"cardID1\", \"cardID1337\"]}}\n" +
                 "        ]\n" +
                 "    }\n" +
                 "  }\n" +

@@ -2,10 +2,11 @@ package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import java.util.ArrayList;
 
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+
 
 /**
  * Created by Fabian on 07.12.2017.

@@ -6,14 +6,15 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
-import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
-import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
-import ch.ethz.inf.vs.a4.minker.einz.PlayerAction;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.PlayerAction;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
 /**

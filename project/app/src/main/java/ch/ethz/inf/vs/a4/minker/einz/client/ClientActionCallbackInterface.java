@@ -27,7 +27,7 @@ public interface ClientActionCallbackInterface {
 
     void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message);
 
-    void onPlayCardResponse(EinzMessage<EinzPlayCardMessageBody> message);
+    void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message);
 
     void onSendState(EinzMessage<EinzSendStateMessageBody> message);
 

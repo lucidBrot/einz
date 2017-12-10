@@ -2,8 +2,9 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
 import android.util.Log;
-import ch.ethz.inf.vs.a4.minker.einz.Globals;
+import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
+import ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.KeepaliveScheduler;
 import ch.ethz.inf.vs.a4.minker.einz.keepalive.OnKeepaliveTimeoutCallback;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -11,7 +12,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.server.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import org.json.JSONException;
 
@@ -124,7 +125,7 @@ public class EinzClient implements Runnable {
              sendRegistrationMessage();
          }
 
-        // TODO: all other messages
+        // TODO: send all other messages
     }
 
     private void debug_fakeReceiveUpdateLobbyList() {
@@ -229,7 +230,7 @@ public class EinzClient implements Runnable {
         // EDIT: that's kinda wrong. it might also be the client who has not yet initialized the buffer, but that was a bug in checking if it was null
         if(Debug.CLIENT_SLEEP_AFTER_CONNECTION_ESTABLISHED) { // for debugging, no longer needed because of sendMessageRetryXTimes instead.
             try {
-                sleep(Globals.CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED);
+                sleep(EinzConstants.CLIENT_WAIT_TIME_AFTER_CONNECTION_ESTABLISHED);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -284,4 +285,5 @@ public class EinzClient implements Runnable {
     void onClientConnectionDead() {
         this.dead=true;
     }
+
 }

@@ -5,6 +5,8 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -182,26 +184,60 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                startGameUI();
+            }
+        };
+
+        runOnMainThread(runnable);
+        Log.d("CliMesssegnerCallback", "Game Initialized");
         // TODO: implement onInitGame
+
+    }
+
+    private void startGameUI() {
+        //TODO: create new GameUI and start the Game
+        //actionCallbackInterface.setGameUI(initializedGameUI);
     }
 
     @Override
     public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsMessageBody> message) {
+        //nothing to do here?
+        //except of course to call Chris' gameUI.onDrawCardsSuccess or maybe directly his function to update the hand
         // TODO: implement onDrawCardsSuccess
     }
 
     @Override
     public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
+        String reason = message.getBody().getReason();
+        Toast.makeText(this.applicationContext,"You're not able to draw a card because " + reason, Toast.LENGTH_SHORT).show(); // if this fails, it is because you need to run this in the main thread
         // TODO: implement onDrawCardsFailure
     }
 
     @Override
-    public void onPlayCardResponse(EinzMessage<EinzPlayCardMessageBody> message) {
+    public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
+        String success = message.getBody().getSuccess();
+        if (!success.equals(true)){
+            Toast.makeText(applicationContext, "You are not allowed to play this card", Toast.LENGTH_SHORT).show();
+        }
         // TODO: implement onPlayCardResponse
     }
 
     @Override
     public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
+        /*
+        ArrayList<Card> hand = message.getBody().getPlayerState().getHand();
+        ArrayList<String> actions = message.getBody().getPlayerState().getPossibleActions();
+
+        gameUI.setHand(hand); // TODO: Chris would need to implement this
+
+        gameUI.setActions(actions); // TODO: Chris would need to implement this
+
+
+        String[] optiones = new String[5];
+        */
         // TODO: implement onSendState
     }
 

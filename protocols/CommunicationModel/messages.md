@@ -559,7 +559,8 @@ The **Client** can request to play a card. The Server will play the card if it i
 >
 > ```json
 > {
->   "ID":"cardID1337"
+>   "ID":"cardID1337",
+>   "origin":"xxx1337baclemenxXx"
 > }
 > ```
 
@@ -573,7 +574,8 @@ The **Client** can request to play a card. The Server will play the card if it i
   },
   "body":{
     "card":{
-      "ID":"cardID1337"
+      "ID":"cardID1337",
+      "origin":"~stack"
     }
   }
 }
@@ -635,11 +637,11 @@ The states will be empty if there was a GetState request while not appropriate -
   },
   "body":{
     "globalstate":{
-      "numcardsinhand":{
-        "Eric":"3",
-        "Rip":"100",
-        "Ric":"2"
-      },
+      "numcardsinhand":[
+        {"name":"Eric", "handSize":"3"},
+        {"name":"Rip","handSize":"100"},
+        {"name":"Ric","handSize":"2"}
+      ],
       "stack":[
         {"ID":"cardID01", "origin":"~talon"},
         {"ID":"cardID1337", "origin":"Rip"}
@@ -770,11 +772,11 @@ The state is defined as containing the global state and the personal player stat
 ```json
 {
   "globalstate":{
-    "numcardsinhand":{
-      "Eric":"3",
-      "Rip":"100",
-      "Ric":"2"
-    },
+    "numcardsinhand":[
+        {"name":"Eric", "handSize":"3"},
+        {"name":"Rip","handSize":"100"},
+        {"name":"Ric","handSize":"2"}
+      ],
     "stack":[
       {"ID":"cardID01", "origin":"~talon"},
       {"ID":"cardID1337", "origin":"Rip"}

@@ -7,13 +7,15 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
-import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
-import ch.ethz.inf.vs.a4.minker.einz.PlayerAction;
+
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.PlayerAction;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
@@ -21,9 +23,8 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFa
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalStateParser;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.GlobalStateParser;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.PlayerState;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import ch.ethz.inf.vs.a4.minker.einz.server.UserNotRegisteredException;
 
@@ -55,14 +56,11 @@ public class MessageSender {
         }
         JSONObject cardRules = cardRulesJSONHelper(config);
         JSONArray globalRules = globalRulesJSONHelper(config);
-
-        //TODO: Eric wat?
-        /*
-        EinzInitGameMessageBody body = new EinzInitGameMessageBody(ruleSet, turnOrder);
+        EinzInitGameMessageBody body = new EinzInitGameMessageBody(cardRules, globalRules, turnOrder);
         EinzMessage<EinzInitGameMessageBody> message = new EinzMessage<>(header, body);
         tes.getServerManager().broadcastMessageToAllPlayers(message);
         tes.getServerManager().broadcastMessageToAllSpectators(message);
-        */
+
 
     }
 

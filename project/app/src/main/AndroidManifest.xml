@@ -25,7 +25,7 @@
         <activity
             android:name=".UI.PlayerActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
-        <activity android:name=".server.ServerActivity" />
+        <activity android:name=".server.Debug_ServerActivity" />
         <activity
             android:name=".UI.ServerSetupActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">

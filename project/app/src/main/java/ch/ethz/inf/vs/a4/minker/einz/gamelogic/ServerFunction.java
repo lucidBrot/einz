@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,19 +8,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
-import ch.ethz.inf.vs.a4.minker.einz.BasicGlobalRule;
-import ch.ethz.inf.vs.a4.minker.einz.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardColor;
-import ch.ethz.inf.vs.a4.minker.einz.CardText;
-import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.Player;
-import ch.ethz.inf.vs.a4.minker.einz.rules.ChangeDirectionRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.NextTurnRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.ResetCardsToDrawRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.StartGameWithCardsRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.WinOnNoCardsRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ChangeDirectionRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ResetCardsToDrawRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.StartGameWithCardsRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WinOnNoCardsRule;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
 /**
@@ -75,7 +73,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
         } else {
-            globalState = new GlobalState(10, players); // #cardtag
+            globalState = new GlobalState(10, players);
             this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
@@ -96,6 +94,10 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param globalRules set of global rules with which the game is played
      * @param cardRules   card rules with the card they should apply to
      */
+
+    // TODO: offer getState(username) function that returns the globalstate and the playerstate (or maybe two functions for this)
+    // TODO: offer onFinishTurn(username) function
+    // TODO: offer onCustomAction(user, message) function
 
 
     public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
@@ -130,9 +132,10 @@ public class ServerFunction implements ServerFunctionDefinition {
      * Lets the players start playing
      */
     public void startGame() {
-        GlobalRuleChecker.checkOnStartGame(globalState, gameConfig);
-        globalState.nextTurn(); //Sets the active player to the one specified in initialiseGame
-        onChange();
+        // TODO: gameConfig is null here
+        ///GlobalRuleChecker.checkOnStartGame(globalState, gameConfig);
+        //globalState.nextTurn(); //Sets the active player to the one specified in initialiseGame
+        //onChange();
     }
 
     /**
@@ -223,7 +226,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        Card card = new Card("temp", ct.type, ct, cc); // #cardtag replace "temp"
+                        Card card = new Card("temp", ct.type, ct, cc, "", ""); // TODO: #cardtag replace "temp"
                         numberOfCardsInGame.put(card, 2);
                         allCardsInGame.add(card);
                     }
@@ -253,7 +256,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         //Add all necessary CardRules: (ChangeDirectionRule)
         for (CardColor cc : CardColor.values()) {
             if (cc != CardColor.NONE) {
-                result.assignRuleToCard(new ChangeDirectionRule(), new Card("temp", CardText.SWITCHORDER.type, CardText.SWITCHORDER, cc));
+                result.assignRuleToCard(new ChangeDirectionRule(), new Card("temp", CardText.SWITCHORDER.type, CardText.SWITCHORDER, cc, "", ""));
             }
         }
         return result;

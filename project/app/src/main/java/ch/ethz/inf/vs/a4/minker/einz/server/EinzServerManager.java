@@ -3,10 +3,13 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
+import ch.ethz.inf.vs.a4.minker.einz.model.Spectator;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.GlobalStateParser;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.PlayerState;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,7 +103,6 @@ public class EinzServerManager {
         SFLock.writeLock().lock();
         getServerFunctionInterface().initialiseStandardGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
         // TODO: not standard game but with rules, maybe call initialise earlier
-        // TODO: send initGame to clients at some point. either here or on receiving specifyRules
         SFLock.writeLock().unlock();
     }
 
@@ -156,7 +158,7 @@ public class EinzServerManager {
     }
 
     private boolean isInvalidUsername(String username){
-        return (username.equals("") || username.equals("server"));
+        return (username.equals("") || username.equals("server") || username.contains("~"));
     }
 
     private boolean isLobbyFull(){
@@ -681,25 +683,36 @@ public class EinzServerManager {
         getSFLock().readLock().lock();
         EinzMessageHeader header = new EinzMessageHeader("stateinfo", "StateInfo");
 
+        GlobalStateParser globalState=null;
+        PlayerState playerState=null;
+
         if(gamePhaseStarted){
             // TODO: get state from fabian
-
+            throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
 
         } else {
-            // TODO: return empty state in message
+
+            globalState = null;
+            playerState = null;
 
         }
-        //EinzSendStateMessageBody body = new EinzSendStateMessageBody();
-
+        EinzSendStateMessageBody body = new EinzSendStateMessageBody(globalState, playerState);
+        EinzMessage<EinzSendStateMessageBody> msg = new EinzMessage<>(header, body);
         getSFLock().readLock().unlock();
-        throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
+        try {
+            server.sendMessageToUser(issuedByPlayer, msg);
+        } catch (UserNotRegisteredException e) {
+            Log.i("ServerManager/getState", "Unregistered user "+issuedByPlayer+" requested his state");
+        } catch (JSONException e) {
+            e.printStackTrace(); // this should not happen
+        }
+
     }
 
     public void onFinishTurn(String issuedByPlayer) {
         if(gamePhaseStarted) { // ignore otherwise
             getSFLock().writeLock().lock();
             // TODO: call fabians on finish turn
-
 
             getSFLock().writeLock().unlock();
             throw new RuntimeException(new TodoException("Fabi plis inplinimt"));

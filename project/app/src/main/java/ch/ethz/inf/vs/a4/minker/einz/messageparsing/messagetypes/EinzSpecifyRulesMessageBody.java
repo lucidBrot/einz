@@ -1,11 +1,17 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
-import ch.ethz.inf.vs.a4.minker.einz.*;
+import ch.ethz.inf.vs.a4.minker.einz.model.ParametrizedRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.RuleLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -57,7 +63,7 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
     /**
      * @return false if failed, else true
      * Parses what it needs to later access that
-     */ // TODO: test this function
+     **/
     private boolean parseCardRulesFurther(){
         if(!neverParsedCardRulesBefore){ // only recalculate if never calculated before. because the variables are final
             return lastCardRulesResult;
@@ -82,7 +88,9 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
                     String id = o.getString("id");
                     JSONObject parameters = o.getJSONObject("parameters");
                     BasicCardRule rule = (BasicCardRule) rl.getInstanceOfRule(id);
-                    rule.setParameters(parameters);
+                    if(rule instanceof ParametrizedRule){
+                        ((ParametrizedRule)rule).setParameter(parameters);
+                    }
                     rules.add(rule);
 
                 }
