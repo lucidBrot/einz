@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
@@ -46,6 +47,8 @@ public interface GameUIInterface {
     void playerStartedTurn(String playerThatStartedTurn);
 
     void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
+
+    void setNumCardsInHandOfEachPlayer(HashMap<String ,String> numCardsInHandOfEachPlayer);
 
     // TODO: customActionRule..?
 }

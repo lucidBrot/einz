@@ -45,6 +45,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 
 // How to get Messages:
@@ -73,6 +74,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     ArrayList<Integer> cardDrawables = new ArrayList<>();
     ArrayList<Card> cards = new ArrayList<>();
     ArrayList<String> availableActions = new ArrayList<>();
+    ArrayList<String> allPlayers = new ArrayList<>();
+
     private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
     private Looper backgroundLooper;
     private Handler backgroundHandler;
@@ -277,29 +280,53 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         availableActions = actions;
     }
 
-    public void addPlayerToList(String player){
-        LinearLayout playerList = findViewById(R.id.ll_playerlist);
+    public void addPlayerToList(String addedPlayer){
+        //ensure no player is added twice
+        if(!allPlayers.contains(addedPlayer)) {
+            LinearLayout playerList = findViewById(R.id.ll_playerlist);
 
-        CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerlist, playerList, false);
-        // false because don't add view yet - I first want to set some text
+            CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerlist, playerList, false);
+            // false because don't add view yet - I first want to set some text
 
-        TextView tv_username = usercard.findViewById(R.id.tv_playerlist_username);
+            TextView tv_username = usercard.findViewById(R.id.tv_playerlist_username);
 
-        // set text
-        tv_username.setText(player);
+            // set text
+            tv_username.setText(addedPlayer);
 
-        // highlight yourself
-        /*
-        if(player.equals(ourClient.getUsername())){
-            usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default));
-            ((ImageView)usercard.findViewById(R.id.icn_role)).setColorFilter(getResources().getColor(R.color.red_darker));
-            ((ImageView)usercard.findViewById(R.id.btn_lobby_kick)).setColorFilter(getResources().getColor(R.color.red_darker));
-            ((TextView)usercard.findViewById(R.id.tv_lobbylist_username)).setTextColor(getResources().getColor(R.color.red_darker));
-            ((TextView)usercard.findViewById(R.id.tv_lobbylist_role)).setTextColor(getResources().getColor(R.color.red_darker));
-        }*/
+            // highlight yourself
+            /*
+            if(player.equals(ourClient.getUsername())){
+                usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default));
+                ((ImageView)usercard.findViewById(R.id.icn_role)).setColorFilter(getResources().getColor(R.color.red_darker));
+                ((ImageView)usercard.findViewById(R.id.btn_lobby_kick)).setColorFilter(getResources().getColor(R.color.red_darker));
+                ((TextView)usercard.findViewById(R.id.tv_lobbylist_username)).setTextColor(getResources().getColor(R.color.red_darker));
+                ((TextView)usercard.findViewById(R.id.tv_lobbylist_role)).setTextColor(getResources().getColor(R.color.red_darker));
+            }*/
 
-        // add view
-        playerList.addView(usercard);
+            // add view
+            usercard.setTag(addedPlayer);
+            playerList.addView(usercard);
+            allPlayers.add(addedPlayer);
+        }
+    }
+
+    public void removePlayerFromList(String playerToBeRemoved){
+        if(allPlayers.contains(playerToBeRemoved)) {
+            LinearLayout playerList = findViewById(R.id.ll_playerlist);
+
+            for (int i = 0; i < playerList.getChildCount();) {
+                View v = playerList.getChildAt(i);
+
+                if (v instanceof CardView && v.getTag().equals(playerToBeRemoved)){
+                       // Do something
+                    playerList.removeView(v);
+                } else {
+                    i++;
+                }
+            }
+
+            allPlayers.remove(playerToBeRemoved);
+        }
     }
 
 
@@ -392,7 +419,30 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
         ArrayList<String> playerList = message.getBody().getTurnOrder();
+        for(String currPlayer:playerList){
+            addPlayerToList(currPlayer);
+        }
 
+    }
+
+    @Override
+    public void setNumCardsInHandOfEachPlayer(HashMap<String, String> numCardsInHandOfEachPlayer) {
+        for (String currPlayer:allPlayers){
+            String numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
+            LinearLayout playerList = findViewById(R.id.ll_playerlist);
+            View cardViewOfPlayer = playerList.findViewWithTag(currPlayer);
+            
+            if(cardViewOfPlayer instanceof CardView){
+                View textViewOfNrOfCards = cardViewOfPlayer.findViewById(R.id.tv_nr_of_cards);
+                if(textViewOfNrOfCards instanceof TextView){
+                    ((TextView) textViewOfNrOfCards).setText(numOfCurrplayerCards);
+                }
+            } else if(cardViewOfPlayer == null){
+                /*
+                removePlayerFromList(currPlayer);
+                addPlayerToList(currPlayer);*/
+            }
+        }
     }
 
     class DragCardListener implements View.OnTouchListener {
