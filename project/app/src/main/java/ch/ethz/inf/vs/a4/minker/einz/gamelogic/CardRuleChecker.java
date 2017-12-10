@@ -65,7 +65,7 @@ public class CardRuleChecker {
      * In permissive mode at least one rule has to return true to allow the player to draw a card.
      * @param state
      * @param played
-     * @return False
+     * @return False if he is not allowed to.
      */
     public static boolean checkIsValidPlayCardPermissive(GlobalState state, Card played, GameConfig gameConfig){
         boolean permissive = false;
@@ -83,7 +83,7 @@ public class CardRuleChecker {
      * In restrictive mode every rule has to return true to allow the player to draw a card.
      * @param state
      * @param played
-     * @return
+     * @return False if he is not allowed to.
      */
     public static boolean checkIsValidPlayCardRestrictive(GlobalState state, Card played, GameConfig gameConfig){
         boolean restrictive = true;
@@ -101,7 +101,7 @@ public class CardRuleChecker {
      * Checks rules in restrictive AND permissive.
      * @param state
      * @param played
-     * @return
+     * @return False if he is not allowed to.
      */
     public static boolean checkIsValidPlayCard(GlobalState state, Card played, GameConfig gameConfig){
         return checkIsValidPlayCardPermissive(state, played, gameConfig)
@@ -113,9 +113,9 @@ public class CardRuleChecker {
 
 
     /**
-     * Called after a card player decides to draw a card
+     * Called after a player decides to draw a card
      * @param state
-     * @return
+     * @return modified state
      */
     public static GlobalState checkOnDrawCard(GlobalState state, GameConfig gameConfig){
         for (BasicRule r : gameConfig.allRules) {
@@ -130,7 +130,7 @@ public class CardRuleChecker {
      * Called if a player played the card assigned with the rule
      * @param state
      * @param played
-     * @return
+     * @return modified state
      */
     public static GlobalState checkOnPlayAssignedCard(GlobalState state, Card played, GameConfig gameConfig){
         for (BasicRule r: gameConfig.allRules){
@@ -145,7 +145,7 @@ public class CardRuleChecker {
      * Called on any card the player plays. This includes the card assigned to this rule.
      * @param state
      * @param played
-     * @return
+     * @return modified state
      */
     public static GlobalState checkOnPlayAnyCard(GlobalState state, Card played, GameConfig gameConfig){
         for (BasicRule r: gameConfig.allRules){

@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
 import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
@@ -60,7 +61,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     private ThreadedEinzServer server; // there should be only one
     private Thread serverThread;
-    private ServerFunctionDefinition serverLogicInterface;
+    private ServerFunction serverLogicInterface;
+
     private EinzClient ourClient;
     private String serverIP;
     private int serverPort;
@@ -73,6 +75,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private String adminUsername; // which user was chosen as admin by the server
     private Looper backgroundLooper;
     private Handler backgroundHandler; // use this to schedule background tasks
+
     // Q: what if the host is not the first user to connect? stop server and restart?
     // A: No. the host is almost the first to connect unless somebody is able to pinpoint very exactly when to connect,
     //    because the server tells the host client that it needs to connect
@@ -136,6 +139,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             }
         });
 
+
+
     }
 
     /**
@@ -165,8 +170,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // thus not for EinzClient
         Intent intent = new Intent(this, PlayerActivity.class);
         Log.w("LobbyActivity", "If you get a deadlock, it is here");
-        EinzConstants.ourClientGlobalLck.lock(); // DANGER ZONE
-        EinzConstants.ourClientGlobal = this.ourClient;
+        EinzSingleton.getInstance().setEinzClient(this.ourClient);
         // unlock on receive in PlayerActivity
         startActivity(intent);
 
@@ -423,9 +427,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private void startServer() {
         Log.d("serverSetupActivity", "startServer was pressed");
         if(serverThread==null) { // only create one server
-            serverLogicInterface = new ServerFunction(); // Fabians Part
+            this.serverLogicInterface = new ServerFunction(); // Fabians Part
             ///server = new ThreadedEinzServer(this.getApplicationContext(), this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove serverPort specification
-            server = new ThreadedEinzServer(this.getApplicationContext(),8080, this, serverLogicInterface);
+            server = new ThreadedEinzServer(this.getApplicationContext(),8080,this, this.serverLogicInterface);
             setIPAndPort(server);
             server.setDEBUG_ONE_MSG(false); // set to true to let server generate messages on same host
             serverThread = new Thread(server);

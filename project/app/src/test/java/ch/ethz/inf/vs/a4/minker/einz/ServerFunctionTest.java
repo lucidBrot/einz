@@ -22,6 +22,7 @@ public class ServerFunctionTest {
         s.startGame();
     }
 
+    /*
     @Test
     public void playTest(){
         ArrayList<Player> players = new ArrayList<>();
@@ -32,4 +33,5 @@ public class ServerFunctionTest {
         s.startGame();
 
     }
+    */
 }
