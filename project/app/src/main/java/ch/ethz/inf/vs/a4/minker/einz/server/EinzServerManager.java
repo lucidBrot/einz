@@ -722,10 +722,10 @@ public class EinzServerManager {
         }
     }
 
-    public void onCustomAction(String issuedByPlayer, EinzMessage message) {
+    public void onCustomAction(String issuedByPlayer, EinzMessage<EinzCustomActionMessageBody> message) {
         if(gamePhaseStarted){
             getSFLock().writeLock().lock();
-            // TODO: call fabians method
+            getServerFunctionInterface().onCustomActionMessage(issuedByPlayer, message);
             getSFLock().writeLock().unlock();
 
             throw new RuntimeException(new TodoException("Fabian plis implement"));
@@ -734,7 +734,7 @@ public class EinzServerManager {
             try {
                 JSONObject failBody = new JSONObject().put("success", "false");
                 EinzMessageHeader header = new EinzMessageHeader("furtheractions", "customActionResponse");
-                EinzCustomActionMessageBody body = new EinzCustomActionMessageBody(failBody);
+                EinzCustomActionMessageBody body = new EinzCustomActionMessageBody(failBody, message.getBody().getRuleName());
                 EinzMessage<EinzCustomActionMessageBody> msg = new EinzMessage<>(header, body);
                 server.sendMessageToUser(issuedByPlayer, msg);
             } catch (JSONException e) {
