@@ -43,7 +43,7 @@ public interface GameUIInterface {
 
     void setActions(ArrayList<String> actions);
 
-    void startOfYourTurn();
+    void playerStartedTurn(String playerThatStartedTurn);
 
     // TODO: customActionRule..?
 }

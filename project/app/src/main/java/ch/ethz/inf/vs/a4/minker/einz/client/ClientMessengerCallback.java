@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
-import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -264,8 +263,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                     gameUI.setActions(actions);
 
                     String whoseCurrentTurn = message.getBody().getGlobalstate().getWhoseTurn();
-                    if(whoseCurrentTurn.equals(parentClient.getUsername()) && !whoseCurrentTurn.equals(previousPlayer)){
-                        gameUI.startOfYourTurn();
+                    if(!whoseCurrentTurn.equals(previousPlayer)){
+                        gameUI.playerStartedTurn(whoseCurrentTurn);
                         previousPlayer = whoseCurrentTurn;
                     }
                 }

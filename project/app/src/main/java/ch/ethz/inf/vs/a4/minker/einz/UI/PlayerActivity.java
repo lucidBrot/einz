@@ -340,13 +340,16 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     @Override
-    public void startOfYourTurn() {
-        Context context = getApplicationContext();
-        CharSequence text = "It's your turn " + ourClient.getUsername();
-        int duration = Toast.LENGTH_SHORT;
+    public void playerStartedTurn(String playerThatStartedTurn) {
+        if (playerThatStartedTurn.equals(ourClient.getUsername())) {
+            Context context = getApplicationContext();
+            CharSequence text = "It's your turn " + ourClient.getUsername();
+            int duration = Toast.LENGTH_SHORT;
 
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
+        //TODO Update UI for Playerlist so active player is visible
     }
 
     class DragCardListener implements View.OnTouchListener {
