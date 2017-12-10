@@ -41,7 +41,10 @@ public class EinzPlayCardParser extends EinzParser {
         JSONObject cardJSON = body.getJSONObject("card");
         String ID = cardJSON.getString("ID");
         String origin = cardJSON.getString("origin");
-        Card card = new Card(ID, origin);
+
+        JSONObject playParams = cardJSON.optJSONObject("playParameters");
+
+        Card card = new Card(ID, origin, playParams);
 
         //put it all together
         EinzMessageBody emb = new EinzPlayCardMessageBody(card);

@@ -555,7 +555,9 @@ The **Client** can request to play a card. The Server will play the card if it i
 
 `card` : *JSONObject*
 
-> Only the card ID is needed. Still, we use a JSONObject for the card to make this more easily extensible.
+> We use a JSONObject for the card to make this more easily extensible.
+>
+> See [Card](#card) for more info!
 >
 > ```json
 > {
@@ -628,6 +630,8 @@ The **server** sends this after being asked via [GetState](#getstate) or when ap
 See the specification of [state](#state) for information about the formatting.
 
 The states will be empty if there was a GetState request while not appropriate - e.g. the game not yet running.
+
+See [Card](#card) for more info!
 
 ```Json
 {
@@ -740,6 +744,7 @@ points: *JSONObject of Players and points*
 ## State
 
 The state is defined as containing the global state and the personal player state.
+See [Card](#card) for more info!
 
 `numcardsinhand`  : *String* to *String* JSONObject
 
@@ -805,7 +810,11 @@ The drawn cards, setup so that the UI will know where they came from in order to
 ```json
 {
   "ID":"cardID1337",
-  "origin":"stack"
+  "origin":"stack",
+  "playParameters":{
+    	"ruleWish":{"wishForColor":"blue"},
+    	"ruleDank":{"xXx":"1337"}
+	}
 }
 ```
 
@@ -821,6 +830,9 @@ Not that the tilde is not allowed within usernames, so this is clear specificati
 `ID` is an identifier to find the corresponding card in the resources / local memory.
 
 The [card](#card) does not have to be unique, there may be multiple copies of the same card in play.
+
+`playParameters` is a list of *JSONObjects*  which represent settings specific to this card ID when played. Exampli gratuita, a player might play a card that allows them to wish for a color. It is easiest when that selection is sent with the playCard Request.
+This field will usually be ignored, unless a rule uses it. To use it, you can call `yourCard.getPlayParameters("wishForColors")` to get the *String* associated with *"wishForColors"* or `yourCard.getPlayParameters()` to get the whole *JSONObject* list. 
 
 ## PossibleActions
 

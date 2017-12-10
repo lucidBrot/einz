@@ -300,7 +300,9 @@ public class GlobalState {
         deserializedState.discardPile = new ArrayList<>();
         for (int i = 0; i < stack.length(); i++){
             JSONObject cardObject = stack.optJSONObject(i);
-            Card card = new Card(cardObject.getString("ID"), cardObject.getString("origin"));
+
+            JSONObject playParams = cardObject.optJSONObject("playParameters");
+            Card card = new Card(cardObject.getString("ID"), cardObject.getString("origin"), playParams);
             deserializedState.discardPile.add(card);
         }
 

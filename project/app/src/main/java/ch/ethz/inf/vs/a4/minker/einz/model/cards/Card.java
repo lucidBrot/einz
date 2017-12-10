@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.model.cards;
 
 import android.content.Context;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,44 +25,50 @@ public class Card {
 
     private final String resourceGroup;
 
-    public String origin = CardOrigin.UNSPECIFIED.value; // origin can be any of CardOrigin or a username
+    public String origin = CardOrigin.UNSPECIFIED.value; // origin can be any of CardOrigin or a username. // Could be final. would that make sense?
+
+    private final JSONObject playParameters; // parameters that rules may ask for, but can also be unset. E.g. what color a wish card wishes for. Is allowed to be null
 
 
-    public Card (String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName){
+    public Card(String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName, String origin, JSONObject playParameters) {
         this.ID = ID;
         this.name = name;
         this.text = text;
         this.color = color;
         this.resourceGroup = resourceGroup;
         this.resourceName = resourceName;
+        this.origin = origin;
+        this.playParameters = playParameters;
+    }
+
+    public Card(String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName) {
+        this(ID, name, text, color, resourceGroup, resourceName, CardOrigin.UNSPECIFIED.value);
+    }
+
+    public Card(String ID, String origin, JSONObject playParameters){
+        this(ID, "DEBUG", CardText.DEBUG, CardColor.BLUE, "DEBUG", "DEBUG", origin, playParameters);
+        // TODO: get Card from CardLoader instead of above constructor
+        // playParameters is allowed to be null
     }
 
     /**
-     *
      * @param ID
      * @param name
      * @param text
      * @param color
      * @param origin origin can be any of CardOrigin or a username
      */
-    public Card (String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName, String origin){
-        this(ID, name, text, color, resourceGroup, resourceName);
-        this.origin = origin;
+    public Card(String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName, String origin) {
+        this(ID, name, text, color, resourceGroup, resourceName, origin, null);
     }
 
     /**
-     * Debug constructor
+     *
      * @param ID
      * @param origin
      */
-    public Card (String ID, String origin) {
-        this.ID = ID;
-        this.origin = origin;
-        this.text = null;
-        this.color = null;
-        this.name = "";
-        this.resourceGroup = "";
-        this.resourceName = "";
+    public Card(String ID, String origin) {
+        this(ID, origin, (JSONObject) null);
     }
 //    /**
 //    * param origin origin can be any of CardOrigin or a username
@@ -89,11 +96,13 @@ public class Card {
 
     /**
      * Name that can be displayed to the user in the UI
+     *
      * @return The name of the Card
      */
     public String getName() {
         return name;
     }
+
     public CardColor getColor() {
         return color;
     }
@@ -103,17 +112,17 @@ public class Card {
     }
 
 
-    public int getImageRessourceID(Context context){
+    public int getImageRessourceID(Context context) {
         return context.getResources().getIdentifier(resourceName, resourceGroup, context.getPackageName());
     }
 
     @Override
-    public String toString(){
+    public String toString() {
 
         return "Card(" + ID + ", " + color + ", " + text + ")";
     }
 
-    public JSONObject toJSON(){
+    public JSONObject toJSON() {
         JSONObject card = new JSONObject();
         try {
             card.put("ID", this.ID);
@@ -123,5 +132,50 @@ public class Card {
         }
         return card;
     }
+
+    /**
+     * playParameters is a list of JSONObjects  which represent settings specific to this card ID when played. Exampli gratuita, a player might play a card that allows them to wish for a color. It is easiest when that selection is sent with the playCard Request.
+     * <p>
+     * This field will usually be ignored, unless a rule uses it. To use it, you can call yourCard.getPlayParameters("wishForColors") to get the String associated with "wishForColors" or yourCard.getPlayParameters() to get the whole JSONObject list.
+     *
+     * @return null if there were no params set
+     */
+    public JSONObject getPlayParameters() {
+        return this.playParameters;
+    }
+
+    /**
+     * @param paramKey identifies usually the rule to which the contained Object belongs
+     * @return null if the given param JSONObject was not found, otherwise that object
+     */
+    public JSONObject getPlayParameters(String paramKey) {
+        if (this.getPlayParameters() != null) {
+            try {
+                return getPlayParameters().getJSONObject(paramKey);
+            } catch (JSONException e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param paramKey  identifies usually the rule to which the contained Object belongs
+     * @param paramName identifies the parameter within that Object. see messages.md for more explanation
+     * @return null if the given param was not found, otherwise that parameter String
+     */
+    public String getPlayParameter(String paramKey, String paramName) {
+        JSONObject obj = getPlayParameters(paramKey);
+        if(obj==null){
+            return  null;
+        }
+        try {
+            return obj.getString(paramName);
+        } catch (JSONException e) {
+            return null;
+        }
+    }
+
 
 }

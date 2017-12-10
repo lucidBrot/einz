@@ -60,7 +60,10 @@ public class EinzStateInfoParser extends EinzParser {
                 JSONObject cardJSON = stackJSON.getJSONObject(i);
                 String ID = cardJSON.getString("ID");
                 String origin = cardJSON.getString("origin");
-                Card card = new Card(ID, origin);
+
+                JSONObject playParams = cardJSON.optJSONObject("playParameters");
+
+                Card card = new Card(ID, origin, playParams);
                 stack.add(card);
             }
             String whoseturn = globalstateJSON.getString("whoseturn");
@@ -78,7 +81,10 @@ public class EinzStateInfoParser extends EinzParser {
                 JSONObject cardJSON = handJSON.getJSONObject(i);
                 String ID = cardJSON.getString("ID");
                 String origin = cardJSON.getString("origin");
-                Card card = new Card(ID, origin); // temp code to make the program compile
+
+                JSONObject playParams = cardJSON.optJSONObject("playParameters");
+
+                Card card = new Card(ID, origin, playParams);
                 hand.add(card);
             }
             JSONArray possibleactionsJSON = playerstateJSON.getJSONArray("possibleactions");
