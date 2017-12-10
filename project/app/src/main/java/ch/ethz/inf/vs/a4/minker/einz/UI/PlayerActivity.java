@@ -251,7 +251,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     public void clearHand(){
-        //TODO IMPLEMENT
+        mGrid.removeAllViews();
+        cards.clear();
+        cardDrawables.clear();
     }
 
 
