@@ -42,6 +42,8 @@ public class WishColorRule extends BasicCardRule {
 
         /*String result = config.getClientCallbackService().getSelectionFromPlayer(state.getActivePlayer(), options);
         wishedColor = CardColor.valueOf(result);*/ // TODO: did not compile
+        wishedColor = CardColor.valueOf(played.getPlayParameter("wishColorRule", "wishedColor")); // I added this as alternative idea (Eric, 10.12.2017)
+
         return state;
     }
 
