@@ -17,6 +17,8 @@ import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -75,6 +77,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     ArrayList<Card> cards = new ArrayList<>();
     ArrayList<String> availableActions = new ArrayList<>();
     ArrayList<String> allPlayers = new ArrayList<>();
+    String colorChosen = "none";
 
     private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
     private Looper backgroundLooper;
@@ -99,6 +102,37 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         mGrid = findViewById(R.id.grid_layout);
         mGrid.setOnDragListener(new HandDragListener());
 
+        Button colorWheelBlueButton = findViewById(R.id.btn_colorwheel_blue);
+        colorWheelBlueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onColorWheelButtonBlueClick();
+            }
+        });
+
+        Button colorWheelYellowButton = findViewById(R.id.btn_colorwheel_yellow);
+        colorWheelYellowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onColorWheelButtonYellowClick();
+            }
+        });
+
+        Button colorWheelRedButton = findViewById(R.id.btn_colorwheel_red);
+        colorWheelRedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onColorWheelButtonRedClick();
+            }
+        });
+
+        Button colorWheelGreenButton = findViewById(R.id.btn_colorwheel_green);
+        colorWheelGreenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onColorWheelButtonGreenClick();
+            }
+        });
 
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
 
@@ -191,28 +225,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
-
-        /*
-        cardDrawables.add(R.drawable.card_einz_blue);
-        cardDrawables.add(R.drawable.card_take2_red);
-        cardDrawables.add(R.drawable.card_take4);
-        cardDrawables.add(R.drawable.card_rev_green);
-        cardDrawables.add(R.drawable.card_4_red);
-        cardDrawables.add(R.drawable.card_2_yellow);
-        cardDrawables.add(R.drawable.card_skip_red);
-        cardDrawables.add(R.drawable.card_7_green);
-        cardDrawables.add(R.drawable.card_2_red);
-        cardDrawables.add(R.drawable.card_8_blue);
-        cardDrawables.add(R.drawable.card_einz_blue);
-        cardDrawables.add(R.drawable.card_take2_red);
-        cardDrawables.add(R.drawable.card_take4);
-        cardDrawables.add(R.drawable.card_rev_green);
-        cardDrawables.add(R.drawable.card_4_red);
-        cardDrawables.add(R.drawable.card_2_yellow);
-        cardDrawables.add(R.drawable.card_skip_red);
-        cardDrawables.add(R.drawable.card_7_green);
-        cardDrawables.add(R.drawable.card_2_red);
-        cardDrawables.add(R.drawable.card_8_blue);*/
     }
 
     public boolean checkCardsStillValid(ArrayList<Card> cardlist){
@@ -308,6 +320,36 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             playerList.addView(usercard);
             allPlayers.add(addedPlayer);
         }
+    }
+
+    public void displayColorWheel(){
+        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
+        colorWheel.setVisibility(View.VISIBLE);
+    }
+
+    public void hideColorWheel(){
+        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
+        colorWheel.setVisibility(View.GONE);
+    }
+
+    public void onColorWheelButtonGreenClick(){
+        hideColorWheel();
+        colorChosen = "green";
+    }
+
+    public void onColorWheelButtonRedClick(){
+        hideColorWheel();
+        colorChosen = "red";
+    }
+
+    public void onColorWheelButtonBlueClick(){
+        hideColorWheel();
+        colorChosen = "blue";
+    }
+
+    public void onColorWheelButtonYellowClick(){
+        hideColorWheel();
+        colorChosen = "yellow";
     }
 
     public void removePlayerFromList(String playerToBeRemoved){
@@ -431,7 +473,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             String numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
             LinearLayout playerList = findViewById(R.id.ll_playerlist);
             View cardViewOfPlayer = playerList.findViewWithTag(currPlayer);
-            
+
             if(cardViewOfPlayer instanceof CardView){
                 View textViewOfNrOfCards = cardViewOfPlayer.findViewById(R.id.tv_nr_of_cards);
                 if(textViewOfNrOfCards instanceof TextView){
@@ -539,7 +581,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                 switch (event.getAction()) {
 
                     case DragEvent.ACTION_DROP:
-                        drawCard();
+                        //drawCard();
                         System.out.println("drew card");
 
                         break;

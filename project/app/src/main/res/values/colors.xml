@@ -25,4 +25,9 @@
     <color name="green_dark">#06C619</color>
     <color name="green_darker">#00950F</color>
 
+    <color name="card_green">#00FF31</color>
+    <color name="card_red">#FF0000</color>
+    <color name="card_yellow">#FFEC00</color>
+    <color name="card_blue">#0069FF</color>
+
 </resources>
