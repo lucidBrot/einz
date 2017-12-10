@@ -81,7 +81,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
-            globalState.nextPlayer = players.get(0); //There currently is no active player, nextplayer will start the game in startGame
+            globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
                 MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
             }
@@ -102,12 +102,14 @@ public class ServerFunction implements ServerFunctionDefinition {
      */
 
     // TODO: offer onCustomAction(user, message) function
+
     public void initialiseGame(ThreadedEinzServer threadedEinzServer, ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
                                Map<Card, ArrayList<BasicCardRule>> cardRules) {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
         } else {
             this.threadedEinzServer = threadedEinzServer;
+            globalState = new GlobalState(10, players);
             gameConfig = new GameConfig(deck);
             //gameConfig.allCardsInGame.addAll(deck.keySet()); -> already done in GameConfig
             for (Player p : players) {
@@ -121,8 +123,9 @@ public class ServerFunction implements ServerFunctionDefinition {
                     gameConfig.assignRuleToCard(r, c);
                 }
             }
+            globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
-            globalState.nextPlayer = players.get(0); //There currently is no active player, nextplayer will start the game in startGame
+            globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
                 MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
             }
@@ -182,11 +185,12 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return whether he is allowed to end his turn (and therefore did)
      */
     public boolean finishTurn(Player p) {
-        if (!globalState.getActivePlayer().equals(p) || !GlobalRuleChecker.checkIsValidEndTurn(globalState, gameConfig)) {
+        if (!globalState.getActivePlayer().equals(p) || !GlobalRuleChecker.checkIsValidEndTurn(globalState, p, gameConfig)) {
             //The player isnt allowed to end his turn
             return false;
         } else {
             GlobalRuleChecker.checkOnEndTurn(globalState, gameConfig);
+            globalState.nextTurn(); //I have to call this here since we can't make a rule for that
             return true;
         }
     }
@@ -264,7 +268,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             } else {
                 /*
                 don't add these cards yet
-                TODO: add them later (except the debug card)
+                TODO: add these cards as soon as wishing a color works
                 Card card = new Card("temp", ct.type, ct, CardColor.NONE); // #cardtag
                 numberOfCardsInGame.put(card, 4);
                 allCardsInGame.add(card);
@@ -279,7 +283,6 @@ public class ServerFunction implements ServerFunctionDefinition {
 
         //Add all necessary GlobalRules
         result.addGlobalRule(new GameEndsOnWinRule());
-        result.addGlobalRule(new NextTurnRule());
         result.addGlobalRule(new ResetCardsToDrawRule());
 
         StartGameWithCardsRule rule = new StartGameWithCardsRule();
@@ -290,7 +293,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         } catch (JSONException e) {
             throw new RuntimeException();
         }
-        result.addGlobalRule(new StartGameWithCardsRule());
+        result.addGlobalRule(rule);
 
         result.addGlobalRule(new WinOnNoCardsRule());
 
@@ -308,7 +311,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             } else {
                 /*
                 add play rules for these cards later (once they get added to the game)
-                TODO: add rules later
+                TODO: add rules as soon as wishing a color works
                 Card card = new Card("temp", ct.type, ct, CardColor.NONE); // #cardtag
 
                         result.assignRuleToCard(new PlayAlwaysRule(), card);
@@ -325,6 +328,9 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
         }
 
+        //ADD THIS LAST SO EFFECTS HAPPEN BEFORE THE PLAYERS TURN IS FINISHED
+        result.addGlobalRule(new NextTurnRule());
+
         //Initialise all the rules with the globalState
         for (BasicRule r : result.allRules) {
             r.initialize(result);
@@ -339,7 +345,7 @@ public class ServerFunction implements ServerFunctionDefinition {
 
         //Check if any player has finished
         for (Player p : globalState.getPlayersOrdered()) {
-            if (GlobalRuleChecker.checkIsPlayerFinished(globalState, p, gameConfig)) {
+            if (GlobalRuleChecker.checkIsPlayerFinished(globalState, p)) {
                 globalState.setPlayerFinished(p);
                 if (!DEBUG_MODE) {
                     MessageSender.sendPlayerFinishedToAll(p, threadedEinzServer);

@@ -11,6 +11,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.model.ParametrizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.Player;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.PlayerAction;
@@ -98,7 +99,7 @@ public class JSONHelper {
         if (!p.equals(state.getActivePlayer())) {
             return; //TODO: Check in rules whether it is a players turn
         }
-        if (GlobalRuleChecker.checkIsValidEndTurn(state, config)) {
+        if (GlobalRuleChecker.checkIsValidEndTurn(state, p, config)) {
             JSONObject finishTurnAction = new JSONObject();
             try {
                 finishTurnAction.put("actionName", PlayerAction.FINISH_TURN.name);
@@ -120,7 +121,11 @@ public class JSONHelper {
                     JSONObject specificRule = new JSONObject();
                     try {
                         specificRule.put(((BasicCardRule) r).getAssignedTo().getID(), r.getName());
-                        specificRule.put("parameters", new JSONObject()); //TODO: add additional parameters where necessary
+                        if(r instanceof ParametrizedRule) {
+                            specificRule.put("parameters", ((ParametrizedRule) r).getParameterTypes());
+                        } else {
+                            specificRule.put("parameters", new JSONObject());
+                        }
                         specificRules.put(specificRule);
                     } catch (JSONException e) {
                         throw new RuntimeException();
@@ -142,7 +147,11 @@ public class JSONHelper {
             JSONObject oneRule = new JSONObject();
             try {
                 oneRule.put(r.getName(), r.getName()); //TODO: Currently name is used as ID
-                oneRule.put("parameters", "r.additionalParameters"); //TODO: additional parameters must be given by the rule
+                if (r instanceof ParametrizedRule){
+                    oneRule.put("parameters", ((ParametrizedRule) r).getParameterTypes());
+                } else {
+                    oneRule.put("parameters", new JSONObject());
+                }
                 result.put(oneRule);
                 //If rules have ID put ,them here, otherwise dont
             } catch (JSONException e) {

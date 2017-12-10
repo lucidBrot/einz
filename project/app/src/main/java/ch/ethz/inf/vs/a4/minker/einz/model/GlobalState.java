@@ -243,7 +243,15 @@ public class GlobalState {
      */
     public void nextTurn(){
         activePlayer = nextPlayer;
-        int playerIndex = players.indexOf(nextPlayer);
+
+        //Changed this loop so it owrks with PlayerContainer <-> Player
+        int playerIndex = -1;
+        for(int i=0; i < players.size(); i++){
+            if(players.get(i).player.equals(nextPlayer)){
+                playerIndex = i;
+            }
+        }
+
         if(playOrderIsForwards){
             nextPlayer = players.get((playerIndex + 1) % players.size()).player;
         } else {
