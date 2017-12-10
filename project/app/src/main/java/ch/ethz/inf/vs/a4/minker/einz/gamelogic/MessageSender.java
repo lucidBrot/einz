@@ -135,7 +135,7 @@ public class MessageSender {
         for (Player p : state.getPlayersOrdered()) {
             numCardsInHand.put(p.getName(), Integer.toString(p.hand.size()));
         }
-        ArrayList<Card> stack = (ArrayList) state.getDiscardPile();
+        ArrayList<Card> stack = new ArrayList<>(state.getDiscardPile());
         String activePlayer = state.getActivePlayer().toString();
         String cardsToDraw = Integer.toString(state.getCardsToDraw());
         GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
