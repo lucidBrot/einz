@@ -456,7 +456,23 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         }
-        //TODO Update UI for Playerlist so active player is visible
+
+        if(allPlayers.contains(playerThatStartedTurn)) {
+            LinearLayout playerList = findViewById(R.id.ll_playerlist);
+
+            for (int i = 0; i < playerList.getChildCount();i++) {
+                View v = playerList.getChildAt(i);
+
+                if (v instanceof CardView && v.getTag().equals(playerThatStartedTurn)){
+                    // Do something
+                    ((CardView) v).setCardBackgroundColor(getResources().getColor(R.color.blue_dark));
+                } else if(v instanceof CardView){
+                    ((CardView) v).setCardBackgroundColor(getResources().getColor(R.color.blue_default));
+                }
+            }
+        }
+
+
     }
 
     @Override
@@ -639,6 +655,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
                         setTopPlayPileCard((Card)tmpView.getTag());
                         //remove card from inner cardlist
+                        // playCard((Card)tmpView.getTag());
 
                         cards.remove((Card) tmpView.getTag());
                         //System.out.println(cards);
