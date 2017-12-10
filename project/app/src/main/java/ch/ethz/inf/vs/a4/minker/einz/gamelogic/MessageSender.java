@@ -1,13 +1,16 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ch.ethz.inf.vs.a4.minker.einz.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.Card;
+import ch.ethz.inf.vs.a4.minker.einz.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.Player;
 import ch.ethz.inf.vs.a4.minker.einz.PlayerAction;
@@ -16,7 +19,6 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
@@ -24,6 +26,14 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.GlobalStateParse
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes.PlayerState;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import ch.ethz.inf.vs.a4.minker.einz.server.UserNotRegisteredException;
+
+import static ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper.cardRulesJSONHelper;
+import static ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper.drawCardsJSONHelper;
+import static ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper.finishTurnJSONHelper;
+import static ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper.globalRulesJSONHelper;
+import static ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper.kickPlayerJSONHelper;
+import static ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper.leaveGameJSONHelper;
+import static ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper.playCardJSONHelper;
 
 /**
  * Created by Fabian on 05.12.2017.
@@ -33,16 +43,18 @@ public class MessageSender {
 
     /**
      * @param tes holds the people to send the message to
-     * @param ruleSet rules to broadcast to the clients
+     * @param config the configuration holding the rules
      * @param playersOrdered order in which players play
      */
-    public static void sendInitGameToAll(ThreadedEinzServer tes, ArrayList<BasicRule> ruleSet, ArrayList<Player> playersOrdered){
+    public static void sendInitGameToAll(ThreadedEinzServer tes, GameConfig config, ArrayList<Player> playersOrdered){
 
         EinzMessageHeader header = new EinzMessageHeader("startgame", "InitGame");
         ArrayList<String> turnOrder = new ArrayList<>();
         for (Player p: playersOrdered){
             turnOrder.add(p.getName());
         }
+        JSONObject cardRules = cardRulesJSONHelper(config);
+        JSONArray globalRules = globalRulesJSONHelper(config);
 
         //TODO: Eric wat?
         /*
@@ -112,11 +124,11 @@ public class MessageSender {
      * @param tes holds the people to send the message to
      * @param state holds the info that we need to build the messages to send
      */
-    public static void sendStateToAll(ThreadedEinzServer tes, GlobalState state){
+    public static void sendStateToAll(ThreadedEinzServer tes, GlobalState state, GameConfig config){
         EinzMessageHeader header = new EinzMessageHeader("stateinfo", "SendState");
         HashMap<String, String> numCardsInHand = new HashMap<>();
 
-        //Build strings for GlobalStateParser and instatiatae it
+        //Build strings for GlobalStateParser and instantiate it
         for (Player p: state.getPlayersOrdered()){
             numCardsInHand.put(p.getName(), Integer.toString(p.hand.size()));
         }
@@ -127,34 +139,68 @@ public class MessageSender {
 
         //send each player a different PlayerState
         for (Player p: state.getPlayersOrdered()){
+            ArrayList<JSONObject> possibleActions = new ArrayList<>();
 
-            //TODO: Test which actions a player can actually do
-            ArrayList<String> possibleActions = new ArrayList<>();
+            //This loop passes the possibleActions to the auxiliary functions to add the appropriate actions as JSONObjects to it
             for (PlayerAction action: PlayerAction.values()){
-                possibleActions.add(action.name);
+                switch (action){
+                    case LEAVE_GAME:
+                        leaveGameJSONHelper(p, state, config, possibleActions);
+                        break;
+                    case DRAW_CARDS:
+                        drawCardsJSONHelper(p, state, config, possibleActions);
+                        break;
+                    case KICK_PLAYER:
+                        kickPlayerJSONHelper(p, tes, possibleActions);
+                        break;
+                    case PLAY_CARD:
+                        playCardJSONHelper(p, state, config, possibleActions);
+                        break;
+                    case FINISH_TURN:
+                        finishTurnJSONHelper(p, state, config, possibleActions);
+
+                        break;
+                    default:
+
+                        break;
+                }
             }
 
-            PlayerState playerState;// = new PlayerState((ArrayList) p.hand, possibleActions); // TODO: possibleActions is now a list of JSONObjects
-            /*EinzSendStateMessageBody body = new EinzSendStateMessageBody(parser, playerState);
-            EinzMessage<EinzSendStateMessageBody> message = new EinzMessage<>(header, body);
+            //Sends the built message to the corresponding player
             try {
+                PlayerState playerState = new PlayerState((ArrayList) p.hand, possibleActions);
+                EinzSendStateMessageBody body = new EinzSendStateMessageBody(parser, playerState);
+                EinzMessage<EinzSendStateMessageBody> message = new EinzMessage<>(header, body);
                 tes.sendMessageToUser(p.getName(), message);
             } catch (UserNotRegisteredException e) {
                 //ignore and continue
-            } catch (JSONException e) {
+            }  catch (JSONException e) {
                 throw new RuntimeException(e);
-            }*/
+            }
         }
 
         //send the spectators all the same message
-        ArrayList<String> possibleActions = new ArrayList<>();
-        possibleActions.add(PlayerAction.LEAVE_GAME.name);
+        //Don't use the JSONHelper here since spectators are allways allowed to leave the game.
+        ArrayList<JSONObject> possibleActions = new ArrayList<>();
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("actionName", PlayerAction.LEAVE_GAME.name);
+            obj.put("parameters", new JSONObject());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        possibleActions.add(obj);
 
-        // TODO: possibleActions is now a list of JSONObjects
-        PlayerState spectatorState;// = new PlayerState(new ArrayList<Card>(), possibleActions); //Send each spectator an empty list as his "hand"
-        /*EinzSendStateMessageBody body = new EinzSendStateMessageBody(parser, spectatorState);
-        EinzMessage<EinzSendStateMessageBody> message = new EinzMessage<>(header, body);
-        tes.getServerManager().broadcastMessageToAllSpectators(message);*/
+        //Send each spectator an empty list as his "hand"
+        try {
+            PlayerState spectatorState = new PlayerState(new ArrayList<Card>(), possibleActions);
+            EinzSendStateMessageBody body = new EinzSendStateMessageBody(parser, spectatorState);
+            EinzMessage<EinzSendStateMessageBody> message = new EinzMessage<>(header, body);
+            tes.getServerManager().broadcastMessageToAllSpectators(message);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 

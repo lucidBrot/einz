@@ -41,7 +41,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * Only used for debugging
      * Use one of the other constructors
      */
-    public ServerFunction(){
+    public ServerFunction() {
         this.MAX_NUMBER_OF_PLAYERS = 20;
     }
 
@@ -80,7 +80,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
             globalState.nextPlayer = players.get(0); //There currently is no active player, nextplayer will start the game in startGame
-            MessageSender.sendInitGameToAll(threadedEinzServer, (ArrayList) gameConfig.allRules,
+            MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig,
                     (ArrayList) globalState.getPlayersOrdered());
         }
     }
@@ -112,13 +112,13 @@ public class ServerFunction implements ServerFunctionDefinition {
                 gameConfig.addGlobalRule(r);
             }
             for (Card c : cardRules.keySet()) {
-                for (BasicCardRule r: cardRules.get(c)){
+                for (BasicCardRule r : cardRules.get(c)) {
                     gameConfig.assignRuleToCard(r, c);
                 }
             }
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
             globalState.nextPlayer = players.get(0); //There currently is no active player, nextplayer will start the game in startGame
-            MessageSender.sendInitGameToAll(threadedEinzServer, (ArrayList) gameConfig.allRules,
+            MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig,
                     (ArrayList) globalState.getPlayersOrdered());
         }
     }
@@ -140,11 +140,12 @@ public class ServerFunction implements ServerFunctionDefinition {
      * OnPlayRules get applied after the player plays his card
      *
      * @param card the card to be played
-     * @param p    the player that wants to playe a card
+     * @param p    the player that wants to play a card
      * @return whether the player is allowed to play the card he wants to play or not
      */
     public boolean play(Card card, Player p) {
         if (!globalState.getActivePlayer().equals(p)) {
+            MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
             return false; //TODO: Check in rules whether its a players turn
         }
         if (!CardRuleChecker.checkIsValidPlayCard(globalState, card, gameConfig)) {
@@ -272,9 +273,11 @@ public class ServerFunction implements ServerFunctionDefinition {
         }
 
         //Send everyone their state
-        MessageSender.sendStateToAll(threadedEinzServer, globalState);
+        MessageSender.sendStateToAll(threadedEinzServer, globalState, gameConfig);
 
 
     }
+
+    //TODO: Send state to a player if he requests it
 
 }

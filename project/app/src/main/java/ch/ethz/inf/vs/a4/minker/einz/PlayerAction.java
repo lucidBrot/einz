@@ -9,7 +9,8 @@ public enum PlayerAction {
     LEAVE_GAME("leaveGame"),
     DRAW_CARDS("drawCards"),
     KICK_PLAYER("kickPlayer"),
-    PLAY_CARD("playCard");
+    PLAY_CARD("playCard"),
+    FINISH_TURN("finishTurn");
 
     public String name;
     PlayerAction(String name){
