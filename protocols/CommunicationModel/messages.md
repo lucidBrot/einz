@@ -833,6 +833,17 @@ The [card](#card) does not have to be unique, there may be multiple copies of th
 
 `playParameters` is a list of *JSONObjects*  which represent settings specific to this card ID when played. Exampli gratuita, a player might play a card that allows them to wish for a color. It is easiest when that selection is sent with the playCard Request.
 This field will usually be ignored, unless a rule uses it. To use it, you can call `yourCard.getPlayParameters("wishForColors")` to get the *String* associated with *"wishForColors"* or `yourCard.getPlayParameters()` to get the whole *JSONObject* list. 
+Example:
+
+```java
+wishedColor = CardColor.valueOf(played.getPlayParameter("wishColorRule", "wishedColor")); 
+// I added this as alternative idea (Eric, 10.12.2017)
+        // Idee: wenn die Karte gespielt wird, muss die UI sowieso wissed dass der user eine farbe auswählen muss. Also user direkt farbe auswählen lassen.
+        //      Danach die karte clientside mit diesem parameter setzen.
+        //      Wenn server die karte erhält wird diese regel getriggert und die liest den parameter aus.
+```
+
+
 
 ## PossibleActions
 
