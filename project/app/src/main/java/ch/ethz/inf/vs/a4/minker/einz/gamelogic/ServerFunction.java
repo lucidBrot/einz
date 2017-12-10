@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
+import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 import org.json.JSONException;
@@ -77,6 +78,18 @@ public class ServerFunction implements ServerFunctionDefinition {
     public void initialiseStandardGame(ThreadedEinzServer threadedEinzServer, ArrayList<Player> players) {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
+            // TODO: if you do nothing here, it crashes
+            //      I added the same code here as in the other case, but that is for debug only
+            Log.w("ServerFunction", "using debug code!!!");
+            this.threadedEinzServer = threadedEinzServer;
+            globalState = new GlobalState(10, players);
+            this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
+            globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
+            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
+            globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
+            if (!DEBUG_MODE) {
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
+            }
         } else {
             this.threadedEinzServer = threadedEinzServer;
             globalState = new GlobalState(10, players);

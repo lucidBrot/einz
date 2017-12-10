@@ -43,9 +43,12 @@ public class JSONHelper {
         }
         if (playableCards.length() > 0) {
             JSONObject playCardAction = new JSONObject();
+
             try {
                 playCardAction.put("actionName", PlayerAction.PLAY_CARD.name);
-                playCardAction.put("parameters", playableCards);
+                JSONObject parameters = new JSONObject();
+                parameters.put("playableCards", playableCards);
+                playCardAction.put("parameters", parameters);
                 possibleActions.add(playCardAction);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
