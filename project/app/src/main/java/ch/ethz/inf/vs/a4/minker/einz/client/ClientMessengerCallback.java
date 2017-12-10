@@ -193,22 +193,36 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 @Override
                 public void run() {
                     lobbyUI.startGameUIWithThisAsContext();
+                    // this sets gameUI, so we can now do the following:
+                    gameUI.onInitGame(message);
+                }
+            });
+        }else if(gameUI!=null){ // for some reason, it is already running. Reinitialize. TODO: does that make sense?
+
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    gameUI.onInitGame(message);
+                }
+            };
+
+            runOnMainThread(runnable);
+
+        } else {
+            // lobbyUI == null and gameUI == null
+            // uhm... that means that neither is currently existing. maybe, the lobbyUI has been paused.
+            runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    lobbyUI.startGameUIWithThisAsContext();
+                    // this sets gameUI, so we can now do the following:
+                    gameUI.onInitGame(message);
                 }
             });
         }
 
         Log.d("CliMesssengerCallback", "Game Initialized");
         // TODO: implement onInitGame
-
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                gameUI.onInitGame(message);
-            }
-        };
-
-        runOnMainThread(runnable);
 
     }
 

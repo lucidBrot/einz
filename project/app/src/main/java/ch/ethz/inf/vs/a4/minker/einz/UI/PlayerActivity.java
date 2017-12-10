@@ -57,7 +57,7 @@ import static java.lang.Thread.sleep;
 // How to get Messages:
 // get the intent extra that is a reference to ourClient
 // make PlayerActivity implement GameUIInterface
-// call ourClient.getClientActionCallbackInterface().setGameUI(this)
+// call ourClient.getActionCallbackInterface().setGameUI(this)
 // ...
 // profit
 // Now the client will - so clemens will - call you on these events
@@ -74,6 +74,21 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private ImageView trayStack;
     private ImageView drawPile;
     private LayoutInflater inflater;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
+            ourClient.getActionCallbackInterface().setGameUI(null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
+            ourClient.getActionCallbackInterface().setGameUI(this);
+    }
+
     private EinzClient ourClient;
     private int cardHeight,cardWidth;
 
@@ -91,6 +106,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.acitivity_player);
+
+        this.ourClient = EinzSingleton.getInstance().getEinzClient();
+        ourClient.getActionCallbackInterface().setGameUI(this);
 
         this.backgroundThread.start();
         this.backgroundLooper = this.backgroundThread.getLooper();
@@ -137,8 +155,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                 onColorWheelButtonGreenClick();
             }
         });
-
-        this.ourClient = EinzSingleton.getInstance().getEinzClient();
 
         inflater = LayoutInflater.from(this);
 
@@ -215,7 +231,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         localImgView.setTag(cardAdded);
 
-        localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext())); // TODO: @Chris fix OOM error
+        localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext())); // TODO: @Chris fix OOM error. Seems to happen at the 12th addcard
         localImgView.getLayoutParams().width  = cardWidth;
         localImgView.getLayoutParams().height = cardHeight;
         itemView.setOnTouchListener(new DragCardListener());
@@ -237,9 +253,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_blue"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
+        /*addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));*/
     }
 
     public boolean checkCardsStillValid(ArrayList<Card> cardlist){
