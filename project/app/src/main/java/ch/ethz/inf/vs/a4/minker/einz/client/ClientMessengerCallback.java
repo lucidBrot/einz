@@ -185,13 +185,26 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     }
 
     @Override
-    public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
+    public void onInitGame(final EinzMessage<EinzInitGameMessageBody> message) {
         if (gameUI!=null) {
             gameUI = new PlayerActivity();
         }
 
         Log.d("CliMesssegnerCallback", "Game Initialized");
         // TODO: implement onInitGame
+
+        final EinzMessage<EinzInitGameMessageBody> msg = message;
+
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                EinzMessage<EinzInitGameMessageBody> msg2 =msg;
+                gameUI.onInitGame(msg2);
+            }
+        };
+
+        runOnMainThread(runnable);
 
     }
 
@@ -213,8 +226,6 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         };
 
         runOnMainThread(runnable);
-
-
     }
 
     @Override

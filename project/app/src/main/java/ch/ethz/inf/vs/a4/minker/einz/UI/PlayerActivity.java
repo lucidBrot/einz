@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayout;
 import android.view.Display;
 import android.view.DragEvent;
@@ -17,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
@@ -28,6 +31,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActio
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
@@ -104,6 +108,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         cardWidth  = (size.x / mGrid.getColumnCount());
         cardHeight = (size.y / (3*mGrid.getRowCount()));
         initCards();
+
+        addPlayerToList("silvia");
+        addPlayerToList("josua");
+        addPlayerToList("clemens");
+        addPlayerToList("chris");
+        addPlayerToList("fabian");
+        addPlayerToList("eric");
+        addPlayerToList("mr.iamsounbelievable");
 
         //add cardDrawables to mgrid
         /*
@@ -265,6 +277,31 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         availableActions = actions;
     }
 
+    public void addPlayerToList(String player){
+        LinearLayout playerList = findViewById(R.id.ll_playerlist);
+
+        CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerlist, playerList, false);
+        // false because don't add view yet - I first want to set some text
+
+        TextView tv_username = usercard.findViewById(R.id.tv_playerlist_username);
+
+        // set text
+        tv_username.setText(player);
+
+        // highlight yourself
+        /*
+        if(player.equals(ourClient.getUsername())){
+            usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default));
+            ((ImageView)usercard.findViewById(R.id.icn_role)).setColorFilter(getResources().getColor(R.color.red_darker));
+            ((ImageView)usercard.findViewById(R.id.btn_lobby_kick)).setColorFilter(getResources().getColor(R.color.red_darker));
+            ((TextView)usercard.findViewById(R.id.tv_lobbylist_username)).setTextColor(getResources().getColor(R.color.red_darker));
+            ((TextView)usercard.findViewById(R.id.tv_lobbylist_role)).setTextColor(getResources().getColor(R.color.red_darker));
+        }*/
+
+        // add view
+        playerList.addView(usercard);
+    }
+
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
@@ -350,6 +387,12 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             toast.show();
         }
         //TODO Update UI for Playerlist so active player is visible
+    }
+
+    @Override
+    public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
+        ArrayList<String> playerList = message.getBody().getTurnOrder();
+
     }
 
     class DragCardListener implements View.OnTouchListener {

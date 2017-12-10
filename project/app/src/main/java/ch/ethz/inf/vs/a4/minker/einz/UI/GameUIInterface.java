@@ -45,5 +45,7 @@ public interface GameUIInterface {
 
     void playerStartedTurn(String playerThatStartedTurn);
 
+    void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
+
     // TODO: customActionRule..?
 }
