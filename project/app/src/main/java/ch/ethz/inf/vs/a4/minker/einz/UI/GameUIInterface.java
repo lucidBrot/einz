@@ -1,7 +1,11 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
 /**
  * The methods that the Game Activity should implement
@@ -20,9 +24,9 @@ public interface GameUIInterface {
 
     void onKickFailure(EinzMessage<EinzKickFailureMessageBody> message);
 
-    ///void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
+    //void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
 
-    void onDrawCardsSuccess(EinzMessage<EinzDrawCardsMessageBody> message);
+    void onDrawCardsSuccess(EinzMessage<EinzDrawCardsSuccessMessageBody> message);
 
     void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message);
 
@@ -32,9 +36,19 @@ public interface GameUIInterface {
 
     void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message);
 
-    void onCustomActionResponse(EinzMessage<EinzCustomActionMessageBody> message);
+    void onCustomActionResponse(EinzMessage<EinzCustomActionResponseMessageBody> message);
 
     void onGameOver (EinzMessage<EinzGameOverMessageBody> message);
+
+    void setHand(ArrayList<Card> hand);
+
+    void setActions(ArrayList<String> actions);
+
+    void playerStartedTurn(String playerThatStartedTurn);
+
+    void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
+
+    void setNumCardsInHandOfEachPlayer(HashMap<String ,String> numCardsInHandOfEachPlayer);
 
     // TODO: customActionRule..?
 }
