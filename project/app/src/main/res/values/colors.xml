@@ -11,7 +11,9 @@
     <color name="orange_brown">#6a3705</color>
 
     <color name="blue_default">#56B3FC</color>
-    <color name="blue_dark">#3491DA</color>
+    <color name="blue_dark">#3491da</color>
+    <color name="blue_darker">#0f6bb2</color>
+
 
     <color name="red_default">#FE4543</color>
     <color name="red_dark">#F32826</color>
@@ -22,5 +24,10 @@
     <color name="green_default">#1FFC35</color>
     <color name="green_dark">#06C619</color>
     <color name="green_darker">#00950F</color>
+
+    <color name="card_green">#00FF31</color>
+    <color name="card_red">#FF0000</color>
+    <color name="card_yellow">#FFEC00</color>
+    <color name="card_blue">#0069FF</color>
 
 </resources>

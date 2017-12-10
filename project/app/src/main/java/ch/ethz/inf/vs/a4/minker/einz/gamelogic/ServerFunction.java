@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -100,8 +102,6 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param globalRules set of global rules with which the game is played
      * @param cardRules   card rules with the card they should apply to
      */
-
-    // TODO: offer onCustomAction(user, message) function
 
     public void initialiseGame(ThreadedEinzServer threadedEinzServer, ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
                                Map<Card, ArrayList<BasicCardRule>> cardRules) {
@@ -370,6 +370,19 @@ public class ServerFunction implements ServerFunctionDefinition {
         if (!DEBUG_MODE) {
             MessageSender.sendState(p, threadedEinzServer, globalState, gameConfig);
         }
+    }
+
+    /**
+     * handles any customAction message incoming by passing it on to the rule with that identifier
+     * @param user who issued this
+     * @param customActionMessage
+     */
+    public void onCustomActionMessage(String user, EinzMessage<EinzCustomActionMessageBody> customActionMessage){
+        EinzCustomActionMessageBody body = customActionMessage.getBody();
+        String ruleName = body.getRuleName();
+
+        // TODO: call rule based on that message ruleName on CustomActionMessage
+        // and reply with CustomActionResponse
     }
 
     public GlobalState getGlobalState() {

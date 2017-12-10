@@ -12,7 +12,6 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzParser;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzFinishTurnMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
 
 /**
  * Created by silvia on 11/24/17.
@@ -38,7 +37,8 @@ public class EinzFurtherActionsParser extends EinzParser {
     private EinzMessage parseCustomAction(JSONObject message) throws JSONException {
         EinzMessageHeader emh = new EinzMessageHeader("furtheractions", "CustomAction");
         JSONObject body = message.getJSONObject("body");
-        EinzMessageBody emb = new EinzCustomActionMessageBody(body);
+        String ruleName = body.getString("ruleName");
+        EinzMessageBody emb = new EinzCustomActionMessageBody(body, ruleName);
         EinzMessage einzMessage = new EinzMessage(emh, emb);
         return einzMessage;
     }
@@ -46,7 +46,9 @@ public class EinzFurtherActionsParser extends EinzParser {
     private EinzMessage parseCustomActionResponse(JSONObject message) throws JSONException {
         EinzMessageHeader emh = new EinzMessageHeader("furtheractions", "CustomActionResponse");
         JSONObject body = message.getJSONObject("body");
-        EinzMessageBody emb = new EinzCustomActionResponseMessageBody(body);
+        String ruleName = body.getString("ruleName");
+        String success = body.getString("success");
+        EinzMessageBody emb = new EinzCustomActionResponseMessageBody(body, ruleName, success);
         EinzMessage einzMessage = new EinzMessage(emh, emb);
         return einzMessage;
     }

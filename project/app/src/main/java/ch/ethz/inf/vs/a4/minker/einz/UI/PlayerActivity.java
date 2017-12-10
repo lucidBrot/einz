@@ -1,22 +1,55 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.ClipData;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayout;
 import android.view.Display;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
 
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
+import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+
 
 // How to get Messages:
 // get the intent extra that is a reference to ourClient
@@ -32,28 +65,76 @@ import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 /**
  * putExtra requires a parcelable, so instead pass the client via Globals
  */
-public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onResume - register this activity at client
+public class PlayerActivity extends FullscreenActivity implements GameUIInterface { // TODO: onStop and onResume - register this activity at client
     private static final int NBR_ITEMS = 20;
     private GridLayout mGrid;
     private ImageView trayStack;
+    private ImageView drawPile;
     private LayoutInflater inflater;
     private EinzClient ourClient;
+    private int cardHeight,cardWidth;
 
+    ArrayList<Integer> cardDrawables = new ArrayList<>();
+    ArrayList<Card> cards = new ArrayList<>();
+    ArrayList<String> availableActions = new ArrayList<>();
+    ArrayList<String> allPlayers = new ArrayList<>();
+    String colorChosen = "none";
 
-    int[] cards;
+    private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
+    private Looper backgroundLooper;
+    private Handler backgroundHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_client);
+        setContentView(R.layout.acitivity_player);
+
+        this.backgroundThread.start();
+        this.backgroundLooper = this.backgroundThread.getLooper();
+        this.backgroundHandler = new Handler(this.backgroundLooper);
 
         trayStack = findViewById(R.id.tray_stack);
         trayStack.setOnDragListener(new TrayDragListener());
-        mGrid = findViewById(R.id.grid_layout);
-        mGrid.setOnDragListener(new DragListener());
-        initCards();
 
-        //<UglyHack>
+        drawPile = findViewById(R.id.draw_pile);
+        drawPile.setOnTouchListener(new DrawCardListener());
+        drawPile.setTag("drawCard");
+
+        mGrid = findViewById(R.id.grid_layout);
+        mGrid.setOnDragListener(new HandDragListener());
+
+        Button colorWheelBlueButton = findViewById(R.id.btn_colorwheel_blue);
+        colorWheelBlueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onColorWheelButtonBlueClick();
+            }
+        });
+
+        Button colorWheelYellowButton = findViewById(R.id.btn_colorwheel_yellow);
+        colorWheelYellowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onColorWheelButtonYellowClick();
+            }
+        });
+
+        Button colorWheelRedButton = findViewById(R.id.btn_colorwheel_red);
+        colorWheelRedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onColorWheelButtonRedClick();
+            }
+        });
+
+        Button colorWheelGreenButton = findViewById(R.id.btn_colorwheel_green);
+        colorWheelGreenButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onColorWheelButtonGreenClick();
+            }
+        });
+
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
 
         inflater = LayoutInflater.from(this);
@@ -61,19 +142,353 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getRealSize(size);
-        for (int i = 0; i < NBR_ITEMS; i++) {
+
+        cardWidth  = (size.x / mGrid.getColumnCount());
+        cardHeight = (size.y / (3*mGrid.getRowCount()));
+        initCards();
+
+        addPlayerToList("silvia");
+        addPlayerToList("josua");
+        addPlayerToList("clemens");
+        addPlayerToList("chris");
+        addPlayerToList("fabian");
+        addPlayerToList("eric");
+        addPlayerToList("mr.iamsounbelievable");
+
+        //add cardDrawables to mgrid
+        /*
+        for (int i = 0; i < cardDrawables.size(); i++) {
             final View itemView = inflater.inflate(R.layout.card_view, mGrid, false);
             ImageView localImgView = (ImageView) itemView;
-            localImgView.setImageResource(cards[i]);
-            localImgView.getLayoutParams().width  = (size.x / mGrid.getColumnCount());
-            localImgView.getLayoutParams().height = (size.y / (3*mGrid.getRowCount()));
-            System.out.println("TESTESTOUT" + mGrid.getMeasuredHeight());
-            itemView.setOnTouchListener(new LongPressListener());
+            localImgView.setImageResource(cardDrawables.get(i));
+            localImgView.getLayoutParams().width  = cardWidth;
+            localImgView.getLayoutParams().height = cardHeight;
+
+            itemView.setOnTouchListener(new DragCardListener());
             mGrid.addView(itemView);
+        }*/
+    }
+
+    private int calculateNewIndex(float x, float y) {
+        // calculate which column to move to
+        final float cellWidth = mGrid.getWidth() / mGrid.getColumnCount();
+        final int column = (int)(x / cellWidth);
+
+        // calculate which row to move to
+        final float cellHeight = mGrid.getHeight() / mGrid.getRowCount();
+        final int row = (int)Math.floor(y / cellHeight);
+
+        // the items in the GridLayout is organized as a wrapping list
+        // and not as an actual grid, so this is how to get the new index
+        int index = row * mGrid.getColumnCount() + column;
+        if (index >= mGrid.getChildCount()) {
+            index = mGrid.getChildCount() - 1;
+        }
+
+        return index;
+    }
+
+    private void addCard(Card cardAdded){
+        cards.add(cardAdded);
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getRealSize(size);
+
+        //add cardDrawables to mgrid
+        final View itemView = inflater.inflate(R.layout.card_view, mGrid, false);
+        ImageView localImgView = (ImageView) itemView;
+
+        localImgView.setTag(cardAdded);
+
+        localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext()));
+        localImgView.getLayoutParams().width  = cardWidth;
+        localImgView.getLayoutParams().height = cardHeight;
+        itemView.setOnTouchListener(new DragCardListener());
+        mGrid.addView(itemView);
+    }
+
+    private void setTopPlayPileCard(Card cardPlaced){
+        trayStack.setImageResource(cardPlaced.getImageRessourceID(getApplicationContext()));
+    }
+
+    private void initCards(){
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_red"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_yellow"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_green"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_red"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_yellow"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_green"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_blue"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
+    }
+
+    public boolean checkCardsStillValid(ArrayList<Card> cardlist){
+        if(cardlist.size() != cards.size()){
+            return false;
+        }
+
+        ArrayList<String> stringOfOwnCards = new ArrayList<>();
+        ArrayList<String> stringOfGotCards = new ArrayList<>();
+
+        for(Card currCard:cards){
+            stringOfOwnCards.add(currCard.getID());
+        }
+
+        for(Card currCard:cardlist){
+            stringOfGotCards.add(currCard.getID());
+        }
+
+        Collections.sort(stringOfGotCards);
+        Collections.sort(stringOfOwnCards);
+
+        return(stringOfGotCards.equals(stringOfOwnCards));
+    }
+
+    public void playCard(final Card playedCard){
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ourClient.getConnection().sendMessage(
+                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}}}");
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void drawCard(){
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ourClient.getConnection().sendMessage("{\"header\":{\"messagegroup\":\"draw\",\"messagetype\":\"DrawCards\"},\"body\":{}}");
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void clearHand(){
+        mGrid.removeAllViews();
+        cards.clear();
+        cardDrawables.clear();
+    }
+
+    public void addToHand(ArrayList<Card> addedCards){
+        for (Card currCard:addedCards){
+            addCard(currCard);
         }
     }
 
-    class LongPressListener implements View.OnTouchListener {
+    public void setAvailableActions(ArrayList<String> actions){
+        availableActions = actions;
+    }
+
+    public void addPlayerToList(String addedPlayer){
+        //ensure no player is added twice
+        if(!allPlayers.contains(addedPlayer)) {
+            LinearLayout playerList = findViewById(R.id.ll_playerlist);
+
+            CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerlist, playerList, false);
+            // false because don't add view yet - I first want to set some text
+
+            TextView tv_username = usercard.findViewById(R.id.tv_playerlist_username);
+
+            // set text
+            tv_username.setText(addedPlayer);
+
+            // highlight yourself
+            /*
+            if(player.equals(ourClient.getUsername())){
+                usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default));
+                ((ImageView)usercard.findViewById(R.id.icn_role)).setColorFilter(getResources().getColor(R.color.red_darker));
+                ((ImageView)usercard.findViewById(R.id.btn_lobby_kick)).setColorFilter(getResources().getColor(R.color.red_darker));
+                ((TextView)usercard.findViewById(R.id.tv_lobbylist_username)).setTextColor(getResources().getColor(R.color.red_darker));
+                ((TextView)usercard.findViewById(R.id.tv_lobbylist_role)).setTextColor(getResources().getColor(R.color.red_darker));
+            }*/
+
+            // add view
+            usercard.setTag(addedPlayer);
+            playerList.addView(usercard);
+            allPlayers.add(addedPlayer);
+        }
+    }
+
+    public void displayColorWheel(){
+        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
+        colorWheel.setVisibility(View.VISIBLE);
+    }
+
+    public void hideColorWheel(){
+        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
+        colorWheel.setVisibility(View.GONE);
+    }
+
+    public void onColorWheelButtonGreenClick(){
+        hideColorWheel();
+        colorChosen = "green";
+    }
+
+    public void onColorWheelButtonRedClick(){
+        hideColorWheel();
+        colorChosen = "red";
+    }
+
+    public void onColorWheelButtonBlueClick(){
+        hideColorWheel();
+        colorChosen = "blue";
+    }
+
+    public void onColorWheelButtonYellowClick(){
+        hideColorWheel();
+        colorChosen = "yellow";
+    }
+
+    public void removePlayerFromList(String playerToBeRemoved){
+        if(allPlayers.contains(playerToBeRemoved)) {
+            LinearLayout playerList = findViewById(R.id.ll_playerlist);
+
+            for (int i = 0; i < playerList.getChildCount();) {
+                View v = playerList.getChildAt(i);
+
+                if (v instanceof CardView && v.getTag().equals(playerToBeRemoved)){
+                       // Do something
+                    playerList.removeView(v);
+                } else {
+                    i++;
+                }
+            }
+
+            allPlayers.remove(playerToBeRemoved);
+        }
+    }
+
+
+    @Override
+    public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
+
+    }
+
+    @Override
+    public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message) {
+
+    }
+
+    @Override
+    public void onShowToast(EinzMessage<EinzShowToastMessageBody> message) {
+        Context context = getApplicationContext();
+        CharSequence text = message.getBody().getToast();
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+    }
+
+    @Override
+    public void onKickFailure(EinzMessage<EinzKickFailureMessageBody> message) {
+
+    }
+
+    @Override
+    public void onDrawCardsSuccess(EinzMessage<EinzDrawCardsSuccessMessageBody> message) {
+        addToHand(message.getBody().getCards());
+    }
+
+    @Override
+    public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
+
+    }
+
+    @Override
+    public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
+
+    }
+
+    @Override
+    public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
+
+    }
+
+    @Override
+    public void onPlayerFinished(EinzMessage<EinzPlayerFinishedMessageBody> message) {
+
+    }
+
+    @Override
+    public void onCustomActionResponse(EinzMessage<EinzCustomActionResponseMessageBody> message) {
+
+    }
+
+    @Override
+    public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
+
+    }
+
+    @Override
+    public void setHand(ArrayList<Card> hand) {
+        if(!checkCardsStillValid(hand)){
+            clearHand();
+            addToHand(hand);
+        }
+    }
+
+    @Override
+    public void setActions(ArrayList<String> actions) {
+        setAvailableActions(actions);
+    }
+
+    @Override
+    public void playerStartedTurn(String playerThatStartedTurn) {
+        if (playerThatStartedTurn.equals(ourClient.getUsername())) {
+            Context context = getApplicationContext();
+            CharSequence text = "It's your turn " + ourClient.getUsername();
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+        }
+        //TODO Update UI for Playerlist so active player is visible
+    }
+
+    @Override
+    public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
+        ArrayList<String> playerList = message.getBody().getTurnOrder();
+        for(String currPlayer:playerList){
+            addPlayerToList(currPlayer);
+        }
+
+    }
+
+    @Override
+    public void setNumCardsInHandOfEachPlayer(HashMap<String, String> numCardsInHandOfEachPlayer) {
+        for (String currPlayer:allPlayers){
+            String numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
+            LinearLayout playerList = findViewById(R.id.ll_playerlist);
+            View cardViewOfPlayer = playerList.findViewWithTag(currPlayer);
+
+            if(cardViewOfPlayer instanceof CardView){
+                View textViewOfNrOfCards = cardViewOfPlayer.findViewById(R.id.tv_nr_of_cards);
+                if(textViewOfNrOfCards instanceof TextView){
+                    ((TextView) textViewOfNrOfCards).setText(numOfCurrplayerCards);
+                }
+            } else if(cardViewOfPlayer == null){
+                /*
+                removePlayerFromList(currPlayer);
+                addPlayerToList(currPlayer);*/
+            }
+        }
+    }
+
+    class DragCardListener implements View.OnTouchListener {
 
         /*@Override
         public boolean onLongClick(View view) {
@@ -104,16 +519,37 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
                 return true;
             }
 
+            return false;
+        }
+    }
+
+    class DrawCardListener implements View.OnTouchListener {
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+
+            if (motionEvent.getAction()==MotionEvent.ACTION_DOWN) {
+                final ClipData data = ClipData.newPlainText("", "");
+
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    view.startDragAndDrop(data, shadowBuilder, view, 0);
+                } else {
+                    view.startDrag(data, shadowBuilder, view, 0);
+                }
+                return true;
+            }
+
 
             return false;
         }
     }
 
-    class DragListener implements View.OnDragListener {
+    class HandDragListener implements View.OnDragListener {
         @Override
         public boolean onDrag(View v, DragEvent event) {
             final View view = (View) event.getLocalState();
-            if (view != null && view instanceof ImageView) {
+            if (view != null && view instanceof ImageView && view.getTag() instanceof Card) {
 
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_STARTED:
@@ -141,6 +577,22 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
                         break;
                 }
                 return true;
+
+            } else if (view != null && view instanceof ImageView && view.getTag().equals("drawCard")) {
+                switch (event.getAction()) {
+
+                    case DragEvent.ACTION_DROP:
+                        //drawCard();
+                        System.out.println("drew card");
+
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+
+                        break;
+                    default:
+                        break;
+                }
+                return true;
             }
             return false;
         }
@@ -156,7 +608,7 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
             final View view = getView();
             if (view != null) {
                 shadowSize.set(view.getWidth()*2, view.getHeight()*2);
-                shadowTouchPoint.set(shadowSize.x / 2, shadowSize.y + shadowSize.y / 2);
+                shadowTouchPoint.set(shadowSize.x / 2, shadowSize.y);
             }
         }
 
@@ -167,15 +619,15 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
                 canvas.scale(2,2);
                 canvas.translate(0,0);
                 view.draw(canvas);
-                }
             }
+        }
     }
 
     class TrayDragListener implements View.OnDragListener {
         @Override
         public boolean onDrag(View v, DragEvent event) {
             final View view = (View) event.getLocalState();
-            if (view != null && view instanceof ImageView) {
+            if (view != null && view instanceof ImageView && view.getTag() instanceof Card) {
                 switch (event.getAction()) {
                     case DragEvent.ACTION_DRAG_LOCATION:
                         // do nothing if hovering above own position
@@ -184,7 +636,14 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
                         break;
                     case DragEvent.ACTION_DROP:
                         ImageView tmpView = (ImageView) view;
-                        trayStack.setImageDrawable(tmpView.getDrawable());
+
+                        setTopPlayPileCard((Card)tmpView.getTag());
+                        //remove card from inner cardlist
+
+                        cards.remove((Card) tmpView.getTag());
+                        //System.out.println(cards);
+
+                        //remove card from View
                         mGrid.removeView(view);
                         view.setVisibility(View.VISIBLE);
 
@@ -201,49 +660,5 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
             }
             return false;
         }
-    }
-
-    private int calculateNewIndex(float x, float y) {
-        // calculate which column to move to
-        final float cellWidth = mGrid.getWidth() / mGrid.getColumnCount();
-        final int column = (int)(x / cellWidth);
-
-        // calculate which row to move to
-        final float cellHeight = mGrid.getHeight() / mGrid.getRowCount();
-        final int row = (int)Math.floor(y / cellHeight);
-
-        // the items in the GridLayout is organized as a wrapping list
-        // and not as an actual grid, so this is how to get the new index
-        int index = row * mGrid.getColumnCount() + column;
-        if (index >= mGrid.getChildCount()) {
-            index = mGrid.getChildCount() - 1;
-        }
-
-        return index;
-    }
-
-
-    private void initCards(){
-        cards = new int[20];
-        cards[0] = R.drawable.card_1_blue;
-        cards[1] = R.drawable.card_take2_red;
-        cards[2] = R.drawable.card_take4;
-        cards[3] = R.drawable.card_rev_green;
-        cards[4] = R.drawable.card_4_red;
-        cards[5] = R.drawable.card_2_yellow;
-        cards[6] = R.drawable.card_skip_red;
-        cards[7] = R.drawable.card_7_green;
-        cards[8] = R.drawable.card_2_red;
-        cards[9] = R.drawable.card_8_blue;
-        cards[10] = R.drawable.card_1_blue;
-        cards[11] = R.drawable.card_take2_red;
-        cards[12] = R.drawable.card_take4;
-        cards[13] = R.drawable.card_rev_green;
-        cards[14] = R.drawable.card_4_red;
-        cards[15] = R.drawable.card_2_yellow;
-        cards[16] = R.drawable.card_skip_red;
-        cards[17] = R.drawable.card_7_green;
-        cards[18] = R.drawable.card_2_red;
-        cards[19] = R.drawable.card_8_blue;
     }
 }

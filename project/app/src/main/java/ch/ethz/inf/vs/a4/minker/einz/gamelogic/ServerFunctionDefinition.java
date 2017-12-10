@@ -5,6 +5,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzCustomActionAction;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.Player;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
@@ -76,5 +79,12 @@ public interface ServerFunctionDefinition {
      * @param p the player to be removed
      */
     public void removePlayer(Player p);
+
+    /**
+     * Not yet doing much. See implementation
+     * @param user
+     * @param message
+     */
+    public void onCustomActionMessage(String user, EinzMessage<EinzCustomActionMessageBody> message);
 
 }

@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.util.Log;
 
 import ch.ethz.inf.vs.a4.minker.einz.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyActivity;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;

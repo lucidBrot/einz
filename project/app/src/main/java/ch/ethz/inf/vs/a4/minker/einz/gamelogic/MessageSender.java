@@ -7,14 +7,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.PlayerAction;
 
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
-import ch.ethz.inf.vs.a4.minker.einz.model.Player;
-import ch.ethz.inf.vs.a4.minker.einz.model.PlayerAction;
-import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
+
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
@@ -60,8 +60,6 @@ public class MessageSender {
         EinzMessage<EinzInitGameMessageBody> message = new EinzMessage<>(header, body);
         tes.getServerManager().broadcastMessageToAllPlayers(message);
         tes.getServerManager().broadcastMessageToAllSpectators(message);
-
-
     }
 
     /**
@@ -130,7 +128,7 @@ public class MessageSender {
         for (Player p : state.getPlayersOrdered()) {
             numCardsInHand.put(p.getName(), Integer.toString(p.hand.size()));
         }
-        ArrayList<Card> stack = (ArrayList) state.getDiscardPile();
+        ArrayList<Card> stack = new ArrayList<>(state.getDiscardPile());
         String activePlayer = state.getActivePlayer().toString();
         String cardsToDraw = Integer.toString(state.getCardsToDraw());
         GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
@@ -205,11 +203,18 @@ public class MessageSender {
     /**
      * @param p             player to send the message to
      * @param tes           ThreadedEinzServer that holds the player to send the message to
-     * @param ruleParameter message to send (depending on the action)
+     * @param ruleParameterBody message to send (depending on the action), including ruleName and success. If ruleName and success are not set, this throws a runtime exception
      */
-    public static void sendCustomActionResponse(Player p, ThreadedEinzServer tes, JSONObject ruleParameter) {
+    public static void sendCustomActionResponse(Player p, ThreadedEinzServer tes, JSONObject ruleParameterBody) {
         EinzMessageHeader header = new EinzMessageHeader("furtheractions", "CustomAction");
-        EinzCustomActionResponseMessageBody body = new EinzCustomActionResponseMessageBody(ruleParameter);
+        String ruleName, success;
+        try {
+            ruleName = ruleParameterBody.getString("ruleName");
+            success = ruleParameterBody.getString("success");
+        } catch (JSONException e){
+           throw new RuntimeException(e); // You NEED to specify ruleName and success
+        }
+        EinzCustomActionResponseMessageBody body = new EinzCustomActionResponseMessageBody(ruleParameterBody, ruleName, success);
         EinzMessage<EinzCustomActionResponseMessageBody> message = new EinzMessage<>(header, body);
         try {
             tes.sendMessageToUser(p.getName(), message);
