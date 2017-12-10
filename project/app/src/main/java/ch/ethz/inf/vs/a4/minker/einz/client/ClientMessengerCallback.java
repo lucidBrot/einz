@@ -208,7 +208,14 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 }
             }
 
-            gameUI.onInitGame(message);
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    gameUI.onInitGame(message);
+                }
+            };
+            runOnMainThread(runnable);
+
         }else if(gameUI!=null){ // for some reason, it is already running. Reinitialize. TODO: does that make sense?
 
             Runnable runnable = new Runnable() {
@@ -239,7 +246,12 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 }
             }
 
-            gameUI.onInitGame(message);
+            runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    gameUI.onInitGame(message);
+                }
+            });
         }
 
         Log.d("CliMesssengerCallback", "Game Initialized");

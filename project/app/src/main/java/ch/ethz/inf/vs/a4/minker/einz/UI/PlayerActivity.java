@@ -13,6 +13,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayout;
+import android.util.Log;
 import android.view.Display;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -458,6 +459,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void setHand(ArrayList<Card> hand) {
+        Log.w("PlayerActivity", "setHand is currently enabled. This means that the cards for debugging will not be shown.");
+        // to disable, just comment out the following four lines
         if(!checkCardsStillValid(hand)){
             clearHand();
             addToHand(hand);
