@@ -9,6 +9,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.Player;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -17,14 +18,18 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 public interface ServerFunctionDefinition {
 
     /**
-     * @param players the players in the game, the players play in the order in which they are in the
-     *                ArrayList (lowest index plays first)
+     * initialises a new game with standard cards and rules
+     *
+     * @param threadedEinzServer server that holds the list of players and spectators
+     * @param players            the players in the game, the players play in the order in which they are in the
+     *                           ArrayList (lowest index plays first)
      */
-    public void initialiseStandardGame(ArrayList<Player> players);
+    public void initialiseStandardGame(ThreadedEinzServer threadedEinzServer, ArrayList<Player> players);
 
     /**
      * initialises a new game
      *
+     * @param threadedEinzServer server that holds the list of players and spectators
      * @param players     the players in the game, the players play in the order in which they are in the
      *                    ArrayList (lowest index plays first)
      * @param deck        contains the specified cards the specified amount of times
@@ -33,7 +38,7 @@ public interface ServerFunctionDefinition {
      * @param globalRules set of global rules with which the game is played
      * @param cardRules   card rules with the card they should apply to
      */
-    public void initialiseGame(ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules, Map<Card, ArrayList<BasicCardRule>> cardRules);
+    public void initialiseGame(ThreadedEinzServer threadedEinzServer, ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules, Map<Card, ArrayList<BasicCardRule>> cardRules);
 
 
     /**
