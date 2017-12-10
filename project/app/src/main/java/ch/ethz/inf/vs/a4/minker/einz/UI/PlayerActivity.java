@@ -135,6 +135,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             }
         });
 
+        Button endTurnButton = findViewById(R.id.btn_end_turn);
+        endTurnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                endTurn();
+            }
+        });
+
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
 
         inflater = LayoutInflater.from(this);
@@ -270,6 +278,19 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             public void run() {
                 try {
                     ourClient.getConnection().sendMessage("{\"header\":{\"messagegroup\":\"draw\",\"messagetype\":\"DrawCards\"},\"body\":{}}");
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void endTurn(){
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ourClient.getConnection().sendMessage("{\"header\":{\"messagegroup\":\"furtheractions\",\"messagetype\":\"FinishTurn\"},\"body\":{}}");
                 } catch (SendMessageFailureException e) {
                     e.printStackTrace();
                 }
