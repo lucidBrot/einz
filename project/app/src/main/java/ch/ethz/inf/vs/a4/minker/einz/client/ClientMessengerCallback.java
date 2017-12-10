@@ -18,6 +18,8 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static java.lang.Thread.sleep;
+
 public class ClientMessengerCallback implements ClientActionCallbackInterface { // TODO: make sure to always cover the case where gameUI and/or lobbyUI are null
     @Nullable
     private LobbyUIInterface lobbyUI; // can be null if the corresponding Activity does not exist anymore
@@ -194,9 +196,18 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 public void run() {
                     lobbyUI.startGameUIWithThisAsContext();
                     // this sets gameUI, so we can now do the following:
-                    gameUI.onInitGame(message);
                 }
             });
+
+            while(gameUI==null){ // sleep until the activity has loaded, then initGame
+                try {
+                    sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            gameUI.onInitGame(message);
         }else if(gameUI!=null){ // for some reason, it is already running. Reinitialize. TODO: does that make sense?
 
             Runnable runnable = new Runnable() {
@@ -215,10 +226,19 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 @Override
                 public void run() {
                     lobbyUI.startGameUIWithThisAsContext();
-                    // this sets gameUI, so we can now do the following:
-                    gameUI.onInitGame(message);
+                    // this sets gameUI, asynchronously to our message-receiver thread
                 }
             });
+
+            while(gameUI==null){ // sleep until the activity has loaded, then initGame
+                try {
+                    sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            gameUI.onInitGame(message);
         }
 
         Log.d("CliMesssengerCallback", "Game Initialized");
