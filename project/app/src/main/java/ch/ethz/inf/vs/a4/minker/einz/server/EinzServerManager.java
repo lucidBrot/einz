@@ -101,7 +101,8 @@ public class EinzServerManager {
         this.gamePhaseStarted = true;
         userListLock.writeLock().unlock();
         SFLock.writeLock().lock();
-        getServerFunctionInterface().initialiseStandardGame(players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+        getServerFunctionInterface().initialiseStandardGame(null, players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+        //TODO: Change "null" as threadedEinzServer to something useful
         // TODO: not standard game but with rules, maybe call initialise earlier
         SFLock.writeLock().unlock();
     }
@@ -616,7 +617,8 @@ public class EinzServerManager {
 
     public void specifyRules(EinzSpecifyRulesMessageBody body) {
         getSFLock().writeLock().lock();
-        getServerFunctionInterface().initialiseGame(getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());
+        getServerFunctionInterface().initialiseGame(null, getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());
+        //TODO: Change "null" as threadedEInzServer to something useful
         getSFLock().writeLock().unlock();
     }
 

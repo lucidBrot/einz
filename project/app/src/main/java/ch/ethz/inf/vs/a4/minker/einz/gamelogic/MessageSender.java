@@ -43,15 +43,15 @@ import static ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper.playCardJSONHel
 public class MessageSender {
 
     /**
-     * @param tes holds the people to send the message to
-     * @param config the configuration holding the rules
+     * @param tes            holds the people to send the message to
+     * @param config         the configuration holding the rules
      * @param playersOrdered order in which players play
      */
-    public static void sendInitGameToAll(ThreadedEinzServer tes, GameConfig config, ArrayList<Player> playersOrdered){
+    public static void sendInitGameToAll(ThreadedEinzServer tes, GameConfig config, ArrayList<Player> playersOrdered) {
 
         EinzMessageHeader header = new EinzMessageHeader("startgame", "InitGame");
         ArrayList<String> turnOrder = new ArrayList<>();
-        for (Player p: playersOrdered){
+        for (Player p : playersOrdered) {
             turnOrder.add(p.getName());
         }
         JSONObject cardRules = cardRulesJSONHelper(config);
@@ -65,11 +65,11 @@ public class MessageSender {
     }
 
     /**
-     * @param p player to send message to
-     * @param tes ThreadedEinzServer that holds the player to send the message to
+     * @param p     player to send message to
+     * @param tes   ThreadedEinzServer that holds the player to send the message to
      * @param cards cards the player draws if he is able to
      */
-    public static void sendDrawCardResponseSuccess(Player p, ThreadedEinzServer tes, ArrayList<Card> cards){
+    public static void sendDrawCardResponseSuccess(Player p, ThreadedEinzServer tes, ArrayList<Card> cards) {
         EinzMessageHeader header = new EinzMessageHeader("draw", "DrawCardsResponse");
         EinzDrawCardsSuccessMessageBody body = new EinzDrawCardsSuccessMessageBody(cards);
         EinzMessage<EinzDrawCardsSuccessMessageBody> message = new EinzMessage<>(header, body);
@@ -83,11 +83,11 @@ public class MessageSender {
     }
 
     /**
-     * @param p player to send message to
-     * @param tes ThreadedEinzServer that holds the player to send the message to
+     * @param p             player to send message to
+     * @param tes           ThreadedEinzServer that holds the player to send the message to
      * @param failureReason reason why the player wasn't able to draw cards
      */
-    public static void sendDrawCardResponseFailure(Player p, ThreadedEinzServer tes, String failureReason){
+    public static void sendDrawCardResponseFailure(Player p, ThreadedEinzServer tes, String failureReason) {
         EinzMessageHeader header = new EinzMessageHeader("draw", "DrawCardsResponse");
         EinzDrawCardsFailureMessageBody body = new EinzDrawCardsFailureMessageBody(failureReason);
         EinzMessage<EinzDrawCardsFailureMessageBody> message = new EinzMessage<>(header, body);
@@ -101,8 +101,8 @@ public class MessageSender {
     }
 
     /**
-     * @param p player to send message to
-     * @param tes ThreadedEinzServer that holds the player to send the message to
+     * @param p       player to send message to
+     * @param tes     ThreadedEinzServer that holds the player to send the message to
      * @param success Whether the card was played or not
      */
     public static void sendPlayCardResponse(Player p, ThreadedEinzServer tes, boolean success) {
@@ -119,15 +119,15 @@ public class MessageSender {
     }
 
     /**
-     * @param tes holds the people to send the message to
+     * @param tes   holds the people to send the message to
      * @param state holds the info that we need to build the messages to send
      */
-    public static void sendStateToAll(ThreadedEinzServer tes, GlobalState state, GameConfig config){
+    public static void sendStateToAll(ThreadedEinzServer tes, GlobalState state, GameConfig config) {
         EinzMessageHeader header = new EinzMessageHeader("stateinfo", "SendState");
         HashMap<String, String> numCardsInHand = new HashMap<>();
 
         //Build strings for GlobalStateParser and instantiate it
-        for (Player p: state.getPlayersOrdered()){
+        for (Player p : state.getPlayersOrdered()) {
             numCardsInHand.put(p.getName(), Integer.toString(p.hand.size()));
         }
         ArrayList<Card> stack = (ArrayList) state.getDiscardPile();
@@ -136,12 +136,12 @@ public class MessageSender {
         GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
 
         //send each player a different PlayerState
-        for (Player p: state.getPlayersOrdered()){
+        for (Player p : state.getPlayersOrdered()) {
             ArrayList<JSONObject> possibleActions = new ArrayList<>();
 
             //This loop passes the possibleActions to the auxiliary functions to add the appropriate actions as JSONObjects to it
-            for (PlayerAction action: PlayerAction.values()){
-                switch (action){
+            for (PlayerAction action : PlayerAction.values()) {
+                switch (action) {
                     case LEAVE_GAME:
                         leaveGameJSONHelper(p, state, config, possibleActions);
                         break;
@@ -172,7 +172,7 @@ public class MessageSender {
                 tes.sendMessageToUser(p.getName(), message);
             } catch (UserNotRegisteredException e) {
                 //ignore and continue
-            }  catch (JSONException e) {
+            } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -203,11 +203,11 @@ public class MessageSender {
     }
 
     /**
-     * @param p player to send the message to
-     * @param tes ThreadedEinzServer that holds the player to send the message to
+     * @param p             player to send the message to
+     * @param tes           ThreadedEinzServer that holds the player to send the message to
      * @param ruleParameter message to send (depending on the action)
      */
-    public static void sendCustomActionResponse(Player p, ThreadedEinzServer tes, JSONObject ruleParameter){
+    public static void sendCustomActionResponse(Player p, ThreadedEinzServer tes, JSONObject ruleParameter) {
         EinzMessageHeader header = new EinzMessageHeader("furtheractions", "CustomAction");
         EinzCustomActionResponseMessageBody body = new EinzCustomActionResponseMessageBody(ruleParameter);
         EinzMessage<EinzCustomActionResponseMessageBody> message = new EinzMessage<>(header, body);
@@ -221,10 +221,10 @@ public class MessageSender {
     }
 
     /**
-     * @param p player that finished
+     * @param p   player that finished
      * @param tes holds the people to send the message to
      */
-    public static void sendPlayerFinishedToAll(Player p, ThreadedEinzServer tes){
+    public static void sendPlayerFinishedToAll(Player p, ThreadedEinzServer tes) {
         EinzMessageHeader header = new EinzMessageHeader("endgame", "PlayerFinished");
         EinzPlayerFinishedMessageBody body = new EinzPlayerFinishedMessageBody(p.getName());
         EinzMessage<EinzPlayerFinishedMessageBody> message = new EinzMessage<>(header, body);
@@ -232,4 +232,56 @@ public class MessageSender {
         tes.getServerManager().broadcastMessageToAllSpectators(message);
     }
 
+    public static void sendState(Player player, ThreadedEinzServer tes, GlobalState state, GameConfig config) {
+        EinzMessageHeader header = new EinzMessageHeader("stateinfo", "SendState");
+        HashMap<String, String> numCardsInHand = new HashMap<>();
+
+        //Build strings for GlobalStateParser and instantiate it
+        for (Player p : state.getPlayersOrdered()) {
+            numCardsInHand.put(p.getName(), Integer.toString(p.hand.size()));
+        }
+        ArrayList<Card> stack = (ArrayList) state.getDiscardPile();
+        String activePlayer = state.getActivePlayer().toString();
+        String cardsToDraw = Integer.toString(state.getCardsToDraw());
+        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
+
+        //Send State to only one player
+        ArrayList<JSONObject> possibleActions = new ArrayList<>();
+
+        //This loop passes the possibleActions to the auxiliary functions to add the appropriate actions as JSONObjects to it
+        for (PlayerAction action : PlayerAction.values()) {
+            switch (action) {
+                case LEAVE_GAME:
+                    leaveGameJSONHelper(player, state, config, possibleActions);
+                    break;
+                case DRAW_CARDS:
+                    drawCardsJSONHelper(player, state, config, possibleActions);
+                    break;
+                case KICK_PLAYER:
+                    kickPlayerJSONHelper(player, tes, possibleActions);
+                    break;
+                case PLAY_CARD:
+                    playCardJSONHelper(player, state, config, possibleActions);
+                    break;
+                case FINISH_TURN:
+                    finishTurnJSONHelper(player, state, config, possibleActions);
+                    break;
+                default:
+
+                    break;
+            }
+        }
+
+        //Sends the built message to the corresponding player
+        try {
+            PlayerState playerState = new PlayerState((ArrayList) player.hand, possibleActions);
+            EinzSendStateMessageBody body = new EinzSendStateMessageBody(parser, playerState);
+            EinzMessage<EinzSendStateMessageBody> message = new EinzMessage<>(header, body);
+            tes.sendMessageToUser(player.getName(), message);
+        } catch (UserNotRegisteredException e) {
+            //ignore and continue
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

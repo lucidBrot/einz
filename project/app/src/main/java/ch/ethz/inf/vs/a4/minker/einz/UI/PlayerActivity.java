@@ -3,39 +3,20 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 import android.content.ClipData;
 import android.graphics.Canvas;
 import android.graphics.Point;
-import android.graphics.drawable.Drawable;
-import android.media.Image;
 import android.os.Build;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.support.v7.widget.GridLayout;
-import android.util.Log;
 import android.view.Display;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.TextView;
 
-import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
-import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
 
 // How to get Messages:
 // get the intent extra that is a reference to ourClient
@@ -244,7 +225,7 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
 
     private void initCards(){
         cards = new int[20];
-        cards[0] = R.drawable.card_einz_blue;
+        cards[0] = R.drawable.card_1_blue;
         cards[1] = R.drawable.card_take2_red;
         cards[2] = R.drawable.card_take4;
         cards[3] = R.drawable.card_rev_green;
@@ -254,7 +235,7 @@ public class PlayerActivity extends FullscreenActivity { // TODO: onStop and onR
         cards[7] = R.drawable.card_7_green;
         cards[8] = R.drawable.card_2_red;
         cards[9] = R.drawable.card_8_blue;
-        cards[10] = R.drawable.card_einz_blue;
+        cards[10] = R.drawable.card_1_blue;
         cards[11] = R.drawable.card_take2_red;
         cards[12] = R.drawable.card_take4;
         cards[13] = R.drawable.card_rev_green;

@@ -7,4 +7,4 @@
     android:paddingBottom="3dp"
     android:paddingRight="3dp"
     android:scaleType="fitCenter"
-    app:srcCompat="@drawable/card_einz_red" />
+    app:srcCompat="@drawable/card_1_red" />
