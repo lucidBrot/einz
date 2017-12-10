@@ -166,7 +166,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         this.backgroundHandler.post(startGame);
 
         // <UglyHack> // no more here because clemens calls this on init game
-        startGameUIWithThisAsContext();
+        // startGameUIWithThisAsContext();
 
     }
 

@@ -190,6 +190,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onInitGame(final EinzMessage<EinzInitGameMessageBody> message) {
+
         if (gameUI==null && lobbyUI!=null) { // @Clemens I completely rewrote this section. I hope you're fine with this
             runOnMainThread(new Runnable() {
                 @Override

@@ -221,13 +221,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         // added this temporary fix for the OOM error problem
         // TODO: add permanent fix
         // https://stackoverflow.com/a/13415604/2550406
-        /*((BitmapDrawable)localImgView.getDrawable()).getBitmap().recycle();
-        try {
-            sleep(1); // give the GC time to clean
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
-        //</temp>
 
         localImgView.setTag(cardAdded);
 
