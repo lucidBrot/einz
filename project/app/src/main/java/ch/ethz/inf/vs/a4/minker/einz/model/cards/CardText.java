@@ -5,25 +5,26 @@ package ch.ethz.inf.vs.a4.minker.einz.model.cards;
  */
 
 public enum CardText {
-    ZERO("zero"),
-    ONE("one"),
-    TWO("two"),
-    THREE("three"),
-    FOUR("four"),
-    FIVE("five"),
-    SIX("six"),
-    SEVEN("seven"),
-    EIGHT("eight"),
-    NINE("nine"),
-    PLUSTWO("plusTwo"),
-    SWITCHORDER("switchOrder"),
-    STOP("stop"),
-    CHANGECOLOR("changeColor"),
-    CHANGECOLORPLUSFOUR("changeColorPlusFour"),
-    DEBUG("DEBUG");
+    ZERO("ZERO", "0"),
+    ONE("ONE", "1"),
+    TWO("TWO", "2"),
+    THREE("THREE", "3"),
+    FOUR("FOUR", "4"),
+    FIVE("FIVE", "5"),
+    SIX("SIX", "6"),
+    SEVEN("SEVEN", "7"),
+    EIGHT("EIGHT", "8"),
+    NINE("NINE", "9"),
+    PLUSTWO("PLUSTWO", "take2"),
+    SWITCHORDER("SWITCHORDER", "rev"),
+    STOP("STOP", "skip"),
+    CHANGECOLOR("CHANGECOLOR", "choose"),
+    CHANGECOLORPLUSFOUR("CHANGECOLORPLUSFOUR" ,"take4"),
+    DEBUG("DEBUG", "debug"); //TODO: Number of "special cards" might change
 
-    public String type;
-    CardText(String type){
+    public String type, indicator;
+    CardText(String type, String indicator){
         this.type = type;
+        this.indicator = indicator;
     }
 }

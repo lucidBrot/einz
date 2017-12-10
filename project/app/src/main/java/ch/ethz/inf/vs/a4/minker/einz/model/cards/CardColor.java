@@ -5,11 +5,11 @@ package ch.ethz.inf.vs.a4.minker.einz.model.cards;
  */
 
 public enum CardColor {
-    YELLOW("yellow"),
-    RED("red"),
-    BLUE("blue"),
-    GREEN("green"),
-    NONE("none");
+    YELLOW("YELLOW"),
+    RED("RED"),
+    BLUE("BLUE"),
+    GREEN("GREEN"),
+    NONE("NONE");
     public String color;
     CardColor(String color){
         this.color = color;

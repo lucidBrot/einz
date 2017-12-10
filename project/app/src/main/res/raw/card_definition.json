@@ -3,7 +3,7 @@
     "ID":"yellow_0", "name":"Yellow 0", "text":"ZERO", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_0_yellow"
   },
   {
-    "ID":"yellow_1", "name":"Yellow 1", "text":"ONE", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_einz_yellow"
+    "ID":"yellow_1", "name":"Yellow 1", "text":"ONE", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_1_yellow"
   },
   {
     "ID":"yellow_2", "name":"Yellow 2", "text":"TWO", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_2_yellow"

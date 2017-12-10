@@ -69,10 +69,10 @@ public class GlobalRuleChecker {
     }
 
     /**
-     * Called after a player leavers the game
+     * Called after a player leaves the game
      *
      * @param state
-     * @return
+     * @return modified state
      */
     public static GlobalState checkOnLeaveGame(GlobalState state, GameConfig gameConfig) {
         for (BasicGlobalRule r : gameConfig.globalRules) {
@@ -85,7 +85,7 @@ public class GlobalRuleChecker {
      * Called before the game starts to setup the game state.
      *
      * @param state
-     * @return
+     * @return modified state
      */
     public static GlobalState checkOnStartGame(GlobalState state, GameConfig gameConfig) {
         for (BasicGlobalRule r : gameConfig.globalRules) {
@@ -98,7 +98,7 @@ public class GlobalRuleChecker {
      * Called after a player ended his turn.
      *
      * @param state
-     * @return
+     * @return modified state
      */
     public static GlobalState checkOnEndTurn(GlobalState state, GameConfig gameConfig) {
         for (BasicGlobalRule r : gameConfig.globalRules) {
@@ -112,7 +112,7 @@ public class GlobalRuleChecker {
      *
      * @param state
      * @param player The Player that has finished
-     * @return
+     * @return modified state
      */
     public static GlobalState checkOnPlayerFinished(GlobalState state, Player player, GameConfig gameConfig) {
         for (BasicGlobalRule r : gameConfig.globalRules) {
@@ -124,7 +124,7 @@ public class GlobalRuleChecker {
     /**
      * Called after a card player decides to draw a card
      * @param state
-     * @return
+     * @return modified state
      */
     public static GlobalState checkOnDrawCard(GlobalState state, GameConfig gameConfig){
         for (BasicGlobalRule r : gameConfig.globalRules) {
@@ -137,7 +137,7 @@ public class GlobalRuleChecker {
      * Called on any card the player plays.
      * @param state
      * @param played
-     * @return
+     * @return modified state
      */
     public static GlobalState checkOnPlayAnyCard(GlobalState state, Card played, GameConfig gameConfig){
         for (BasicGlobalRule r : gameConfig.globalRules) {
