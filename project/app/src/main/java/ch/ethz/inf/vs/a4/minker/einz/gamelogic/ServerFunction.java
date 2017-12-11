@@ -179,7 +179,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return whether the player is allowed to play the card he wants to play or not
      */
     public boolean play(Card card, Player p) {
-        if (!globalState.getActivePlayer().equals(p)) {
+        if (!globalState.getActivePlayer().getName().equals(p.getName())) {
             if (!DEBUG_MODE) {
                 MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
             }
