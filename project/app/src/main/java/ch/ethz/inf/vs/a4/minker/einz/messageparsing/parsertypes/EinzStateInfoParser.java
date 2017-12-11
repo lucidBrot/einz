@@ -5,6 +5,8 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,6 +87,7 @@ public class EinzStateInfoParser extends EinzParser {
                 JSONObject playParams = cardJSON.optJSONObject("playParameters");
 
                 Card card = new Card(ID, origin, playParams);
+                // Card card = new Card(ID, origin, CardText.DEBUG, CardColor.BLUE, "drawable", "card_1_blue"); // TODO: use CardLoader that is somehow globally available
                 hand.add(card);
             }
             JSONArray possibleactionsJSON = playerstateJSON.getJSONArray("possibleactions");

@@ -13,6 +13,9 @@ public interface LobbyUIInterface {
     public void setAdmin(String username);
 
     void onRegistrationFailed(EinzRegisterFailureMessageBody body);
+
+    public void startGameUIWithThisAsContext();
+
     // still to do:
     // on connection failed
 

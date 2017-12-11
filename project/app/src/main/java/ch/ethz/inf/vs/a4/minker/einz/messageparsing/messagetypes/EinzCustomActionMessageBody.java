@@ -11,15 +11,25 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 
 public class EinzCustomActionMessageBody extends EinzMessageBody {
 
-    JSONObject ruleParameter;
+    final JSONObject ruleParameterBody;
+    final String ruleName;
 
-    public EinzCustomActionMessageBody(JSONObject ruleParameter) {
-        this.ruleParameter = ruleParameter;
+    public EinzCustomActionMessageBody(JSONObject ruleParameterBody, String ruleName) {
+        this.ruleParameterBody = ruleParameterBody;
+        this.ruleName = ruleName;
     }
 
     @Override
     public JSONObject toJSON() throws JSONException {
-        return this.ruleParameter;
+        return this.ruleParameterBody;
+    }
+
+    public JSONObject getRuleParameterBody() {
+        return ruleParameterBody;
+    }
+
+    public String getRuleName() {
+        return ruleName;
     }
 }
 /*
