@@ -7,9 +7,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.InvalidResourceFormatException;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug_ServerActivity;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 public class MainActivity extends FullscreenActivity implements View.OnClickListener {
 
@@ -28,6 +33,19 @@ public class MainActivity extends FullscreenActivity implements View.OnClickList
 
         // log some warnings if debug variables have been set and possibly forgotten
         Debug.debug_printInitialWarnings();
+
+        // initialize the globally available CardLoader with the cards
+        initializeCardLoader();
+    }
+
+    private void initializeCardLoader() {
+        CardLoader loader = EinzSingleton.getInstance().getCardLoader();
+        try {
+            loader.loadCardsFromResourceFile(this, R.raw.card_definition);
+        } catch (JSONException e) {
+            Log.e("MainActivity", "Failed to initialize CardLoader.");
+            e.printStackTrace();
+        }
     }
 
     @Override

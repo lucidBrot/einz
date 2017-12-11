@@ -4,6 +4,7 @@ import android.content.ClipData;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -12,6 +13,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayout;
+import android.util.Log;
 import android.view.Display;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
@@ -44,17 +47,20 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterR
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardOrigin;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import static java.lang.Thread.sleep;
+
 
 // How to get Messages:
 // get the intent extra that is a reference to ourClient
 // make PlayerActivity implement GameUIInterface
-// call ourClient.getClientActionCallbackInterface().setGameUI(this)
+// call ourClient.getActionCallbackInterface().setGameUI(this)
 // ...
 // profit
 // Now the client will - so clemens will - call you on these events
@@ -71,6 +77,21 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private ImageView trayStack;
     private ImageView drawPile;
     private LayoutInflater inflater;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
+            ourClient.getActionCallbackInterface().setGameUI(null);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
+            ourClient.getActionCallbackInterface().setGameUI(this);
+    }
+
     private EinzClient ourClient;
     private int cardHeight,cardWidth;
 
@@ -88,6 +109,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.acitivity_player);
+
+        this.ourClient = EinzSingleton.getInstance().getEinzClient();
+        ourClient.getActionCallbackInterface().setGameUI(this);
 
         this.backgroundThread.start();
         this.backgroundLooper = this.backgroundThread.getLooper();
@@ -142,8 +166,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                 endTurn();
             }
         });
-
-        this.ourClient = EinzSingleton.getInstance().getEinzClient();
 
         inflater = LayoutInflater.from(this);
 
@@ -207,9 +229,13 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final View itemView = inflater.inflate(R.layout.card_view, mGrid, false);
         ImageView localImgView = (ImageView) itemView;
 
+        // added this temporary fix for the OOM error problem
+        // TODO: add permanent fix
+        // https://stackoverflow.com/a/13415604/2550406
+
         localImgView.setTag(cardAdded);
 
-        localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext()));
+        localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext())); // TODO: @Chris fix OOM error. Seems to happen at the 12th addcard
         localImgView.getLayoutParams().width  = cardWidth;
         localImgView.getLayoutParams().height = cardHeight;
         itemView.setOnTouchListener(new DragCardListener());
@@ -221,6 +247,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     private void initCards(){
+        // here's how you would do that
+        CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
+        addCard(cardLoader.getCardInstance("yellow_1"));
+        // </education>
+
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_blue"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_yellow"));
@@ -230,10 +261,10 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
+        /*addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));*/
     }
 
     public boolean checkCardsStillValid(ArrayList<Card> cardlist){
@@ -456,6 +487,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void setHand(ArrayList<Card> hand) {
+        Log.w("PlayerActivity", "setHand is currently enabled. This means that the cards for debugging will not be shown.");
+        // to disable, just comment out the following four lines
         if(!checkCardsStillValid(hand)){
             clearHand();
             addToHand(hand);
@@ -523,6 +556,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                 addPlayerToList(currPlayer);*/
             }
         }
+    }
+
+    @Override
+    public void onUpdateLobbyList(String admin, ArrayList<String> players, ArrayList<String> spectators) {
+        // TODO: change display of players when somebody left.
     }
 
     class DragCardListener implements View.OnTouchListener {
@@ -676,7 +714,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
                         setTopPlayPileCard((Card)tmpView.getTag());
                         //remove card from inner cardlist
-                        // playCard((Card)tmpView.getTag());
+                         playCard((Card)tmpView.getTag());
 
                         cards.remove((Card) tmpView.getTag());
                         //System.out.println(cards);
@@ -698,5 +736,12 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             }
             return false;
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // TODO: directly stop server and client
+        //      currently, back only takes the user to the LobbyActivity, where they have to press back again.
     }
 }

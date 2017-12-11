@@ -165,15 +165,21 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         };
         this.backgroundHandler.post(startGame);
 
-        // <UglyHack> // TODO: remove this part because clemens calls this
+        // <UglyHack> // no more here because clemens calls this on init game
+        // startGameUIWithThisAsContext();
+
+    }
+
+    /**
+     * Starts the gameUI {@link PlayerActivity} with this Activity as parent context
+     */
+    public void startGameUIWithThisAsContext(){
+        // <UglyHack>
         // read EinzConstants.ourClientGlobal's javadocs to understand this. Basically, I cannot implement parcelable for PrintWriter, and
         // thus not for EinzClient
         Intent intent = new Intent(this, PlayerActivity.class);
-        Log.w("LobbyActivity", "If you get a deadlock, it is here");
         EinzSingleton.getInstance().setEinzClient(this.ourClient);
-        // unlock on receive in PlayerActivity
         startActivity(intent);
-
     }
 
     private void debug_populate_lobbylist() {
@@ -356,7 +362,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     @Override
     protected void onRestart() {
         super.onRestart();
-        this.ourClient.getActionCallbackInterface().setLobbyUI(this);
+        if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
+            this.ourClient.getActionCallbackInterface().setLobbyUI(this);
     }
 
     @Override

@@ -1,11 +1,13 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
@@ -15,6 +17,8 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import static java.lang.Thread.sleep;
 
 public class ClientMessengerCallback implements ClientActionCallbackInterface { // TODO: make sure to always cover the case where gameUI and/or lobbyUI are null
     @Nullable
@@ -104,9 +108,13 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                if(lobbyUI!=null) { // TODO: update lobby list if it changes during the game
+                if(lobbyUI!=null) {
                     lobbyUI.setAdmin(message.getBody().getAdmin());
                     lobbyUI.setLobbyList(players, spectators);
+                }
+
+                if(gameUI!=null){
+                    gameUI.onUpdateLobbyList(message.getBody().getAdmin(), players, spectators);
                 }
             }
         };
@@ -186,25 +194,72 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onInitGame(final EinzMessage<EinzInitGameMessageBody> message) {
-        if (gameUI!=null) {
-            gameUI = new PlayerActivity();
+
+        if (gameUI==null && lobbyUI!=null) { // @Clemens I completely rewrote this section. I hope you're fine with this
+            runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    lobbyUI.startGameUIWithThisAsContext();
+                    // this sets gameUI, so we can now do the following:
+                }
+            });
+
+            while(gameUI==null){ // sleep until the activity has loaded, then initGame
+                try {
+                    sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    gameUI.onInitGame(message);
+                }
+            };
+            runOnMainThread(runnable);
+
+        }else if(gameUI!=null){ // for some reason, it is already running. Reinitialize. TODO: does that make sense?
+
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    gameUI.onInitGame(message);
+                }
+            };
+
+            runOnMainThread(runnable);
+
+        } else {
+            // lobbyUI == null and gameUI == null
+            // uhm... that means that neither is currently existing. maybe, the lobbyUI has been paused.
+            runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    lobbyUI.startGameUIWithThisAsContext();
+                    // this sets gameUI, asynchronously to our message-receiver thread
+                }
+            });
+
+            while(gameUI==null){ // sleep until the activity has loaded, then initGame
+                try {
+                    sleep(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    gameUI.onInitGame(message);
+                }
+            });
         }
 
-        Log.d("CliMesssegnerCallback", "Game Initialized");
+        Log.d("CliMesssengerCallback", "Game Initialized");
         // TODO: implement onInitGame
-
-        final EinzMessage<EinzInitGameMessageBody> msg = message;
-
-
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                EinzMessage<EinzInitGameMessageBody> msg2 =msg;
-                gameUI.onInitGame(msg2);
-            }
-        };
-
-        runOnMainThread(runnable);
 
     }
 
@@ -251,7 +306,12 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
         String success = message.getBody().getSuccess();
         if (!success.equals(true)){
-            Toast.makeText(applicationContext, "You are not allowed to play this card", Toast.LENGTH_SHORT).show();
+            runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(applicationContext, "You are not allowed to play this card", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         // TODO: implement onPlayCardResponse
     }

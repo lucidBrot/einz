@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.model;
 
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
 import org.json.JSONArray;
@@ -243,7 +244,15 @@ public class GlobalState {
      */
     public void nextTurn(){
         activePlayer = nextPlayer;
-        int playerIndex = players.indexOf(nextPlayer);
+
+        //Changed this loop so it owrks with PlayerContainer <-> Player
+        int playerIndex = -1;
+        for(int i=0; i < players.size(); i++){
+            if(players.get(i).player.equals(nextPlayer)){
+                playerIndex = i;
+            }
+        }
+
         if(playOrderIsForwards){
             nextPlayer = players.get((playerIndex + 1) % players.size()).player;
         } else {
@@ -300,7 +309,11 @@ public class GlobalState {
         deserializedState.discardPile = new ArrayList<>();
         for (int i = 0; i < stack.length(); i++){
             JSONObject cardObject = stack.optJSONObject(i);
-            Card card = new Card(cardObject.getString("ID"), cardObject.getString("origin"));
+
+            JSONObject playParams = cardObject.optJSONObject("playParameters");
+            Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(
+                            cardObject.getString("ID"),
+                            cardObject.getString("origin"), playParams);
             deserializedState.discardPile.add(card);
         }
 
