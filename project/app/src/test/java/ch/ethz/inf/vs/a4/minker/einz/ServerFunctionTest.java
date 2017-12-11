@@ -19,7 +19,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 public class ServerFunctionTest {
     @Test
     public void initialiseStandardGameTest() {
-        initializeCardLoader();
+        //initializeCardLoader();
         ArrayList<Player> players = new ArrayList<>();
         players.add(new Player("Peter"));
         players.add(new Player("Paul"));
@@ -28,6 +28,7 @@ public class ServerFunctionTest {
         s.startGame();
     }
 
+    /*
     private void initializeCardLoader() {
         CardLoader loader = EinzSingleton.getInstance().getCardLoader();
         try {
@@ -37,10 +38,12 @@ public class ServerFunctionTest {
             e.printStackTrace();
         }
     }
+    */
 
 
     @Test
     public void playTestStandardGame() {
+        //initializeCardLoader();
         ArrayList<Player> players = new ArrayList<>();
         Player peter = new Player("Peter");
         Player paul = new Player("Paul");
@@ -63,7 +66,8 @@ public class ServerFunctionTest {
                            // s.finishTurn(p); WITH CURRENT DEFAULTRULES, THIS ISNT NEEDED
                         }
                     }
-                } catch (Exception e){
+                } catch (IndexOutOfBoundsException e){
+                    Log.i("Exception","");
 
                 }
             }

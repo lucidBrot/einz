@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import android.util.Log;
+
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -29,6 +30,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ChangeDirectionRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.DrawTwoCardsRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.GameEndsOnWinRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.IsValidDrawRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule2;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayColorRule;
@@ -237,9 +239,14 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
             return null;
         } else {
-            ArrayList<Card> result = (ArrayList) globalState.drawCards(globalState.getCardsToDraw());
+            List<Card> resultList = globalState.drawCards(globalState.getCardsToDraw());
+            ArrayList<Card> result = new ArrayList<>();
+            for(Card c: resultList){
+                result.add(c);
+            } //Build Arraylist form list since casting causes an exception
             p.hand.addAll(result);
             CardRuleChecker.checkOnDrawCard(globalState, gameConfig);
+            GlobalRuleChecker.checkOnDrawCard(globalState, gameConfig);
             if (!DEBUG_MODE) {
                 MessageSender.sendDrawCardResponseSuccess(p, threadedEinzServer, result);
             }
@@ -284,13 +291,17 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        // Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
-                        // NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
-                        // TODO: either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
-                        Card card = cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+ct.indicator);
-
-                        numberOfCardsInGame.put(card, 2);
-                        allCardsInGame.add(card);
+                        if(DEBUG_MODE) {
+                            Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                            //NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
+                            //either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
+                            numberOfCardsInGame.put(card, 2);
+                            allCardsInGame.add(card);
+                        }else {
+                            Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
+                            numberOfCardsInGame.put(card, 2);
+                            allCardsInGame.add(card);
+                        }
                     }
                 }
             } else {
@@ -304,7 +315,6 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
         }
         GameConfig result = new GameConfig(numberOfCardsInGame);
-        //gameConfig.allCardsInGame.addAll(deck.keySet()); -> already done in GameConfig
         for (Player p : players) {
             result.addParticipant(p);
         }
@@ -330,12 +340,18 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        // Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
-                        // lowercase issue was here as well
-                        Card card = cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+ct.indicator);
-                        //assign rules to the cards
-                        result.assignRuleToCard(new PlayColorRule(), card);
-                        result.assignRuleToCard(new PlayTextRule(), card);
+                        if(DEBUG_MODE) {
+                            Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                            //assign rules to the cards
+                            result.assignRuleToCard(new PlayColorRule(), card);
+                            result.assignRuleToCard(new PlayTextRule(), card);
+                            // lowercase issue was here as well
+                        } else {
+                            Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
+                            //assign rules to the cards
+                            result.assignRuleToCard(new PlayColorRule(), card);
+                            result.assignRuleToCard(new PlayTextRule(), card);
+                        }
                     }
                 }
             } else {
@@ -350,14 +366,30 @@ public class ServerFunction implements ServerFunctionDefinition {
         }
 
         for (CardColor cc : CardColor.values()) { // TODO: I replaced your version below with one that uses CardLoader. Does that make sense?
-           
-            if(cc != CardColor.NONE){
-                result.assignRuleToCard(new ChangeDirectionRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.SWITCHORDER.indicator) );
-                result.assignRuleToCard(new DrawTwoCardsRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.PLUSTWO.indicator));
-                result.assignRuleToCard(new SkipRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.STOP.indicator));
 
-                // It might make sense to somewhere specify all IDs that exist, so that we don't have to guess
+            if (cc != CardColor.NONE) {
+                if(DEBUG_MODE) {
+                    result.assignRuleToCard(new ChangeDirectionRule(), new Card(cc + "_" + CardText.SWITCHORDER.indicator, CardText.SWITCHORDER.type,
+                            CardText.SWITCHORDER, cc, "drawable", "card_" + CardText.SWITCHORDER.indicator + "_" + cc));
+                    result.assignRuleToCard(new DrawTwoCardsRule(), new Card(cc + "_" + CardText.PLUSTWO.indicator, CardText.PLUSTWO.type,
+                            CardText.PLUSTWO, cc, "drawable", "card_" + CardText.PLUSTWO.indicator + "_" + cc));
+
+                    result.assignRuleToCard(new SkipRule(), new Card(cc + "_" + CardText.STOP.indicator, CardText.STOP.type,
+                            CardText.STOP, cc, "drawable", "card_" + CardText.STOP.indicator + "_" + cc));
+                }else{
+                    result.assignRuleToCard(new ChangeDirectionRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.SWITCHORDER.indicator) );
+                    result.assignRuleToCard(new DrawTwoCardsRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.PLUSTWO.indicator));
+                    result.assignRuleToCard(new SkipRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.STOP.indicator));
+                    //It might make sense to somewhere specify all IDs that exist, so that we don't have to guess
+                }
             }
+        }
+        if (DEBUG_MODE) {
+            result.assignRuleToCard(new IsValidDrawRule(), new Card(CardColor.YELLOW + "_" + CardText.ZERO.indicator, CardText.ZERO.type,
+                    CardText.ZERO, CardColor.YELLOW, "drawable", "card_" + CardText.ZERO.indicator + "_" + CardColor.YELLOW));
+        } else {
+            result.assignRuleToCard(new IsValidDrawRule(), cardLoader.getCardInstance(CardColor.YELLOW.toString().toLowerCase()+"_"+CardText.ZERO.indicator));
+
         }
 
         //ADD THIS LAST SO EFFECTS HAPPEN BEFORE THE PLAYERS TURN IS FINISHED
@@ -375,6 +407,7 @@ public class ServerFunction implements ServerFunctionDefinition {
     /**
      * things to do whenever anything in the game changes
      */
+
     private void onChange() {
 
         //Check if any player has finished
