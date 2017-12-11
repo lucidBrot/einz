@@ -35,6 +35,9 @@
   {
     "ID":"red_skip", "name":"Red skip", "text":"STOP", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_skip_red"
   },
+  {
+    "ID":"red_rev", "name":"Red rev", "text":"SWITCHORDER", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_rev_red"
+  },
   
   {
     "ID":"green_0", "name":"Green 0", "text":"ZERO", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_0_green"
@@ -71,6 +74,9 @@
   },
   {
     "ID":"green_skip", "name":"Green skip", "text":"STOP", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_skip_green"
+  },
+  {
+    "ID":"green_rev", "name":"Green rev", "text":"SWITCHORDER", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_rev_green"
   },
 
   {
@@ -109,6 +115,9 @@
   {
     "ID":"blue_skip", "name":"Blue skip", "text":"STOP", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_skip_blue"
   },
+  {
+    "ID":"blue_rev", "name":"Blue rev", "text":"SWITCHORDER", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_rev_blue"
+  },
 
   {
     "ID":"yellow_0", "name":"Yellow 0", "text":"ZERO", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_0_yellow"
@@ -146,6 +155,10 @@
   {
     "ID":"yellow_skip", "name":"Yellow skip", "text":"STOP", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_skip_yellow"
   },
+  {
+    "ID":"yellow_rev", "name":"Yellow rev", "text":"SWITCHORDER", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_rev_yellow"
+  },
+
   
   {
     "ID":"take4", "name":"take4", "text":"CHANGECOLORPLUSFOUR", "color":"NONE", "resourceGroup":"drawable", "resourceName":"card_take4"

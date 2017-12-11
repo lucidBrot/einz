@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
 import android.content.Context;
+import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.InvalidResourceFormatException;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardOrigin;
 import com.google.common.io.Resources;
@@ -42,6 +43,7 @@ public class CardLoader {
         if (!cardMapping.containsKey(cardID)) {
             //return null;
             // TODO: remove this debug card once all cards are registered in the json resource
+            Log.w("CardLoader", "unmapped card requested: "+cardID);
             return getCardInstance("debug");
             // return new Card("blue_1", CardOrigin.STACK.value, CardText.DEBUG, CardColor.BLUE, "drawable", "card_1_blue");
             // return getCardInstance("yellow_skip");
