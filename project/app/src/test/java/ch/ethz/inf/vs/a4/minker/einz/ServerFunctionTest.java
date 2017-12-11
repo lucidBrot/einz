@@ -28,7 +28,7 @@ public class ServerFunctionTest {
 
 
     @Test
-    public void playTest() {
+    public void playTestStandardGame() {
         ArrayList<Player> players = new ArrayList<>();
         Player peter = new Player("Peter");
         Player paul = new Player("Paul");
@@ -48,7 +48,7 @@ public class ServerFunctionTest {
                         s.play(p.hand.get(i), p);
                         if (i == tries - 1) {
                             s.drawCards(p);
-                            s.finishTurn(p);
+                           // s.finishTurn(p); WITH CURRENT DEFAULTRULES, THIS ISNT NEEDED
                         }
                     }
                 } catch (Exception e){
@@ -58,8 +58,11 @@ public class ServerFunctionTest {
         }
         Log.i("Endstate","");
 
-        //TODO: Add a rule for when a player can just end his turn?
-        //TODO: playing a plus2 card sets the cardsToDraw to 8
+        //Add a rule for when a player can just end his turn? -> with current ruleset not necessary
+        //playing a plus2 card sets the cardsToDraw to 8 -> hopefully fixed
+        //add a "skip" rule -> added
+        //add a "isValidDrawCards" rule -> not very sophisticated but should work
+        //TODO: card_definition.json
     }
 
 }

@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,9 +27,11 @@ import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ChangeDirectionRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.DrawTwoCardsRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.GameEndsOnWinRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule2;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayColorRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayTextRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ResetCardsToDrawRule;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.SkipRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.StartGameWithCardsRule;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WinOnNoCardsRule;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
@@ -45,9 +48,10 @@ public class ServerFunction implements ServerFunctionDefinition {
     private final int MAX_NUMBER_OF_PLAYERS;
     private final boolean DEBUG_MODE;
 
-    public ServerFunction(){
+    public ServerFunction() {
         this(false);
     }
+
     /**
      * Sets DEBUG_MODE to debugMode
      * only call this with "true" for debugging
@@ -94,13 +98,13 @@ public class ServerFunction implements ServerFunctionDefinition {
      * initialises a new game
      *
      * @param threadedEinzServer server that holds the list of players and spectators
-     * @param players     the players in the game, the players play in the order in which they are in the
-     *                    ArrayList (lowest index plays first)
-     * @param deck        contains the specified cards the specified amount of times
-     *                    in the HashMap, the Key determines the Card and the Mapped value determines how many times
-     *                    that card is put into the game
-     * @param globalRules set of global rules with which the game is played
-     * @param cardRules   card rules with the card they should apply to
+     * @param players            the players in the game, the players play in the order in which they are in the
+     *                           ArrayList (lowest index plays first)
+     * @param deck               contains the specified cards the specified amount of times
+     *                           in the HashMap, the Key determines the Card and the Mapped value determines how many times
+     *                           that card is put into the game
+     * @param globalRules        set of global rules with which the game is played
+     * @param cardRules          card rules with the card they should apply to
      */
 
     public void initialiseGame(ThreadedEinzServer threadedEinzServer, ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
@@ -122,6 +126,10 @@ public class ServerFunction implements ServerFunctionDefinition {
                 for (BasicCardRule r : cardRules.get(c)) {
                     gameConfig.assignRuleToCard(r, c);
                 }
+            }
+            //Initialise all the rules with the gameConfig
+            for (BasicRule r : gameConfig.allRules) {
+                r.initialize(gameConfig);
             }
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
@@ -325,13 +333,17 @@ public class ServerFunction implements ServerFunctionDefinition {
                         CardText.SWITCHORDER, cc, "drawable", "card_" + CardText.SWITCHORDER.indicator + "_" + cc));
                 result.assignRuleToCard(new DrawTwoCardsRule(), new Card(cc + "_" + CardText.PLUSTWO.indicator, CardText.PLUSTWO.type,
                         CardText.PLUSTWO, cc, "drawable", "card_" + CardText.PLUSTWO.indicator + "_" + cc));
+                result.assignRuleToCard(new SkipRule(), new Card(cc + "_" + CardText.STOP.indicator, CardText.STOP.type,
+                        CardText.STOP, cc, "drawable", "card_" + CardText.STOP.indicator + "_" + cc));
             }
         }
 
         //ADD THIS LAST SO EFFECTS HAPPEN BEFORE THE PLAYERS TURN IS FINISHED
         result.addGlobalRule(new NextTurnRule());
+        result.addGlobalRule(new NextTurnRule2());
 
-        //Initialise all the rules with the globalState
+        //Initialise all the rules with the gameConfig
+        //Initialise all the rules with the gameConfig
         for (BasicRule r : result.allRules) {
             r.initialize(result);
         }
@@ -374,10 +386,11 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     /**
      * handles any customAction message incoming by passing it on to the rule with that identifier
-     * @param user who issued this
+     *
+     * @param user                who issued this
      * @param customActionMessage
      */
-    public void onCustomActionMessage(String user, EinzMessage<EinzCustomActionMessageBody> customActionMessage){
+    public void onCustomActionMessage(String user, EinzMessage<EinzCustomActionMessageBody> customActionMessage) {
         EinzCustomActionMessageBody body = customActionMessage.getBody();
         String ruleName = body.getRuleName();
 

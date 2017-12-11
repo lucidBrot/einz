@@ -28,5 +28,20 @@
   },
   {
     "ID":"yellow_9", "name":"Yellow 9", "text":"NINE", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_9_yellow"
+  },
+  {
+    "ID":"yellow_take2", "name":"Yellow take2", "text":"PLUSTWO", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_take2_yellow"
+  },
+  {
+    "ID":"yellow_rev", "name":"Yellow rev", "text":"SWITCHORDER", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_rev_yellow"
+  },
+  {
+    "ID":"yellow_skip", "name":"Yellow skip", "text":"STOP", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_skip_yellow"
+  },
+  {
+    "ID":"yellow_choose", "name":"Yellow choose", "text":"CHANGECOLOR", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_choose_yellow"
+  },
+  {
+    "ID":"yellow_take4", "name":"Yellow take4", "text":"CHANGECOLORPLUSFOUR", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_take4_yellow"
   }
 ]
