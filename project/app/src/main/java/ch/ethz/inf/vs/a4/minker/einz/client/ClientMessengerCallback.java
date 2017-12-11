@@ -66,6 +66,15 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         return lobbyUI;
     }
 
+    public void onKeepaliveTimeout(){
+        runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(applicationContext, "FUCK I LOST CONNECTION", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     public GameUIInterface getGameUI() {
         return gameUI;
     }

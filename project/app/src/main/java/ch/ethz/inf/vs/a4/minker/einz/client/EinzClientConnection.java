@@ -50,7 +50,8 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
     }
 
     void onKeepaliveTimeout() {
-        // TODO: onKeepaliveTimeout inform user that we lost connection
+        //  onKeepaliveTimeout inform user that we lost connection
+        this.parentClient.getActionCallbackInterface().onKeepaliveTimeout();
     }
 
     public EinzClientConnection(String serverIP, int serverPort, EinzClient parentClient) {

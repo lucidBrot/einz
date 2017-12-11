@@ -45,8 +45,8 @@ public class Debug {
     public static long a_startTime = 0;
     public static long a_endTime = 0;
 
-    public static boolean logKeepalivePackets = true; // set to false to reduce log spam from receiving/sending keepalive packets, including the messages from actionfactory
-    public static boolean logKeepaliveSpam = true; // set to false to reduce log spam from triggering maybe-timeouts and more verbose debug output
+    public static boolean logKeepalivePackets = false; // set to false to reduce log spam from receiving/sending keepalive packets, including the messages from actionfactory
+    public static boolean logKeepaliveSpam = false; // set to false to reduce log spam from triggering maybe-timeouts and more verbose debug output
     public static boolean useKeepalive = true; // set true to use keepalive mechanisms
 
     /**

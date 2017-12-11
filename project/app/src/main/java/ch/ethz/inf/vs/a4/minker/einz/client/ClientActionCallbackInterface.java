@@ -37,7 +37,7 @@ public interface ClientActionCallbackInterface {
 
     void onCustomActionResponse(EinzMessage<EinzCustomActionResponseMessageBody> message);
 
-
+    public void onKeepaliveTimeout();
 
     void setGameUIAndDisableLobbyUI(GameUIInterface gameUI);
     void setGameUI(GameUIInterface gameUI);
