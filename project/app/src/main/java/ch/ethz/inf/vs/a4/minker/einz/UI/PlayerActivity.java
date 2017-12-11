@@ -27,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
@@ -46,6 +47,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterR
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardOrigin;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 
 import java.util.ArrayList;
@@ -237,6 +239,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     private void initCards(){
+        // here's how you would do that
+        CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
+        addCard(cardLoader.getCardInstance("yellow_1"));
+        // </education>
+
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_blue"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_yellow"));
@@ -246,8 +253,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_blue"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
-        /*addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
+        /*addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));*/
     }

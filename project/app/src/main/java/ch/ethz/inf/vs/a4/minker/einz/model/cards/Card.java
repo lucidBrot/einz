@@ -51,6 +51,7 @@ public class Card {
     }
 
     /**
+     * <b>"Deprecated" because you should use CardLoader in most cases!</b><br>
      * Calls {@link #Card(String, String, CardText, CardColor, String, String, String, JSONObject)}
      * with <code>playParameters = null</code> and <code>origin = CardOrigin.UNSPECIFIED.value</code>
      *
@@ -60,6 +61,7 @@ public class Card {
      * @param text  can be any of {@link CardText}
      * @param color can be any of {@link CardColor}
      */
+    @Deprecated
     public Card(String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName) {
         this(ID, name, text, color, resourceGroup, resourceName, CardOrigin.UNSPECIFIED.value, null);
     }

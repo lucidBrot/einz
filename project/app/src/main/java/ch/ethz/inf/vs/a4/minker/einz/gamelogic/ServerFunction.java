@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 import org.json.JSONException;
@@ -269,11 +271,16 @@ public class ServerFunction implements ServerFunctionDefinition {
     private GameConfig createStandardConfig(List<Player> players) {
         Map<Card, Integer> numberOfCardsInGame = new HashMap<>();
         Set<Card> allCardsInGame = new HashSet<>();
+        CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
         for (CardText ct : CardText.values()) {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                        // Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                        // NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
+                        // TODO: either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
+                        Card card = cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+ct.indicator);
+
                         numberOfCardsInGame.put(card, 2);
                         allCardsInGame.add(card);
                     }
