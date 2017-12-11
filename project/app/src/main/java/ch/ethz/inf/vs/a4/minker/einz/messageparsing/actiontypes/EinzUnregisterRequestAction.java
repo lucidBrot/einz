@@ -51,7 +51,7 @@ public class EinzUnregisterRequestAction extends EinzAction {
             }
 
             // don't send response back, 'response' here is null except for kicking
-            // unregisterUser automattically broadcasts UnregisterResponse
+            // unregisterUser automatically broadcasts UnregisterResponse
 
         } else {
             // user is not allowed to do this, just don't react
