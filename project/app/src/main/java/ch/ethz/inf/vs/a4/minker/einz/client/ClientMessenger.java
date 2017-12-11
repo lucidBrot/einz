@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
@@ -44,7 +45,9 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
      */
     @Override
     public void messageReceived(String message) {
-        Log.d("ClientMessenger", "received message: "+message);
+        if(!message.equals("{\"header\":{\"messagegroup\":\"networking\",\"messagetype\":\"KeepAlive\"},\"body\":{}}") || Debug.logKeepalivePackets) {
+            Log.d("ClientMessenger", "received message: " + message);
+        }
 
         // notify the keepalive
         parentClient.keepaliveScheduler.onAnyMessageReceived();
