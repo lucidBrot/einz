@@ -304,6 +304,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
+        final EinzMessage<EinzPlayCardResponseMessageBody> msg = message;
         String success = message.getBody().getSuccess();
         if (!success.equals("true")){
             runOnMainThread(new Runnable() {
@@ -313,7 +314,13 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 }
             });
         }
-        // TODO: implement onPlayCardResponse
+
+        runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                gameUI.onPlayCardResponse(msg);
+            }
+        });
     }
 
     @Override
