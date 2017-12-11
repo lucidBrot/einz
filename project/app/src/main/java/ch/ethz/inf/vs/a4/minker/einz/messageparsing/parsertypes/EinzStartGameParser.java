@@ -30,7 +30,7 @@ public class EinzStartGameParser extends EinzParser {
             case "InitGame":
                 return parseInitGame(message);
             default:
-                Log.d("EinzStartGameParser","Not a valid messagetype "+messagetype+" for EinzRegistrationParser");
+                Log.d("EinzStartGameParser","Not a valid messagetype "+messagetype+" for EinzStartGameParser");
                 return null;
         }
     }

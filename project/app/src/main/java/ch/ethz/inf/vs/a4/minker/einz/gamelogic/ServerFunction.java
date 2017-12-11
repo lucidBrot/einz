@@ -227,11 +227,13 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return the Cards that player draws, if he is not allowed to draw cards returns null.
      */
     public ArrayList<Card> drawCards(Player p) {
-        if (!globalState.getActivePlayer().equals(p)) {
+        Player player = globalState.getActivePlayer();
+        if (!player.getName().equals(p.getName())) {
             if (!DEBUG_MODE) {
                 MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "It is not your turn.");
             }
             return null; //TODO: Check in rules whether its a players turn
+            // TODO: why can I draw forever, every time a card?
         }
         if (!CardRuleChecker.checkIsValidDrawCards(globalState, gameConfig)) {
             if (!DEBUG_MODE) {
@@ -244,11 +246,11 @@ public class ServerFunction implements ServerFunctionDefinition {
             for(Card c: resultList){
                 result.add(c);
             } //Build Arraylist form list since casting causes an exception
-            p.hand.addAll(result);
+            player.hand.addAll(result);
             CardRuleChecker.checkOnDrawCard(globalState, gameConfig);
             GlobalRuleChecker.checkOnDrawCard(globalState, gameConfig);
             if (!DEBUG_MODE) {
-                MessageSender.sendDrawCardResponseSuccess(p, threadedEinzServer, result);
+                MessageSender.sendDrawCardResponseSuccess(player, threadedEinzServer, result);
             }
 
             onChange();

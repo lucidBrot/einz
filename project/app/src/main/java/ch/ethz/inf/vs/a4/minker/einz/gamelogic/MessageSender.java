@@ -68,7 +68,7 @@ public class MessageSender {
      * @param cards cards the player draws if he is able to
      */
     public static void sendDrawCardResponseSuccess(Player p, ThreadedEinzServer tes, ArrayList<Card> cards) {
-        EinzMessageHeader header = new EinzMessageHeader("draw", "DrawCardsResponse");
+        EinzMessageHeader header = new EinzMessageHeader("draw", "DrawCardsSuccess");
         EinzDrawCardsSuccessMessageBody body = new EinzDrawCardsSuccessMessageBody(cards);
         EinzMessage<EinzDrawCardsSuccessMessageBody> message = new EinzMessage<>(header, body);
         try {
@@ -86,7 +86,7 @@ public class MessageSender {
      * @param failureReason reason why the player wasn't able to draw cards
      */
     public static void sendDrawCardResponseFailure(Player p, ThreadedEinzServer tes, String failureReason) {
-        EinzMessageHeader header = new EinzMessageHeader("draw", "DrawCardsResponse");
+        EinzMessageHeader header = new EinzMessageHeader("draw", "DrawCardsFailure");
         EinzDrawCardsFailureMessageBody body = new EinzDrawCardsFailureMessageBody(failureReason);
         EinzMessage<EinzDrawCardsFailureMessageBody> message = new EinzMessage<>(header, body);
         try {

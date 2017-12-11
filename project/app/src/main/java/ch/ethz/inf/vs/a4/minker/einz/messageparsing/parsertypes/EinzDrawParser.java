@@ -32,7 +32,7 @@ public class EinzDrawParser extends EinzParser {
             case "DrawCards":
                 return parseDrawCards(message);
             default:
-                Log.d("EinzDrawParser","Not a valid messagetype "+header.getString("messagetype")+" for EinzRegistrationParser");
+                Log.d("EinzDrawParser","Not a valid messagetype "+header.getString("messagetype")+" for EinzDrawParser");
                 return null;
         }
     }

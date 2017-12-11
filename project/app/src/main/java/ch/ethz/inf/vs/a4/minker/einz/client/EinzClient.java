@@ -180,7 +180,7 @@ public class EinzClient implements Runnable {
 
                 //DEBUG
                 Log.d("EinzClient", "Trying to...");
-                connection.sendMessageRetryXTimes(5,message);
+                connection.sendMessageRetryXTimes(2,message);
 
 
                 //simple logging:
