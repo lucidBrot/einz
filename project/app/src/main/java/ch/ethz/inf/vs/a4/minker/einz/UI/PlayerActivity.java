@@ -709,7 +709,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
                         setTopPlayPileCard((Card)tmpView.getTag());
                         //remove card from inner cardlist
-                        // playCard((Card)tmpView.getTag());
+                         playCard((Card)tmpView.getTag());
 
                         cards.remove((Card) tmpView.getTag());
                         //System.out.println(cards);

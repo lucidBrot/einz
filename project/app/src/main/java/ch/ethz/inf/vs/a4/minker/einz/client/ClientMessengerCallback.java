@@ -302,7 +302,12 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
         String success = message.getBody().getSuccess();
         if (!success.equals(true)){
-            Toast.makeText(applicationContext, "You are not allowed to play this card", Toast.LENGTH_SHORT).show();
+            runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(applicationContext, "You are not allowed to play this card", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         // TODO: implement onPlayCardResponse
     }
