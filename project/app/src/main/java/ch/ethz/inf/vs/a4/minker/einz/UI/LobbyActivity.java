@@ -179,6 +179,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         startActivity(intent);
     }
 
+    @Override
+    public void onKeepaliveTimeout() {
+        this.onBackPressed();
+    }
+
     private void debug_populate_lobbylist() {
 
         // <Debug>

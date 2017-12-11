@@ -71,6 +71,12 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
             @Override
             public void run() {
                 Toast.makeText(applicationContext, "FUCK I LOST CONNECTION", Toast.LENGTH_LONG).show();
+                if(lobbyUI!=null){
+                    lobbyUI.onKeepaliveTimeout();
+                }
+                if(gameUI!=null){
+                    gameUI.onKeepaliveTimeout();
+                }
             }
         });
     }
@@ -172,11 +178,13 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                     if(username.equals(parentClient.getUsername())){
                         parentClient.shutdown(false);
                         Toast.makeText(applicationContext, "You have been disconnected. Reason: "+reason, Toast.LENGTH_LONG).show();
+                        onKeepaliveTimeout(); // TODO: give this a less toasty feeling
+
                     } else {
                         Toast.makeText(applicationContext, username+" has been disconnected. Reason: "+reason, Toast.LENGTH_LONG).show();
                     }
 
-                    this.notifyAll(); // inform any waiting threads
+                    /*r.*/notifyAll(); // inform any waiting threads
                 }
             }
         };

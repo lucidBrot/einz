@@ -16,6 +16,8 @@ public interface LobbyUIInterface {
 
     public void startGameUIWithThisAsContext();
 
+    void onKeepaliveTimeout();
+
     // still to do:
     // on connection failed
 

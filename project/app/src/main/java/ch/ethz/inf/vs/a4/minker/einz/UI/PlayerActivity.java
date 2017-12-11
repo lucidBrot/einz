@@ -644,6 +644,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         setTopPlayedCard(card);
     }
 
+    @Override
+    public void onKeepaliveTimeout() {
+        // TODO: what to do when lost connection? probably return to main menu
+    }
+
     class DragCardListener implements View.OnTouchListener {
 
         /*@Override
