@@ -149,9 +149,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private void onStartGameButtonClick(){
         if(!this.host)
             return;
-        // TODO: ignore successive button clicks
-
-
 
         // send startGame message before that activity starts
         EinzMessageHeader header = new EinzMessageHeader("startgame", "StartGame");
@@ -364,6 +361,17 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         super.onRestart();
         if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
             this.ourClient.getActionCallbackInterface().setLobbyUI(this);
+
+        Button startGameButton = (Button) findViewById(R.id.btn_start_game);
+        startGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                view.setEnabled(false);
+                onStartGameButtonClick();
+            }
+        });
+        startGameButton.setEnabled(true);
+
     }
 
     @Override

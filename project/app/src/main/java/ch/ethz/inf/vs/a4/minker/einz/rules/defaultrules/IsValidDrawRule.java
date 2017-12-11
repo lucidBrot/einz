@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules;
 
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
@@ -9,7 +10,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
  * @Josua: If you have different rules in mind for the rules.defaultrules, feel free to change this
  */
 
-public class IsValidDrawRule extends BasicGlobalRule {
+public class IsValidDrawRule extends BasicCardRule {
 
     @Override
     public String getName() {
@@ -22,12 +23,13 @@ public class IsValidDrawRule extends BasicGlobalRule {
         /*
          * This is only useful if it gets checked somewhere else if it is that players turn
          * and a player can not play anything after he draws cards. (e.g. NextTurnRule2 is active).
+         * Currently This CardRule gets assigned to the YELLOW_0 card just so that it works
+         * This is not clean and should be changed when someone has time
          */
     }
 
     @Override
-    public GlobalState onPlayAnyCard(GlobalState state, Card played){
-        state.nextTurn();
-        return state;
+    public boolean isValidDrawCardsPermissive(GlobalState state){
+        return true;
     }
 }
