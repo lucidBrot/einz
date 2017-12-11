@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
 
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,11 +42,14 @@ public class EinzPlayCardParser extends EinzParser {
         JSONObject cardJSON = body.getJSONObject("card");
         String ID = cardJSON.getString("ID");
         String origin = cardJSON.getString("origin");
-        Card card = new Card(ID, origin);
+
+        JSONObject playParams = cardJSON.optJSONObject("playParameters");
+
+        Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin, playParams);
 
         //put it all together
         EinzMessageBody emb = new EinzPlayCardMessageBody(card);
-        EinzMessage einzMessage = new EinzMessage(emh, emb);
+        EinzMessage einzMessage = new EinzMessage<>(emh, emb);
         return einzMessage;
     }
 

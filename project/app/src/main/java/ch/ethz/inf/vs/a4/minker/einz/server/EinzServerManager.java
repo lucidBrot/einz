@@ -715,10 +715,8 @@ public class EinzServerManager {
     public void onFinishTurn(String issuedByPlayer) {
         if(gamePhaseStarted) { // ignore otherwise
             getSFLock().writeLock().lock();
-            // TODO: call fabians on finish turn
-
+            getServerFunctionInterface().finishTurn(new Player(issuedByPlayer));
             getSFLock().writeLock().unlock();
-            throw new RuntimeException(new TodoException("Fabi plis inplinimt"));
         }
     }
 

@@ -1,5 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
+import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 
@@ -81,6 +84,18 @@ public class ServerFunction implements ServerFunctionDefinition {
     public void initialiseStandardGame(ThreadedEinzServer threadedEinzServer, ArrayList<Player> players) {
         if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
+            // TODO: if you do nothing here, it crashes
+            //      I added the same code here as in the other case, but that is for debug only
+            Log.w("ServerFunction", "using debug code!!!");
+            this.threadedEinzServer = threadedEinzServer;
+            globalState = new GlobalState(10, players);
+            this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
+            globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
+            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
+            globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
+            if (!DEBUG_MODE) {
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
+            }
         } else {
             this.threadedEinzServer = threadedEinzServer;
             globalState = new GlobalState(10, players);
@@ -264,11 +279,16 @@ public class ServerFunction implements ServerFunctionDefinition {
     private GameConfig createStandardConfig(List<Player> players) {
         Map<Card, Integer> numberOfCardsInGame = new HashMap<>();
         Set<Card> allCardsInGame = new HashSet<>();
+        CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
         for (CardText ct : CardText.values()) {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                        // Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                        // NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
+                        // TODO: either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
+                        Card card = cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+ct.indicator);
+
                         numberOfCardsInGame.put(card, 2);
                         allCardsInGame.add(card);
                     }
@@ -310,7 +330,9 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                        // Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                        // lowercase issue was here as well
+                        Card card = cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+ct.indicator);
                         //assign rules to the cards
                         result.assignRuleToCard(new PlayColorRule(), card);
                         result.assignRuleToCard(new PlayTextRule(), card);
@@ -327,14 +349,14 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
         }
 
-        for (CardColor cc : CardColor.values()) {
-            if (cc != CardColor.NONE) {
-                result.assignRuleToCard(new ChangeDirectionRule(), new Card(cc + "_" + CardText.SWITCHORDER.indicator, CardText.SWITCHORDER.type,
-                        CardText.SWITCHORDER, cc, "drawable", "card_" + CardText.SWITCHORDER.indicator + "_" + cc));
-                result.assignRuleToCard(new DrawTwoCardsRule(), new Card(cc + "_" + CardText.PLUSTWO.indicator, CardText.PLUSTWO.type,
-                        CardText.PLUSTWO, cc, "drawable", "card_" + CardText.PLUSTWO.indicator + "_" + cc));
-                result.assignRuleToCard(new SkipRule(), new Card(cc + "_" + CardText.STOP.indicator, CardText.STOP.type,
-                        CardText.STOP, cc, "drawable", "card_" + CardText.STOP.indicator + "_" + cc));
+        for (CardColor cc : CardColor.values()) { // TODO: I replaced your version below with one that uses CardLoader. Does that make sense?
+           
+            if(cc != CardColor.NONE){
+                result.assignRuleToCard(new ChangeDirectionRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.SWITCHORDER.indicator) );
+                result.assignRuleToCard(new DrawTwoCardsRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.PLUSTWO.indicator));
+                result.assignRuleToCard(new SkipRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.STOP.indicator));
+
+                // It might make sense to somewhere specify all IDs that exist, so that we don't have to guess
             }
         }
 

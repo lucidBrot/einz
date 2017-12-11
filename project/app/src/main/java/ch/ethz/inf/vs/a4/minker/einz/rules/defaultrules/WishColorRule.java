@@ -42,6 +42,11 @@ public class WishColorRule extends BasicCardRule {
 
         /*String result = config.getClientCallbackService().getSelectionFromPlayer(state.getActivePlayer(), options);
         wishedColor = CardColor.valueOf(result);*/ // TODO: did not compile
+        wishedColor = CardColor.valueOf(played.getPlayParameter("wishColorRule", "wishedColor")); // I added this as alternative idea (Eric, 10.12.2017)
+        // Idee: wenn die Karte gespielt wird, muss die UI sowieso wissed dass der user eine farbe auswählen muss. Also user direkt farbe auswählen lassen.
+        //      Danach die karte clientside mit diesem parameter setzen.
+        //      Wenn server die karte erhält wird diese regel getriggert und die liest den parameter aus.
+
         return state;
     }
 

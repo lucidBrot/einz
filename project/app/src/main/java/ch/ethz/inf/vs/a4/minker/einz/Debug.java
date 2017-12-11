@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardOrigin;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.client.TempClient;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -292,7 +293,7 @@ public class Debug {
 
     private static String debug_getPlayCardMessage() {
         EinzMessageHeader header=new EinzMessageHeader("playcard","PlayCard" );
-        Card card = new Card("card.lul.id", "bla", CardText.DEBUG, CardColor.BLUE, "", "");
+        Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance("yellow_1", CardOrigin.UNSPECIFIED.value);
         EinzMessageBody body  = new EinzPlayCardMessageBody(card);
         EinzMessage message = new EinzMessage<>(header, body);
         try {

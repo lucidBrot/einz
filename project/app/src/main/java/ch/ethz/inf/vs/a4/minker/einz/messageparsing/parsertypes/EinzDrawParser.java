@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
@@ -51,7 +52,7 @@ public class EinzDrawParser extends EinzParser {
         ArrayList<Card> cards = new ArrayList<>();
         for(int i=0; i< jcards.length();i++){
             JSONObject myCard = jcards.getJSONObject(i);
-            cards.add(new Card(myCard.getString("ID"), myCard.getString("origin")));
+            cards.add(EinzSingleton.getInstance().getCardLoader().getCardInstance(myCard.getString("ID"), myCard.getString("origin")));
         }
         return new EinzMessage<>(header, new EinzDrawCardsSuccessMessageBody(cards));
     }

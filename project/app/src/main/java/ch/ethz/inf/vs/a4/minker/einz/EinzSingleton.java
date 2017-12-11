@@ -10,9 +10,10 @@ public class EinzSingleton {
     private static EinzSingleton instance;
 
     private EinzClient client;
+    private final CardLoader cardLoader;
 
     private EinzSingleton(){
-
+        this.cardLoader = new CardLoader();
     }
 
     public static EinzSingleton getInstance(){
@@ -28,5 +29,9 @@ public class EinzSingleton {
 
     public EinzClient getEinzClient(){
         return client;
+    }
+
+    public CardLoader getCardLoader() {
+        return cardLoader;
     }
 }

@@ -1,5 +1,116 @@
 [
   {
+    "ID":"red_0", "name":"Red 0", "text":"ZERO", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_0_red"
+  },
+  {
+    "ID":"red_1", "name":"Red 1", "text":"ONE", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_1_red"
+  },
+  {
+    "ID":"red_2", "name":"Red 2", "text":"TWO", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_2_red"
+  },
+  {
+    "ID":"red_3", "name":"Red 3", "text":"THREE", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_3_red"
+  },
+  {
+    "ID":"red_4", "name":"Red 4", "text":"FOUR", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_4_red"
+  },
+  {
+    "ID":"red_5", "name":"Red 5", "text":"FIVE", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_5_red"
+  },
+  {
+    "ID":"red_6", "name":"Red 6", "text":"SIX", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_6_red"
+  },
+  {
+    "ID":"red_7", "name":"Red 7", "text":"SEVEN", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_7_red"
+  },
+  {
+    "ID":"red_8", "name":"Red 8", "text":"EIGHT", "color":"RED", "resourceGroup":"drawable","resourceName":"card_8_red"
+  },
+  {
+    "ID":"red_9", "name":"Red 9", "text":"NINE", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_9_red"
+  },
+  {
+    "ID":"red_take2", "name":"Red take2", "text":"PLUSTWO", "color":"RED", "resourceGroup":"drawable","resourceName":"card_take2_red"
+  },
+  {
+    "ID":"red_skip", "name":"Red skip", "text":"STOP", "color":"RED", "resourceGroup":"drawable", "resourceName":"card_skip_red"
+  },
+  
+  {
+    "ID":"green_0", "name":"Green 0", "text":"ZERO", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_0_green"
+  },
+  {
+    "ID":"green_1", "name":"Green 1", "text":"ONE", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_1_green"
+  },
+  {
+    "ID":"green_2", "name":"Green 2", "text":"TWO", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_2_green"
+  },
+  {
+    "ID":"green_3", "name":"Green 3", "text":"THREE", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_3_green"
+  },
+  {
+    "ID":"green_4", "name":"Green 4", "text":"FOUR", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_4_green"
+  },
+  {
+    "ID":"green_5", "name":"Green 5", "text":"FIVE", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_5_green"
+  },
+  {
+    "ID":"green_6", "name":"Green 6", "text":"SIX", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_6_green"
+  },
+  {
+    "ID":"green_7", "name":"Green 7", "text":"SEVEN", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_7_green"
+  },
+  {
+    "ID":"green_8", "name":"Green 8", "text":"EIGHT", "color":"GREEN", "resourceGroup":"drawable","resourceName":"card_8_green"
+  },
+  {
+    "ID":"green_9", "name":"Green 9", "text":"NINE", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_9_green"
+  },
+  {
+    "ID":"green_take2", "name":"Green take2", "text":"PLUSTWO", "color":"GREEN", "resourceGroup":"drawable","resourceName":"card_take2_green"
+  },
+  {
+    "ID":"green_skip", "name":"Green skip", "text":"STOP", "color":"GREEN", "resourceGroup":"drawable", "resourceName":"card_skip_green"
+  },
+
+  {
+    "ID":"blue_0", "name":"Blue 0", "text":"ZERO", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_0_blue"
+  },
+  {
+    "ID":"blue_1", "name":"Blue 1", "text":"ONE", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_1_blue"
+  },
+  {
+    "ID":"blue_2", "name":"Blue 2", "text":"TWO", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_2_blue"
+  },
+  {
+    "ID":"blue_3", "name":"Blue 3", "text":"THREE", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_3_blue"
+  },
+  {
+    "ID":"blue_4", "name":"Blue 4", "text":"FOUR", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_4_blue"
+  },
+  {
+    "ID":"blue_5", "name":"Blue 5", "text":"FIVE", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_5_blue"
+  },
+  {
+    "ID":"blue_6", "name":"Blue 6", "text":"SIX", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_6_blue"
+  },
+  {
+    "ID":"blue_7", "name":"Blue 7", "text":"SEVEN", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_7_blue"
+  },
+  {
+    "ID":"blue_8", "name":"Blue 8", "text":"EIGHT", "color":"BLUE", "resourceGroup":"drawable","resourceName":"card_8_blue"
+  },
+  {
+    "ID":"blue_9", "name":"Blue 9", "text":"NINE", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_9_blue"
+  },
+  {
+    "ID":"blue_take2", "name":"Blue take2", "text":"PLUSTWO", "color":"BLUE", "resourceGroup":"drawable","resourceName":"card_take2_blue"
+  },
+  {
+    "ID":"blue_skip", "name":"Blue skip", "text":"STOP", "color":"BLUE", "resourceGroup":"drawable", "resourceName":"card_skip_blue"
+  },
+
+  {
     "ID":"yellow_0", "name":"Yellow 0", "text":"ZERO", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_0_yellow"
   },
   {
@@ -30,18 +141,20 @@
     "ID":"yellow_9", "name":"Yellow 9", "text":"NINE", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_9_yellow"
   },
   {
-    "ID":"yellow_take2", "name":"Yellow take2", "text":"PLUSTWO", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_take2_yellow"
-  },
-  {
-    "ID":"yellow_rev", "name":"Yellow rev", "text":"SWITCHORDER", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_rev_yellow"
+    "ID":"yellow_take2", "name":"Yellow take2", "text":"PLUSTWO", "color":"YELLOW", "resourceGroup":"drawable","resourceName":"card_take2_yellow"
   },
   {
     "ID":"yellow_skip", "name":"Yellow skip", "text":"STOP", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_skip_yellow"
   },
+  
   {
-    "ID":"yellow_choose", "name":"Yellow choose", "text":"CHANGECOLOR", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_choose_yellow"
+    "ID":"take4", "name":"take4", "text":"CHANGECOLORPLUSFOUR", "color":"NONE", "resourceGroup":"drawable", "resourceName":"card_take4"
   },
   {
-    "ID":"yellow_take4", "name":"Yellow take4", "text":"CHANGECOLORPLUSFOUR", "color":"YELLOW", "resourceGroup":"drawable", "resourceName":"card_take4_yellow"
+    "ID":"choose", "name":"choose", "text":"CHANGECOLOR", "color":"NONE", "resourceGroup":"drawable", "resourceName":"card_choose_2"
+  },
+  {
+    "ID":"debug", "name":"debug", "text":"DEBUG", "color":"NONE", "resourceGroup":"drawable", "resourceName":"card_choose"
   }
+
 ]
