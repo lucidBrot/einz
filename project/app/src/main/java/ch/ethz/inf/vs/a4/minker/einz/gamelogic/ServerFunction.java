@@ -322,7 +322,9 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                        // Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
+                        // lowercase issue was here as well
+                        Card card = cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+ct.indicator);
                         //assign rules to the cards
                         result.assignRuleToCard(new PlayColorRule(), card);
                         result.assignRuleToCard(new PlayTextRule(), card);
@@ -339,12 +341,19 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
         }
 
-        for (CardColor cc : CardColor.values()) {
+        for (CardColor cc : CardColor.values()) { // TODO: I replaced your version below with one that uses CardLoader. Does that make sense?
+            /*
             if (cc != CardColor.NONE) {
                 result.assignRuleToCard(new ChangeDirectionRule(), new Card(cc + "_" + CardText.SWITCHORDER.indicator, CardText.SWITCHORDER.type,
                         CardText.SWITCHORDER, cc, "drawable", "card_" + CardText.SWITCHORDER.indicator + "_" + cc));
                 result.assignRuleToCard(new DrawTwoCardsRule(), new Card(cc + "_" + CardText.PLUSTWO.indicator, CardText.PLUSTWO.type,
                         CardText.PLUSTWO, cc, "drawable", "card_" + CardText.PLUSTWO.indicator + "_" + cc));
+            }*/
+
+            if(cc != CardColor.NONE){
+                result.assignRuleToCard(new ChangeDirectionRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.SWITCHORDER.indicator) );
+                result.assignRuleToCard(new DrawTwoCardsRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.PLUSTWO.indicator));
+                // It might make sense to somewhere specify all IDs that exist, so that we don't have to guesss
             }
         }
 

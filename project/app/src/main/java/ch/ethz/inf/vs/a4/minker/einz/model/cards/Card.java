@@ -31,6 +31,8 @@ public class Card {
 
 
     /**
+     * <b>Are you sure you shouldn't be using {@link ch.ethz.inf.vs.a4.minker.einz.CardLoader#getCardInstance(String, String, JSONObject)} instead?</b><br>
+     *
      * @param ID             see 'specs' in {@link ch.ethz.inf.vs.a4.minker.einz.R.raw#card_definition}
      * @param name           can be any String. This should probably be specified somewhere. Currently, all I know is that it has the format <code>"Yellow 1"</code>
      *                       in {@link ch.ethz.inf.vs.a4.minker.einz.R.raw#card_definition}
@@ -67,6 +69,7 @@ public class Card {
     }
 
     /**
+     * <b>"Deprecated" because you should use CardLoader in most cases!</b><br>
      * Calls {@link #Card(String, String, CardText, CardColor, String, String, String, JSONObject)} with <code>playParameters = null</code>
      *
      * @param ID     see 'specs' in {@link ch.ethz.inf.vs.a4.minker.einz.R.raw#card_definition}
@@ -76,6 +79,7 @@ public class Card {
      * @param color  can be any of {@link CardColor}
      * @param origin origin can be any of {@link CardOrigin} or a username
      */
+    @Deprecated
     public Card(String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName, String origin) {
         this(ID, name, text, color, resourceGroup, resourceName, origin, null);
     }
