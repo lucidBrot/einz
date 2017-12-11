@@ -406,7 +406,20 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         // TODO: implement onCustomActionResponse
     }
 
-    private void runOnMainThread(Runnable runnable) {
+    private void runOnMainThread(final Runnable runnable) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(gameUI==null){
+                    try {
+                        sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                } // wait for gameUI to exist, then perform the action
+                runnable.run();
+            }
+        });
         Handler mainHandler = new Handler(this.applicationContext.getMainLooper());
         mainHandler.post(runnable);
     }
