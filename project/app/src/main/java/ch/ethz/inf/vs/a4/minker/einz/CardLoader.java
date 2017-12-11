@@ -41,7 +41,8 @@ public class CardLoader {
     public Card getCardInstance(String cardID, String cardOrigin, @Nullable JSONObject playParameters) {
         if (!cardMapping.containsKey(cardID)) {
             //return null;
-            return getCardInstance("yellow_1", CardOrigin.STACK.value); // TODO: remove this debug card once all cards are registered in the json resource
+            // TODO: remove this debug card once all cards are registered in the json resource
+            return new Card("blue_1", CardOrigin.STACK.value, CardText.DEBUG, CardColor.BLUE, "drawable", "card_1_blue");
         }
         CardAttributeContainer params = cardMapping.get(cardID);
         return new Card(cardID, params.name, params.text, params.color, params.resourceGroup, params.resourceName, cardOrigin, playParameters);
