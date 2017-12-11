@@ -112,9 +112,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.acitivity_player);
 
-        this.ourClient = EinzSingleton.getInstance().getEinzClient();
-        ourClient.getActionCallbackInterface().setGameUI(this);
-
         this.backgroundThread.start();
         this.backgroundLooper = this.backgroundThread.getLooper();
         this.backgroundHandler = new Handler(this.backgroundLooper);
@@ -187,14 +184,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         cardHeight = (size.y / (3*mGrid.getRowCount()));
         initCards();
 
-        addPlayerToList("silvia");
-        addPlayerToList("josua");
-        addPlayerToList("clemens");
-        addPlayerToList("chris");
-        addPlayerToList("fabian");
-        addPlayerToList("eric");
-        addPlayerToList("mr.iamsounbelievable");
-
         //add cardDrawables to mgrid
         /*
         for (int i = 0; i < cardDrawables.size(); i++) {
@@ -207,6 +196,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             itemView.setOnTouchListener(new DragCardListener());
             mGrid.addView(itemView);
         }*/
+        this.ourClient = EinzSingleton.getInstance().getEinzClient();
+        ourClient.getActionCallbackInterface().setGameUI(this);
     }
 
     private int calculateNewIndex(float x, float y) {
