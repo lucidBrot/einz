@@ -732,4 +732,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             return false;
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // TODO: directly stop server and client
+        //      currently, back only takes the user to the LobbyActivity, where they have to press back again.
+    }
 }
