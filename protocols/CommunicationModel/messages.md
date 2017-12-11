@@ -879,12 +879,7 @@ Possibly in the future supported: "transferServer"
 Every possible Action has the option to provide parameters custom to that action. E.g. the playCard action needs to know what cards can be played:
 
 ```json
-{"playCard":
- {
-   "actionName":"playableCards",
-   "parameters":["cardID1", "cardID1337"]
- }
-}
+{"actionName":"playCard","parameters":{"playableCards":["red_3","green_rev"]}}
 ```
 
 
