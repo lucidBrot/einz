@@ -1,13 +1,17 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import android.content.Context;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.InvalidResourceFormatException;
 import com.google.common.io.Resources;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
@@ -60,6 +64,19 @@ public class CardLoader {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void loadCardsFromResourceFile(Context applicationContext, int resourceFile) throws JSONException{
+        InputStream jsonStream = applicationContext.getResources().openRawResource(resourceFile);
+        JSONArray jsonArray = new JSONArray(convertStreamToString(jsonStream));
+        this.loadCards(jsonArray);
+    }
+
+    // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
+    // utility function
+    private String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 
     private class CardAttributeContainer{
