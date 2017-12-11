@@ -285,13 +285,13 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     @Override
     public void onDrawCardsFailure(EinzMessage<EinzDrawCardsFailureMessageBody> message) {
-        String reason = message.getBody().getReason();
-        Toast.makeText(this.applicationContext,"You're not able to draw a card because " + reason, Toast.LENGTH_SHORT).show();
+        final String reason = message.getBody().getReason();
         final EinzMessage<EinzDrawCardsFailureMessageBody> msg = message;
 
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
+                Toast.makeText(applicationContext,"You're not able to draw a card because " + reason, Toast.LENGTH_SHORT).show();
                 EinzMessage<EinzDrawCardsFailureMessageBody> msg2 =msg;
                 gameUI.onDrawCardsFailure(msg2);
             }
