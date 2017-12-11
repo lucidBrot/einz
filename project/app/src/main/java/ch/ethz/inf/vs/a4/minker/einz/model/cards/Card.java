@@ -17,9 +17,9 @@ public class Card {
     //color determines the color of the card. If the card has no color, it is "none"
     private final CardColor color;
 
-    private final String ID;
+    private final String ID; // unique identifier that maps to name, resourceName and resourceGroup
 
-    private final String name;
+    private final String name; // name that can be displayed to the user in the UI
 
     private final String resourceName;
 
