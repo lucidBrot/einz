@@ -261,10 +261,10 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_blue"));
-        /*addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));*/
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
     }
 
     public boolean checkCardsStillValid(ArrayList<Card> cardlist){
