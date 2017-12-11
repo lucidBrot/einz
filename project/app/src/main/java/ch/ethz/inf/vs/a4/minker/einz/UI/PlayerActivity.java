@@ -79,6 +79,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private LayoutInflater inflater;
     private final double cardSizeRatio = 351.0/251.0;
     private boolean canDrawCard,canEndTurn;
+    private Card lastPlayedCard = null;
 
     @Override
     protected void onStop() {
@@ -250,6 +251,17 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         mGrid.addView(itemView);
     }
 
+    private void removeCardFromHand(Card cardRemoved){
+        if(cardRemoved != null) {
+            cards.remove(cardRemoved);
+            mGrid.removeView(mGrid.findViewWithTag(cardRemoved));
+        }
+    }
+
+    private void setlastplayedCard(Card lastplayedCard){
+        this.lastPlayedCard = lastplayedCard;
+    }
+
     public void setTopPlayedCard(Card cardToSet) {
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
@@ -257,6 +269,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
         trayStack.setImageBitmap(bitmapResized);
+        //setlastplayedCard(cardToSet);
     }
 
     private void initCards(){
@@ -498,6 +511,12 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
+        if(message.getBody().getSuccess().equals("true")){
+               if(lastPlayedCard != null){
+                   removeCardFromHand(lastPlayedCard);
+               }
+               setTopPlayedCard(lastPlayedCard);
+        }
     }
 
     @Override
@@ -774,7 +793,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     case DragEvent.ACTION_DROP:
                         ImageView tmpView = (ImageView) view;
 
-                        setTopPlayedCard((Card)tmpView.getTag());
+                        setlastplayedCard((Card)tmpView.getTag());
                         //remove card from inner cardlist
                          playCard((Card)tmpView.getTag());
 
