@@ -233,6 +233,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                 MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "It is not your turn.");
             }
             return null; //TODO: Check in rules whether its a players turn
+            // TODO: why can I draw forever, every time a card?
         }
         if (!CardRuleChecker.checkIsValidDrawCards(globalState, gameConfig)) {
             if (!DEBUG_MODE) {
