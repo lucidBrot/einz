@@ -127,6 +127,7 @@ public class Card {
         try {
             card.put("ID", this.ID);
             card.put("origin", this.origin);
+            card.put("playParameters", this.playParameters);
         } catch (JSONException e) {
             e.printStackTrace(); // this will not happen. EVER.
         }

@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz;
 
 import android.content.Context;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.InvalidResourceFormatException;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardOrigin;
 import com.google.common.io.Resources;
 
 import org.json.JSONArray;
@@ -17,6 +18,8 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 
+import javax.annotation.Nullable;
+
 /**
  * Created by Josua on 11/28/17.
  */
@@ -29,16 +32,29 @@ public class CardLoader {
         cardMapping = new HashMap<>();
     }
 
-    /**
-     * @param cardID
-     * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings
-     */
-    public Card getCardInstance(String cardID) {
+    public Card getCardInstance(String cardID, String cardOrigin, @Nullable JSONObject playParameters){
         if(!cardMapping.containsKey(cardID)){
             return null;
         }
         CardAttributeContainer params = cardMapping.get(cardID);
-        return new Card(cardID, params.name, params.text, params.color, params.resourceGroup, params.resourceName);
+        return new Card(cardID, params.name, params.text, params.color, params.resourceGroup, params.resourceName, cardOrigin, playParameters);
+    }
+
+    /**
+     * @param cardID
+     * @param cardOrigin
+     * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings
+     */
+    public Card getCardInstance(String cardID, String cardOrigin){
+        return getCardInstance(cardID, cardOrigin, null);
+    }
+
+    /**
+     * @param cardID
+     * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings and as origin {@link CardOrigin#UNSPECIFIED}
+     */
+    public Card getCardInstance(String cardID) {
+        return getCardInstance(cardID, CardOrigin.UNSPECIFIED.value);
     }
 
 
@@ -66,6 +82,14 @@ public class CardLoader {
         }
     }
 
+    /**
+     * @param applicationContext
+     * @param resourceFile A file containing a JSONArray of JSONObjects which represent cards in the form
+     *                     {\n" +
+    "    \"ID\":\"yellow_0\", \"name\":\"Yellow 0\", \"text\":\"ZERO\", \"color\":\"YELLOW\", \"resourceGroup\":\"drawable\", \"resourceName\":\"card_0_yellow\",\n" +
+    "  }
+     * @throws JSONException
+     */
     public void loadCardsFromResourceFile(Context applicationContext, int resourceFile) throws JSONException{
         InputStream jsonStream = applicationContext.getResources().openRawResource(resourceFile);
         JSONArray jsonArray = new JSONArray(convertStreamToString(jsonStream));
