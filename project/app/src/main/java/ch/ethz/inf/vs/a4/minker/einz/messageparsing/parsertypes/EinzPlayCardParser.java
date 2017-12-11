@@ -48,7 +48,7 @@ public class EinzPlayCardParser extends EinzParser {
 
         //put it all together
         EinzMessageBody emb = new EinzPlayCardMessageBody(card);
-        EinzMessage einzMessage = new EinzMessage(emh, emb);
+        EinzMessage einzMessage = new EinzMessage<>(emh, emb);
         return einzMessage;
     }
 
