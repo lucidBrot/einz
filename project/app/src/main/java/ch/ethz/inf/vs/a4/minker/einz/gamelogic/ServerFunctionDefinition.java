@@ -87,4 +87,6 @@ public interface ServerFunctionDefinition {
      */
     public void onCustomActionMessage(String user, EinzMessage<EinzCustomActionMessageBody> message);
 
+    public boolean finishTurn(Player p);
+
 }
