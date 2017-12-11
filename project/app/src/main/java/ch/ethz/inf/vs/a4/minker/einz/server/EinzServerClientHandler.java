@@ -187,7 +187,9 @@ public class EinzServerClientHandler implements Runnable, SendMessageCallback{
                     Log.d("ESCH", "closed clientSocket");
                     return;
                 } else {
-                    Log.d("ESCH", "received line: "+line);
+                    if(Debug.logKeepaliveSpam || !line.equals("{\"header\":{\"messagegroup\":\"networking\",\"messagetype\":\"KeepAlive\"},\"body\":{}}")){
+                        Log.d("ESCH", "received line: "+line);
+                    }
                     this.keepaliveScheduler.onAnyMessageReceived();
                     if(parentEinzServer.DEBUG_ECHO) sendMessage("Your Package was: "+line + "\r\n"); // echo back the same packet // T/ODO: don't echo back
                     runAction(parseMessage(line));
