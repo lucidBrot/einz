@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
@@ -21,7 +22,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -48,7 +48,6 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterR
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
-import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardOrigin;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 
 import java.util.ArrayList;
@@ -167,6 +166,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             @Override
             public void onClick(View view) {
                 endTurn();
+            }
+        });
+
+        Button endGame = findViewById(R.id.btn_end_game);
+        colorWheelBlueButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goBackToMainMenu();
             }
         });
 
@@ -367,7 +374,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         if(!allPlayers.contains(addedPlayer)) {
             LinearLayout playerList = findViewById(R.id.ll_playerlist);
 
-            CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerlist, playerList, false);
+            CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerlist_element, playerList, false);
             // false because don't add view yet - I first want to set some text
 
             TextView tv_username = usercard.findViewById(R.id.tv_playerlist_username);
@@ -458,6 +465,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         this.canEndTurn = canEndTurn;
     }
 
+    public void goBackToMainMenu(){
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
 
@@ -514,7 +526,25 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
+        LinearLayout endscreen = findViewById(R.id.ll_endscreen);
+        endscreen.setVisibility(View.VISIBLE);
+        LinearLayout winningPlayers = findViewById(R.id.ll_winning_players);
+        HashMap<String,String> playerPoints = message.getBody().getPoints();
+        for(String player:allPlayers){
 
+            CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerpointlist_element, winningPlayers, false);
+                // false because don't add view yet - I first want to set some text
+
+            TextView tv_username = usercard.findViewById(R.id.tv_playerlist_username);
+            TextView tv_points = usercard.findViewById(R.id.tv_nr_of_points);
+
+                // set text
+            tv_username.setText(player);
+            tv_points.setText(String.valueOf(playerPoints.get(player)));
+
+                // add view
+            winningPlayers.addView(usercard);
+        }
     }
 
     @Override
