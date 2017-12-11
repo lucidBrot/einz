@@ -668,6 +668,7 @@ public class EinzServerManager {
             EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCardResponse");
             EinzPlayCardResponseMessageBody body= new EinzPlayCardResponseMessageBody("false");
             EinzMessage<EinzPlayCardResponseMessageBody> response = new EinzMessage<>(header, body);
+            Log.d("servMan/playCard", "Not allowing "+issuedByPlayer+" to play a card because the gamePhase hasn't started yet");
             try {
                 server.sendMessageToUser(issuedByPlayer, response);
             } catch (UserNotRegisteredException e) {
