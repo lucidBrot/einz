@@ -52,5 +52,7 @@ public interface GameUIInterface {
 
     void onUpdateLobbyList(String admin, ArrayList<String> players, ArrayList<String> spectators);
 
+    void setTopCard(Card card);
+
     // TODO: customActionRule..?
 }

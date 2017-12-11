@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.ClipData;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
@@ -77,6 +78,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private ImageView trayStack;
     private ImageView drawPile;
     private LayoutInflater inflater;
+    private final double cardSizeRatio = 351.0/251.0;
+    private boolean canPlayCard,canDrawCard,canEndTurn;
 
     @Override
     protected void onStop() {
@@ -235,15 +238,27 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         localImgView.setTag(cardAdded);
 
-        localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext())); // TODO: @Chris fix OOM error. Seems to happen at the 12th addcard
+        //((BitmapDrawable)localImgView.getDrawable()).getBitmap().recycle();
+
+        //localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext())); // TODO: @Chris fix OOM error. Seems to happen at the 12th addcard
         localImgView.getLayoutParams().width  = cardWidth;
         localImgView.getLayoutParams().height = cardHeight;
+
+        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()))).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, (int)(1.0/cardSizeRatio * (double)cardHeight),cardHeight, false);
+        localImgView.setImageBitmap(bitmapResized);
+
         itemView.setOnTouchListener(new DragCardListener());
         mGrid.addView(itemView);
     }
 
-    private void setTopPlayPileCard(Card cardPlaced){
-        trayStack.setImageResource(cardPlaced.getImageRessourceID(getApplicationContext()));
+    public void setTopPlayedCard(Card cardToSet) {
+
+        //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
+
+        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
+        trayStack.setImageBitmap(bitmapResized);
     }
 
     private void initCards(){
@@ -261,10 +276,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_2_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_blue"));
-        /*addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));*/
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
     }
 
     public boolean checkCardsStillValid(ArrayList<Card> cardlist){
@@ -343,6 +359,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void setAvailableActions(ArrayList<String> actions){
         availableActions = actions;
+        
     }
 
     public void addPlayerToList(String addedPlayer){
@@ -462,7 +479,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
-
     }
 
     @Override
@@ -500,6 +516,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         setAvailableActions(actions);
     }
 
+
+
     @Override
     public void playerStartedTurn(String playerThatStartedTurn) {
         if (playerThatStartedTurn.equals(ourClient.getUsername())) {
@@ -535,7 +553,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         for(String currPlayer:playerList){
             addPlayerToList(currPlayer);
         }
-
     }
 
     @Override
@@ -561,6 +578,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     public void onUpdateLobbyList(String admin, ArrayList<String> players, ArrayList<String> spectators) {
         // TODO: change display of players when somebody left.
+    }
+
+    @Override
+    public void setTopCard(Card card) {
+        setTopPlayedCard(card);
     }
 
     class DragCardListener implements View.OnTouchListener {
@@ -657,7 +679,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                 switch (event.getAction()) {
 
                     case DragEvent.ACTION_DROP:
-                        //drawCard();
+                        drawCard();
                         System.out.println("drew card");
 
                         break;
@@ -712,15 +734,15 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     case DragEvent.ACTION_DROP:
                         ImageView tmpView = (ImageView) view;
 
-                        setTopPlayPileCard((Card)tmpView.getTag());
+                        setTopPlayedCard((Card)tmpView.getTag());
                         //remove card from inner cardlist
                          playCard((Card)tmpView.getTag());
 
-                        cards.remove((Card) tmpView.getTag());
+                        //cards.remove((Card) tmpView.getTag());
                         //System.out.println(cards);
 
                         //remove card from View
-                        mGrid.removeView(view);
+                        //mGrid.removeView(view);
                         view.setVisibility(View.VISIBLE);
 
 
