@@ -4,6 +4,7 @@ import android.util.Log;
 
 import ch.ethz.inf.vs.a4.minker.einz.model.Player;
 
+import org.json.JSONException;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -18,12 +19,23 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 public class ServerFunctionTest {
     @Test
     public void initialiseStandardGameTest() {
+        initializeCardLoader();
         ArrayList<Player> players = new ArrayList<>();
         players.add(new Player("Peter"));
         players.add(new Player("Paul"));
         ServerFunction s = new ServerFunction(true);
         s.initialiseStandardGame(null, players);
         s.startGame();
+    }
+
+    private void initializeCardLoader() {
+        CardLoader loader = EinzSingleton.getInstance().getCardLoader();
+        try {
+            loader.loadCardsFromResourceFile(this, R.raw.card_definition);
+        } catch (JSONException e) {
+            Log.e("MainActivity", "Failed to initialize CardLoader.");
+            e.printStackTrace();
+        }
     }
 
 
