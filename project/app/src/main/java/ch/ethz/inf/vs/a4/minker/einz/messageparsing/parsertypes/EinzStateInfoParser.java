@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 
 import android.util.Log;
 
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
@@ -65,7 +66,7 @@ public class EinzStateInfoParser extends EinzParser {
 
                 JSONObject playParams = cardJSON.optJSONObject("playParameters");
 
-                Card card = new Card(ID, origin, playParams);
+                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin, playParams);
                 stack.add(card);
             }
             String whoseturn = globalstateJSON.getString("whoseturn");
@@ -86,7 +87,7 @@ public class EinzStateInfoParser extends EinzParser {
 
                 JSONObject playParams = cardJSON.optJSONObject("playParameters");
 
-                Card card = new Card(ID, origin, playParams);
+                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin, playParams);
                 // Card card = new Card(ID, origin, CardText.DEBUG, CardColor.BLUE, "drawable", "card_1_blue"); // TODO: use CardLoader that is somehow globally available
                 hand.add(card);
             }

@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.model;
 
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
 import org.json.JSONArray;
@@ -310,7 +311,9 @@ public class GlobalState {
             JSONObject cardObject = stack.optJSONObject(i);
 
             JSONObject playParams = cardObject.optJSONObject("playParameters");
-            Card card = new Card(cardObject.getString("ID"), cardObject.getString("origin"), playParams);
+            Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(
+                            cardObject.getString("ID"),
+                            cardObject.getString("origin"), playParams);
             deserializedState.discardPile.add(card);
         }
 

@@ -28,12 +28,18 @@ public class CardLoader {
     private Map<String, CardAttributeContainer> cardMapping;
 
 
-    public CardLoader(){
+    public CardLoader() {
         cardMapping = new HashMap<>();
     }
 
-    public Card getCardInstance(String cardID, String cardOrigin, @Nullable JSONObject playParameters){
-        if(!cardMapping.containsKey(cardID)){
+    /**
+     * @param cardID         the ID
+     * @param cardOrigin     some username or a {@link CardOrigin} string
+     * @param playParameters null or some JSONObject of the form  <code>{"ruleWish":{"wishForColor":"blue"},"ruleDank":{"xXx":"1337"}}</code>
+     * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings and as origin {@link CardOrigin#UNSPECIFIED}
+     */
+    public Card getCardInstance(String cardID, String cardOrigin, @Nullable JSONObject playParameters) {
+        if (!cardMapping.containsKey(cardID)) {
             return null;
         }
         CardAttributeContainer params = cardMapping.get(cardID);
@@ -45,7 +51,7 @@ public class CardLoader {
      * @param cardOrigin
      * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings
      */
-    public Card getCardInstance(String cardID, String cardOrigin){
+    public Card getCardInstance(String cardID, String cardOrigin) {
         return getCardInstance(cardID, cardOrigin, null);
     }
 
@@ -60,7 +66,7 @@ public class CardLoader {
 
     public void loadCards(JSONArray cardDefinitions) throws JSONException {
 
-        for(int i = 0; i < cardDefinitions.length(); i++){
+        for (int i = 0; i < cardDefinitions.length(); i++) {
             try {
                 JSONObject cardObject = cardDefinitions.getJSONObject(i);
 
@@ -76,7 +82,7 @@ public class CardLoader {
 
                 CardAttributeContainer params = new CardAttributeContainer(name, cardText, cardColor, resourceGroup, resourceName);
                 cardMapping.put(ID, params);
-            } catch (IllegalArgumentException e){
+            } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }
         }
@@ -84,13 +90,13 @@ public class CardLoader {
 
     /**
      * @param applicationContext
-     * @param resourceFile A file containing a JSONArray of JSONObjects which represent cards in the form
-     *                     {\n" +
-    "    \"ID\":\"yellow_0\", \"name\":\"Yellow 0\", \"text\":\"ZERO\", \"color\":\"YELLOW\", \"resourceGroup\":\"drawable\", \"resourceName\":\"card_0_yellow\",\n" +
-    "  }
+     * @param resourceFile       A file containing a JSONArray of JSONObjects which represent cards in the form
+     *                           {\n" +
+     *                           "    \"ID\":\"yellow_0\", \"name\":\"Yellow 0\", \"text\":\"ZERO\", \"color\":\"YELLOW\", \"resourceGroup\":\"drawable\", \"resourceName\":\"card_0_yellow\",\n" +
+     *                           "  }
      * @throws JSONException
      */
-    public void loadCardsFromResourceFile(Context applicationContext, int resourceFile) throws JSONException{
+    public void loadCardsFromResourceFile(Context applicationContext, int resourceFile) throws JSONException {
         InputStream jsonStream = applicationContext.getResources().openRawResource(resourceFile);
         JSONArray jsonArray = new JSONArray(convertStreamToString(jsonStream));
         this.loadCards(jsonArray);
@@ -103,14 +109,14 @@ public class CardLoader {
         return s.hasNext() ? s.next() : "";
     }
 
-    private class CardAttributeContainer{
+    private class CardAttributeContainer {
         public String name;
         public CardText text;
         public CardColor color;
         public String resourceGroup;
         public String resourceName;
 
-        CardAttributeContainer(String name, CardText text, CardColor color, String resourceGroup, String resourceName){
+        CardAttributeContainer(String name, CardText text, CardColor color, String resourceGroup, String resourceName) {
             this.name = name;
             this.text = text;
             this.color = color;

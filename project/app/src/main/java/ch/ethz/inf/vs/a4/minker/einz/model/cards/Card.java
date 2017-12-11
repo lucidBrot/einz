@@ -30,6 +30,15 @@ public class Card {
     private final JSONObject playParameters; // parameters that rules may ask for, but can also be unset. E.g. what color a wish card wishes for. Is allowed to be null
 
 
+    /**
+     * @param ID             see 'specs' in {@link ch.ethz.inf.vs.a4.minker.einz.R.raw#card_definition}
+     * @param name           can be any String. This should probably be specified somewhere. Currently, all I know is that it has the format <code>"Yellow 1"</code>
+     *                       in {@link ch.ethz.inf.vs.a4.minker.einz.R.raw#card_definition}
+     * @param text           can be any of {@link CardText}
+     * @param color          can be any of {@link CardColor}
+     * @param origin         origin can be any of {@link CardOrigin} or a username
+     * @param playParameters allowed to be <code>null</code>, otherwise a valid JSONObject, see messages.md
+     */
     public Card(String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName, String origin, JSONObject playParameters) {
         this.ID = ID;
         this.name = name;
@@ -41,49 +50,34 @@ public class Card {
         this.playParameters = playParameters;
     }
 
+    /**
+     * Calls {@link #Card(String, String, CardText, CardColor, String, String, String, JSONObject)}
+     * with <code>playParameters = null</code> and <code>origin = CardOrigin.UNSPECIFIED.value</code>
+     *
+     * @param ID    see 'specs' in {@link ch.ethz.inf.vs.a4.minker.einz.R.raw#card_definition}
+     * @param name  can be any String. This should probably be specified somewhere. Currently, all I know is that it has the format <code>"Yellow 1"</code>
+     *              in {@link ch.ethz.inf.vs.a4.minker.einz.R.raw#card_definition}
+     * @param text  can be any of {@link CardText}
+     * @param color can be any of {@link CardColor}
+     */
     public Card(String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName) {
-        this(ID, name, text, color, resourceGroup, resourceName, CardOrigin.UNSPECIFIED.value);
-    }
-
-    public Card(String ID, String origin, JSONObject playParameters){
-        this(ID, "DEBUG", CardText.DEBUG, CardColor.BLUE, "DEBUG", "DEBUG", origin, playParameters);
-        // TODO: get Card from CardLoader instead of above constructor
-        // playParameters is allowed to be null
+        this(ID, name, text, color, resourceGroup, resourceName, CardOrigin.UNSPECIFIED.value, null);
     }
 
     /**
-     * @param ID
-     * @param name
-     * @param text
-     * @param color
-     * @param origin origin can be any of CardOrigin or a username
+     * Calls {@link #Card(String, String, CardText, CardColor, String, String, String, JSONObject)} with <code>playParameters = null</code>
+     *
+     * @param ID     see 'specs' in {@link ch.ethz.inf.vs.a4.minker.einz.R.raw#card_definition}
+     * @param name   can be any String. This should probably be specified somewhere. Currently, all I know is that it has the format <code>"Yellow 1"</code>
+     *               in {@link ch.ethz.inf.vs.a4.minker.einz.R.raw#card_definition}
+     * @param text   can be any of {@link CardText}
+     * @param color  can be any of {@link CardColor}
+     * @param origin origin can be any of {@link CardOrigin} or a username
      */
     public Card(String ID, String name, CardText text, CardColor color, String resourceGroup, String resourceName, String origin) {
         this(ID, name, text, color, resourceGroup, resourceName, origin, null);
     }
 
-    /**
-     *
-     * @param ID
-     * @param origin
-     */
-    public Card(String ID, String origin) {
-        this(ID, origin, (JSONObject) null);
-    }
-//    /**
-//    * param origin origin can be any of CardOrigin or a username
-//     */
-//    public Card (String ID, String origin){
-//        Card card = new CardLoader().getCardInstance(ID); // does not work because no cards are loaded with a new instance
-//        if(card == null) {
-//            throw new UnmappedCardIDException("ID: "+ID); // most probable cause
-//        }
-//        this.ID=card.ID;
-//        this.name=card.name;
-//        this.text=card.text;
-//        this.color=card.color;
-//        this.origin=origin;
-//    }
 
     public String getOrigin() {
         return origin;
@@ -168,8 +162,8 @@ public class Card {
      */
     public String getPlayParameter(String paramKey, String paramName) {
         JSONObject obj = getPlayParameters(paramKey);
-        if(obj==null){
-            return  null;
+        if (obj == null) {
+            return null;
         }
         try {
             return obj.getString(paramName);
