@@ -23,4 +23,19 @@ public class Player extends Participant {
         this.hand = new ArrayList<>();
     }
 
+    /**
+     * Like <code>List.remove()</code>, but without needing to globally overwrite equals. Instead, this only compares the ID and removes the first match.
+     * <br>Do not use if the cards would be distinguished by more.
+     * @param card
+     * @return
+     */
+    public void removeCardFromHandWhereIDMatches(Card card){
+        for(Card c : this.hand){
+            if(c.getID().equals(card.getID())){
+                this.hand.remove(c);
+                break;
+            }
+        }
+    }
+
 }
