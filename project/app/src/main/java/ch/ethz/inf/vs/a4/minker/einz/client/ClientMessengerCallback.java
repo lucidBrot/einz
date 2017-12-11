@@ -322,7 +322,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         final ArrayList<Card> handtemp = message.getBody().getPlayerState().getHand();
         final ArrayList<String> actionstemp = message.getBody().getPlayerState().getPossibleActionsNames();
         final HashMap<String,String> numCardsInHandOfEachPlayer = message.getBody().getGlobalstate().getNumCardsInHand();
-        final Card topCard = message.getBody().getGlobalstate().getStack().get(message.getBody().getGlobalstate().getStack().size());
+        final Card topCard = message.getBody().getGlobalstate().getStack().get(message.getBody().getGlobalstate().getStack().size()-1);
 
 
         Runnable runnable = new Runnable() {

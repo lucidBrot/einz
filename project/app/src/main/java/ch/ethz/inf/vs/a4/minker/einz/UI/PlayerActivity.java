@@ -79,7 +79,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private ImageView drawPile;
     private LayoutInflater inflater;
     private final double cardSizeRatio = 351.0/251.0;
-    private boolean canPlayCard,canDrawCard,canEndTurn;
+    private boolean canDrawCard,canEndTurn;
 
     @Override
     protected void onStop() {
@@ -359,7 +359,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void setAvailableActions(ArrayList<String> actions){
         availableActions = actions;
-        
+        //canPlayCard = availableActions.contains("drawCards");
     }
 
     public void addPlayerToList(String addedPlayer){
@@ -441,6 +441,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         }
     }
 
+    public void setCanDrawCard(boolean canDrawCard) {
+
+        this.canDrawCard = canDrawCard;
+
+        if(canDrawCard){
+            drawPile = findViewById(R.id.draw_pile);
+            drawPile.setOnTouchListener(new DrawCardListener());
+        } else {
+            drawPile = findViewById(R.id.draw_pile);
+            drawPile.setOnTouchListener(null);
+        }
+    }
+
+    public void setCanEndTurn(boolean canEndTurn) {
+        this.canEndTurn = canEndTurn;
+    }
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
@@ -521,6 +537,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     public void playerStartedTurn(String playerThatStartedTurn) {
         if (playerThatStartedTurn.equals(ourClient.getUsername())) {
+
+            setCanDrawCard(true);
+
             Context context = getApplicationContext();
             CharSequence text = "It's your turn " + ourClient.getUsername();
             int duration = Toast.LENGTH_SHORT;
