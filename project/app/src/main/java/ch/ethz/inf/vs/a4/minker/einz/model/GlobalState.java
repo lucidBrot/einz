@@ -279,7 +279,7 @@ public class GlobalState {
         for(Card card : discardPile){
             JSONObject cardObj = new JSONObject();
             cardObj.put("ID",card.getID());
-            cardObj.put("origin", card.origin);
+            cardObj.put("origin", card.getOrigin());
             stack.put(cardObj);
         }
 

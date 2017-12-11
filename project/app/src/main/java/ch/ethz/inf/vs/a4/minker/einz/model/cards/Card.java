@@ -6,6 +6,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Objects;
+
 /**
  * Created by Fabian on 11.11.2017.
  */
@@ -25,9 +27,9 @@ public class Card {
 
     private final String resourceGroup;
 
-    public String origin = CardOrigin.UNSPECIFIED.value; // origin can be any of CardOrigin or a username. // Could be final. would that make sense?
+    private String origin = CardOrigin.UNSPECIFIED.value; // origin can be any of CardOrigin or a username. // Could be final. would that make sense?
 
-    private final JSONObject playParameters; // parameters that rules may ask for, but can also be unset. E.g. what color a wish card wishes for. Is allowed to be null
+    private JSONObject playParameters; // parameters that rules may ask for, but can also be unset. E.g. what color a wish card wishes for. Is allowed to be null
 
 
     /**
@@ -111,6 +113,13 @@ public class Card {
         return ID;
     }
 
+    public void setPlayParameters(JSONObject playParameters) {
+        this.playParameters = playParameters;
+    }
+
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
 
     public int getImageRessourceID(Context context) {
         return context.getResources().getIdentifier(resourceName, resourceGroup, context.getPackageName());
@@ -179,4 +188,38 @@ public class Card {
     }
 
 
+    //below was probably a bad idea. what happens with that if two different cards are compared (but they only differ in origin)
+//    /**
+//     * {@inheritDoc}
+//     *
+//     * Does only compare the fields which will probably not change. I.e. a card with different origin or different parameters is still the same card
+//     * @param obj
+//     * @return
+//     */
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (!(obj instanceof Card)) {
+//            return super.equals(obj);
+//        }
+//
+//        Card object = (Card) obj;
+//        return (
+//                object.ID.equals(this.ID) &&
+//                object.name.equals(this.name) &&
+//                object.color.equals(this.color) &&
+//                object.text.equals(this.color) &&
+//                object.resourceGroup.equals(this.resourceGroup) &&
+//                object.resourceName.equals(this.resourceName)
+//        );
+//    }
+//
+//    public boolean equalsExactly(Card card){
+//        return this.equals(card) && this.playParameters.equals(card.playParameters) && this.origin.equals(card.origin);
+//    }
+//
+//    @Override
+//    public int hashCode() { // see https://stackoverflow.com/a/2265637/2550406
+//        // two cards are equal if all their fixed things are equal
+//        return Objects.hash(this.ID, this.name, this.color, this.text, this.resourceGroup, this.resourceName);
+//    }
 }

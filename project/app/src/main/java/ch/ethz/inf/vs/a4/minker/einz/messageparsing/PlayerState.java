@@ -78,7 +78,7 @@ public class PlayerState {
         for (int i = 0; i<hand.size(); i++){
             Card card = hand.get(i);
             JSONObject cardJSON = new JSONObject();
-            cardJSON.put("origin", card.origin);
+            cardJSON.put("origin", card.getOrigin());
             cardJSON.put("ID", card.getID());
             handJSON.put(i, cardJSON);
         }

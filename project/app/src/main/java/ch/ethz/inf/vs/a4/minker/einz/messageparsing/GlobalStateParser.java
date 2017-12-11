@@ -77,7 +77,7 @@ public class GlobalStateParser {
         for (int i = 0; i<stack.size(); i++){
             Card card = stack.get(i);
             JSONObject cardJSON = new JSONObject();
-            cardJSON.put("origin", card.origin);
+            cardJSON.put("origin", card.getOrigin());
             cardJSON.put("ID", card.getID());
             stackJSON.put(i, cardJSON);
         }

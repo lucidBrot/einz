@@ -179,7 +179,8 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return whether the player is allowed to play the card he wants to play or not
      */
     public boolean play(Card card, Player p) {
-        if (!globalState.getActivePlayer().equals(p)) {
+        Player player = globalState.getActivePlayer();
+        if (!player.getName().equals(p.getName())) {
             if (!DEBUG_MODE) {
                 MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
             }
@@ -191,15 +192,14 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
             return false;
         } else {
-            p.hand.remove(card);
+            player.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways, and sending the message only cares for its name attribute
             globalState.addCardToDiscardPile(card);
-            CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
-            CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
-            GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+            globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
+            globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+            globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             if (!DEBUG_MODE) {
                 MessageSender.sendPlayCardResponse(p, threadedEinzServer, true);
             }
-
             onChange();
             return true;
         }
