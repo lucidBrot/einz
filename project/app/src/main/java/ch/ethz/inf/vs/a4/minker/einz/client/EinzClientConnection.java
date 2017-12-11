@@ -221,6 +221,7 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
     }
 
     public void sendMessageRetryXTimes(int X, EinzMessage<? extends EinzMessageBody> message) {
+        int oldX = X;
         while (X>0) { // try 5 times to send the message. Otherwise we failed
             try {
                 sendMessage(message);
@@ -235,9 +236,10 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
                 X--;
             }
         }
+        if(!isConnected()){X=-1;}
         if(X<=0){
             // we failed to register because the message buffer out was still null or something like that, but after trying de facto waiting for 100*5 ms, it should have worked.
-            Log.w("ClientConnection", "Retried 5 times and slept for a total of 500 ms but the buffer is still unable to send");
+            Log.w("ClientConnection", "Retried "+oldX+" times and slept for a total of 500 ms but the buffer is still unable to send");
         }
     }
 

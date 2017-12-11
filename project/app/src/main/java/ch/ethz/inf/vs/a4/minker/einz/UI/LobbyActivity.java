@@ -157,7 +157,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         Runnable startGame = new Runnable() {
             @Override
             public void run() {
-                ourClient.getConnection().sendMessageRetryXTimes(5, startGameMessage);
+                ourClient.getConnection().sendMessageRetryXTimes(2, startGameMessage);
             }
         };
         this.backgroundHandler.post(startGame);
