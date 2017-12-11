@@ -50,5 +50,7 @@ public interface GameUIInterface {
 
     void setNumCardsInHandOfEachPlayer(HashMap<String ,String> numCardsInHandOfEachPlayer);
 
+    void onUpdateLobbyList(String admin, ArrayList<String> players, ArrayList<String> spectators);
+
     // TODO: customActionRule..?
 }

@@ -558,6 +558,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         }
     }
 
+    @Override
+    public void onUpdateLobbyList(String admin, ArrayList<String> players, ArrayList<String> spectators) {
+        // TODO: change display of players when somebody left.
+    }
+
     class DragCardListener implements View.OnTouchListener {
 
         /*@Override

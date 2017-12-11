@@ -73,7 +73,7 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
             Log.w("ClientMessenger", "Invalid Message");
             return;
         }else {
-            einzAction.run(); // TODO: write into the corresponding EinzAction subclasses what they should do on run()
+            einzAction.run();
             // maybe you'll want to call functions defined somewhere else, e.g. in here.
         }
 

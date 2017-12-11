@@ -108,9 +108,13 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                if(lobbyUI!=null) { // TODO: update lobby list if it changes during the game
+                if(lobbyUI!=null) {
                     lobbyUI.setAdmin(message.getBody().getAdmin());
                     lobbyUI.setLobbyList(players, spectators);
+                }
+
+                if(gameUI!=null){
+                    gameUI.onUpdateLobbyList(message.getBody().getAdmin(), players, spectators);
                 }
             }
         };
