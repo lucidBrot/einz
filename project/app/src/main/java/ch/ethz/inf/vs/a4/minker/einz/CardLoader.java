@@ -44,7 +44,8 @@ public class CardLoader {
             //return null;
             // TODO: remove this debug card once all cards are registered in the json resource
             Log.w("CardLoader", "unmapped card requested: "+cardID);
-            return getCardInstance("debug");
+            return new Card("debug", "debug", CardText.DEBUG, CardColor.NONE, "drawable", "card_choose");
+            // return getCardInstance("debug"); // This is bad because the mapping-not-found should not rely on a mapping
             // return new Card("blue_1", CardOrigin.STACK.value, CardText.DEBUG, CardColor.BLUE, "drawable", "card_1_blue");
             // return getCardInstance("yellow_skip");
         }
