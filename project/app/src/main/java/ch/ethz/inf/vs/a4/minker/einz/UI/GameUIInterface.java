@@ -54,5 +54,7 @@ public interface GameUIInterface {
 
     void setTopCard(Card card);
 
+    void onKeepaliveTimeout();
+
     // TODO: customActionRule..?
 }
