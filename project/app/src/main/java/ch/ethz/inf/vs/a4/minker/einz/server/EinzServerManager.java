@@ -605,7 +605,7 @@ public class EinzServerManager {
     }
 
     public void startGame(String issuedByPlayer) {
-        if(isRegisteredAdmin(issuedByPlayer) && !gamePhaseStarted) {
+        if(isRegisteredAdmin(issuedByPlayer) /*&& !gamePhaseStarted*/) { // if game is running, should we restart or not?
             finishRegistrationPhaseAndInitGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
             SFLock.writeLock().lock();
             serverFunctionInterface.startGame();
