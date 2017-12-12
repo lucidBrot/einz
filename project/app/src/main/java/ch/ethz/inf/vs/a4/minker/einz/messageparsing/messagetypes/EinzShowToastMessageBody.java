@@ -43,6 +43,8 @@ public class EinzShowToastMessageBody extends EinzMessageBody {
         jsonObject.put("from", this.getFrom());
         JSONObject styleJSON = new JSONObject();
         HashMap<String, String> style = getStyle();
+        if(style==null){style=new HashMap<>();}
+
         for (Map.Entry<String, String> entry : style.entrySet()) {
             String property = entry.getKey();
             String value = entry.getValue();

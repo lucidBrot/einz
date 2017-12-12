@@ -616,15 +616,51 @@ public class EinzServerManager {
     }
 
     public void startGame(String issuedByPlayer) {
-        if(isRegisteredAdmin(issuedByPlayer) /*&& !gamePhaseStarted*/) { // if game is running, should we restart or not?
+        if(isRegisteredAdmin(issuedByPlayer) && !gamePhaseStarted) { // if game is running, should we restart or not?
+            if(numPlayersRegisteredWithoutSpectators()>0){
+
             finishRegistrationPhaseAndInitGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
             SFLock.writeLock().lock();
             serverFunctionInterface.startGame();
-            SFLock.writeLock().unlock();
+            SFLock.writeLock().unlock();}
+            else{
+                try {
+                    sendToast(issuedByPlayer, "Please start the game only when there is at least one player.");
+                } catch (UserNotRegisteredException e) {
+                    Log.e("servMan/startGame", "a unregistered player glitched a bit and stopped the registration phase...\nShutting down to get rid of any potential problems");
+                    e.printStackTrace();
+                    server.shutdown();
+                }
+            }
         }
         else{
             Log.e("servMan", "somebody unauthorized tried to start the game!");
         }
+    }
+
+    private void sendToast(String issuedByPlayer, String s) throws UserNotRegisteredException {
+        try {
+            this.server.sendMessageToUser(issuedByPlayer, new EinzMessage<EinzShowToastMessageBody>(
+                    new EinzMessageHeader("toast", "ShowToast"),
+                    new EinzShowToastMessageBody(s, "server", null)
+            ));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int numPlayersRegisteredWithoutSpectators() {
+        userListLock.readLock().lock();
+        int i=0;
+        for(Map.Entry<String, EinzServerClientHandler> entry : registeredClientHandlers.entrySet()){
+            EinzServerClientHandler handler = (EinzServerClientHandler) entry.getValue();
+            String role = getRegisteredClientRoles().get(entry.getKey());
+            if ( role.toLowerCase().equals("player")) {
+                i++;
+            }
+        }
+        userListLock.readLock().unlock();
+        return i;
     }
 
     public void specifyRules(EinzSpecifyRulesMessageBody body) {
