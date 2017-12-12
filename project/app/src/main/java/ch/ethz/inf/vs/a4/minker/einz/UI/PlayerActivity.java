@@ -30,6 +30,7 @@ import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -116,6 +117,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     ArrayList<String> availableActions = new ArrayList<>();
     ArrayList<String> allPlayers = new ArrayList<>();
     String colorChosen = "none";
+    ScrollView handScrollView;
 
     private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
     private Looper backgroundLooper;
@@ -135,12 +137,15 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         trayStack2 = findViewById(R.id.tray_stack_2);
 
+        handScrollView = findViewById(R.id.sv_hand);
+        handScrollView.setOnDragListener(new HandDragListener());
+
         drawPile = findViewById(R.id.draw_pile);
         drawPile.setOnTouchListener(new DrawCardListener());
         drawPile.setTag("drawCard");
 
         mGrid = findViewById(R.id.grid_layout);
-        mGrid.setOnDragListener(new HandDragListener());
+        //mGrid.setOnDragListener(new HandDragListener());
 
         Button colorWheelBlueButton = findViewById(R.id.btn_colorwheel_blue);
         colorWheelBlueButton.setOnClickListener(new View.OnClickListener() {
