@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.model;
 
+import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
@@ -53,7 +55,13 @@ public class GlobalState {
      * @param orderOfPlayers An ordered list of players determining the order in which the players will play.
      */
     public GlobalState(int maxDiscardPileSize, List<Player> orderOfPlayers){
-        this.maxDiscardPileSize = maxDiscardPileSize;
+        if(Debug.smallStack>=0){
+            Log.w("DEBUG", "Using a small stack max size of "+Debug.smallStack+". To disable, set Debug.smallStack to -1");
+            this.maxDiscardPileSize = Debug.smallStack;
+        } else {
+            this.maxDiscardPileSize = maxDiscardPileSize;
+        }
+
         this.players = new ArrayList<>();
         for (Player player : orderOfPlayers) {
             players.add(new PlayerContainer(player));
@@ -123,7 +131,7 @@ public class GlobalState {
     public void addCardToDiscardPile(Card card){
         discardPile.add(card);
         if(discardPile.size() > maxDiscardPileSize){
-            discardPile = discardPile.subList(1, discardPile.size() - 1);
+            discardPile = discardPile.subList(1, discardPile.size());
         }
     }
 

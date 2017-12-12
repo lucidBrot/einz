@@ -177,6 +177,12 @@ Request to play on this server, or to spectate.
 
 > *"player"* or *"spectator"* 
 
+`playerSeating` : JSONObject
+
+> Specifications are free to Chris. This field is used to communicate to other devices what the own orientation is. We assume the devices sit around the spectator, thus allowing us to calculate a positioning of playernames on the spectator which mirrors the real seating.
+>
+> This Object will be sent by the server to everybody in InitGame
+
 The **Client** sends this and Server only reacts to it. The Server's reaction is either RegisterSuccess or RegisterFailure, followed by an information to all players with the [updated lobby list](#updatelobbylist).
 
 ```JSON
@@ -188,6 +194,7 @@ The **Client** sends this and Server only reacts to it. The Server's reaction is
   "body":{
     "username":"roger",
     "role":"player",
+    "playerSeating":{}
   }
 }
 ```
@@ -223,6 +230,10 @@ It is not important for the client to know spectators and the admin, but it migh
 
 > The username of the admin
 
+`playerSeating`:JSONObject
+
+> As specified in the [register messsage](#register) by chris
+
 ```json
 {
   "header":{
@@ -231,11 +242,11 @@ It is not important for the client to know spectators and the admin, but it migh
   },
   "body":{
     "lobbylist":[
-      {"username":"roger", "role":"player"},
-      {"username":"chris", "role":"player"},
-      {"username":"table", "role":"spectator"}
+      {"username":"roger", "role":"player",     "playerSeating":{}},
+      {"username":"chris", "role":"player",      "playerSeating":{}},
+      {"username":"table", "role":"spectator",      "playerSeating":{}}
     ],
-    "admin":"roger"
+    "admin":"roger",
   }
 }
 ```
@@ -678,7 +689,7 @@ Send some `toast` that should be displayed to the clientside user.
 
 `style` : *JSONObject* 
 
-> The client might ignore this. If the UI supports multiple textcolors or background colors, this will specify a style
+> The client might ignore this. If the UI supports multiple textcolors or background colors, this will specify a style. How exactly is yet to be specified. The client should always support this being empty or null.
 
 `from`: *"String"*
 

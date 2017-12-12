@@ -42,7 +42,7 @@ public class EinzRegisterAction extends EinzAction{
     @Override
     public void run() {
         // register user
-        EinzMessage response = getServerManager().registerUser(this.body.getUsername(), this.body.getRole(), getEinzServerClientHandler());
+        EinzMessage response = getServerManager().registerUser(this.body.getUsername(), this.body.getRole(), getEinzServerClientHandler(), this.body.getPlayerSeating());
         // send response
         getEinzServerClientHandler().sendMessage(response);
         // if it was a successful register, inform all clients about the change

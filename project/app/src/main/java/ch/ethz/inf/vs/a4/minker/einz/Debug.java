@@ -48,6 +48,7 @@ public class Debug {
     public static boolean logKeepalivePackets = false; // set to false to reduce log spam from receiving/sending keepalive packets, including the messages from actionfactory
     public static boolean logKeepaliveSpam = false; // set to false to reduce log spam from triggering maybe-timeouts and more verbose debug output
     public static boolean useKeepalive = true; // set true to use keepalive mechanisms
+    public static int smallStack = -1; // set to -1 to disable
 
     /**
      * called at program start in order to inform Devs about debug settings that may be unintentional

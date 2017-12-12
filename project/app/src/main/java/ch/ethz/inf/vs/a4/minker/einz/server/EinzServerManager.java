@@ -51,6 +51,7 @@ public class EinzServerManager {
     // used to keep track of currently registered usernames
     private ConcurrentHashMap<String, String> registeredClientRoles; // mapping client usernames to roles
     protected String adminUsername;
+    private ConcurrentHashMap<String,JSONObject> registeredClientPositioning; // used for finding out where a player is irl positioned
 
     public ReentrantReadWriteLock getUserListLock() { // registeredClientRoles, registeredClientHandlers, gamePhaseStarted
         return userListLock;
@@ -63,6 +64,7 @@ public class EinzServerManager {
         this.server = whotomanage;
         this.registeredClientHandlers = new ConcurrentHashMap<>();
         this.registeredClientRoles = new ConcurrentHashMap<>();
+        this.registeredClientPositioning = new ConcurrentHashMap<>();
         this.serverFunctionInterface = serverFunctionInterface;
         this.gamePhaseStarted = false;
     }
@@ -174,7 +176,7 @@ public class EinzServerManager {
      * @param username
      * @param handler
      */
-    public EinzMessage<? extends EinzMessageBody> registerUser(String username, String role, EinzServerClientHandler handler){
+    public EinzMessage<? extends EinzMessageBody> registerUser(String username, String role, EinzServerClientHandler handler, JSONObject playerSeating){
 
         String reason = "unknown";
         boolean success = false;
@@ -226,6 +228,7 @@ public class EinzServerManager {
             if (success) {
                 handler.setConnectedUser(username); // tell the handler which user it is connected to
                 String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
+                getRegisteredClientPositioning().putIfAbsent(username, playerSeating);
                 userListLock.writeLock().unlock();
                 if (DEBUG && absent != null) { // assertion on android
                     userListLock.writeLock().unlock();
@@ -322,6 +325,7 @@ public class EinzServerManager {
             // unregister them
             getRegisteredClientRoles().remove(username);
             getRegisteredClientHandlers().remove(username);
+            getRegisteredClientPositioning().remove(username);
             getUserListLock().writeLock().unlock();
 
             // tell fabian about it
@@ -472,6 +476,13 @@ public class EinzServerManager {
     public ConcurrentHashMap<String, String> getRegisteredClientRoles() {
         this.userListLock.readLock().lock();
         ConcurrentHashMap<String, String> hm = registeredClientRoles;
+        this.userListLock.readLock().unlock();
+        return hm;
+    }
+
+    public ConcurrentHashMap<String, JSONObject> getRegisteredClientPositioning(){
+        this.userListLock.readLock().lock();
+        ConcurrentHashMap<String, JSONObject> hm = registeredClientPositioning;
         this.userListLock.readLock().unlock();
         return hm;
     }

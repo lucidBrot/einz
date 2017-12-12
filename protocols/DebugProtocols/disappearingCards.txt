@@ -1,0 +1,207 @@
+14142-14281/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"10","name":"kjkj"},{"handSize":"9","name":"asdkfj"}],"stack":[{"origin":"~unspecified","ID":"red_4"},{"origin":"~unspecified","ID":"red_7"},{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"yellow_5"},{"origin":"~unspecified","ID":"yellow_2"},{"origin":"~unspecified","ID":"yellow_0"},{"origin":"~unspecified","ID":"yellow_8"},{"origin":"~unspecified","ID":"green_8"},{"origin":"~unspecified","ID":"green_5"},{"origin":"~unspecified","ID":"green_3"}],"whoseturn":"kjkj","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"red_1"},{"origin":"~unspecified","ID":"red_6"},{"origin":"~unspecified","ID":"blue_6"},{"origin":"~unspecified","ID":"yellow_2"},{"origin":"~unspecified","ID":"red_8"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"yellow_rev"},{"origin":"~unspecified","ID":"yellow_4"}],"possibleactions":[]}}}
+12-11 22:13:59.702 14142-14281/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody
+12-11 22:13:59.702 14142-14281/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction
+12-11 22:13:59.766 14142-14142/ch.ethz.inf.vs.a4.minker.einz W/PlayerActivity: setHand is currently enabled. This means that the cards for debugging will not be shown.
+12-11 22:13:59.798 14142-14171/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaec93660: ver 3 1 (tinfo 0xaeca7590)
+12-11 22:14:19.907 14142-14384/ch.ethz.inf.vs.a4.minker.einz D/ESCH: received line: {"header":{"messagegroup":"playcard","messagetype":"PlayCard"},"body":{"card":{"ID":"green_0","origin":"~unspecified"}}}
+12-11 22:14:19.907 14142-14384/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody
+12-11 22:14:19.907 14142-14384/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction
+12-11 22:14:19.907 14142-14384/ch.ethz.inf.vs.a4.minker.einz D/EinzPlayCardAction: run()
+12-11 22:14:19.907 14142-14384/ch.ethz.inf.vs.a4.minker.einz D/DEBUG: DEBUG
+12-11 22:14:19.907 14142-14384/ch.ethz.inf.vs.a4.minker.einz D/DEBUG: DEBUG
+12-11 22:14:19.908 14142-14281/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"9","name":"kjkj"},{"handSize":"9","name":"asdkfj"}],"stack":[{"origin":"~unspecified","ID":"red_7"},{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"yellow_5"},{"origin":"~unspecified","ID":"yellow_2"},{"origin":"~unspecified","ID":"yellow_0"},{"origin":"~unspecified","ID":"yellow_8"},{"origin":"~unspecified","ID":"green_8"},{"origin":"~unspecified","ID":"green_5"},{"origin":"~unspecified","ID":"green_3"}],"whoseturn":"asdkfj","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"red_1"},{"origin":"~unspecified","ID":"red_6"},{"origin":"~unspecified","ID":"blue_6"},{"origin":"~unspecified","ID":"yellow_2"},{"origin":"~unspecified","ID":"red_8"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"yellow_rev"},{"origin":"~unspecified","ID":"yellow_4"}],"possibleactions":[{"actionName":"drawCards","parameters":{}}]}}}
+
+
+
+D/ESCH: received line: {"header":{"messagegroup":"playcard","messagetype":"PlayCard"},"body":{"card":{"ID":"green_4","origin":"~unspecified"}}}
+12-12 09:29:31.232 3969-3997/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody
+12-12 09:29:31.232 3969-3997/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction
+12-12 09:29:31.232 3969-3997/ch.ethz.inf.vs.a4.minker.einz D/EinzPlayCardAction: run()
+12-12 09:29:31.233 3969-3993/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"playcard","messagetype":"PlayCardResponse"},"body":{"success":"true"}}
+12-12 09:29:31.233 3969-3993/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody
+12-12 09:29:31.233 3969-3993/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardResponseAction
+12-12 09:29:31.233 3969-3993/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"2","name":"asdf"},{"handSize":"7","name":"kj"}],"stack":[{"origin":"~unspecified","ID":"green_4"},{"origin":"~unspecified","ID":"green_skip"},{"origin":"~unspecified","ID":"green_3"},{"origin":"~unspecified","ID":"green_6"},{"origin":"~unspecified","ID":"green_0"},{"origin":"~unspecified","ID":"yellow_0"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"yellow_8"},{"origin":"~unspecified","ID":"yellow_4"}],"whoseturn":"kj","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"red_9"},{"origin":"~unspecified","ID":"red_skip"}],"possibleactions":[]}}}
+
+
+
+After both clients drawing multiple times in a row:
+ D/ESCH: received line: {"header":{"messagegroup":"playcard","messagetype":"PlayCard"},"body":{"card":{"ID":"blue_4","origin":"~unspecified"}}}
+12-12 09:55:56.923 23088-23641/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody
+12-12 09:55:56.923 23088-23641/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction
+12-12 09:55:56.923 23088-23641/ch.ethz.inf.vs.a4.minker.einz D/EinzPlayCardAction: run()
+12-12 09:55:56.927 23088-23171/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"12","name":"jasfd"},{"handSize":"12","name":"sdh"}],"stack":[{"origin":"~unspecified","ID":"blue_7"}],"whoseturn":"sdh","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"red_take2"},{"origin":"~unspecified","ID":"red_1"},{"origin":"~unspecified","ID":"red_0"},{"origin":"~unspecified","ID":"green_0"},{"origin":"~unspecified","ID":"green_2"},{"origin":"~unspecified","ID":"red_6"},{"origin":"~unspecified","ID":"green_0"},{"origin":"~unspecified","ID":"red_rev"},{"origin":"~unspecified","ID":"red_8"},{"origin":"~unspecified","ID":"yellow_3"},{"origin":"~unspecified","ID":"green_1"},{"origin":"~unspecified","ID":"blue_8"}],"possibleactions":[{"actionName":"drawCards","parameters":{}},{"actionName":"playCard","parameters":{"playableCards":["blue_8"]}}]}}}
+12-12 09:55:56.928 23088-23171/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: 
+
+After both clients drawing twice:
+12-12 09:58:37.440 25418-26106/ch.ethz.inf.vs.a4.minker.einz D/ESCH: received line: {"header":{"messagegroup":"playcard","messagetype":"PlayCard"},"body":{"card":{"ID":"yellow_2","origin":"~unspecified"}}}
+12-12 09:58:37.440 25418-26106/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody
+12-12 09:58:37.440 25418-26106/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction
+12-12 09:58:37.440 25418-26106/ch.ethz.inf.vs.a4.minker.einz D/EinzPlayCardAction: run()
+12-12 09:58:37.441 25418-26102/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"playcard","messagetype":"PlayCardResponse"},"body":{"success":"true"}}
+12-12 09:58:37.441 25418-26102/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody
+12-12 09:58:37.441 25418-26102/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardResponseAction
+12-12 09:58:37.442 25418-26102/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"9","name":"sdfghj"},{"handSize":"9","name":"kk"}],"stack":[{"origin":"~unspecified","ID":"yellow_0"}],"whoseturn":"kk","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"blue_1"},{"origin":"~unspecified","ID":"green_skip"},{"origin":"~unspecified","ID":"blue_6"},{"origin":"~unspecified","ID":"red_3"},{"origin":"~unspecified","ID":"green_3"},{"origin":"~unspecified","ID":"red_6"},{"origin":"~unspecified","ID":"green_3"},{"origin":"~unspecified","ID":"blue_5"},{"origin":"~unspecified","ID":"red_0"}],"possibleactions":[]}}}
+
+
+After the other drawing:
+ D/ESCH: received line: {"header":{"messagegroup":"playcard","messagetype":"PlayCard"},"body":{"card":{"ID":"yellow_rev","origin":"~unspecified"}}}
+12-12 10:00:06.226 27283-27507/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody
+12-12 10:00:06.227 27283-27507/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction
+12-12 10:00:06.227 27283-27507/ch.ethz.inf.vs.a4.minker.einz D/EinzPlayCardAction: run()
+12-12 10:00:06.229 27283-27421/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"9","name":"sdfghj"},{"handSize":"6","name":"kk"}],"stack":[{"origin":"~unspecified","ID":"yellow_7"}],"whoseturn":"sdfghj","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"yellow_0"},{"origin":"~unspecified","ID":"blue_3"},{"origin":"~unspecified","ID":"red_rev"},{"origin":"~unspecified","ID":"green_7"},{"origin":"~unspecified","ID":"red_7"},{"origin":"~unspecified","ID":"red_skip"},{"origin":"~unspecified","ID":"green_5"},{"origin":"~unspecified","ID":"blue_8"},{"origin":"~unspecified","ID":"blue_2"}],"possibleactions":[{"actionName":"drawCards","parameters":{}},{"actionName":"playCard","parameters":{"playableCards":["yellow_0","green_7","red_7"]}}]}}}
+
+
+Draw card -> next time on my turn play +2 -> card disappears but opponent gets 2 cards when drawing:
+ W/DEBUG: Using a small stack max size of 2. To disable, set Debug.smallStack to -1
+12-12 10:11:34.346 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/servMan/broadcastP: broadcasting EinzInitGameMessageBody
+                                                                                   {"header":{"messagegroup":"startgame","messagetype":"InitGame"},"body":{"cardRules":{"blue_1":[],"blue_4":[],"blue_8":[],"red_take2":[],"yellow_3":[],"blue_9":[],"red_0":[],"blue_0":[],"blue_7":[],"blue_take2":[],"yellow_7":[],"yellow_8":[],"yellow_skip":[],"green_2":[],"green_4":[],"yellow_5":[],"red_9":[],"blue_3":[],"green_6":[],"blue_5":[],"red_7":[],"blue_skip":[],"blue_6":[],"green_9":[],"red_2":[],"yellow_4":[],"yellow_rev":[],"green_0":[],"green_skip":[],"yellow_take2":[],"red_8":[],"green_3":[],"green_1":[],"yellow_0":[],"red_3":[],"green_7":[],"yellow_9":[],"yellow_1":[],"yellow_6":[],"red_6":[],"yellow_2":[],"red_1":[],"red_rev":[],"green_rev":[],"red_skip":[],"green_5":[],"green_take2":[],"blue_2":[],"green_8":[],"red_5":[],"blue_rev":[],"red_4":[]},"globalRules":[{"End game when a Player finishes":"End game when a Player finishes","parameters":{}},{"Resets the cardsToDraw field":"Resets the cardsToDraw field","parameters":{}},{"Start Cards":"Start Cards","parameters":"{Number Of Cards=NUMBER}"},{"Play all cards":"Play all cards","parameters":{}},{"Next players turn":"Next players turn","parameters":{}},{"Can't play after draw":"Can't play after draw","parameters":{}}],"turn-order":["kdkd","asdf"]}}
+12-12 10:11:34.347 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"startgame","messagetype":"InitGame"},"body":{"cardRules":{"blue_1":[],"blue_4":[],"blue_8":[],"red_take2":[],"yellow_3":[],"blue_9":[],"red_0":[],"blue_0":[],"blue_7":[],"blue_take2":[],"yellow_7":[],"yellow_8":[],"yellow_skip":[],"green_2":[],"green_4":[],"yellow_5":[],"red_9":[],"blue_3":[],"green_6":[],"blue_5":[],"red_7":[],"blue_skip":[],"blue_6":[],"green_9":[],"red_2":[],"yellow_4":[],"yellow_rev":[],"green_0":[],"green_skip":[],"yellow_take2":[],"red_8":[],"green_3":[],"green_1":[],"yellow_0":[],"red_3":[],"green_7":[],"yellow_9":[],"yellow_1":[],"yellow_6":[],"red_6":[],"yellow_2":[],"red_1":[],"red_rev":[],"green_rev":[],"red_skip":[],"green_5":[],"green_take2":[],"blue_2":[],"green_8":[],"red_5":[],"blue_rev":[],"red_4":[]},"globalRules":[{"End game when a Player finishes":"End game when a Player finishes","parameters":{}},{"Resets the cardsToDraw field":"Resets the cardsToDraw field","parameters":{}},{"Start Cards":"Start Cards","parameters":"{Number Of Cards=NUMBER}"},{"Play all cards":"Play all cards","parameters":{}},{"Next players turn":"Next players turn","parameters":{}},{"Can't play after draw":"Can't play after draw","parameters":{}}],"turn-order":["kdkd","asdf"]}}
+12-12 10:11:34.347 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody
+12-12 10:11:34.347 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzInitGameAction
+12-12 10:11:34.358 1646-1886/system_process I/ActivityManager: START u0 {cmp=ch.ethz.inf.vs.a4.minker.einz/.UI.PlayerActivity} from uid 10060 on display 0
+12-12 10:11:34.378 1328-1615/? D/AudioFlinger: mixer(0xb4340000) throttle end: throttle time(11)
+12-12 10:11:34.949 28938-28948/ch.ethz.inf.vs.a4.minker.einz I/art: Background sticky concurrent mark sweep GC freed 42(2256B) AllocSpace objects, 0(0B) LOS objects, 0% free, 101MB/101MB, paused 9.142ms total 16.908ms
+12-12 10:11:35.108 28938-28948/ch.ethz.inf.vs.a4.minker.einz W/art: Suspending all threads took: 6.942ms
+12-12 10:11:35.115 28938-28948/ch.ethz.inf.vs.a4.minker.einz I/art: Background partial concurrent mark sweep GC freed 45(2000B) AllocSpace objects, 1(12MB) LOS objects, 4% free, 89MB/93MB, paused 7.917ms total 20.483ms
+12-12 10:11:35.349 1646-1923/system_process I/AccountManagerService: getTypesVisibleToCaller: isPermitted? true
+12-12 10:11:35.775 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/CliMesssengerCallback: Game Initialized
+12-12 10:11:35.776 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"7","name":"asdf"},{"handSize":"7","name":"kdkd"}],"stack":[{"origin":"~unspecified","ID":"blue_8"}],"whoseturn":"kdkd","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"blue_3"},{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"yellow_rev"},{"origin":"~unspecified","ID":"green_take2"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"green_9"}],"possibleactions":[]}}}
+12-12 10:11:35.776 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody
+12-12 10:11:35.776 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction
+12-12 10:11:35.786 28938-28938/ch.ethz.inf.vs.a4.minker.einz I/Choreographer: Skipped 82 frames!  The application may be doing too much work on its main thread.
+12-12 10:11:35.908 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:11:36.002 28938-28938/ch.ethz.inf.vs.a4.minker.einz W/PlayerActivity: setHand is currently enabled. This means that the cards for debugging will not be shown.
+12-12 10:11:36.488 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3116401 , only wrote 3114632
+12-12 10:11:36.488 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3114636 , only wrote 3114632
+12-12 10:11:36.503 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3115295 , only wrote 3115293
+12-12 10:11:36.829 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3129660 , only wrote 3129174
+12-12 10:11:36.829 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3129178 , only wrote 3129174
+12-12 10:11:36.851 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3130157 , only wrote 3129835
+12-12 10:11:37.009 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3136782 , only wrote 3136445
+12-12 10:11:37.028 28938-28938/ch.ethz.inf.vs.a4.minker.einz I/Choreographer: Skipped 73 frames!  The application may be doing too much work on its main thread.
+12-12 10:11:37.271 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3147999 , only wrote 3147682
+12-12 10:11:37.271 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3147696 , only wrote 3147682
+12-12 10:11:37.291 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3148563 , only wrote 3148343
+12-12 10:11:37.380 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3152268 , only wrote 3151648
+12-12 10:11:37.380 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3151652 , only wrote 3151648
+12-12 10:11:37.486 1328-1614/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3156332 , only wrote 3156275
+12-12 10:11:37.490 1328-1615/? W/audio_hw_generic: Not supplying enough data to HAL, expected position 3156420 , only wrote 3156275
+12-12 10:11:37.575 1646-1678/system_process I/ActivityManager: Displayed ch.ethz.inf.vs.a4.minker.einz/.UI.PlayerActivity: +3s200ms
+12-12 10:11:37.594 28938-28957/ch.ethz.inf.vs.a4.minker.einz E/Surface: getSlotFromBufferLocked: unknown buffer: 0xab20a2c0
+12-12 10:11:44.867 1229-1924/? D/gralloc_ranchu: gralloc_alloc: Creating ashmem region of size 536576
+12-12 10:11:45.643 28938-28938/ch.ethz.inf.vs.a4.minker.einz I/System.out: drew card
+12-12 10:11:45.643 28938-28938/ch.ethz.inf.vs.a4.minker.einz I/ViewRootImpl: Reporting drop result: true
+12-12 10:11:45.643 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ESCH: received line: {"header":{"messagegroup":"draw","messagetype":"DrawCards"},"body":{}}
+12-12 10:11:45.644 1646-2154/system_process W/WindowManager: Drag is in progress but there is no drag window handle.
+12-12 10:11:45.644 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsMessageBody
+12-12 10:11:45.644 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzDrawCardsAction
+12-12 10:11:45.644 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"draw","messagetype":"DrawCardsFailure"},"body":{"reason":"It is not your turn."}}
+12-12 10:11:45.644 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody
+12-12 10:11:45.644 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzDrawCardsFailureAction
+12-12 10:11:45.691 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:11:45.718 28938-28957/ch.ethz.inf.vs.a4.minker.einz V/RenderScript: 0xab21a000 Launching thread(s), CPUs 2
+12-12 10:11:47.650 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:11:47.651 28938-28957/ch.ethz.inf.vs.a4.minker.einz E/Surface: getSlotFromBufferLocked: unknown buffer: 0xab2096e0
+12-12 10:11:49.542 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/ESCH: received line: {"header":{"messagegroup":"draw","messagetype":"DrawCards"},"body":{}}
+12-12 10:11:49.542 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsMessageBody
+12-12 10:11:49.542 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzDrawCardsAction
+12-12 10:11:49.549 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"7","name":"asdf"},{"handSize":"8","name":"kdkd"}],"stack":[{"origin":"~unspecified","ID":"blue_8"}],"whoseturn":"asdf","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"blue_3"},{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"yellow_rev"},{"origin":"~unspecified","ID":"green_take2"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"green_9"}],"possibleactions":[{"actionName":"drawCards","parameters":{}},{"actionName":"playCard","parameters":{"playableCards":["blue_3"]}}]}}}
+12-12 10:11:49.549 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody
+12-12 10:11:49.549 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction
+12-12 10:11:49.550 28938-28938/ch.ethz.inf.vs.a4.minker.einz W/PlayerActivity: setHand is currently enabled. This means that the cards for debugging will not be shown.
+12-12 10:11:49.863 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:11:50.157 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:11:51.861 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:11:51.862 28938-28957/ch.ethz.inf.vs.a4.minker.einz E/Surface: getSlotFromBufferLocked: unknown buffer: 0xab209140
+12-12 10:11:52.864 1229-1318/? D/gralloc_ranchu: gralloc_alloc: Creating ashmem region of size 348160
+12-12 10:11:52.904 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:11:53.838 28938-28938/ch.ethz.inf.vs.a4.minker.einz I/ViewRootImpl: Reporting drop result: true
+12-12 10:11:53.839 1646-3552/system_process W/WindowManager: Drag is in progress but there is no drag window handle.
+12-12 10:11:53.839 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ESCH: received line: {"header":{"messagegroup":"playcard","messagetype":"PlayCard"},"body":{"card":{"ID":"blue_3","origin":"~unspecified"}}}
+12-12 10:11:53.839 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody
+12-12 10:11:53.840 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction
+12-12 10:11:53.840 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/EinzPlayCardAction: run()
+12-12 10:11:53.841 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"playcard","messagetype":"PlayCardResponse"},"body":{"success":"true"}}
+12-12 10:11:53.841 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody
+12-12 10:11:53.841 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardResponseAction
+12-12 10:11:53.842 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"6","name":"asdf"},{"handSize":"8","name":"kdkd"}],"stack":[{"origin":"~unspecified","ID":"blue_8"},{"origin":"~unspecified","ID":"blue_3"}],"whoseturn":"kdkd","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"yellow_rev"},{"origin":"~unspecified","ID":"green_take2"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"green_9"}],"possibleactions":[]}}}
+12-12 10:11:53.842 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody
+12-12 10:11:53.843 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction
+12-12 10:11:53.913 28938-28938/ch.ethz.inf.vs.a4.minker.einz W/PlayerActivity: setHand is currently enabled. This means that the cards for debugging will not be shown.
+12-12 10:12:00.972 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/ESCH: received line: {"header":{"messagegroup":"draw","messagetype":"DrawCards"},"body":{}}
+12-12 10:12:00.972 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsMessageBody
+12-12 10:12:00.973 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzDrawCardsAction
+12-12 10:12:00.975 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"6","name":"asdf"},{"handSize":"9","name":"kdkd"}],"stack":[{"origin":"~unspecified","ID":"blue_8"},{"origin":"~unspecified","ID":"blue_3"}],"whoseturn":"asdf","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"yellow_rev"},{"origin":"~unspecified","ID":"green_take2"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"green_9"}],"possibleactions":[{"actionName":"drawCards","parameters":{}}]}}}
+12-12 10:12:00.978 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody
+12-12 10:12:00.980 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction
+12-12 10:12:00.982 28938-28938/ch.ethz.inf.vs.a4.minker.einz W/PlayerActivity: setHand is currently enabled. This means that the cards for debugging will not be shown.
+12-12 10:12:01.283 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:12:02.452 1229-1277/? D/gralloc_ranchu: gralloc_alloc: Creating ashmem region of size 536576
+12-12 10:12:03.191 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:12:03.192 28938-28957/ch.ethz.inf.vs.a4.minker.einz E/Surface: getSlotFromBufferLocked: unknown buffer: 0xab2096e0
+12-12 10:12:03.308 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ESCH: received line: {"header":{"messagegroup":"draw","messagetype":"DrawCards"},"body":{}}
+12-12 10:12:03.309 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsMessageBody
+12-12 10:12:03.311 28938-28938/ch.ethz.inf.vs.a4.minker.einz I/System.out: drew card
+12-12 10:12:03.311 28938-28938/ch.ethz.inf.vs.a4.minker.einz I/ViewRootImpl: Reporting drop result: true
+12-12 10:12:03.312 1646-1657/system_process W/WindowManager: Drag is in progress but there is no drag window handle.
+12-12 10:12:03.313 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzDrawCardsAction
+12-12 10:12:03.315 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"draw","messagetype":"DrawCardsSuccess"},"body":{"cards":[{"ID":"blue_2","origin":"~unspecified"}]}}
+12-12 10:12:03.316 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody
+12-12 10:12:03.316 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzDrawCardsSuccessAction
+12-12 10:12:03.326 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"7","name":"asdf"},{"handSize":"9","name":"kdkd"}],"stack":[{"origin":"~unspecified","ID":"blue_8"},{"origin":"~unspecified","ID":"blue_3"}],"whoseturn":"kdkd","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"yellow_rev"},{"origin":"~unspecified","ID":"green_take2"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"blue_2"}],"possibleactions":[]}}}
+12-12 10:12:03.326 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody
+12-12 10:12:03.326 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction
+12-12 10:12:03.457 28938-28938/ch.ethz.inf.vs.a4.minker.einz W/PlayerActivity: setHand is currently enabled. This means that the cards for debugging will not be shown.
+12-12 10:12:03.755 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:12:06.918 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/ESCH: received line: {"header":{"messagegroup":"playcard","messagetype":"PlayCard"},"body":{"card":{"ID":"blue_take2","origin":"~unspecified"}}}
+12-12 10:12:06.918 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody
+12-12 10:12:06.918 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzPlayCardAction
+12-12 10:12:06.918 28938-29100/ch.ethz.inf.vs.a4.minker.einz D/EinzPlayCardAction: run()
+12-12 10:12:06.922 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"7","name":"asdf"},{"handSize":"8","name":"kdkd"}],"stack":[{"origin":"~unspecified","ID":"blue_3"}],"whoseturn":"asdf","drawxcardsmin":"2"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"yellow_rev"},{"origin":"~unspecified","ID":"green_take2"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"blue_2"}],"possibleactions":[{"actionName":"drawCards","parameters":{}}]}}}
+12-12 10:12:06.923 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody
+12-12 10:12:06.923 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction
+12-12 10:12:06.924 28938-28938/ch.ethz.inf.vs.a4.minker.einz W/PlayerActivity: setHand is currently enabled. This means that the cards for debugging will not be shown.
+12-12 10:12:07.216 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:12:09.144 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+12-12 10:12:09.148 28938-28957/ch.ethz.inf.vs.a4.minker.einz E/Surface: getSlotFromBufferLocked: unknown buffer: 0xab209140
+12-12 10:12:09.301 1229-1686/? D/gralloc_ranchu: gralloc_alloc: Creating ashmem region of size 536576
+12-12 10:12:10.035 28938-28938/ch.ethz.inf.vs.a4.minker.einz I/System.out: drew card
+12-12 10:12:10.035 28938-28938/ch.ethz.inf.vs.a4.minker.einz I/ViewRootImpl: Reporting drop result: true
+12-12 10:12:10.036 1646-2311/system_process W/WindowManager: Drag is in progress but there is no drag window handle.
+12-12 10:12:10.037 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ESCH: received line: {"header":{"messagegroup":"draw","messagetype":"DrawCards"},"body":{}}
+12-12 10:12:10.037 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsMessageBody
+12-12 10:12:10.037 28938-29040/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzDrawCardsAction
+12-12 10:12:10.038 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"draw","messagetype":"DrawCardsSuccess"},"body":{"cards":[{"ID":"blue_5","origin":"~unspecified"},{"ID":"blue_rev","origin":"~unspecified"}]}}
+12-12 10:12:10.038 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody
+12-12 10:12:10.038 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzDrawCardsSuccessAction
+12-12 10:12:10.038 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ClientMessenger: received message: {"header":{"messagegroup":"stateinfo","messagetype":"SendState"},"body":{"globalstate":{"numcardsinhand":[{"handSize":"9","name":"asdf"},{"handSize":"8","name":"kdkd"}],"stack":[{"origin":"~unspecified","ID":"blue_3"}],"whoseturn":"kdkd","drawxcardsmin":"1"},"playerstate":{"hand":[{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"yellow_rev"},{"origin":"~unspecified","ID":"green_take2"},{"origin":"~unspecified","ID":"yellow_7"},{"origin":"~unspecified","ID":"red_5"},{"origin":"~unspecified","ID":"green_9"},{"origin":"~unspecified","ID":"blue_2"},{"origin":"~unspecified","ID":"blue_5"},{"origin":"~unspecified","ID":"blue_rev"}],"possibleactions":[]}}}
+12-12 10:12:10.039 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: Getting mapping for body text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody
+12-12 10:12:10.041 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction
+12-12 10:12:10.167 28938-28938/ch.ethz.inf.vs.a4.minker.einz W/PlayerActivity: setHand is currently enabled. This means that the cards for debugging will not be shown.
+12-12 10:12:10.431 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+
+
+after drawing very often, the client lost a card after the host did not
+
+Server only draws, client only plays after initial drawing phase: every second play by client is lost.
+
+Seems like it's every second card played that gets lost... with maxStack = 2
+
+for maxStack = 3, it's not between 2-4
+
+A huge stack fixes this problem
+
+everything seems fine until (draws+cardsplayed) in total > maxStack. Then, it starts behaving randomly, seemingly somewhat based on drawing.
+
+SOLUTION:
+	the problem was this function:
+	
+	    public void addCardToDiscardPile(Card card){
+			discardPile.add(card);
+			if(discardPile.size() > maxDiscardPileSize){
+				discardPile = discardPile.subList(1, discardPile.size() -1);
+			}
+		}
+	
+	subList is inclusive the first parameter and exclusive the second. that means that we never kept the newest card if the stack was full.
+	Also, we discarded the oldest card, so from then on it took two cards played until it reached max size trigger again.
