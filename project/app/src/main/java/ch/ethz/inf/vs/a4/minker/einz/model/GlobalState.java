@@ -225,10 +225,17 @@ public class GlobalState {
         gameFinished = true;
     }
 
+    /**
+     * adds the specified player to the finished players and removes any players with the same name from the list of players.
+     * Does both only if there was at least one player with that name in that list.
+     * <b>Make sure the actual reallife person players have unique names or rewrite this message</b>
+     */
     public void setPlayerFinished(Player player){
-        if(players.contains(player)) {
-            this.players.remove(player);
-            this.finishedPlayers.add(player);
+        for(PlayerContainer pc : players){
+            if(pc.player.getName().equals(player.getName())){
+                this.players.remove(pc);
+                this.finishedPlayers.add(player);
+            }
         }
     }
 
