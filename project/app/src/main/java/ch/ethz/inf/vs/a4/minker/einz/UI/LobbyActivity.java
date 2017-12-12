@@ -182,9 +182,17 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // <UglyHack>
         // read EinzConstants.ourClientGlobal's javadocs to understand this. Basically, I cannot implement parcelable for PrintWriter, and
         // thus not for EinzClient
-        Intent intent = new Intent(this, PlayerActivity.class);
-        EinzSingleton.getInstance().setEinzClient(this.ourClient);
-        startActivity(intent);
+        Intent intent;
+        if(this.role.equals("player")) {
+            intent = new Intent(this, PlayerActivity.class);
+            EinzSingleton.getInstance().setEinzClient(this.ourClient);
+            startActivity(intent);
+        } else if(this.role.equals("spectator")){
+            intent = new Intent(this, SpectatorActivity.class);
+            EinzSingleton.getInstance().setEinzClient(this.ourClient);
+            startActivity(intent);
+        }
+
     }
 
     @Override

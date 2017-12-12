@@ -30,6 +30,7 @@ import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -82,12 +83,18 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private GridLayout mGrid;
     private ArrayList<Card> cardStack = new ArrayList<>();
     private ImageView trayStack,trayStack2;
+
+    private String currentlyActivePlayer = "~";
+
     private ImageView drawPile;
     private LayoutInflater inflater;
     private final double cardSizeRatio = 351.0/251.0;
     private boolean canDrawCard,canEndTurn;
     private Card lastPlayedCard = null;
     private Card seconLastPlayedCard = null;
+
+    private EinzClient ourClient;
+
 
     @Override
     protected void onStop() {
@@ -103,7 +110,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             ourClient.getActionCallbackInterface().setGameUI(this);
     }
 
-    private EinzClient ourClient;
     private int cardHeight,cardWidth;
 
     ArrayList<Integer> cardDrawables = new ArrayList<>();
@@ -111,6 +117,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     ArrayList<String> availableActions = new ArrayList<>();
     ArrayList<String> allPlayers = new ArrayList<>();
     String colorChosen = "none";
+    ScrollView handScrollView;
 
     private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
     private Looper backgroundLooper;
@@ -130,12 +137,15 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         trayStack2 = findViewById(R.id.tray_stack_2);
 
+        handScrollView = findViewById(R.id.sv_hand);
+        handScrollView.setOnDragListener(new HandDragListener());
+
         drawPile = findViewById(R.id.draw_pile);
         drawPile.setOnTouchListener(new DrawCardListener());
         drawPile.setTag("drawCard");
 
         mGrid = findViewById(R.id.grid_layout);
-        mGrid.setOnDragListener(new HandDragListener());
+        //mGrid.setOnDragListener(new HandDragListener());
 
         Button colorWheelBlueButton = findViewById(R.id.btn_colorwheel_blue);
         colorWheelBlueButton.setOnClickListener(new View.OnClickListener() {
@@ -276,10 +286,16 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
 
-        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
+        Bitmap b = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
+        } else {
+            b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
+        }
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
         trayStack.setImageBitmap(bitmapResized);
 
+        //if()
         double direction = Math.random() * 2*Math.PI;
         double xTranslation = Math.cos(direction) * 1000;
         double yTranslation = Math.sin(direction) * 1000;
@@ -611,11 +627,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setHand(ArrayList<Card> hand) {
         Log.w("PlayerActivity", "setHand is currently enabled. This means that the cards for debugging will not be shown.");
         // to disable, just comment out the following four lines
-        try {
-            sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         if(!checkCardsStillValid(hand)){
             clearHand();
             addToHand(hand);
@@ -631,6 +642,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void playerStartedTurn(String playerThatStartedTurn) {
+
+        currentlyActivePlayer = playerThatStartedTurn;
+
         if (playerThatStartedTurn.equals(ourClient.getUsername())) {
 
             setCanDrawCard(true);
