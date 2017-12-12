@@ -68,7 +68,7 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         for(int i=0; i<jsonLobbyList.length();i++){
             JSONObject obj = jsonLobbyList.getJSONObject(i);
             lobbylist.put(obj.getString("username"), obj.getString("role"));
-            playerSeatings.put(obj.getString("username"), obj.getJSONObject("playerSeating"));
+            playerSeatings.put(obj.getString("username"), obj.optJSONObject("playerSeating"));
         }
 
         return new EinzMessage<>(
