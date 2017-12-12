@@ -83,6 +83,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private ArrayList<Card> cardStack = new ArrayList<>();
     private ImageView trayStack,trayStack2;
 
+    private String currentlyActivePlayer = "~";
+
     private ImageView drawPile;
     private LayoutInflater inflater;
     private final double cardSizeRatio = 351.0/251.0;
@@ -283,6 +285,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
         trayStack.setImageBitmap(bitmapResized);
 
+        //if()
         double direction = Math.random() * 2*Math.PI;
         double xTranslation = Math.cos(direction) * 1000;
         double yTranslation = Math.sin(direction) * 1000;
@@ -614,11 +617,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setHand(ArrayList<Card> hand) {
         Log.w("PlayerActivity", "setHand is currently enabled. This means that the cards for debugging will not be shown.");
         // to disable, just comment out the following four lines
-        try {
-            sleep(200);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         if(!checkCardsStillValid(hand)){
             clearHand();
             addToHand(hand);
@@ -634,6 +632,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void playerStartedTurn(String playerThatStartedTurn) {
+
+        currentlyActivePlayer = playerThatStartedTurn;
+
         if (playerThatStartedTurn.equals(ourClient.getUsername())) {
 
             setCanDrawCard(true);
