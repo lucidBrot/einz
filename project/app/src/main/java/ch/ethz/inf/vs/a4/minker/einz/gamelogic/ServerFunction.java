@@ -420,11 +420,16 @@ public class ServerFunction implements ServerFunctionDefinition {
 
         //Check if any player has finished
         for (Player p : globalState.getPlayersOrdered()) {
+            /*
             if (GlobalRuleChecker.checkIsPlayerFinished(globalState, p)) {
-                globalState.setPlayerFinished(p);
+                globalState.setPlayerFinished(p); // isn't that a cycle? set finished if finished. Also, why do this every turn again?
                 if (!DEBUG_MODE) {
                     MessageSender.sendPlayerFinishedToAll(p, threadedEinzServer);
                 }
+            }*/
+            // TODO: review this setPlayerFinished condition through a rule
+            if(p.hand.size()<=0){
+                globalState.setPlayerFinished(p);
             }
         }
 
