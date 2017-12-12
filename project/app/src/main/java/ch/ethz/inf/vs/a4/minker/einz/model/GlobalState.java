@@ -131,7 +131,7 @@ public class GlobalState {
     public void addCardToDiscardPile(Card card){
         discardPile.add(card);
         if(discardPile.size() > maxDiscardPileSize){
-            discardPile = discardPile.subList(1, discardPile.size() - 1);
+            discardPile = discardPile.subList(1, discardPile.size());
         }
     }
 

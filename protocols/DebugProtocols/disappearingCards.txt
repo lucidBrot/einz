@@ -192,3 +192,16 @@ for maxStack = 3, it's not between 2-4
 A huge stack fixes this problem
 
 everything seems fine until (draws+cardsplayed) in total > maxStack. Then, it starts behaving randomly, seemingly somewhat based on drawing.
+
+SOLUTION:
+	the problem was this function:
+	
+	    public void addCardToDiscardPile(Card card){
+			discardPile.add(card);
+			if(discardPile.size() > maxDiscardPileSize){
+				discardPile = discardPile.subList(1, discardPile.size() -1);
+			}
+		}
+	
+	subList is inclusive the first parameter and exclusive the second. that means that we never kept the newest card if the stack was full.
+	Also, we discarded the oldest card, so from then on it took two cards played until it reached max size trigger again.
