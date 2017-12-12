@@ -129,13 +129,21 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         this.backgroundLooper = this.backgroundThread.getLooper();
         this.backgroundHandler = new Handler(this.backgroundLooper);
 
-        Button startGameButton = (Button) findViewById(R.id.btn_start_game);
+        final Button startGameButton = (Button) findViewById(R.id.btn_start_game);
         startGameButton.setEnabled(true);
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 view.setEnabled(false);
                 onStartGameButtonClick();
+                Handler mainHandler = new Handler(getMainLooper());
+                mainHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        startGameButton.setEnabled(true);
+                    }
+                }, 600); // set enabled again after some time because the problem would have been minuscule in the first place
+                // and it is inconvenient to have to go back after getting "Plz be at least one player"
             }
         });
 

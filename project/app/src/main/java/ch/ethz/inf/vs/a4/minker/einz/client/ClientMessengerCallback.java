@@ -376,8 +376,13 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     }
 
     @Override
-    public void onShowToast(EinzMessage<EinzShowToastMessageBody> message) {
-        Toast.makeText(applicationContext, message.getBody().getToast(), Toast.LENGTH_SHORT).show();
+    public void onShowToast(final EinzMessage<EinzShowToastMessageBody> message) {
+        runOnMainThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(applicationContext, message.getBody().getToast(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
