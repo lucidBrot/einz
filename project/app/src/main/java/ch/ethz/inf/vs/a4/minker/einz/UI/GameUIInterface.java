@@ -52,7 +52,7 @@ public interface GameUIInterface {
 
     void onUpdateLobbyList(String admin, ArrayList<String> players, ArrayList<String> spectators);
 
-    void setTopCard(Card card);
+    void setStack(ArrayList<Card> stack);
 
     void onKeepaliveTimeout();
 
