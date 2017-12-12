@@ -252,11 +252,12 @@ public class MessageSender {
      */
     public static void sendEndGameToAll(GlobalState state, ThreadedEinzServer tes) {
         EinzMessageHeader header = new EinzMessageHeader("endgame", "GameOver");
-        HashMap<String, String> points = new HashMap<>();
         for (int i = 0; i < state.getFinishedPlayers().size(); i++) {
-            points.put(state.getFinishedPlayers().get(i).getName(), Integer.toString(state.getFinishedPlayers().size() - i));
+            state.addPoints(state.getFinishedPlayers().get(i).getName(), state.getFinishedPlayers().size()-i);
+            ///<old>/// points.put(state.getFinishedPlayers().get(i).getName(), Integer.toString(state.getFinishedPlayers().size() - i));
+            // TODO move this functionality to rules
         }
-        EinzGameOverMessageBody body = new EinzGameOverMessageBody(points);
+        EinzGameOverMessageBody body = new EinzGameOverMessageBody(state.getPoints(), true);
         EinzMessage<EinzGameOverMessageBody> message = new EinzMessage<>(header, body);
         tes.getServerManager().broadcastMessageToAllPlayers(message);
         tes.getServerManager().broadcastMessageToAllSpectators(message);

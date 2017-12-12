@@ -9,11 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -48,6 +44,8 @@ public class GlobalState {
     private boolean gameFinished = false;
 
     private final int maxDiscardPileSize;
+
+    private HashMap<String, Integer> points = new HashMap<String, Integer>(); // String for player.getName(),  String for points
 
     /**
      * Creates an instance of a Global game state.
@@ -94,6 +92,29 @@ public class GlobalState {
      */
     public void addCardsToDrawPile(List<Card> cards){
         drawPile.addAll(cards);
+    }
+
+    /**
+     * @return a <literal>HashMap<name of player, points></literal>
+     */
+    public HashMap<String, Integer> getPoints() {
+        return points;
+    }
+
+    public void setPoints(HashMap<String, Integer> points) {
+        this.points = points;
+    }
+
+    /**
+     * Adds the (possibly negative) points to the score of the player identified by his name.
+     * If there were no points previously, it will set them to the new value
+     */
+    public void addPoints(String playerName, Integer points){
+        if(this.getPoints().containsKey(playerName)){
+            this.getPoints().put(playerName, this.getPoints().get(playerName)+ points);
+        } else {
+            this.getPoints().put(playerName, points);
+        }
     }
 
     /**

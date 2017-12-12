@@ -20,6 +20,18 @@ public class EinzGameOverMessageBody extends EinzMessageBody {
         this.points = points;
     }
 
+    /**
+     * This is a convenience constructor.
+     * @param ignoreThisBoolean ignore this, it is only there to allow multiple constructors taking a hashmap
+     */
+    public EinzGameOverMessageBody (HashMap<String, Integer> points, boolean ignoreThisBoolean) {
+        HashMap<String, String> myPoints = new HashMap<>();
+        for(String k : points.keySet()){
+            myPoints.put(k, String.valueOf(points.get(k)));
+        }
+        this.points = myPoints;
+    }
+
     public HashMap<String, String> getPoints() {
         return points;
     }
