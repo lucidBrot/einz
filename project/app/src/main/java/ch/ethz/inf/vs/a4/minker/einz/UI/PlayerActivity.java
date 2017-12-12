@@ -286,7 +286,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
 
-        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
+        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
         trayStack.setImageBitmap(bitmapResized);
 
