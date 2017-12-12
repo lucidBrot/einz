@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
+import android.animation.Animator;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -15,12 +16,17 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayout;
+import android.transition.Explode;
 import android.util.Log;
 import android.view.Display;
 import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -74,12 +80,14 @@ import static java.lang.Thread.sleep;
 public class PlayerActivity extends FullscreenActivity implements GameUIInterface { // TODO: onStop and onResume - register this activity at client
     private static final int NBR_ITEMS = 20;
     private GridLayout mGrid;
-    private ImageView trayStack;
+    private ArrayList<Card> cardStack = new ArrayList<>();
+    private ImageView trayStack,trayStack2;
     private ImageView drawPile;
     private LayoutInflater inflater;
     private final double cardSizeRatio = 351.0/251.0;
     private boolean canDrawCard,canEndTurn;
     private Card lastPlayedCard = null;
+    private Card seconLastPlayedCard = null;
 
     @Override
     protected void onStop() {
@@ -119,6 +127,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         trayStack = findViewById(R.id.tray_stack);
         trayStack.setOnDragListener(new TrayDragListener());
+
+        trayStack2 = findViewById(R.id.tray_stack_2);
 
         drawPile = findViewById(R.id.draw_pile);
         drawPile.setOnTouchListener(new DrawCardListener());
@@ -269,7 +279,43 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
         trayStack.setImageBitmap(bitmapResized);
-        //setlastplayedCard(cardToSet);
+
+        double direction = Math.random() * 2*Math.PI;
+        double xTranslation = Math.cos(direction) * 1000;
+        double yTranslation = Math.sin(direction) * 1000;
+
+        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).setListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animator) {
+                trayStack.animate().translationX(0).translationY(0).setDuration(1000);
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animator) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animator) {
+
+            }
+        });
+    }
+
+    public void setSecondTopPlayedCard(Card cardToSet) {
+
+        //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
+
+        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack2.getWidth(),(int)(cardSizeRatio * (double)trayStack2.getWidth()), false);
+        trayStack2.setImageBitmap(bitmapResized);
+
+                //setlastplayedCard(cardToSet);
     }
 
     private void initCards(){
@@ -645,8 +691,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     @Override
-    public void setTopCard(Card card) {
-        setTopPlayedCard(card);
+    public void setStack(ArrayList<Card> stack) {
+        if(stack.size() != cardStack.size()) {
+            Card sndCard = null;
+
+            if (stack.size() > 1) {
+                sndCard = stack.get(stack.size() - 2);
+                setSecondTopPlayedCard(sndCard);
+
+            }
+
+            final Card topCard = stack.get(stack.size() - 1);
+
+            setTopPlayedCard(topCard);
+
+            cardStack = stack;
+        }
     }
 
     @Override

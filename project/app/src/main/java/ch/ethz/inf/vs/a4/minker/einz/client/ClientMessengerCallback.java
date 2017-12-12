@@ -29,7 +29,6 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     private final EinzClient parentClient;
     private String previousPlayer = "~";
 
-
     /**
      * @param lobbyUIInterface make sure to call {@link #setGameUIAndDisableLobbyUI(GameUIInterface)} after destroying the lobby
      * @param appContext just the Context of the application, for toasts and stuff
@@ -346,8 +345,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         final ArrayList<Card> handtemp = message.getBody().getPlayerState().getHand();
         final ArrayList<String> actionstemp = message.getBody().getPlayerState().getPossibleActionsNames();
         final HashMap<String,String> numCardsInHandOfEachPlayer = message.getBody().getGlobalstate().getNumCardsInHand();
-        final Card topCard = message.getBody().getGlobalstate().getStack().get(message.getBody().getGlobalstate().getStack().size()-1);
 
+        final ArrayList<Card> currStack = message.getBody().getGlobalstate().getStack();
 
         Runnable runnable = new Runnable() {
             @Override
@@ -359,7 +358,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                     gameUI.setHand(hand);
                     gameUI.setActions(actions);
                     gameUI.setNumCardsInHandOfEachPlayer(numCardsInHandOfEachPlayer);
-                    gameUI.setTopCard(topCard);
+
+                    gameUI.setStack(currStack);
 
                     String whoseCurrentTurn = message.getBody().getGlobalstate().getWhoseTurn();
                     if(!whoseCurrentTurn.equals(previousPlayer)){
@@ -371,7 +371,6 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         };
 
         runOnMainThread(runnable);
-
 
     }
 
