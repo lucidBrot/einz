@@ -3,8 +3,12 @@ package ch.ethz.inf.vs.a4.minker.einz.rules.otherrules;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.model.Player;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
-public class CountCardValuesAsPoints extends BasicGlobalRule {
+/**
+ * Less points is better
+ */
+public class CountNumberOfCardsAsPoints extends BasicGlobalRule {
     /**
      * The Name of the Rule. Used as identifier for the rule
      *
@@ -12,7 +16,7 @@ public class CountCardValuesAsPoints extends BasicGlobalRule {
      */
     @Override
     public String getName() {
-        return "CountCardValuesAsPoints";
+        return "CountNumberOfCardsAsPoints";
     }
 
     /**
@@ -24,7 +28,15 @@ public class CountCardValuesAsPoints extends BasicGlobalRule {
      */
     @Override
     public GlobalState onPlayerFinished(GlobalState state, Player player) {
-        return super.onPlayerFinished(state, player);
+        state.finishGame();
+        for(Player p : state.getPlayersOrdered()){
+            int i = 0;
+            for(Card c : p.hand){
+                i++;
+            }
+            state.getPoints().put(p.getName(), i);
+        }
+        return state;
     }
 
     /**
@@ -34,6 +46,6 @@ public class CountCardValuesAsPoints extends BasicGlobalRule {
      */
     @Override
     public String getDescription() {
-        return "The ranking is determined by the cards value you still have.";
+        return "The ranking is determined by the number of cards value you still have.";
     }
 }

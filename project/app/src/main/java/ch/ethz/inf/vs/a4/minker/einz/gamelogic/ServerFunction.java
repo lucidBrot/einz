@@ -7,6 +7,7 @@ import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 
+import ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountNumberOfCardsAsPoints;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -336,6 +337,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         //Add all necessary GlobalRules
         result.addGlobalRule(new GameEndsOnWinRule());
         result.addGlobalRule(new ResetCardsToDrawRule());
+        result.addGlobalRule(new CountNumberOfCardsAsPoints()); // TODO: maybe rather use CountRankFinishedAsPoints or a different (new) rule to count value of cards.
 
         StartGameWithCardsRule rule = new StartGameWithCardsRule();
         JSONObject parameter = new JSONObject();
