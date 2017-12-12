@@ -242,14 +242,11 @@ It is not important for the client to know spectators and the admin, but it migh
   },
   "body":{
     "lobbylist":[
-      {"username":"roger", "role":"player"},
-      {"username":"chris", "role":"player"},
-      {"username":"table", "role":"spectator"}
+      {"username":"roger", "role":"player",     "playerSeating":{}},
+      {"username":"chris", "role":"player",      "playerSeating":{}},
+      {"username":"table", "role":"spectator",      "playerSeating":{}}
     ],
     "admin":"roger",
-    "playerSeating":{
-      
-    }
   }
 }
 ```

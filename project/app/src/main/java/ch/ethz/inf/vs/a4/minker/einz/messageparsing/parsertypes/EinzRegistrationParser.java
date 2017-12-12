@@ -62,16 +62,18 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         String admin = body.getString("admin");
         HashMap<String, String> lobbylist = new HashMap<>();
         JSONArray jsonLobbyList = body.getJSONArray("lobbylist");
+        HashMap<String, JSONObject> playerSeatings = new HashMap<>();
 
         // foreach mapping {name:role}
         for(int i=0; i<jsonLobbyList.length();i++){
             JSONObject obj = jsonLobbyList.getJSONObject(i);
             lobbylist.put(obj.getString("username"), obj.getString("role"));
+            playerSeatings.put(obj.getString("username"), obj.getJSONObject("playerSeating"));
         }
 
         return new EinzMessage<>(
                 new EinzMessageHeader("registration", "UpdateLobbyList"),
-                new EinzUpdateLobbyListMessageBody(lobbylist, admin)
+                new EinzUpdateLobbyListMessageBody(lobbylist, admin, playerSeatings)
         );
     }
 
