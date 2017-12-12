@@ -7,10 +7,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
-import android.widget.GridLayout;
+import android.support.v7.widget.GridLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -90,6 +91,11 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
             }*/
 
             // add view
+
+            usercard.getLayoutParams().width = playerList.getMeasuredWidth()/2;
+
+            usercard.getLayoutParams().width -= ((CardView.MarginLayoutParams)usercard.getLayoutParams()).leftMargin + ((CardView.MarginLayoutParams)usercard.getLayoutParams()).rightMargin;
+
             usercard.setTag(addedPlayer);
             playerList.addView(usercard);
             allPlayers.add(addedPlayer);

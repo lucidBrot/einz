@@ -286,9 +286,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="30dp"
+                android:background="@drawable/button_blue"
                 android:gravity="center"
-                android:orientation="vertical"
-                tools:background="@drawable/button_blue">
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tv_game_over"

@@ -71,19 +71,23 @@
 
     </android.support.constraint.ConstraintLayout>
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.5"
-        android:background="@drawable/button_red">
+        android:layout_margin="10dp"
+        android:layout_weight="1"
+        android:background="@drawable/button_red"
+        tools:layout_editor_absoluteX="8dp"
+        tools:layout_editor_absoluteY="8dp">
 
-        <GridLayout
+        <android.support.v7.widget.GridLayout
             android:id="@+id/gl_playerlist"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:columnCount="2">
 
-        </GridLayout>
-    </ScrollView>
+        </android.support.v7.widget.GridLayout>
+
+    </RelativeLayout>
 
 </LinearLayout>

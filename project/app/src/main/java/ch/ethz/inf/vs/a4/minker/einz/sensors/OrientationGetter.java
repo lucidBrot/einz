@@ -10,6 +10,10 @@ import android.hardware.SensorEventListener;
 
 public class OrientationGetter implements SensorEventListener {
 
+    double lastOrientation;
+    public OrientationGetter(){
+
+    }
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {

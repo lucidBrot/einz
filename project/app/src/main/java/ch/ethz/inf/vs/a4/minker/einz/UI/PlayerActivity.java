@@ -286,29 +286,30 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
 
-        Bitmap b = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
-        } else {
-            b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
-        }
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
-        trayStack.setImageBitmap(bitmapResized);
+        final Card cardToBeSet = cardToSet;
 
         //if()
         double direction = Math.random() * 2*Math.PI;
-        double xTranslation = Math.cos(direction) * 1000;
-        double yTranslation = Math.sin(direction) * 1000;
+        double xTranslation = Math.cos(direction) * 1500;
+        double yTranslation = Math.sin(direction) * 1500;
 
         trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).setListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animator) {
+                Bitmap b = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    b = ((BitmapDrawable)getResources().getDrawable(cardToBeSet.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
+                } else {
+                    b = ((BitmapDrawable)getResources().getDrawable(cardToBeSet.getImageRessourceID(getApplicationContext()))).getBitmap();
+                }
 
+                Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
+                trayStack.setImageBitmap(bitmapResized);
             }
 
             @Override
             public void onAnimationEnd(Animator animator) {
-                trayStack.animate().translationX(0).translationY(0).setDuration(1000);
+                trayStack.animate().translationX(0).translationY(0).setDuration(500);
             }
 
             @Override
@@ -321,6 +322,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
             }
         });
+
+
     }
 
     public void setSecondTopPlayedCard(Card cardToSet) {
@@ -339,7 +342,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
         addCard(cardLoader.getCardInstance("yellow_1"));
         // </education>
-
+        /*
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_blue"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_yellow"));
@@ -353,7 +356,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));*/
     }
 
     public boolean checkCardsStillValid(ArrayList<Card> cardlist){
@@ -606,6 +609,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         endscreen.setVisibility(View.VISIBLE);
         LinearLayout winningPlayers = findViewById(R.id.ll_winning_players);
         HashMap<String,String> playerPoints = message.getBody().getPoints();
+
         for(String player:allPlayers){
 
             CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerpointlist_element, winningPlayers, false);
@@ -637,8 +641,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setActions(ArrayList<String> actions) {
         setAvailableActions(actions);
     }
-
-
+    
 
     @Override
     public void playerStartedTurn(String playerThatStartedTurn) {
