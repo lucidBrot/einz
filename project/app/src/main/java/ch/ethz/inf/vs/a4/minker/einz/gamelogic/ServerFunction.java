@@ -169,7 +169,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return whether the player is allowed to play the card he wants to play or not
      */
     public boolean play(Card card, Player p) {
-        if(globalState.isGameFinished()){
+        if (globalState.isGameFinished()) {
             if (!DEBUG_MODE) {
                 MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
             }
@@ -206,7 +206,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return whether he is allowed to end his turn (and therefore did)
      */
     public boolean finishTurn(Player p) {
-        if (globalState.getActivePlayer() == null || !globalState. getActivePlayer().getName().equals(p.getName()) || !GlobalRuleChecker.checkIsValidEndTurn(globalState, p, gameConfig)) {
+        if (globalState.getActivePlayer() == null || !globalState.getActivePlayer().getName().equals(p.getName()) || !GlobalRuleChecker.checkIsValidEndTurn(globalState, p, gameConfig)) {
             //The player isnt allowed to end his turn
             return false;
         } else {
@@ -223,7 +223,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return the Cards that player draws, if he is not allowed to draw cards returns null.
      */
     public ArrayList<Card> drawCards(Player p) {
-        if(globalState.isGameFinished()){
+        if (globalState.isGameFinished()) {
             if (!DEBUG_MODE) {
                 MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "The game has finished.");
             }
@@ -432,19 +432,19 @@ public class ServerFunction implements ServerFunctionDefinition {
                     MessageSender.sendPlayerFinishedToAll(p, threadedEinzServer);
                 }
                 GlobalRuleChecker.checkOnPlayerFinished(globalState, p, gameConfig);
-
-
-                //Send everyone their state
-                if (!DEBUG_MODE) {
-                    MessageSender.sendStateToAll(threadedEinzServer, globalState, gameConfig);
-                }
-
-                //Check if the game is over
-                if (globalState.isGameFinished()) {
-                    endGame();
-                }
-
             }
+
+            //Send everyone their state
+            if (!DEBUG_MODE) {
+                MessageSender.sendStateToAll(threadedEinzServer, globalState, gameConfig);
+            }
+
+            //Check if the game is over
+            if (globalState.isGameFinished()) {
+                endGame();
+            }
+
+            
         }
     }
 
