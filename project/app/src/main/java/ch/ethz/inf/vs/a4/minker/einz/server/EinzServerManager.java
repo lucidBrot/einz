@@ -793,4 +793,8 @@ public class EinzServerManager {
 
         }
     }
+
+    public void setGamePhaseStarted(boolean gamePhaseStarted) {
+        this.gamePhaseStarted = gamePhaseStarted;
+    }
 }

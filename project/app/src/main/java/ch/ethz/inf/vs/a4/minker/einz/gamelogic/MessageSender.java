@@ -132,7 +132,7 @@ public class MessageSender {
         ArrayList<Card> stack = new ArrayList<>(state.getDiscardPile());
         String activePlayer;
         if(state.getActivePlayer() != null) {
-            activePlayer = state.getActivePlayer().toString();
+            activePlayer = state.getActivePlayer().getName();
         } else {
             activePlayer = "~null";
         }
@@ -273,7 +273,7 @@ public class MessageSender {
         ArrayList<Card> stack = new ArrayList<>(state.getDiscardPile());
         String activePlayer;
         if(state.getActivePlayer() != null) {
-            activePlayer = state.getActivePlayer().toString();
+            activePlayer = state.getActivePlayer().getName();
         } else {
             activePlayer = "~null";
         }

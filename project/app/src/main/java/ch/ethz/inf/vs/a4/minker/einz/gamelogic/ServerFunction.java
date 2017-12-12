@@ -272,7 +272,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         if (!DEBUG_MODE) {
             MessageSender.sendEndGameToAll(globalState, threadedEinzServer);
         }
-        //TODO: Eric calls a function from server to end the server properly
+        threadedEinzServer.onGameOver();
     }
 
     /**
