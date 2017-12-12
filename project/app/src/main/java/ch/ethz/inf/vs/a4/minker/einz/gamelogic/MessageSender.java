@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.model.Player;
 import ch.ethz.inf.vs.a4.minker.einz.model.PlayerAction;
@@ -201,8 +202,8 @@ public class MessageSender {
     }
 
     /**
-     * @param p             player to send the message to
-     * @param tes           ThreadedEinzServer that holds the player to send the message to
+     * @param p                 player to send the message to
+     * @param tes               ThreadedEinzServer that holds the player to send the message to
      * @param ruleParameterBody message to send (depending on the action), including ruleName and success. If ruleName and success are not set, this throws a runtime exception
      */
     public static void sendCustomActionResponse(Player p, ThreadedEinzServer tes, JSONObject ruleParameterBody) {
@@ -211,8 +212,8 @@ public class MessageSender {
         try {
             ruleName = ruleParameterBody.getString("ruleName");
             success = ruleParameterBody.getString("success");
-        } catch (JSONException e){
-           throw new RuntimeException(e); // You NEED to specify ruleName and success
+        } catch (JSONException e) {
+            throw new RuntimeException(e); // You NEED to specify ruleName and success
         }
         EinzCustomActionResponseMessageBody body = new EinzCustomActionResponseMessageBody(ruleParameterBody, ruleName, success);
         EinzMessage<EinzCustomActionResponseMessageBody> message = new EinzMessage<>(header, body);
@@ -233,6 +234,25 @@ public class MessageSender {
         EinzMessageHeader header = new EinzMessageHeader("endgame", "PlayerFinished");
         EinzPlayerFinishedMessageBody body = new EinzPlayerFinishedMessageBody(p.getName());
         EinzMessage<EinzPlayerFinishedMessageBody> message = new EinzMessage<>(header, body);
+        tes.getServerManager().broadcastMessageToAllPlayers(message);
+        tes.getServerManager().broadcastMessageToAllSpectators(message);
+    }
+
+    /**
+     * Points just represents order in which the players are finished
+     * Players that finish first get more points
+     *
+     * @param state state of the game
+     * @param tes   holds the players and spectators to send message to
+     */
+    public static void sendEndGameToAll(GlobalState state, ThreadedEinzServer tes) {
+        EinzMessageHeader header = new EinzMessageHeader("endgame", "GameOver");
+        HashMap<String, String> points = new HashMap<>();
+        for (int i = 0; i < state.getFinishedPlayers().size(); i++) {
+            points.put(state.getFinishedPlayers().get(i).getName(), Integer.toString(state.getFinishedPlayers().size() - i));
+        }
+        EinzGameOverMessageBody body = new EinzGameOverMessageBody(points);
+        EinzMessage<EinzGameOverMessageBody> message = new EinzMessage<>(header, body);
         tes.getServerManager().broadcastMessageToAllPlayers(message);
         tes.getServerManager().broadcastMessageToAllSpectators(message);
     }

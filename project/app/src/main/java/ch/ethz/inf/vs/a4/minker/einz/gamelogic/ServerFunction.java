@@ -231,8 +231,12 @@ public class ServerFunction implements ServerFunctionDefinition {
             return null;
         } else {
             List<Card> resultList = globalState.drawCards(globalState.getCardsToDraw());
+            if(resultList == null){
+                globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile());
+                resultList = globalState.drawCards(globalState.getCardsToDraw());
+            }
             ArrayList<Card> result = new ArrayList<>();
-            for(Card c: resultList){
+            for (Card c : resultList) {
                 result.add(c);
             } //Build Arraylist form list since casting causes an exception
             player.hand.addAll(result);
@@ -249,10 +253,14 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     /**
      * ends the running game
-     * not sure what this does exactly
+     * send everyone the EndGame message
      */
     public void endGame() {
-
+        globalState.finishGame();
+        if (!DEBUG_MODE) {
+            MessageSender.sendEndGameToAll(globalState, threadedEinzServer);
+        }
+        //TODO: Call a function from server to turn him off (or something like that)
     }
 
     /**
@@ -263,6 +271,9 @@ public class ServerFunction implements ServerFunctionDefinition {
      */
     public void removePlayer(Player player) {
         globalState.removePlayer(player);
+        if(globalState.getPlayersOrdered().size()<1){
+            endGame();
+        }
     }
 
     /**
@@ -280,13 +291,13 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        if(DEBUG_MODE) {
+                        if (DEBUG_MODE) {
                             Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
                             //NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
                             //either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
                             numberOfCardsInGame.put(card, 2);
                             allCardsInGame.add(card);
-                        }else {
+                        } else {
                             Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
                             numberOfCardsInGame.put(card, 2);
                             allCardsInGame.add(card);
@@ -329,7 +340,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
-                        if(DEBUG_MODE) {
+                        if (DEBUG_MODE) {
                             Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
                             //assign rules to the cards
                             result.assignRuleToCard(new PlayColorRule(), card);
@@ -357,17 +368,17 @@ public class ServerFunction implements ServerFunctionDefinition {
         for (CardColor cc : CardColor.values()) {
 
             if (cc != CardColor.NONE) {
-                if(DEBUG_MODE) {
+                if (DEBUG_MODE) {
                     result.assignRuleToCard(new ChangeDirectionRule(), new Card(cc + "_" + CardText.SWITCHORDER.indicator, CardText.SWITCHORDER.type,
                             CardText.SWITCHORDER, cc, "drawable", "card_" + CardText.SWITCHORDER.indicator + "_" + cc));
                     result.assignRuleToCard(new DrawTwoCardsRule(), new Card(cc + "_" + CardText.PLUSTWO.indicator, CardText.PLUSTWO.type,
                             CardText.PLUSTWO, cc, "drawable", "card_" + CardText.PLUSTWO.indicator + "_" + cc));
                     result.assignRuleToCard(new SkipRule(), new Card(cc + "_" + CardText.STOP.indicator, CardText.STOP.type,
                             CardText.STOP, cc, "drawable", "card_" + CardText.STOP.indicator + "_" + cc));
-                }else{
-                    result.assignRuleToCard(new ChangeDirectionRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.SWITCHORDER.indicator) );
-                    result.assignRuleToCard(new DrawTwoCardsRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.PLUSTWO.indicator));
-                    result.assignRuleToCard(new SkipRule(), cardLoader.getCardInstance(cc.toString().toLowerCase()+"_"+CardText.STOP.indicator));
+                } else {
+                    result.assignRuleToCard(new ChangeDirectionRule(), cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + CardText.SWITCHORDER.indicator));
+                    result.assignRuleToCard(new DrawTwoCardsRule(), cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + CardText.PLUSTWO.indicator));
+                    result.assignRuleToCard(new SkipRule(), cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + CardText.STOP.indicator));
                     //It might make sense to somewhere specify all IDs that exist, so that we don't have to guess
                 }
             }
@@ -376,7 +387,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             result.assignRuleToCard(new IsValidDrawRule(), new Card(CardColor.YELLOW + "_" + CardText.ZERO.indicator, CardText.ZERO.type,
                     CardText.ZERO, CardColor.YELLOW, "drawable", "card_" + CardText.ZERO.indicator + "_" + CardColor.YELLOW));
         } else {
-            result.assignRuleToCard(new IsValidDrawRule(), cardLoader.getCardInstance(CardColor.YELLOW.toString().toLowerCase()+"_"+CardText.ZERO.indicator));
+            result.assignRuleToCard(new IsValidDrawRule(), cardLoader.getCardInstance(CardColor.YELLOW.toString().toLowerCase() + "_" + CardText.ZERO.indicator));
 
         }
 
@@ -400,17 +411,23 @@ public class ServerFunction implements ServerFunctionDefinition {
 
         //Check if any player has finished
         for (Player p : globalState.getPlayersOrdered()) {
-            if (GlobalRuleChecker.checkIsPlayerFinished(globalState, p)) {
+            if (GlobalRuleChecker.checkIsPlayerFinished(globalState, p, gameConfig)) {
                 globalState.setPlayerFinished(p);
                 if (!DEBUG_MODE) {
                     MessageSender.sendPlayerFinishedToAll(p, threadedEinzServer);
                 }
+                GlobalRuleChecker.checkOnPlayerFinished(globalState, p, gameConfig);
             }
         }
 
         //Send everyone their state
         if (!DEBUG_MODE) {
             MessageSender.sendStateToAll(threadedEinzServer, globalState, gameConfig);
+        }
+
+        //Check if the game is over
+        if (globalState.isGameFinished()) {
+            endGame();
         }
 
     }

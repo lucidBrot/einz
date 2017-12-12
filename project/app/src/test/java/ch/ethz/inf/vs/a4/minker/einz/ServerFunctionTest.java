@@ -78,7 +78,41 @@ public class ServerFunctionTest {
         //playing a plus2 card sets the cardsToDraw to 8 -> hopefully fixed
         //add a "skip" rule -> added
         //add a "isValidDrawCards" rule -> not very sophisticated but should work
-        //TODO: card_definition.json
     }
 
+    @Test
+    public void playTestOnePlayer() {
+        //initializeCardLoader();
+        ArrayList<Player> players = new ArrayList<>();
+        Player peter = new Player("ForeverAlone");
+        players.add(peter);
+        Debug.smallStack = -1;
+        ServerFunction s = new ServerFunction(true);
+        s.initialiseStandardGame(null, players);
+        s.startGame();
+
+        int barrier = 300;
+        while (!s.getGlobalState().isGameFinished() && barrier > 0) {
+            for (Player p : s.getGlobalState().getPlayersOrdered()) {
+                int tries = p.hand.size();
+                barrier--;
+                try {
+                    for (int i = 0; i < tries; i++) {
+                        s.play(p.hand.get(i), p);
+                        if(p.hand.size() == 0){
+                            Log.i("Finish","Playerw ould be finished now");
+                        }
+                        if (i == tries - 1) {
+                            s.drawCards(p);
+                            // s.finishTurn(p); WITH CURRENT DEFAULTRULES, THIS ISNT NEEDED
+                        }
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    Log.i("Exception", "");
+
+                }
+            }
+        }
+        Log.i("Endstate", "");
+    }
 }
