@@ -142,7 +142,8 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         JSONObject body = message.getJSONObject("body");
         username = body.getString("username");
         role = body.getString("role");
-        EinzMessageBody emb = new EinzRegisterMessageBody(username, role);
+        JSONObject playerSeating = body.optJSONObject("playerSeating");
+        EinzMessageBody emb = new EinzRegisterMessageBody(username, role, playerSeating);
         return new EinzMessage<>(emh, emb);
     }
 

@@ -10,10 +10,16 @@ public class EinzRegisterMessageBody extends EinzMessageBody {
 
     private final String username;
     private final String role;
+    private final JSONObject playerSeating; // used for spectators displaying positioning of players
 
-    public EinzRegisterMessageBody(String username, String role) {
+    public EinzRegisterMessageBody(String username, String role, JSONObject playerSeating) {
         this.username = username;
         this.role = role;
+        this.playerSeating = playerSeating;
+    }
+
+    public EinzRegisterMessageBody(String username, String role) {
+        this(username, role, new JSONObject());
     }
 
     @Override
@@ -21,6 +27,7 @@ public class EinzRegisterMessageBody extends EinzMessageBody {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("username", username);
         jsonBody.put("role", role);
+        jsonBody.put("playerSeating", playerSeating);
         return jsonBody;
     }
 
