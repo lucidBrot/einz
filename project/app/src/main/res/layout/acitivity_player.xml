@@ -252,15 +252,23 @@
 
             </FrameLayout>
 
-            <android.support.v7.widget.GridLayout
-                android:id="@+id/grid_layout"
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_marginTop="10dp"
                 android:layout_weight="2"
                 android:background="@android:color/holo_orange_light"
-                app:columnCount="8"
-                app:rowCount="4"></android.support.v7.widget.GridLayout>
+                android:scrollbarAlwaysDrawHorizontalTrack="false">
+
+                <android.support.v7.widget.GridLayout
+                    android:id="@+id/grid_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="2"
+                    app:columnCount="8"
+                    app:rowCount="4"></android.support.v7.widget.GridLayout>
+            </ScrollView>
 
         </LinearLayout>
 
