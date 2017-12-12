@@ -512,10 +512,10 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
         if(message.getBody().getSuccess().equals("true")){
-               if(lastPlayedCard != null){
-                   removeCardFromHand(lastPlayedCard);
-               }
-               setTopPlayedCard(lastPlayedCard);
+            setTopPlayedCard(lastPlayedCard);
+            if(lastPlayedCard != null){
+                removeCardFromHand(lastPlayedCard);
+            }
         }
     }
 
@@ -561,6 +561,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setHand(ArrayList<Card> hand) {
         Log.w("PlayerActivity", "setHand is currently enabled. This means that the cards for debugging will not be shown.");
         // to disable, just comment out the following four lines
+        try {
+            sleep(200);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if(!checkCardsStillValid(hand)){
             clearHand();
             addToHand(hand);
