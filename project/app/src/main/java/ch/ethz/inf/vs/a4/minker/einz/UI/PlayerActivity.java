@@ -341,18 +341,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     public boolean checkCardsStillValid(ArrayList<Card> cardlist){
-        if(cardlist.size() != cards.size()){
+        return checkCardListIdentical(cardlist,cards);
+    }
+
+    public boolean checkCardListIdentical(ArrayList<Card> cardlist1,ArrayList<Card> cardlist2){
+        if(cardlist1.size() != cardlist2.size()){
             return false;
         }
 
         ArrayList<String> stringOfOwnCards = new ArrayList<>();
         ArrayList<String> stringOfGotCards = new ArrayList<>();
 
-        for(Card currCard:cards){
+        for(Card currCard:cardlist2){
             stringOfOwnCards.add(currCard.getID());
         }
 
-        for(Card currCard:cardlist){
+        for(Card currCard:cardlist1){
             stringOfGotCards.add(currCard.getID());
         }
 
@@ -692,13 +696,12 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void setStack(ArrayList<Card> stack) {
-        if(stack.size() != cardStack.size()) {
+        if(!checkCardListIdentical(stack,cardStack)) {
             Card sndCard = null;
 
             if (stack.size() > 1) {
                 sndCard = stack.get(stack.size() - 2);
                 setSecondTopPlayedCard(sndCard);
-
             }
 
             final Card topCard = stack.get(stack.size() - 1);
