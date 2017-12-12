@@ -7,6 +7,7 @@ import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
 
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.*;
 import ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountNumberOfCardsAsPoints;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,18 +29,6 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ChangeDirectionRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.DrawTwoCardsRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.GameEndsOnWinRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.IsValidDrawRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule2;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayColorRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayTextRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ResetCardsToDrawRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.SkipRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.StartGameWithCardsRule;
-import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WinOnNoCardsRule;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
 /**

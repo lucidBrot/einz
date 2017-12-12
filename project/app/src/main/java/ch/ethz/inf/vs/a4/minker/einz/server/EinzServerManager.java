@@ -616,7 +616,6 @@ public class EinzServerManager {
     }
 
     public void startGame(String issuedByPlayer) {
-        getSFLock().writeLock().lock();
         if(isRegisteredAdmin(issuedByPlayer) && !gamePhaseStarted) { // if game is running, should we restart or not?
             if(numPlayersRegisteredWithoutSpectators()>0){
 
@@ -637,7 +636,6 @@ public class EinzServerManager {
         else{
             Log.e("servMan", "somebody unauthorized tried to start the game!");
         }
-        getSFLock().writeLock().unlock();
     }
 
     private void sendToast(String issuedByPlayer, String s) throws UserNotRegisteredException {

@@ -242,7 +242,7 @@ public class GlobalState {
     /**
      * Sets the finished Flag to true.
      */
-    public void finishGame(){
+    public synchronized void finishGame(){
         gameFinished = true;
     }
 
@@ -251,7 +251,7 @@ public class GlobalState {
      * Does both only if there was at least one player with that name in that list.
      * <b>Make sure the actual reallife person players have unique names or rewrite this message</b>
      */
-    public void setPlayerFinished(Player player){
+    public synchronized void setPlayerFinished(Player player){
         for(PlayerContainer pc : players){
             if(pc.player.getName().equals(player.getName())){
                 this.players.remove(pc);
@@ -264,7 +264,7 @@ public class GlobalState {
         return new ArrayList<>(finishedPlayers);
     }
 
-    public void removePlayer(Player player){
+    public synchronized void removePlayer(Player player){
         for (int i = 0; i < players.size(); i++) {
             PlayerContainer container = players.get(i);
             if (container.player == player){
