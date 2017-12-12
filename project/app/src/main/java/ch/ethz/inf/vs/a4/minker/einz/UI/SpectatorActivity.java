@@ -247,7 +247,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     public void playerStartedTurn(String playerThatStartedTurn) {
         currentlyActivePlayer = playerThatStartedTurn;
         if(allPlayers.contains(playerThatStartedTurn)) {
-            LinearLayout playerList = findViewById(R.id.ll_playerlist);
+            android.widget.GridLayout playerList = findViewById(R.id.gl_playerlist);
 
             for (int i = 0; i < playerList.getChildCount();i++) {
                 View v = playerList.getChildAt(i);
@@ -274,7 +274,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     public void setNumCardsInHandOfEachPlayer(HashMap<String, String> numCardsInHandOfEachPlayer) {
         for (String currPlayer:allPlayers){
             String numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
-            LinearLayout playerList = findViewById(R.id.ll_playerlist);
+            android.widget.GridLayout playerList = findViewById(R.id.gl_playerlist);
             View cardViewOfPlayer = playerList.findViewWithTag(currPlayer);
 
             if(cardViewOfPlayer instanceof CardView){
