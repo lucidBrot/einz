@@ -28,9 +28,15 @@ public class EinzUpdateLobbyListMessageBody extends EinzMessageBody {
 
     private final HashMap<String, String> lobbylist;
     private final String admin;
+    private final HashMap<String, JSONObject> playerSeatings;
 
     public EinzUpdateLobbyListMessageBody(HashMap<String, String> lobbylist, String admin){
 
+        this(lobbylist, admin, null);
+    }
+
+    public EinzUpdateLobbyListMessageBody(HashMap<String, String> lobbylist, String admin, HashMap<String, JSONObject> playerToPlayerSeating){
+        this.playerSeatings = playerToPlayerSeating;
         this.lobbylist = lobbylist;
         this.admin = admin;
     }
@@ -42,10 +48,19 @@ public class EinzUpdateLobbyListMessageBody extends EinzMessageBody {
     public JSONObject toJSON() throws JSONException {
         JSONObject body = new JSONObject();
         JSONArray lobbylist = new JSONArray();
+
+        HashMap<String, JSONObject> playerSeatings;
+        if(this.playerSeatings == null){
+            playerSeatings = new HashMap<>();
+        } else {
+            playerSeatings = this.playerSeatings;
+        }
+
         for(String s : getLobbylist().keySet()){
             JSONObject entry = new JSONObject();
             entry.put("username", s);
             entry.put("role", getLobbylist().get(s));
+            entry.put("playerSeating", playerSeatings.get(s));
             lobbylist.put(entry);
         }
         body.put("lobbylist", lobbylist);

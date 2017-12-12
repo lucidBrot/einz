@@ -87,7 +87,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         if (players.size() < 1 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
             //if you do nothing here, it crashes
-            //don't call initialiseStandardGame with to samll/large players.size()
+            //don't call initialiseStandardGame with to small/large players.size()
         } else {
             this.threadedEinzServer = threadedEinzServer;
             globalState = new GlobalState(10, players);
@@ -169,8 +169,14 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return whether the player is allowed to play the card he wants to play or not
      */
     public boolean play(Card card, Player p) {
+        if(globalState.isGameFinished()){
+            if (!DEBUG_MODE) {
+                MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
+            }
+            return false;
+        }
         Player player = globalState.getActivePlayer();
-        if (!player.getName().equals(p.getName())) {
+        if (player == null || !player.getName().equals(p.getName())) {
             if (!DEBUG_MODE) {
                 MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
             }
@@ -200,7 +206,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return whether he is allowed to end his turn (and therefore did)
      */
     public boolean finishTurn(Player p) {
-        if (!globalState.getActivePlayer().equals(p) || !GlobalRuleChecker.checkIsValidEndTurn(globalState, p, gameConfig)) {
+        if (globalState.getActivePlayer() == null || !globalState. getActivePlayer().getName().equals(p.getName()) || !GlobalRuleChecker.checkIsValidEndTurn(globalState, p, gameConfig)) {
             //The player isnt allowed to end his turn
             return false;
         } else {
@@ -217,8 +223,14 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @return the Cards that player draws, if he is not allowed to draw cards returns null.
      */
     public ArrayList<Card> drawCards(Player p) {
+        if(globalState.isGameFinished()){
+            if (!DEBUG_MODE) {
+                MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "The game has finished.");
+            }
+            return null;
+        }
         Player player = globalState.getActivePlayer();
-        if (!player.getName().equals(p.getName())) {
+        if (player == null || !player.getName().equals(p.getName())) {
             if (!DEBUG_MODE) {
                 MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "It is not your turn.");
             }
@@ -231,7 +243,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             return null;
         } else {
             List<Card> resultList = globalState.drawCards(globalState.getCardsToDraw());
-            if(resultList == null){
+            if (resultList == null) {
                 globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile());
                 resultList = globalState.drawCards(globalState.getCardsToDraw());
             }
@@ -260,7 +272,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         if (!DEBUG_MODE) {
             MessageSender.sendEndGameToAll(globalState, threadedEinzServer);
         }
-        //TODO: Call a function from server to turn him off (or something like that)
+        //TODO: Eric calls a function from server to end the server properly
     }
 
     /**
@@ -271,7 +283,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      */
     public void removePlayer(Player player) {
         globalState.removePlayer(player);
-        if(globalState.getPlayersOrdered().size()<1){
+        if (globalState.getPlayersOrdered().size() < 1) {
             endGame();
         }
     }
@@ -411,25 +423,29 @@ public class ServerFunction implements ServerFunctionDefinition {
 
         //Check if any player has finished
         for (Player p : globalState.getPlayersOrdered()) {
-            if (GlobalRuleChecker.checkIsPlayerFinished(globalState, p, gameConfig)) {
+
+            if (GlobalRuleChecker.checkIsPlayerFinished(globalState, p, gameConfig)) { //this checks whether a player is finished through a rule!
+                //If a rule says that a player is finished, set him to finished in the globalState
+                //This works now because the GlobalRuleChecker now works as intended
                 globalState.setPlayerFinished(p);
                 if (!DEBUG_MODE) {
                     MessageSender.sendPlayerFinishedToAll(p, threadedEinzServer);
                 }
                 GlobalRuleChecker.checkOnPlayerFinished(globalState, p, gameConfig);
+
+
+                //Send everyone their state
+                if (!DEBUG_MODE) {
+                    MessageSender.sendStateToAll(threadedEinzServer, globalState, gameConfig);
+                }
+
+                //Check if the game is over
+                if (globalState.isGameFinished()) {
+                    endGame();
+                }
+
             }
         }
-
-        //Send everyone their state
-        if (!DEBUG_MODE) {
-            MessageSender.sendStateToAll(threadedEinzServer, globalState, gameConfig);
-        }
-
-        //Check if the game is over
-        if (globalState.isGameFinished()) {
-            endGame();
-        }
-
     }
 
     /**
@@ -438,6 +454,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      *
      * @param p the player that wants to receive the state of the game
      */
+
     public void getState(Player p) {
         if (!DEBUG_MODE) {
             MessageSender.sendState(p, threadedEinzServer, globalState, gameConfig);

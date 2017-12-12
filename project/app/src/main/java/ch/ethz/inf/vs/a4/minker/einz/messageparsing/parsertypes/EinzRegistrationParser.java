@@ -62,16 +62,18 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         String admin = body.getString("admin");
         HashMap<String, String> lobbylist = new HashMap<>();
         JSONArray jsonLobbyList = body.getJSONArray("lobbylist");
+        HashMap<String, JSONObject> playerSeatings = new HashMap<>();
 
         // foreach mapping {name:role}
         for(int i=0; i<jsonLobbyList.length();i++){
             JSONObject obj = jsonLobbyList.getJSONObject(i);
             lobbylist.put(obj.getString("username"), obj.getString("role"));
+            playerSeatings.put(obj.getString("username"), obj.optJSONObject("playerSeating"));
         }
 
         return new EinzMessage<>(
                 new EinzMessageHeader("registration", "UpdateLobbyList"),
-                new EinzUpdateLobbyListMessageBody(lobbylist, admin)
+                new EinzUpdateLobbyListMessageBody(lobbylist, admin, playerSeatings)
         );
     }
 
@@ -142,7 +144,8 @@ public class EinzRegistrationParser extends ch.ethz.inf.vs.a4.minker.einz.messag
         JSONObject body = message.getJSONObject("body");
         username = body.getString("username");
         role = body.getString("role");
-        EinzMessageBody emb = new EinzRegisterMessageBody(username, role);
+        JSONObject playerSeating = body.optJSONObject("playerSeating");
+        EinzMessageBody emb = new EinzRegisterMessageBody(username, role, playerSeating);
         return new EinzMessage<>(emh, emb);
     }
 

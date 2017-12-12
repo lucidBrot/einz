@@ -51,6 +51,7 @@ public class EinzServerManager {
     // used to keep track of currently registered usernames
     private ConcurrentHashMap<String, String> registeredClientRoles; // mapping client usernames to roles
     protected String adminUsername;
+    private ConcurrentHashMap<String,JSONObject> registeredClientPositioning; // used for finding out where a player is irl positioned
 
     public ReentrantReadWriteLock getUserListLock() { // registeredClientRoles, registeredClientHandlers, gamePhaseStarted
         return userListLock;
@@ -63,6 +64,7 @@ public class EinzServerManager {
         this.server = whotomanage;
         this.registeredClientHandlers = new ConcurrentHashMap<>();
         this.registeredClientRoles = new ConcurrentHashMap<>();
+        this.registeredClientPositioning = new ConcurrentHashMap<>();
         this.serverFunctionInterface = serverFunctionInterface;
         this.gamePhaseStarted = false;
     }
@@ -174,7 +176,7 @@ public class EinzServerManager {
      * @param username
      * @param handler
      */
-    public EinzMessage<? extends EinzMessageBody> registerUser(String username, String role, EinzServerClientHandler handler){
+    public EinzMessage<? extends EinzMessageBody> registerUser(String username, String role, EinzServerClientHandler handler, JSONObject playerSeating){
 
         String reason = "unknown";
         boolean success = false;
@@ -226,6 +228,7 @@ public class EinzServerManager {
             if (success) {
                 handler.setConnectedUser(username); // tell the handler which user it is connected to
                 String absent = getRegisteredClientRoles().putIfAbsent(username, role); //it really should be absent
+                getRegisteredClientPositioning().putIfAbsent(username, playerSeating);
                 userListLock.writeLock().unlock();
                 if (DEBUG && absent != null) { // assertion on android
                     userListLock.writeLock().unlock();
@@ -322,6 +325,7 @@ public class EinzServerManager {
             // unregister them
             getRegisteredClientRoles().remove(username);
             getRegisteredClientHandlers().remove(username);
+            getRegisteredClientPositioning().remove(username);
             getUserListLock().writeLock().unlock();
 
             // tell fabian about it
@@ -476,6 +480,13 @@ public class EinzServerManager {
         return hm;
     }
 
+    public ConcurrentHashMap<String, JSONObject> getRegisteredClientPositioning(){
+        this.userListLock.readLock().lock();
+        ConcurrentHashMap<String, JSONObject> hm = registeredClientPositioning;
+        this.userListLock.readLock().unlock();
+        return hm;
+    }
+
     /**
      * Lock onto {@link #userListLock} to ensure consistency while reading this.
      * Make sure to lock for writing on this.
@@ -605,15 +616,51 @@ public class EinzServerManager {
     }
 
     public void startGame(String issuedByPlayer) {
-        if(isRegisteredAdmin(issuedByPlayer) /*&& !gamePhaseStarted*/) { // if game is running, should we restart or not?
+        if(isRegisteredAdmin(issuedByPlayer) && !gamePhaseStarted) { // if game is running, should we restart or not?
+            if(numPlayersRegisteredWithoutSpectators()>0){
+
             finishRegistrationPhaseAndInitGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
             SFLock.writeLock().lock();
             serverFunctionInterface.startGame();
-            SFLock.writeLock().unlock();
+            SFLock.writeLock().unlock();}
+            else{
+                try {
+                    sendToast(issuedByPlayer, "Please start the game only when there is at least one player.");
+                } catch (UserNotRegisteredException e) {
+                    Log.e("servMan/startGame", "a unregistered player glitched a bit and stopped the registration phase...\nShutting down to get rid of any potential problems");
+                    e.printStackTrace();
+                    server.shutdown();
+                }
+            }
         }
         else{
             Log.e("servMan", "somebody unauthorized tried to start the game!");
         }
+    }
+
+    private void sendToast(String issuedByPlayer, String s) throws UserNotRegisteredException {
+        try {
+            this.server.sendMessageToUser(issuedByPlayer, new EinzMessage<EinzShowToastMessageBody>(
+                    new EinzMessageHeader("toast", "ShowToast"),
+                    new EinzShowToastMessageBody(s, "server", null)
+            ));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private int numPlayersRegisteredWithoutSpectators() {
+        userListLock.readLock().lock();
+        int i=0;
+        for(Map.Entry<String, EinzServerClientHandler> entry : registeredClientHandlers.entrySet()){
+            EinzServerClientHandler handler = (EinzServerClientHandler) entry.getValue();
+            String role = getRegisteredClientRoles().get(entry.getKey());
+            if ( role.toLowerCase().equals("player")) {
+                i++;
+            }
+        }
+        userListLock.readLock().unlock();
+        return i;
     }
 
     public void specifyRules(EinzSpecifyRulesMessageBody body) {

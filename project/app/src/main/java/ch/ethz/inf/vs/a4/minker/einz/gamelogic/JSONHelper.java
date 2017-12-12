@@ -34,7 +34,7 @@ public class JSONHelper {
      * @param possibleActions List of possible actions that the playCardAction should be added to if the player can play at least one card
      */
     public static void playCardJSONHelper(Player p, GlobalState state, GameConfig config, ArrayList<JSONObject> possibleActions) {
-        if (!p.equals(state.getActivePlayer())) {
+        if (state.getActivePlayer() == null || !p.getName().equals(state.getActivePlayer().getName())) {
             return; //TODO: Check in rules whether it is a players turn
         }
         JSONArray playableCards = new JSONArray();
@@ -71,7 +71,7 @@ public class JSONHelper {
     }
 
     public static void drawCardsJSONHelper(Player p, GlobalState state, GameConfig config, ArrayList<JSONObject> possibleActions) {
-        if (!p.equals(state.getActivePlayer())) {
+        if (state.getActivePlayer() == null || !p.getName().equals(state.getActivePlayer().getName())) {
             return; //TODO: Check in rules whether it is a players turn
         }
         if (CardRuleChecker.checkIsValidDrawCards(state, config)) {
@@ -100,7 +100,7 @@ public class JSONHelper {
     }
 
     public static void finishTurnJSONHelper(Player p, GlobalState state, GameConfig config, ArrayList<JSONObject> possibleActions) {
-        if (!p.equals(state.getActivePlayer())) {
+        if (state.getActivePlayer() == null || !p.getName().equals(state.getActivePlayer().getName())) {
             return; //TODO: Check in rules whether it is a players turn
         }
         if (GlobalRuleChecker.checkIsValidEndTurn(state, p, config)) {
@@ -150,7 +150,7 @@ public class JSONHelper {
         for (BasicGlobalRule r : config.globalRules) {
             JSONObject oneRule = new JSONObject();
             try {
-                oneRule.put(r.getName(), r.getName()); //Currently name is used as ID
+                oneRule.put("id", r.getName()); //TODO: Currently "id" is used as ID
                 if (r instanceof ParametrizedRule){
                     oneRule.put("parameters", ((ParametrizedRule) r).getParameterTypes());
                 } else {
