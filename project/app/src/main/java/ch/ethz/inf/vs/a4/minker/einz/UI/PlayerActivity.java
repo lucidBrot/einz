@@ -82,12 +82,16 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private GridLayout mGrid;
     private ArrayList<Card> cardStack = new ArrayList<>();
     private ImageView trayStack,trayStack2;
+
     private ImageView drawPile;
     private LayoutInflater inflater;
     private final double cardSizeRatio = 351.0/251.0;
     private boolean canDrawCard,canEndTurn;
     private Card lastPlayedCard = null;
     private Card seconLastPlayedCard = null;
+
+    private EinzClient ourClient;
+
 
     @Override
     protected void onStop() {
@@ -103,7 +107,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             ourClient.getActionCallbackInterface().setGameUI(this);
     }
 
-    private EinzClient ourClient;
     private int cardHeight,cardWidth;
 
     ArrayList<Integer> cardDrawables = new ArrayList<>();
