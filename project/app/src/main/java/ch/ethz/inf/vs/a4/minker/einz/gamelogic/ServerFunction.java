@@ -94,7 +94,13 @@ public class ServerFunction implements ServerFunctionDefinition {
             this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
-            globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
+            if(players.size()>0) {
+                globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
+            } else {
+                // we're not gonna play yet anyways...
+                // TODO: @Fabian is it ok if nextPlayer is null?
+                globalState.nextPlayer = null;
+            }
             if (!DEBUG_MODE) {
                 MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
             }
