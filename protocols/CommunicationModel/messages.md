@@ -692,7 +692,7 @@ Send some `toast` that should be displayed to the clientside user.
 
 `style` : *JSONObject* 
 
-> The client might ignore this. If the UI supports multiple textcolors or background colors, this will specify a style
+> The client might ignore this. If the UI supports multiple textcolors or background colors, this will specify a style. How exactly is yet to be specified. The client should always support this being empty or null.
 
 `from`: *"String"*
 
