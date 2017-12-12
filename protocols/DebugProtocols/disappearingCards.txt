@@ -179,3 +179,16 @@ Draw card -> next time on my turn play +2 -> card disappears but opponent gets 2
 12-12 10:12:10.041 28938-29036/ch.ethz.inf.vs.a4.minker.einz D/ActionFactory: successfully generated action of text class ch.ethz.inf.vs.a4.minker.einz.messageparsing.actiontypes.EinzSendStateAction
 12-12 10:12:10.167 28938-28938/ch.ethz.inf.vs.a4.minker.einz W/PlayerActivity: setHand is currently enabled. This means that the cards for debugging will not be shown.
 12-12 10:12:10.431 28938-28957/ch.ethz.inf.vs.a4.minker.einz D/EGL_emulation: eglMakeCurrent: 0xaebe45a0: ver 2 0 (tinfo 0xaebd2ac0)
+
+
+after drawing very often, the client lost a card after the host did not
+
+Server only draws, client only plays after initial drawing phase: every second play by client is lost.
+
+Seems like it's every second card played that gets lost... with maxStack = 2
+
+for maxStack = 3, it's not between 2-4
+
+A huge stack fixes this problem
+
+everything seems fine until (draws+cardsplayed) in total > maxStack. Then, it starts behaving randomly, seemingly somewhat based on drawing.

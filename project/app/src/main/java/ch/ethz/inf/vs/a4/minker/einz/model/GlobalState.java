@@ -57,7 +57,7 @@ public class GlobalState {
     public GlobalState(int maxDiscardPileSize, List<Player> orderOfPlayers){
         if(Debug.smallStack>=0){
             Log.w("DEBUG", "Using a small stack max size of "+Debug.smallStack+". To disable, set Debug.smallStack to -1");
-            this.maxDiscardPileSize = 2;
+            this.maxDiscardPileSize = Debug.smallStack;
         } else {
             this.maxDiscardPileSize = maxDiscardPileSize;
         }
