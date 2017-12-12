@@ -38,4 +38,8 @@ public class EinzRegisterMessageBody extends EinzMessageBody {
     public String getRole() {
         return role;
     }
+
+    public JSONObject getPlayerSeating() {
+        return playerSeating;
+    }
 }
