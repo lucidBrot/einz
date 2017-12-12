@@ -279,6 +279,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     public void setNumCardsInHandOfEachPlayer(HashMap<String, String> numCardsInHandOfEachPlayer) {
         for (String currPlayer:allPlayers){
             String numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
+
             GridLayout playerList = findViewById(R.id.gl_playerlist);
             View cardViewOfPlayer = playerList.findViewWithTag(currPlayer);
 

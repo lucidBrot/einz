@@ -108,6 +108,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
             }
         });
         */
+
         // same functionality but works on older devices:
         for (String username : hashMap.keySet()) {
             String s2 = hashMap.get(username);
