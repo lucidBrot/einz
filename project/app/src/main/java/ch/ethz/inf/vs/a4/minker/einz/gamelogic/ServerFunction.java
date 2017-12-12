@@ -84,26 +84,10 @@ public class ServerFunction implements ServerFunctionDefinition {
      */
 
     public void initialiseStandardGame(ThreadedEinzServer threadedEinzServer, ArrayList<Player> players) {
-        if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
+        if (players.size() < 1 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
-            // TODO: if you do nothing here, it crashes
-            //      I added the same code here as in the other case, but that is for debug only
-            Log.w("ServerFunction", "using debug code!!!");
-            this.threadedEinzServer = threadedEinzServer;
-            globalState = new GlobalState(10, players);
-            this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
-            globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
-            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
-            if(players.size()>0) {
-                globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
-            } else {
-                // we're not gonna play yet anyways...
-                // TODO: @Fabian is it ok if nextPlayer is null?
-                globalState.nextPlayer = null;
-            }
-            if (!DEBUG_MODE) {
-                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
-            }
+            //if you do nothing here, it crashes
+            //don't call initialiseStandardGame with to samll/large players.size()
         } else {
             this.threadedEinzServer = threadedEinzServer;
             globalState = new GlobalState(10, players);
@@ -132,7 +116,7 @@ public class ServerFunction implements ServerFunctionDefinition {
 
     public void initialiseGame(ThreadedEinzServer threadedEinzServer, ArrayList<Player> players, HashMap<Card, Integer> deck, Collection<BasicGlobalRule> globalRules,
                                Map<Card, ArrayList<BasicCardRule>> cardRules) {
-        if (players.size() < 2 || players.size() > MAX_NUMBER_OF_PLAYERS) {
+        if (players.size() < 1 || players.size() > MAX_NUMBER_OF_PLAYERS) {
             //don't initialise game
         } else {
             this.threadedEinzServer = threadedEinzServer;
@@ -239,7 +223,6 @@ public class ServerFunction implements ServerFunctionDefinition {
                 MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "It is not your turn.");
             }
             return null; //TODO: Check in rules whether its a players turn
-            // TODO: why can I draw forever, every time a card?
         }
         if (!CardRuleChecker.checkIsValidDrawCards(globalState, gameConfig)) {
             if (!DEBUG_MODE) {
@@ -279,9 +262,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param player the player to be removed
      */
     public void removePlayer(Player player) {
-        globalState.setPlayerFinished(player);
-        GlobalRuleChecker.checkOnPlayerFinished(globalState, player, gameConfig);
-        //TODO: don't let player finsih but remove him
+        globalState.removePlayer(player);
     }
 
     /**
@@ -373,7 +354,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
         }
 
-        for (CardColor cc : CardColor.values()) { // TODO: I replaced your version below with one that uses CardLoader. Does that make sense?
+        for (CardColor cc : CardColor.values()) {
 
             if (cc != CardColor.NONE) {
                 if(DEBUG_MODE) {
@@ -381,7 +362,6 @@ public class ServerFunction implements ServerFunctionDefinition {
                             CardText.SWITCHORDER, cc, "drawable", "card_" + CardText.SWITCHORDER.indicator + "_" + cc));
                     result.assignRuleToCard(new DrawTwoCardsRule(), new Card(cc + "_" + CardText.PLUSTWO.indicator, CardText.PLUSTWO.type,
                             CardText.PLUSTWO, cc, "drawable", "card_" + CardText.PLUSTWO.indicator + "_" + cc));
-
                     result.assignRuleToCard(new SkipRule(), new Card(cc + "_" + CardText.STOP.indicator, CardText.STOP.type,
                             CardText.STOP, cc, "drawable", "card_" + CardText.STOP.indicator + "_" + cc));
                 }else{
