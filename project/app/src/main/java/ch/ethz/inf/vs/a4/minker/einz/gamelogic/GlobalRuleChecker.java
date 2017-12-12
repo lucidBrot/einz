@@ -167,4 +167,17 @@ public class GlobalRuleChecker {
         }
         return state;
     }
+
+    /**
+     * called when the game is over, e.g. to determine the ranking points
+     * @param state
+     * @param gameConfig
+     * @return modified state
+     */
+    public static GlobalState checkOnGameOver(GlobalState state, GameConfig gameConfig){
+        for (BasicGlobalRule r : gameConfig.globalRules){
+            state = r.onGameOver(state);
+        }
+        return state;
+    }
 }

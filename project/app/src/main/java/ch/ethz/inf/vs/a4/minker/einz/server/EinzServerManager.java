@@ -667,8 +667,7 @@ public class EinzServerManager {
 
     public void specifyRules(EinzSpecifyRulesMessageBody body) {
         getSFLock().writeLock().lock();
-        getServerFunctionInterface().initialiseGame(null, getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());
-        //TODO: Change "null" as threadedEInzServer to something useful
+        getServerFunctionInterface().initialiseGame(this.server, getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());
         getSFLock().writeLock().unlock();
     }
 

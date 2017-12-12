@@ -156,4 +156,12 @@ public class CardRuleChecker {
         return state;
     }
 
+    public static GlobalState checkOnGameOver(GlobalState state, GameConfig gameConfig) {
+        for (BasicRule r: gameConfig.allRules){
+            if (r instanceof BasicCardRule){
+                state = ((BasicCardRule) r).onGameOver(state);
+            }
+        }
+        return state;
+    }
 }

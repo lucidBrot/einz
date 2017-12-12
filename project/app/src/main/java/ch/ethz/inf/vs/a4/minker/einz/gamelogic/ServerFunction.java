@@ -155,7 +155,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      */
     public void startGame() {
         // gameConfig is null here if initialiseGame/initialiseStandartGame is not called properly
-        GlobalRuleChecker.checkOnStartGame(globalState, gameConfig);
+        globalState = GlobalRuleChecker.checkOnStartGame(globalState, gameConfig);
         globalState.nextTurn(); //Sets the active player to the one specified in initialiseGame
         onChange();
     }
@@ -252,8 +252,8 @@ public class ServerFunction implements ServerFunctionDefinition {
                 result.add(c);
             } //Build Arraylist form list since casting causes an exception
             player.hand.addAll(result);
-            CardRuleChecker.checkOnDrawCard(globalState, gameConfig);
-            GlobalRuleChecker.checkOnDrawCard(globalState, gameConfig);
+            globalState = CardRuleChecker.checkOnDrawCard(globalState, gameConfig);
+            globalState = GlobalRuleChecker.checkOnDrawCard(globalState, gameConfig);
             if (!DEBUG_MODE) {
                 MessageSender.sendDrawCardResponseSuccess(player, threadedEinzServer, result);
             }
@@ -269,6 +269,8 @@ public class ServerFunction implements ServerFunctionDefinition {
      */
     public void endGame() {
         globalState.finishGame();
+        globalState = CardRuleChecker.checkOnGameOver(globalState, gameConfig);
+        globalState = GlobalRuleChecker.checkOnGameOver(globalState, gameConfig);
         if (!DEBUG_MODE) {
             MessageSender.sendEndGameToAll(globalState, threadedEinzServer);
         }
@@ -431,7 +433,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                 if (!DEBUG_MODE) {
                     MessageSender.sendPlayerFinishedToAll(p, threadedEinzServer);
                 }
-                GlobalRuleChecker.checkOnPlayerFinished(globalState, p, gameConfig);
+                globalState = GlobalRuleChecker.checkOnPlayerFinished(globalState, p, gameConfig);
             }
 
             //Send everyone their state
