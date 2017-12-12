@@ -242,7 +242,7 @@ public class GlobalState {
     /**
      * Sets the finished Flag to true.
      */
-    public synchronized void finishGame(){
+    public void finishGame(){
         gameFinished = true;
     }
 
