@@ -193,7 +193,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         cardWidth  = (size.x / mGrid.getColumnCount());
         cardHeight = (size.y / (3*mGrid.getRowCount()));
-        initCards();
+        //initCards();
 
         //add cardDrawables to mgrid
         /*
