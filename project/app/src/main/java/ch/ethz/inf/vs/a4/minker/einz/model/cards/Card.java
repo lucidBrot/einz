@@ -110,6 +110,9 @@ public class Card {
         JSONObject card = new JSONObject();
         try {
             card.put("ID", this.ID);
+            if(this.origin==null){
+                this.origin=CardOrigin.UNSPECIFIED.value;
+            }
             card.put("origin", this.origin);
         } catch (JSONException e) {
             e.printStackTrace(); // this will not happen. EVER.
