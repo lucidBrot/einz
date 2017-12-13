@@ -294,7 +294,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         for (CardText ct : CardText.values()) {
             if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
                 for (CardColor cc : CardColor.values()) {
-                    if (cc != CardColor.NONE && cc == CardColor.BLUE) { // TODO: enable NONE
+                    if (cc != CardColor.NONE /*&& cc == CardColor.BLUE*/) { // <Debug> can set here to only use blue colors
                         if (DEBUG_MODE) {
                             Card card = new Card(cc + "_" + ct.indicator, ct.type, ct, cc, "drawable", "card_" + ct.indicator + "_" + cc);
                             //NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
