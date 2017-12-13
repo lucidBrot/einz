@@ -436,7 +436,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     ourClient.getConnection().sendMessage(
                             "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"}," +
                                     "\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}, " +
-                                    "\"playParameters\":{\"Wish color\":\"RED\"}}}");
+                                    "\"playParameters\":{\"Wish color\":\"GREEN\"}}}");
                 } catch (SendMessageFailureException e) {
                     e.printStackTrace();
                 }

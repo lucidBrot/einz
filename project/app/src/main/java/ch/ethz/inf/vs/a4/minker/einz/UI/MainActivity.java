@@ -43,7 +43,7 @@ public class MainActivity extends FullscreenActivity implements View.OnClickList
     private void initializeRuleLoader() {
         RuleLoader loader = EinzSingleton.getInstance().getRuleLoader();
         try {
-            loader.loadRulesFromResourceFile(this, R.raw.card_definition);
+            loader.loadRulesFromResourceFile(this, R.raw.rule_registration);
         } catch (JSONException e) {
             Log.e("MainActivity", "Failed to initialize RuleLoader.");
             e.printStackTrace();

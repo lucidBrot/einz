@@ -87,7 +87,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
-                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
             }
         }
     }
@@ -133,7 +133,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
-                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
             }
         }
     }
@@ -181,7 +181,8 @@ public class ServerFunction implements ServerFunctionDefinition {
         } else {
             player.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways, and sending the message only cares for its name attribute
             globalState.addCardToDiscardPile(card);
-            globalState.setPlayParameters(playParameters);
+            //globalState.setPlayParameters(playParameters);
+            globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
             globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
             globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);

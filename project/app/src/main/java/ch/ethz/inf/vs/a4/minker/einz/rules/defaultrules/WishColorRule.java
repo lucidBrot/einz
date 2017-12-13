@@ -31,8 +31,10 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
     }
 
     @Override
-    public boolean isValidPlayCardRestrictive(GlobalState state, Card played) {
-        return !wished || played.getColor().equals(wishedColor);
+    public boolean isValidPlayCardPermissive(GlobalState state, Card played) {
+        System.err.println("wished color " + wishedColor);
+        System.err.println("wished color " + played.getColor());
+        return played.getColor().equals(wishedColor);
     }
 
     @Override
@@ -45,13 +47,13 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
 
         String result = config.getClien tCallbackService().getSelectionFromPlayer(state.getActivePlayer(), options);
         wishedColor = CardColor.valueOf(result);*/
-        JSONObject params = state.getPlayParameter("wishColorRule");
-        if(params!=null && !params.equals(new JSONObject())){
-            wishedColor = CardColor.valueOf(params.optString("wishedColor"));
-        } else {
-            // TODO: what to do if no color sent?
-            wishedColor = CardColor.NONE;
-        }
+//        JSONObject params = state.getPlayParameter("wishColorRule");
+//        if(params!=null && !params.equals(new JSONObject())){
+//            wishedColor = CardColor.valueOf(params.optString("wishedColor"));
+//        } else {
+//            // TODO: what to do if no color sent?
+//            wishedColor = CardColor.NONE;
+//        }
         // Idee: wenn die Karte gespielt wird, muss die UI sowieso wissed dass der user eine farbe auswählen muss. Also user direkt farbe auswählen lassen.
         //      Danach die karte clientside mit diesem parameter setzen.
         //      Wenn server die karte erhält wird diese regel getriggert und die liest den parameter aus.
@@ -74,5 +76,13 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
             result.add(color.name());
         }
         return result;
+    }
+
+    @Override
+    public GlobalState onPlayAssignedCardChoice(GlobalState state, String choice){
+        wishedColor = CardColor.valueOf(choice);
+        System.err.println("Made choice " + choice);
+        System.err.println("Made choice color" + wishedColor);
+        return state;
     }
 }

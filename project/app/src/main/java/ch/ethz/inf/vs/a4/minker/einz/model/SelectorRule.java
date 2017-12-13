@@ -15,4 +15,6 @@ public interface SelectorRule {
      * @return A List of choices
      */
     List<String> getChoices(GlobalState state);
+
+    GlobalState onPlayAssignedCardChoice(GlobalState state, String choice);
 }
