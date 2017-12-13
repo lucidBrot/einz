@@ -119,6 +119,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     ArrayList<String> allPlayers = new ArrayList<>();
     String colorChosen = "none";
     LinearLayout llHand;
+    LinearLayout llGame;
     ScrollView svHand;
 
     private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
@@ -138,6 +139,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         trayStack.setOnDragListener(new TrayDragListener());
 
         trayStack2 = findViewById(R.id.tray_stack_2);
+
+        llGame = findViewById(R.id.ll_game);
+        llGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideColorWheel();
+            }
+        });
 
         mGrid = findViewById(R.id.grid_layout);
         mGridScrollable = findViewById(R.id.grid_layout_scrollable);
@@ -422,12 +431,98 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     public void playCard(final Card playedCard){
+        hideColorWheel();
+
+        setlastplayedCard(playedCard);
+
+        if (isWishingCard(playedCard)){
+            displayColorWheel();
+        } else {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ourClient.getConnection().sendMessage(
+                                "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}}}");
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+    private boolean isWishingCard(Card playedCard) {
+        return playedCard.getID().equals("take4") || playedCard.getID().equals("choose");
+    }
+
+    public void displayColorWheel(){
+        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
+        colorWheel.setVisibility(View.VISIBLE);
+    }
+
+    public void hideColorWheel(){
+        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
+        colorWheel.setVisibility(View.INVISIBLE);
+    }
+
+    public void onColorWheelButtonGreenClick(){
+        hideColorWheel();
+        colorChosen = "green";
         this.backgroundHandler.post(new Runnable() {
             @Override
             public void run() {
                 try {
                     ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}}}");
+                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + lastPlayedCard.getID() + "\",\"origin\":\"" + lastPlayedCard.getOrigin() + "\"}}}");
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void onColorWheelButtonRedClick(){
+        hideColorWheel();
+        colorChosen = "red";
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ourClient.getConnection().sendMessage(
+                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + lastPlayedCard.getID() + "\",\"origin\":\"" + lastPlayedCard.getOrigin() + "\"}}}");
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void onColorWheelButtonBlueClick(){
+        hideColorWheel();
+        colorChosen = "blue";
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ourClient.getConnection().sendMessage(
+                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + lastPlayedCard.getID() + "\",\"origin\":\"" + lastPlayedCard.getOrigin() + "\"}}}");
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void onColorWheelButtonYellowClick(){
+        hideColorWheel();
+        colorChosen = "yellow";
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ourClient.getConnection().sendMessage(
+                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + lastPlayedCard.getID() + "\",\"origin\":\"" + lastPlayedCard.getOrigin() + "\"}}}");
                 } catch (SendMessageFailureException e) {
                     e.printStackTrace();
                 }
@@ -509,36 +604,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             playerList.addView(usercard);
             allPlayers.add(addedPlayer);
         }
-    }
-
-    public void displayColorWheel(){
-        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
-        colorWheel.setVisibility(View.VISIBLE);
-    }
-
-    public void hideColorWheel(){
-        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
-        colorWheel.setVisibility(View.INVISIBLE);
-    }
-
-    public void onColorWheelButtonGreenClick(){
-        hideColorWheel();
-        colorChosen = "green";
-    }
-
-    public void onColorWheelButtonRedClick(){
-        hideColorWheel();
-        colorChosen = "red";
-    }
-
-    public void onColorWheelButtonBlueClick(){
-        hideColorWheel();
-        colorChosen = "blue";
-    }
-
-    public void onColorWheelButtonYellowClick(){
-        hideColorWheel();
-        colorChosen = "yellow";
     }
 
     public void removePlayerFromList(String playerToBeRemoved){
@@ -1011,7 +1076,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     case DragEvent.ACTION_DROP:
                         ImageView tmpView = (ImageView) view;
 
-                        setlastplayedCard((Card)tmpView.getTag());
+                        //setlastplayedCard((Card)tmpView.getTag());
                         //remove card from inner cardlist
                          playCard((Card)tmpView.getTag());
 
