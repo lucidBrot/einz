@@ -663,6 +663,8 @@ The states will be empty if there was a GetState request while not appropriate -
 
 See [Card](#card) for more info!
 
+`playParameters` comes from PlayCard when a color was wished.
+
 ```Json
 {
   "header":{
@@ -681,7 +683,11 @@ See [Card](#card) for more info!
         {"ID":"cardID1337", "origin":"Rip"}
       ],
       "whoseturn":"Ric",
-      "drawxcardsmin":"2"
+      "drawxcardsmin":"2",
+      "playParameters":{
+        "wishColorRule":{"wishForColor":"blue"},
+        "ruleDank":{"xXx":"1337"}
+      }
     },
     "playerstate":{
       "hand":[

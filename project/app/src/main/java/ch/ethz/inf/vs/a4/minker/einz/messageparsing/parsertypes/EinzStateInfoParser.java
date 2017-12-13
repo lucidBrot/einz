@@ -66,7 +66,7 @@ public class EinzStateInfoParser extends EinzParser {
 
                 JSONObject playParams = cardJSON.optJSONObject("playParameters");
 
-                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin, playParams);
+                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin);
                 stack.add(card);
             }
             String whoseturn = globalstateJSON.getString("whoseturn");
@@ -87,7 +87,7 @@ public class EinzStateInfoParser extends EinzParser {
 
                 JSONObject playParams = cardJSON.optJSONObject("playParameters");
 
-                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin, playParams);
+                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin);
                 // Card card = new Card(ID, origin, CardText.DEBUG, CardColor.BLUE, "drawable", "card_1_blue");
                 hand.add(card);
             }
