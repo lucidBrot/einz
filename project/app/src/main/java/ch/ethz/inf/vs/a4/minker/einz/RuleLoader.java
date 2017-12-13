@@ -25,6 +25,7 @@ public class RuleLoader {
     public RuleLoader(){
         ruleMapping = new HashMap<>();
         ruleDescription = new HashMap<>();
+        ruleParameters = new HashMap<>();
     }
 
     public BasicRule getInstanceOfRule(String ruleName){
