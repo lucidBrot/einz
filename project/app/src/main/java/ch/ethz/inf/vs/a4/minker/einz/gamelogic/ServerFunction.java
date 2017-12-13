@@ -309,17 +309,22 @@ public class ServerFunction implements ServerFunctionDefinition {
                         }
                     }
                 }
-            } else if (ct != CardText.DEBUG) {
-                if (DEBUG_MODE) {
-                    Card card = new Card(CardColor.NONE + "_" + ct.indicator, ct.type, ct, CardColor.NONE, "drawable", "card_" + ct.indicator + "_" + CardColor.NONE);
-                    //NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
-                    //either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
-                    numberOfCardsInGame.put(card, 4);
-                    allCardsInGame.add(card);
-                } else {
-                    Card card = cardLoader.getCardInstance(CardColor.NONE.toString().toLowerCase() + "_" + ct.indicator);
-                    numberOfCardsInGame.put(card, 4);
-                    allCardsInGame.add(card);
+            } else {
+                switch (ct) {
+                    case DEBUG:
+                        break; // don't add this card
+                    case CHANGECOLOR:
+                        Card card = cardLoader.getCardInstance("choose");
+                        numberOfCardsInGame.put(card, 4);
+                        allCardsInGame.add(card);
+                        break;
+                    case CHANGECOLORPLUSFOUR:
+                        Card carD = cardLoader.getCardInstance("take4");
+                        numberOfCardsInGame.put(carD, 4);
+                        allCardsInGame.add(carD);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -364,7 +369,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                         }
                     }
                 }
-            } else if(ct != CardText.DEBUG){
+            } else if (ct != CardText.DEBUG) {
                 if (DEBUG_MODE) {
                     Card card = new Card(CardColor.NONE + "_" + ct.indicator, ct.type, ct, CardColor.NONE, "drawable", "card_" + ct.indicator + "_" + CardColor.NONE);
                     //NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
