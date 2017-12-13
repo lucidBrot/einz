@@ -34,12 +34,11 @@ public class CardLoader {
     }
 
     /**
-     * @param cardID         the ID
-     * @param cardOrigin     some username or a {@link CardOrigin} string
-     * @param playParameters null or some JSONObject of the form  <code>{"ruleWish":{"wishForColor":"blue"},"ruleDank":{"xXx":"1337"}}</code>
-     * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings and as origin {@link CardOrigin#UNSPECIFIED}
+     * @param cardID
+     * @param cardOrigin
+     * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings
      */
-    public Card getCardInstance(String cardID, String cardOrigin, @Nullable JSONObject playParameters) {
+    public Card getCardInstance(String cardID, String cardOrigin) {
         if (!cardMapping.containsKey(cardID)) {
             //return null;
             // TODO: remove this debug card once all cards are registered in the json resource
@@ -50,16 +49,7 @@ public class CardLoader {
             // return getCardInstance("yellow_skip");
         }
         CardAttributeContainer params = cardMapping.get(cardID);
-        return new Card(cardID, params.name, params.text, params.color, params.resourceGroup, params.resourceName, cardOrigin, playParameters);
-    }
-
-    /**
-     * @param cardID
-     * @param cardOrigin
-     * @return the Card with the specified ID or <code>null</code> if it was not found in our mappings
-     */
-    public Card getCardInstance(String cardID, String cardOrigin) {
-        return getCardInstance(cardID, cardOrigin, null);
+        return new Card(cardID, params.name, params.text, params.color, params.resourceGroup, params.resourceName, cardOrigin);
     }
 
     /**

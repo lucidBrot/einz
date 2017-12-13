@@ -43,12 +43,12 @@ public class EinzPlayCardParser extends EinzParser {
         String ID = cardJSON.getString("ID");
         String origin = cardJSON.getString("origin");
 
-        JSONObject playParams = cardJSON.optJSONObject("playParameters");
+        JSONObject playParams = body.optJSONObject("playParameters");
 
-        Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin, playParams);
+        Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin);
 
         //put it all together
-        EinzMessageBody emb = new EinzPlayCardMessageBody(card);
+        EinzMessageBody emb = new EinzPlayCardMessageBody(card, playParams);
         EinzMessage einzMessage = new EinzMessage<>(emh, emb);
         return einzMessage;
     }

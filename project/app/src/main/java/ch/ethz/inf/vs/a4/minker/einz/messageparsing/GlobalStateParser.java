@@ -19,12 +19,25 @@ public class GlobalStateParser {
     private ArrayList<Card> stack;
     private String whoseTurn;
     private String drawxCardsMin;
+    private JSONObject playParameters;
 
-    public GlobalStateParser(HashMap<String, String> numcardsinhand, ArrayList<Card> stack, String whoseTurn, String drawxCardsMin){
+    /**
+     * @param numcardsinhand
+     * @param stack
+     * @param whoseTurn
+     * @param drawxCardsMin
+     * @param playParameters see the docs
+     */
+    public GlobalStateParser(HashMap<String, String> numcardsinhand, ArrayList<Card> stack, String whoseTurn, String drawxCardsMin, JSONObject playParameters){
         this.numcardsinhand = numcardsinhand;
         this.stack = stack;
         this.whoseTurn = whoseTurn;
         this.drawxCardsMin = drawxCardsMin;
+        this.playParameters=playParameters==null?new JSONObject():playParameters;
+    }
+
+    public GlobalStateParser(HashMap<String, String> numcardsinhand, ArrayList<Card> stack, String whoseTurn, String drawxCardsMin){
+        this(numcardsinhand, stack, whoseTurn, drawxCardsMin, new JSONObject());
     }
 
     public String getWhoseTurn() {
@@ -33,6 +46,20 @@ public class GlobalStateParser {
 
     public void setWhoseTurn(String whoseTurn) {
         this.whoseTurn = whoseTurn;
+    }
+
+    public JSONObject getPlayParameters() {
+        return playParameters;
+    }
+
+    public void setPlayParameters(JSONObject playParameters) {
+
+        this.playParameters = playParameters;
+    }
+
+    public HashMap<String, String> getNumcardsinhand() {
+
+        return numcardsinhand;
     }
 
     public String getDrawxCardsMin() {

@@ -159,7 +159,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param p    the player that wants to play a card
      * @return whether the player is allowed to play the card he wants to play or not
      */
-    public boolean play(Card card, Player p) {
+    public boolean play(Card card, Player p, JSONObject playParameters) {
         if (globalState.isGameFinished()) {
             if (!DEBUG_MODE) {
                 MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
@@ -181,6 +181,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         } else {
             player.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways, and sending the message only cares for its name attribute
             globalState.addCardToDiscardPile(card);
+            globalState.setPlayParameters(playParameters);
             globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
             globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
@@ -190,6 +191,13 @@ public class ServerFunction implements ServerFunctionDefinition {
             onChange();
             return true;
         }
+    }
+
+    /**
+     * calls {@link #play(Card, Player, JSONObject)} without a JSONObject for playParameters
+     */
+    public boolean play(Card card, Player p){
+        return play(card, p, new JSONObject());
     }
 
     /**
