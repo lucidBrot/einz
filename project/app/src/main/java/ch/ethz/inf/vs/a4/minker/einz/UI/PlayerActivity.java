@@ -303,17 +303,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     private void rearrangeHandSmallEnough(){
-        svHand.setVisibility(View.GONE);
         llHand.setVisibility(View.VISIBLE);
+        svHand.setVisibility(View.GONE);
     }
 
     private void removeCardFromHand(Card cardRemoved){
         if(cardRemoved != null) {
-            int numberOfCardsBefore = cards.size();
-            cards.remove(cardRemoved);
-            mGrid.removeView(mGrid.findViewWithTag(cardRemoved));
+            if(!(mGridScrollable.getChildCount() == mGrid.getChildCount() && mGrid.getChildCount() == cards.size())){
+                System.out.println("will fail to remove card");
+            }
+
             mGridScrollable.removeView(mGridScrollable.findViewWithTag(cardRemoved));
-            if(numberOfCardsBefore > MAXCARDINHAND && cards.size() <= MAXCARDINHAND){
+            mGrid.removeView(mGrid.findViewWithTag(cardRemoved));
+
+            cards.remove(cardRemoved);
+
+            if(cards.size() + 1 > MAXCARDINHAND && cards.size() <= MAXCARDINHAND){
                 rearrangeHandSmallEnough();
             }
         }
@@ -463,13 +468,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     public void addToHand(ArrayList<Card> addedCards){
-        int nrOfCardsBefore = cards.size();
         for (Card currCard:addedCards){
-            int numberOfCardsBefore = cards.size();
             addCard(currCard);
-            if(numberOfCardsBefore <= MAXCARDINHAND && cards.size() > MAXCARDINHAND){
-                rearrangeHandTooBig();
-            }
+        }
+        if(cards.size() - addedCards.size() <= MAXCARDINHAND && cards.size() > MAXCARDINHAND){
+            rearrangeHandTooBig();
         }
     }
 
@@ -844,9 +847,27 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                         // get the new list index
                         final int index = calculateNewIndex(mGrid,event.getX(), event.getY());
                         // remove the view from the old position
-                        mGrid.removeView(view);
-                        // and push to the new
-                        mGrid.addView(view, index);
+                        if(mGrid.indexOfChild(view)!=index) {
+                            mGrid.removeView(view);
+                            // and push to the new
+                            // card got removed in the meantime if not true
+                            if(mGrid.getChildCount() < cards.size()) {
+                                mGrid.addView(view, index);
+                            }
+                            //same shit for the other view
+                            View view2 = mGridScrollable.findViewWithTag(view.getTag());
+                            if (view2 != null) {
+
+                                if (index < mGridScrollable.getChildCount()) {
+                                    mGridScrollable.removeView(view2);
+
+                                    // card got removed in the meantime if not true
+                                    if(mGridScrollable.getChildCount() < cards.size()) {
+                                        mGridScrollable.addView(view2, index);
+                                    }
+                                }
+                            }
+                        }
 
                         break;
                     case DragEvent.ACTION_DROP:
@@ -854,7 +875,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
-                        view.setVisibility(View.VISIBLE);
+                        //view.setVisibility(View.VISIBLE);
 
                         break;
                     default:
@@ -897,10 +918,21 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                         // get the new list index
                         final int index = calculateNewIndex(mGridScrollable,event.getX(), event.getY());
                         // remove the view from the old position
-                        mGridScrollable.removeView(view);
-                        // and push to the new
-                        mGridScrollable.addView(view, index);
+                        if(mGrid.indexOfChild(view)!=index) {
 
+                            mGridScrollable.removeView(view);
+                            // and push to the new
+                            mGridScrollable.addView(view, index);
+                            //same for other
+                            View view2 = mGrid.findViewWithTag(view.getTag());
+                            if (view2 != null) {
+                                if (index < mGrid.getChildCount()) {
+                                    mGrid.removeView(view2);
+
+                                    mGrid.addView(view2, index);
+                                }
+                            }
+                        }
                         break;
                     case DragEvent.ACTION_DROP:
                         view.setVisibility(View.VISIBLE);
