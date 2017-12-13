@@ -188,7 +188,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         });
 
         Button endGame = findViewById(R.id.btn_end_game);
-        colorWheelBlueButton.setOnClickListener(new View.OnClickListener() {
+        endGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goBackToMainMenu();
@@ -201,8 +201,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         Point size = new Point();
         display.getRealSize(size);
 
-        cardWidth  = (size.x / mGrid.getColumnCount());
-        cardHeight = (size.y / (3*mGrid.getRowCount()));
+        cardWidth  = (size.x / 8);
+        cardHeight = (size.y /(12));
         //initCards();
 
         //add cardDrawables to mgrid
@@ -300,46 +300,31 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         } else {
             b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         }
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
+
+        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
         trayStack.setImageBitmap(bitmapResized);
 
         //if()
         double direction = Math.random() * 2*Math.PI;
-        double xTranslation = Math.cos(direction) * 1000;
-        double yTranslation = Math.sin(direction) * 1000;
+        double xTranslation = Math.cos(direction) * 1500;
+        double yTranslation = Math.sin(direction) * 1500;
 
-        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).setListener(new Animator.AnimatorListener() {
+        trayStack.setVisibility(View.VISIBLE);
+        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new Runnable() {
             @Override
-            public void onAnimationStart(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                trayStack.animate().translationX(0).translationY(0).setDuration(1000);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
+            public void run() {
+                trayStack.setVisibility(View.VISIBLE);
+                trayStack.animate().translationX(0).translationY(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(500).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        trayStack2.setImageBitmap(bitmapResized);
+                    }
+                });
 
             }
         });
-    }
 
-    public void setSecondTopPlayedCard(Card cardToSet) {
 
-        //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
-
-        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack2.getWidth(),(int)(cardSizeRatio * (double)trayStack2.getWidth()), false);
-        trayStack2.setImageBitmap(bitmapResized);
-
-                //setlastplayedCard(cardToSet);
     }
 
     private void initCards(){
@@ -347,7 +332,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
         addCard(cardLoader.getCardInstance("yellow_1"));
         // </education>
-
+        /*
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_blue"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_yellow"));
@@ -361,7 +346,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));*/
     }
 
     public boolean checkCardsStillValid(ArrayList<Card> cardlist){
@@ -484,7 +469,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void hideColorWheel(){
         LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
-        colorWheel.setVisibility(View.GONE);
+        colorWheel.setVisibility(View.INVISIBLE);
     }
 
     public void onColorWheelButtonGreenClick(){
@@ -614,6 +599,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         endscreen.setVisibility(View.VISIBLE);
         LinearLayout winningPlayers = findViewById(R.id.ll_winning_players);
         HashMap<String,String> playerPoints = message.getBody().getPoints();
+
         for(String player:allPlayers){
 
             CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerpointlist_element, winningPlayers, false);
@@ -720,11 +706,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setStack(ArrayList<Card> stack) {
         if(!checkCardListIdentical(stack,cardStack)) {
             Card sndCard = null;
-
-            if (stack.size() > 1) {
-                sndCard = stack.get(stack.size() - 2);
-                setSecondTopPlayedCard(sndCard);
-            }
 
             final Card topCard = stack.get(stack.size() - 1);
 
