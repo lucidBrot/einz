@@ -11,13 +11,13 @@
     <color name="orange_brown">#6a3705</color>
 
     <color name="blue_default">#56B3FC</color>
-    <color name="blue_dark">#3491da</color>
-    <color name="blue_darker">#0f6bb2</color>
+    <color name="blue_dark">#217ec7</color>
+    <color name="blue_darker">#144368</color>
 
 
     <color name="red_default">#FE4543</color>
-    <color name="red_dark">#F32826</color>
-    <color name="red_darker">#9F0200</color>
+    <color name="red_dark">#c9100f</color>
+    <color name="red_darker">#7b0200</color>
 
     <color name="red_wine">#870000</color>
 

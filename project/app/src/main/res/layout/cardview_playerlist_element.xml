@@ -19,7 +19,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
+            android:layout_weight="3"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -27,16 +27,17 @@
                 android:id="@+id/tv_playerlist_username"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
+                android:layout_marginLeft="5dp"
                 android:ellipsize="none"
                 android:text="Roger"
+                android:textAlignment="center"
                 android:textColor="@color/blue_darker"
-                android:textSize="10sp" />
+                android:textSize="12sp" />
 
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight=".5"
             android:gravity="center"
@@ -46,26 +47,27 @@
                 android:id="@+id/tv_nr_of_cards"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="5dp"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:text="0"
-                android:textAlignment="textEnd"
+                android:textAlignment="center"
                 android:textColor="@color/blue_darker"
-                android:textSize="10sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
         <RelativeLayout
             android:layout_width="0dp"
-            android:layout_height="20dp"
-            android:layout_weight=".5"
-            android:alpha=".5"
+            android:layout_height="30dp"
+            android:layout_weight=".7"
+            android:alpha=".6"
             android:gravity="center">
 
             <ImageView
                 android:id="@+id/imageView3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginRight="5dp"
+                android:scaleType="fitCenter"
                 app:srcCompat="@drawable/card_back" />
 
         </RelativeLayout>

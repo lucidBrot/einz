@@ -698,12 +698,17 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
             setCanDrawCard(true);
 
+            /*
             Context context = getApplicationContext();
             CharSequence text = "It's your turn " + ourClient.getUsername();
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
+            */
+            findViewById(R.id.ll_its_your_turn).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.ll_its_your_turn).setVisibility(View.GONE);
         }
 
         if(allPlayers.contains(playerThatStartedTurn)) {
