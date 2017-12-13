@@ -208,7 +208,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
-
+        // Log.d("DEBUG", "toost updateLobby");
         playerSeating = message.getBody().getPlayerSeatings();
 
     }
