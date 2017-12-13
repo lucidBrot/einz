@@ -277,7 +277,13 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         localImgView2.getLayoutParams().width  = cardWidth;
         localImgView2.getLayoutParams().height = cardHeight;
 
-        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()))).getBitmap();
+        Bitmap b;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
+        } else {
+            b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()))).getBitmap();
+        }
+
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, (int)(1.0/cardSizeRatio * (double)cardHeight),cardHeight, false);
 
         localImgView.setImageBitmap(bitmapResized);
