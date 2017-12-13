@@ -591,7 +591,7 @@ The **Client** can request to play a card. The Server will play the card if it i
       "origin":"~stack"
     },
      "playParameters":{
-    	"ruleWish":{"wishForColor":"blue"},
+    	"wishColorRule":{"wishForColor":"blue"},
     	"ruleDank":{"xXx":"1337"}
     }
   }
@@ -600,7 +600,7 @@ The **Client** can request to play a card. The Server will play the card if it i
 
 `playParameters` is a list of *JSONObjects*  which represent settings specific to this card ID when played. Exampli gratuita, a player might play a card that allows them to wish for a color. It is easiest when that selection is sent with the playCard Request.
 
-This field will usually be ignored, unless a rule uses it. To use it, you can call `yourCard.getPlayParameters("wishForColors")` to get the *String* associated with *"wishForColors"* or `yourCard.getPlayParameters()` to get the whole *JSONObject* list. 
+This field will usually be ignored, unless a rule uses it. To use it, you can call `message.getPlayParameters("wishForColors")` to get the *String* associated with *"wishForColors"* or `message.getPlayParameters()` to get the whole *JSONObject* list. 
 Example:
 
 ```java
@@ -611,7 +611,7 @@ wishedColor = CardColor.valueOf(played.getPlayParameter("wishColorRule", "wished
         //      Wenn server die karte erhält wird diese regel getriggert und die liest den parameter aus.
 ```
 
-
+Make sure to use a rule name coherent with our rules.
 
 ## PlayCardResponse
 
@@ -999,3 +999,5 @@ A rule is only specified by its identifier and maybe some parameters, already pr
 ## Custom Rule Actions
 
 List here which rules require which parameter format.
+
+`wishColorRule`:`{"wishForColor":"blue"}`
