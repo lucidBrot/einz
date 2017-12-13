@@ -119,7 +119,15 @@ public class EinzServerManager {
         Card myCard = cardLoader.getCardInstance("debug");
         deck.put(myCard, 2);
         Collection<BasicGlobalRule> globalRules = new ArrayList<>();
-        globalRules.add(new StartGameWithCardsRule());
+        StartGameWithCardsRule myStartGameWithCardsRule = new StartGameWithCardsRule();
+        try {
+            JSONObject param = new JSONObject();
+            param.put(StartGameWithCardsRule.getParameterName(), 7);
+            myStartGameWithCardsRule.setParameter(param);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        globalRules.add(myStartGameWithCardsRule);
         globalRules.add(new WinOnNoCardsRule());
         globalRules.add(new ResetCardsToDrawRule());
         globalRules.add(new CountNumberOfCardsAsPoints());
@@ -131,6 +139,9 @@ public class EinzServerManager {
                 for (CardColor cc : CardColor.values()) {
                     if (cc != CardColor.NONE) {
                         Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
+
+                        deck.put(card, 1);
+
                         //assign rules to the cards
                         ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
                         arr.add(new PlayColorRule());

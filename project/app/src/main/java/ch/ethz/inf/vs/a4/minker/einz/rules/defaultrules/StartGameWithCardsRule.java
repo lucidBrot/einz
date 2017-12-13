@@ -59,4 +59,7 @@ public class StartGameWithCardsRule extends BasicGlobalRule implements Parametri
         return types;
     }
 
+    public static String getParameterName() {
+        return parameterName;
+    }
 }
