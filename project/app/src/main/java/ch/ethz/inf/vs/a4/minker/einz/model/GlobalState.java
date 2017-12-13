@@ -256,7 +256,7 @@ public class GlobalState {
         for(int i=0; i<players.size(); i++){
             PlayerContainer pc = players.get(i);
             if(pc.player.getName().equals(player.getName())){
-                this.players.remove(pc);
+                //this.players.remove(pc);
                 this.finishedPlayers.add(player);
             }
         }

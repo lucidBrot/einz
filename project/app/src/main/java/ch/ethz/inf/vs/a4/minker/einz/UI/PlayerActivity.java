@@ -285,6 +285,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setTopPlayedCard(Card cardToSet) {
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
+        if(trayStack.getWidth()<=0||trayStack.getHeight()<=0){
+            Log.w("PlayerActivity/setTopPlayedCard", "using sleep hack because trayStack had height or width 0 or less");
+            try {
+                sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
         Bitmap b = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
