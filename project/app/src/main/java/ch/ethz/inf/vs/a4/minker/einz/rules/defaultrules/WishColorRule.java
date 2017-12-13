@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
+import org.json.JSONObject;
 
 /**
  * Created by Josua on 11/27/17.
@@ -42,7 +43,13 @@ public class WishColorRule extends BasicCardRule {
 
         String result = config.getClientCallbackService().getSelectionFromPlayer(state.getActivePlayer(), options);
         wishedColor = CardColor.valueOf(result);*/
-        wishedColor = CardColor.valueOf(played.getPlayParameter("wishColorRule", "wishedColor")); // I added this as alternative idea (Eric, 10.12.2017)
+        JSONObject params = state.getPlayParameter("wishColorRule");
+        if(params!=null && !params.equals(new JSONObject())){
+            wishedColor = CardColor.valueOf(params.optString("wishedColor"));
+        } else {
+            // TODO: what to do if no color sent?
+            wishedColor = CardColor.NONE;
+        }
         // Idee: wenn die Karte gespielt wird, muss die UI sowieso wissed dass der user eine farbe auswählen muss. Also user direkt farbe auswählen lassen.
         //      Danach die karte clientside mit diesem parameter setzen.
         //      Wenn server die karte erhält wird diese regel getriggert und die liest den parameter aus.
