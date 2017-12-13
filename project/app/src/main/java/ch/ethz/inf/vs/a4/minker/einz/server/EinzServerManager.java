@@ -3,6 +3,8 @@ package ch.ethz.inf.vs.a4.minker.einz.server;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.Player;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.model.Spectator;
@@ -10,6 +12,11 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.GlobalStateParser;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.PlayerState;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.*;
+import ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountNumberOfCardsAsPoints;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -104,7 +111,62 @@ public class EinzServerManager {
         userListLock.writeLock().unlock();
         SFLock.writeLock().lock();
 
-        getServerFunctionInterface().initialiseStandardGame(server, players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+        //getServerFunctionInterface().initialiseStandardGame(server, players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
+
+        //<Debug>
+        HashMap<Card, Integer> deck = new HashMap<>();
+        CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
+        Card myCard = cardLoader.getCardInstance("debug");
+        deck.put(myCard, 2);
+        Collection<BasicGlobalRule> globalRules = new ArrayList<>();
+        globalRules.add(new StartGameWithCardsRule());
+        globalRules.add(new WinOnNoCardsRule());
+        globalRules.add(new ResetCardsToDrawRule());
+        globalRules.add(new CountNumberOfCardsAsPoints());
+        Map<Card, ArrayList<BasicCardRule>> cardRules = new HashMap<>();
+        HashMap<String, ArrayList<BasicCardRule>> tempCardRules = new HashMap<>(); // same as cardRules but with ID string as identifier
+        //Add all necessary CardRules
+        for (CardText ct : CardText.values()) {
+            if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
+                for (CardColor cc : CardColor.values()) {
+                    if (cc != CardColor.NONE) {
+                        Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
+                        //assign rules to the cards
+                        ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
+                        arr.add(new PlayColorRule());
+                        arr.add(new PlayTextRule());
+                        tempCardRules.put(card.getID(), arr);
+                    }
+                }
+            }
+        }
+        for (CardColor cc : CardColor.values()) {
+
+            if (cc != CardColor.NONE) {
+                String card = cc.toString().toLowerCase() + "_" + CardText.SWITCHORDER.indicator;
+                String card1 =cc.toString().toLowerCase() + "_" + CardText.PLUSTWO.indicator;
+                String card2 =cc.toString().toLowerCase() + "_" + CardText.STOP.indicator;
+                //assign rules to the cards
+                ArrayList<BasicCardRule> arr =  tempCardRules.get(card);
+                ArrayList<BasicCardRule> arr1 = tempCardRules.get(card);
+                ArrayList<BasicCardRule> arr2 = tempCardRules.get(card2);
+                arr.add(new ChangeDirectionRule());
+                arr1.add(new DrawTwoCardsRule());
+                arr2.add(new SkipRule());
+                tempCardRules.put(card, arr);
+                tempCardRules.put(card1, arr1);
+                tempCardRules.put(card2, arr2);
+                //It might make sense to somewhere specify all IDs that exist, so that we don't have to guess
+            }
+        }
+
+        // actually add these
+        for(String id : tempCardRules.keySet()){
+            cardRules.put(cardLoader.getCardInstance(id), tempCardRules.get(id));
+        }
+
+        getServerFunctionInterface().initialiseGame(this.server, players,deck, globalRules, cardRules);
+        //</Debug>
 
         // TODO: not standard game but with rules, maybe call initialise earlier
         SFLock.writeLock().unlock();

@@ -132,7 +132,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
-                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<Player>( globalState.getPlayersOrdered()));
             }
         }
     }
@@ -312,6 +312,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                 /*
                 don't add these cards yet
                 TODO: add these cards as soon as wishing a color works
+                // "What is allCardsInGame for? you never query it." - Eric
                 Card card = new Card("temp", ct.type, ct, CardColor.NONE); // #cardtag
                 numberOfCardsInGame.put(card, 4);
                 allCardsInGame.add(card);
