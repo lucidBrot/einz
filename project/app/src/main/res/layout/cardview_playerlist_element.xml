@@ -39,7 +39,7 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight=".5"
+            android:layout_weight=".8"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -51,7 +51,7 @@
                 android:text="0"
                 android:textAlignment="center"
                 android:textColor="@color/blue_darker"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
 
         </LinearLayout>
 
