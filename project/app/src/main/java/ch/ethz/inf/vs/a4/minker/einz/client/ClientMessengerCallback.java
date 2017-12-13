@@ -14,6 +14,7 @@ import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import ch.ethz.inf.vs.a4.minker.einz.sensors.OrientationGetter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     private final Context applicationContext;
     private final EinzClient parentClient;
     private String previousPlayer = "~";
+
 
     /**
      * @param lobbyUIInterface make sure to call {@link #setGameUIAndDisableLobbyUI(GameUIInterface)} after destroying the lobby
@@ -129,7 +131,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 }
 
                 if(gameUI!=null){
-                    gameUI.onUpdateLobbyList(message.getBody().getAdmin(), players, spectators);
+                    //gameUI.onUpdateLobbyList(message.getBody().getAdmin(), players, spectators);
+                    gameUI.onUpdateLobbyList(message);
                 }
             }
         };

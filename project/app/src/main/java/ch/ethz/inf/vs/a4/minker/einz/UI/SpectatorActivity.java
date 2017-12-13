@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -16,6 +17,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import org.json.JSONObject;
 
 import java.util.AbstractQueue;
 import java.util.ArrayList;
@@ -39,6 +42,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMe
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.sensors.OrientationGetter;
 
 public class SpectatorActivity extends FullscreenActivity implements GameUIInterface{
 
@@ -52,6 +56,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
 
     private String currentlyActivePlayer = "~";
     private HashMap<String,String> playerDirections = new HashMap<>();
+    private HashMap<String, JSONObject> playerSeating;
 
 
     @Override
@@ -59,9 +64,9 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spectator);
 
-        trayStack = findViewById(R.id.tray_stack);
+        trayStack = findViewById(R.id.tray_stack_spec);
 
-        trayStack2 = findViewById(R.id.tray_stack_2);
+        trayStack2 = findViewById(R.id.tray_stack_spec_2);
 
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
         ourClient.getActionCallbackInterface().setGameUI(this);
@@ -134,32 +139,39 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
         } else {
             b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         }
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
+
+        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
         trayStack.setImageBitmap(bitmapResized);
 
-        double direction = Math.random() * 2*Math.PI;
-        double xTranslation = Math.cos(direction) * 1000;
-        double yTranslation = Math.sin(direction) * 1000;
 
-        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).setListener(new Animator.AnimatorListener() {
+        double specOrientation = Double.NaN,playerOrientation = Double.NaN;
+        if(playerSeating != null) {
+            specOrientation = JSONToOrientation(playerSeating.get(ourClient.getUsername()));
+            playerOrientation = JSONToOrientation(playerSeating.get(currentlyActivePlayer));
+        }
+
+        double direction;
+        if(Double.isNaN(specOrientation) || Double.isNaN(playerOrientation)){
+            direction = Math.random() * 2*Math.PI;
+        } else {
+            direction = (Math.PI + playerOrientation) - specOrientation;
+        }
+        double xTranslation = Math.cos(direction) * 1500;
+        double yTranslation = Math.sin(direction) * 1500;
+
+        Log.d("Translation","x: " + String.valueOf(xTranslation) + " y: "+yTranslation);
+
+        trayStack.setVisibility(View.INVISIBLE);
+        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).withEndAction(new Runnable() {
             @Override
-            public void onAnimationStart(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                trayStack.animate().translationX(0).translationY(0).setDuration(1000);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
-
+            public void run() {
+                trayStack.setVisibility(View.VISIBLE);
+                trayStack.animate().translationX(0).translationY(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(1000).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        trayStack2.setImageBitmap(bitmapResized);
+                    }
+                });
             }
         });
     }
@@ -168,11 +180,16 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
 
-        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
+        /*Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack2.getWidth(),(int)(cardSizeRatio * (double)trayStack2.getWidth()), false);
-        trayStack2.setImageBitmap(bitmapResized);
+        trayStack2.setImageBitmap(bitmapResized);*/
+        trayStack2.setImageDrawable(trayStack.getDrawable());
 
         //setlastplayedCard(cardToSet);
+    }
+
+    private double JSONToOrientation(JSONObject orientationObject){
+        return orientationObject.optDouble("orientation");
     }
 
     @Override
@@ -191,6 +208,8 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
+
+        playerSeating = message.getBody().getPlayerSeatings();
 
     }
 
@@ -257,6 +276,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     @Override
     public void playerStartedTurn(String playerThatStartedTurn) {
         currentlyActivePlayer = playerThatStartedTurn;
+
         if(allPlayers.contains(playerThatStartedTurn)) {
             GridLayout playerList = findViewById(R.id.gl_playerlist);
 

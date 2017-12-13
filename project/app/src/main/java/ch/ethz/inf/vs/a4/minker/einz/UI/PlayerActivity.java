@@ -285,56 +285,37 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setTopPlayedCard(Card cardToSet) {
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
+        Bitmap b = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
+        } else {
+            b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
+        }
 
-        final Card cardToBeSet = cardToSet;
+        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
+        trayStack.setImageBitmap(bitmapResized);
 
         //if()
         double direction = Math.random() * 2*Math.PI;
         double xTranslation = Math.cos(direction) * 1500;
         double yTranslation = Math.sin(direction) * 1500;
 
-        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).setListener(new Animator.AnimatorListener() {
+        trayStack.setVisibility(View.VISIBLE);
+        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new Runnable() {
             @Override
-            public void onAnimationStart(Animator animator) {
-                Bitmap b = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                    b = ((BitmapDrawable)getResources().getDrawable(cardToBeSet.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
-                } else {
-                    b = ((BitmapDrawable)getResources().getDrawable(cardToBeSet.getImageRessourceID(getApplicationContext()))).getBitmap();
-                }
-
-                Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
-                trayStack.setImageBitmap(bitmapResized);
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                trayStack.animate().translationX(0).translationY(0).setDuration(500);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
+            public void run() {
+                trayStack.setVisibility(View.VISIBLE);
+                trayStack.animate().translationX(0).translationY(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(1000).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        trayStack2.setImageBitmap(bitmapResized);
+                    }
+                });
 
             }
         });
 
 
-    }
-
-    public void setSecondTopPlayedCard(Card cardToSet) {
-
-        //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
-
-        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack2.getWidth(),(int)(cardSizeRatio * (double)trayStack2.getWidth()), false);
-        trayStack2.setImageBitmap(bitmapResized);
-
-                //setlastplayedCard(cardToSet);
     }
 
     private void initCards(){
@@ -641,7 +622,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setActions(ArrayList<String> actions) {
         setAvailableActions(actions);
     }
-    
+
+
 
     @Override
     public void playerStartedTurn(String playerThatStartedTurn) {
@@ -715,11 +697,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setStack(ArrayList<Card> stack) {
         if(!checkCardListIdentical(stack,cardStack)) {
             Card sndCard = null;
-
-            if (stack.size() > 1) {
-                sndCard = stack.get(stack.size() - 2);
-                setSecondTopPlayedCard(sndCard);
-            }
 
             final Card topCard = stack.get(stack.size() - 1);
 

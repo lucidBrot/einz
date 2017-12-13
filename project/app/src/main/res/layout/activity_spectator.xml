@@ -36,7 +36,7 @@
             tools:layout_constraintTop_creator="1" />
 
         <ImageView
-            android:id="@+id/tray_stack_2"
+            android:id="@+id/tray_stack_spec_2"
             android:layout_width="200dp"
             android:layout_height="280dp"
             android:layout_marginBottom="115dp"
@@ -54,7 +54,7 @@
             tools:layout_constraintTop_creator="1" />
 
         <ImageView
-            android:id="@+id/tray_stack"
+            android:id="@+id/tray_stack_spec"
             android:layout_width="200dp"
             android:layout_height="280dp"
             android:rotation="0"

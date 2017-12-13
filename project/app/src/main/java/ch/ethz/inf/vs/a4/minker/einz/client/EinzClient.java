@@ -13,8 +13,10 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickMessage
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.sensors.OrientationGetter;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import static java.lang.Thread.sleep;
 
@@ -40,6 +42,7 @@ public class EinzClient implements Runnable {
 
     private String username;
     private String role;
+    private double orientation = 0;
     private final LobbyUIInterface lobbyUI;
 
     /**
@@ -57,6 +60,10 @@ public class EinzClient implements Runnable {
      * @param lobbyUI the implementation of{@link LobbyUIInterface} that should be called to update the UI
      */
     public EinzClient(String serverIP, int serverPort, Context appContext, String username, String role, boolean isHost, LobbyUIInterface lobbyUI) {
+
+        OrientationGetter oG = new OrientationGetter(appContext);
+        oG.getOrientation(this);
+
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.appContext = appContext;
@@ -75,6 +82,11 @@ public class EinzClient implements Runnable {
         this.isHost = isHost;
         this.dead=false;
         Log.d("EinzClient", "Finished constructing this instance ("+username+")");
+    }
+
+    //sets the orientation of client when enough sensorValues are read
+    public void setOrientation(double orientation){
+        this.orientation = orientation;
     }
 
     /**
@@ -175,7 +187,14 @@ public class EinzClient implements Runnable {
 
                 // example message sending. implement this where you like
                 EinzMessageHeader header = new EinzMessageHeader("registration", "Register");
-                EinzRegisterMessageBody body = new EinzRegisterMessageBody(username, role); // getting all the girls
+
+                JSONObject orientationJSON = null;
+                try {
+                    orientationJSON = new JSONObject("{orientation:"+String.valueOf(orientation)+"}");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                EinzRegisterMessageBody body = new EinzRegisterMessageBody(username, role, orientationJSON); // getting all the girls
                 final EinzMessage<EinzRegisterMessageBody> message = new EinzMessage<>(header, body);
 
                 //DEBUG
