@@ -408,6 +408,8 @@ public class ServerFunction implements ServerFunctionDefinition {
                 }
             }
         }
+        result.assignRuleToCard(new PlayAlwaysRule(), cardLoader.getCardInstance("choose"));
+        result.assignRuleToCard(new WishColorRule(), cardLoader.getCardInstance("choose"));
         if (DEBUG_MODE) {
             result.assignRuleToCard(new IsValidDrawRule(), new Card(CardColor.YELLOW + "_" + CardText.ZERO.indicator, CardText.ZERO.type,
                     CardText.ZERO, CardColor.YELLOW, "drawable", "card_" + CardText.ZERO.indicator + "_" + CardColor.YELLOW));

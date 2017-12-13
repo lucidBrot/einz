@@ -23,8 +23,6 @@ public class GameConfig {
     public List<Participant> allParticipants;
 
 
-    private ClientCallbackService clientCallbackService;
-
     private List<Card> drawPile;
 
     private Map<Card,Set<BasicCardRule>> rulePerCard;
@@ -79,14 +77,6 @@ public class GameConfig {
         shuffledDrawPile.addAll(drawPile);
         Collections.shuffle(shuffledDrawPile);
         return shuffledDrawPile;
-    }
-
-    public void setClientCallbackService(ClientCallbackService service){
-        this.clientCallbackService = service;
-    }
-
-    public ClientCallbackService getClientCallbackService(){
-        return clientCallbackService;
     }
 
 }

@@ -11,6 +11,7 @@ import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.Debug;
+import ch.ethz.inf.vs.a4.minker.einz.RuleLoader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.InvalidResourceFormatException;
 import ch.ethz.inf.vs.a4.minker.einz.server.Debug_ServerActivity;
 import org.json.JSONArray;
@@ -36,6 +37,17 @@ public class MainActivity extends FullscreenActivity implements View.OnClickList
 
         // initialize the globally available CardLoader with the cards
         initializeCardLoader();
+        initializeRuleLoader();
+    }
+
+    private void initializeRuleLoader() {
+        RuleLoader loader = EinzSingleton.getInstance().getRuleLoader();
+        try {
+            loader.loadRulesFromResourceFile(this, R.raw.card_definition);
+        } catch (JSONException e) {
+            Log.e("MainActivity", "Failed to initialize RuleLoader.");
+            e.printStackTrace();
+        }
     }
 
     private void initializeCardLoader() {

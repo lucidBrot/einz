@@ -1,10 +1,14 @@
 package ch.ethz.inf.vs.a4.minker.einz;
 
+import android.content.Context;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
@@ -77,5 +81,18 @@ public class RuleLoader {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void loadRulesFromResourceFile(Context applicationContext, int resourceFile) throws JSONException {
+        InputStream jsonStream = applicationContext.getResources().openRawResource(resourceFile);
+        JSONArray jsonArray = new JSONArray(convertStreamToString(jsonStream));
+        this.loadRules(jsonArray);
+    }
+
+    // https://stackoverflow.com/questions/6774579/typearray-in-android-how-to-store-custom-objects-in-xml-and-retrieve-them
+    // utility function
+    private String convertStreamToString(InputStream is) {
+        Scanner s = new Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
     }
 }

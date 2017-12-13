@@ -35,6 +35,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import org.json.JSONArray;
+
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
@@ -53,6 +55,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMe
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
@@ -60,6 +63,9 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.Thread.sleep;
 
@@ -96,6 +102,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private EinzClient ourClient;
     private GridLayout mGridScrollable;
 
+    private Map<String, List<BasicCardRule>> ruleMapping;
 
     @Override
     protected void onStop() {
@@ -427,7 +434,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             public void run() {
                 try {
                     ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}}}");
+                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"}," +
+                                    "\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}, " +
+                                    "\"playParameters\":{\"Wish color\":\"RED\"}}}");
                 } catch (SendMessageFailureException e) {
                     e.printStackTrace();
                 }
@@ -735,6 +744,24 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         for(String currPlayer:playerList){
             addPlayerToList(currPlayer);
         }
+        ruleMapping = new HashMap<>();
+        Iterator<String> cardIDs = message.getBody().getCardRules().keys();
+        try {
+            while(cardIDs.hasNext()){
+                String cardID = cardIDs.next();
+                ArrayList<BasicCardRule> rulesForCard = new ArrayList<>();
+                JSONArray jsonRules = message.getBody().getCardRules().getJSONArray(cardID);
+                for(int i = 0; i < jsonRules.length(); i++){
+                    String ruleName = jsonRules.getJSONObject(i).getString("id");
+                    BasicCardRule ruleObject = (BasicCardRule) EinzSingleton.getInstance().getRuleLoader().getInstanceOfRule(ruleName);
+                    rulesForCard.add(ruleObject);
+                }
+                ruleMapping.put(cardID, rulesForCard);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

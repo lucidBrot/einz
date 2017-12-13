@@ -1,7 +1,9 @@
 package ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import ch.ethz.inf.vs.a4.minker.einz.model.SelectorRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
@@ -12,7 +14,7 @@ import org.json.JSONObject;
  * Created by Josua on 11/27/17.
  */
 
-public class WishColorRule extends BasicCardRule {
+public class WishColorRule extends BasicCardRule implements SelectorRule {
 
     private CardColor wishedColor = null;
 
@@ -29,8 +31,8 @@ public class WishColorRule extends BasicCardRule {
     }
 
     @Override
-    public boolean isValidPlayCardPermissive(GlobalState state, Card played) {
-        return played.getColor().equals(wishedColor);
+    public boolean isValidPlayCardRestrictive(GlobalState state, Card played) {
+        return !wished || played.getColor().equals(wishedColor);
     }
 
     @Override
@@ -41,7 +43,7 @@ public class WishColorRule extends BasicCardRule {
             options.add(color.color);
         }
 
-        String result = config.getClientCallbackService().getSelectionFromPlayer(state.getActivePlayer(), options);
+        String result = config.getClien tCallbackService().getSelectionFromPlayer(state.getActivePlayer(), options);
         wishedColor = CardColor.valueOf(result);*/
         JSONObject params = state.getPlayParameter("wishColorRule");
         if(params!=null && !params.equals(new JSONObject())){
@@ -65,4 +67,12 @@ public class WishColorRule extends BasicCardRule {
         return state;
     }
 
+    @Override
+    public List<String> getChoices(GlobalState state) {
+        List<String> result = new ArrayList<>();
+        for(CardColor color : CardColor.values()){
+            result.add(color.name());
+        }
+        return result;
+    }
 }

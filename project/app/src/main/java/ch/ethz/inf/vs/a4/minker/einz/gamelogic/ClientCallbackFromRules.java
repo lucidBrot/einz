@@ -5,7 +5,7 @@
 //import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 //import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 //import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionMessageBody;
-//import ch.ethz.inf.vs.a4.minker.einz.model.ClientCallbackService;
+//import ch.ethz.inf.vs.a4.minker.einz.model.SelectorRule;
 //import ch.ethz.inf.vs.a4.minker.einz.model.Player;
 //import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 //import ch.ethz.inf.vs.a4.minker.einz.server.UserNotRegisteredException;
@@ -14,10 +14,10 @@
 //
 //import java.util.List;
 //
-//public class ClientCallbackFromRules implements ClientCallbackService {
+//public class ClientCallbackFromRules implements SelectorRule {
 //
-//    // -------------------------- The ClientCallbackService ----------------------------
-//    // ClientCallbackService was created by Josua to draw a line between the model and the implementation.
+//    // -------------------------- The SelectorRule ----------------------------
+//    // SelectorRule was created by Josua to draw a line between the model and the implementation.
 //    // It is used by rules to send messages back to the server, so I thought this would fit best here.
 //    // Reasons:
 //    //  - ThreadedEinzServer only cares about the connection itself, and the usernames associated with them
