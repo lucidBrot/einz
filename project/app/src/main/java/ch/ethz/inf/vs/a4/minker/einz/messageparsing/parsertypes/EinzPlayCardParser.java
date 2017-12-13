@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 import android.util.Log;
 
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardOrigin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,7 +42,8 @@ public class EinzPlayCardParser extends EinzParser {
         //get card
         JSONObject cardJSON = body.getJSONObject("card");
         String ID = cardJSON.getString("ID");
-        String origin = cardJSON.getString("origin");
+        String origin = cardJSON.optString("origin");
+        if(origin==null){origin= CardOrigin.UNSPECIFIED.value;}
 
         JSONObject playParams = body.optJSONObject("playParameters");
 
