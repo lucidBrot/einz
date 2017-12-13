@@ -251,8 +251,10 @@ public class GlobalState {
      * Does both only if there was at least one player with that name in that list.
      * <b>Make sure the actual reallife person players have unique names or rewrite this message</b>
      */
-    public synchronized void setPlayerFinished(Player player){
-        for(PlayerContainer pc : players){
+    public void setPlayerFinished(Player player){
+        Log.d(Thread.currentThread().getName(), "setPlayerFinished("+player.getName()+")");
+        for(int i=0; i<players.size(); i++){
+            PlayerContainer pc = players.get(i);
             if(pc.player.getName().equals(player.getName())){
                 this.players.remove(pc);
                 this.finishedPlayers.add(player);
@@ -264,7 +266,8 @@ public class GlobalState {
         return new ArrayList<>(finishedPlayers);
     }
 
-    public synchronized void removePlayer(Player player){
+    public void removePlayer(Player player){
+        Log.d(Thread.currentThread().getName(), "removePlayer("+player.getName()+")");
         for (int i = 0; i < players.size(); i++) {
             PlayerContainer container = players.get(i);
             if (container.player == player){
