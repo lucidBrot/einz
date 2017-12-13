@@ -127,4 +127,6 @@ public abstract class BasicGlobalRule extends BasicRule {
     public GlobalState onPlayAnyCard(GlobalState state, Card played){
         return state;
     }
+
+    public GlobalState onGameOver(GlobalState state){return state;}
 }

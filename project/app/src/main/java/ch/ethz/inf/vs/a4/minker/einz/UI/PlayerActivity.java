@@ -188,7 +188,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         });
 
         Button endGame = findViewById(R.id.btn_end_game);
-        colorWheelBlueButton.setOnClickListener(new View.OnClickListener() {
+        endGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goBackToMainMenu();
@@ -203,7 +203,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         cardWidth  = (size.x / mGrid.getColumnCount());
         cardHeight = (size.y / (3*mGrid.getRowCount()));
-        initCards();
+        //initCards();
 
         //add cardDrawables to mgrid
         /*
@@ -285,6 +285,15 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setTopPlayedCard(Card cardToSet) {
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
+        if(trayStack.getWidth()<=0||trayStack.getHeight()<=0){
+            Log.w("PlayerActivity/setTopPlayedCard", "using sleep hack because trayStack had height or width 0 or less");
+            try {
+                sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
         Bitmap b = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
@@ -460,7 +469,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void hideColorWheel(){
         LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
-        colorWheel.setVisibility(View.GONE);
+        colorWheel.setVisibility(View.INVISIBLE);
     }
 
     public void onColorWheelButtonGreenClick(){

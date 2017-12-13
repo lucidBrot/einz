@@ -62,17 +62,18 @@ public class GlobalRuleChecker {
 
     /**
      * Determines if a player has finished the game and can be removed from the game cycle. This is a winning condition.
+     * Applies the isPlayerFinishedRules permissive
      *
      * @param state
      * @param player The Player to check if he finished
      * @return
      */
-    public static boolean checkIsPlayerFinished(GlobalState state, Player player) {
-        if(state.getFinishedPlayers().contains(player)){
-            return true;
-        } else {
-            return false;
+    public static boolean checkIsPlayerFinished(GlobalState state, Player player, GameConfig gameConfig) {
+        boolean permissive = false;
+        for (BasicGlobalRule r : gameConfig.globalRules) {
+            permissive = permissive || r.isPlayerFinished(state, player);
         }
+        return permissive;
     }
 
 
@@ -163,6 +164,19 @@ public class GlobalRuleChecker {
     public static GlobalState checkOnPlayAnyCard(GlobalState state, Card played, GameConfig gameConfig){
         for (BasicGlobalRule r : gameConfig.globalRules) {
             state = r.onPlayAnyCard(state, played);
+        }
+        return state;
+    }
+
+    /**
+     * called when the game is over, e.g. to determine the ranking points
+     * @param state
+     * @param gameConfig
+     * @return modified state
+     */
+    public static GlobalState checkOnGameOver(GlobalState state, GameConfig gameConfig){
+        for (BasicGlobalRule r : gameConfig.globalRules){
+            state = r.onGameOver(state);
         }
         return state;
     }

@@ -24,7 +24,7 @@ public class PlayerActionChecker {
      * @return whether the player is allowed to play the card he wants to play or not
      */
     public static boolean isPlayable(Card card, Player p, GlobalState state, GameConfig config) {
-        if (!state.getActivePlayer().equals(p) || !CardRuleChecker.checkIsValidPlayCard(state, card, config)) {
+        if (state.getActivePlayer() != null || !state.getActivePlayer().getName().equals(p.getName()) || !CardRuleChecker.checkIsValidPlayCard(state, card, config)) {
             return false; //TODO: Check in rules whether its a players turn
         } else {
             return true;

@@ -99,4 +99,7 @@ public abstract class BasicCardRule extends BasicRule {
         return state;
     }
 
+    public GlobalState onGameOver(GlobalState state) {
+        return state;
+    }
 }

@@ -38,4 +38,8 @@ public class Player extends Participant {
         }
     }
 
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }

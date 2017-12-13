@@ -351,4 +351,17 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
     public boolean isDead() {
         return dead;
     }
+
+    /**
+     * called by Gamelogic. stops server. (or at some point might reinitialize it instead.)
+     */
+    public void onGameOver() {
+        this.serverManager.setGamePhaseStarted(false);
+
+        shutdown();
+
+        // Alternatively to shutdown:
+        // Keep all the ESCH, Keepalive and serverMessenger
+        // But for this, admin client would have to send startGame again.
+    }
 }
