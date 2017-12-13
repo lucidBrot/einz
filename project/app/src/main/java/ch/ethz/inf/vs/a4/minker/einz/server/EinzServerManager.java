@@ -140,7 +140,7 @@ public class EinzServerManager {
                     if (cc != CardColor.NONE) {
                         Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
 
-                        deck.put(card, 1);
+                        //deck.put(card, 1);
 
                         //assign rules to the cards
                         ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
