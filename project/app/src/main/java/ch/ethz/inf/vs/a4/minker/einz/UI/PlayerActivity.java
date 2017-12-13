@@ -305,7 +305,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             @Override
             public void run() {
                 trayStack.setVisibility(View.VISIBLE);
-                trayStack.animate().translationX(0).translationY(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(1000).withEndAction(new Runnable() {
+                trayStack.animate().translationX(0).translationY(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(500).withEndAction(new Runnable() {
                     @Override
                     public void run() {
                         trayStack2.setImageBitmap(bitmapResized);
