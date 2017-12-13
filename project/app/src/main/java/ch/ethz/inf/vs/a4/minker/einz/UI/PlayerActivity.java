@@ -41,12 +41,15 @@ import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
@@ -442,8 +445,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                 @Override
                 public void run() {
                     try {
-                        ourClient.getConnection().sendMessage(
-                                "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}}}");
+                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
+                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
@@ -468,66 +472,82 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void onColorWheelButtonGreenClick(){
         hideColorWheel();
-        colorChosen = "green";
-        this.backgroundHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + lastPlayedCard.getID() + "\",\"origin\":\"" + lastPlayedCard.getOrigin() + "\"}}}");
-                } catch (SendMessageFailureException e) {
-                    e.printStackTrace();
+        String chosenColor = "green";
+        colorChosen = chosenColor;
+        if(isWishingCard(lastPlayedCard)) {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
+                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void onColorWheelButtonRedClick(){
         hideColorWheel();
-        colorChosen = "red";
-        this.backgroundHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + lastPlayedCard.getID() + "\",\"origin\":\"" + lastPlayedCard.getOrigin() + "\"}}}");
-                } catch (SendMessageFailureException e) {
-                    e.printStackTrace();
+        String chosenColor = "red";
+        colorChosen = chosenColor;
+        if(isWishingCard(lastPlayedCard)) {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
+                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void onColorWheelButtonBlueClick(){
         hideColorWheel();
-        colorChosen = "blue";
-        this.backgroundHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + lastPlayedCard.getID() + "\",\"origin\":\"" + lastPlayedCard.getOrigin() + "\"}}}");
-                } catch (SendMessageFailureException e) {
-                    e.printStackTrace();
+        String chosenColor = "blue";
+        colorChosen = chosenColor;
+        if(isWishingCard(lastPlayedCard)) {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
+                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void onColorWheelButtonYellowClick(){
         hideColorWheel();
-        colorChosen = "yellow";
-        this.backgroundHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + lastPlayedCard.getID() + "\",\"origin\":\"" + lastPlayedCard.getOrigin() + "\"}}}");
-                } catch (SendMessageFailureException e) {
-                    e.printStackTrace();
+        String chosenColor = "yellow";
+        colorChosen = chosenColor;
+        if(isWishingCard(lastPlayedCard)) {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
+                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public void drawCard(){
