@@ -70,7 +70,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
         trayStack2 = findViewById(R.id.tray_stack_spec_2);
 
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
-        ourClient.getActionCallbackInterface().setGameUI(this);
+        //ourClient.getActionCallbackInterface().setGameUI(this);
 
         // this.ourClient.getActionCallbackInterface().getPlayerSeatings()
     }
