@@ -135,7 +135,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             ourClient.getActionCallbackInterface().setGameUI(this);
     }
 
-    private int cardHeight,cardWidth;
+    private int cardHeight,cardWidth,cardBigWidth,cardBigHeight;
 
     ArrayList<Integer> cardDrawables = new ArrayList<>();
     ArrayList<Card> cards = new ArrayList<>();
@@ -241,6 +241,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         Point size = new Point();
         display.getRealSize(size);
 
+        double cardBigWidth_double = (((double) size.x) / 7.)*3.;
+        cardBigWidth = (int) cardBigWidth_double;
+        cardBigHeight = (int) ((double)cardBigWidth * cardSizeRatio);
         cardWidth  = (size.x / 8);
         cardHeight = (size.y /(12));
         //initCards();
@@ -364,14 +367,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setTopPlayedCard(Card cardToSet) {
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
-        if(trayStack.getWidth()<=0||trayStack.getHeight()<=0){
-            Log.w("PlayerActivity/setTopPlayedCard", "using sleep hack because trayStack had height or width 0 or less");
-            try {
-                sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
 
         Bitmap b = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -380,7 +375,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         }
 
-        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
+        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, cardBigWidth,cardBigHeight, false);
         trayStack.setImageBitmap(bitmapResized);
 
         double direction;
