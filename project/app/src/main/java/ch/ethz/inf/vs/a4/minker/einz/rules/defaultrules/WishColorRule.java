@@ -38,7 +38,7 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
         if(!wished){
             return false; // some other rule has to decide if this is valid, so we don't set this. cuz we're permissive.
         }
-        boolean unset = (wishedColor==null /*wishedColor.equals(CardColor.NONE)*/); // allow any card to be played if none is set
+        boolean unset = (wishedColor==null /*wishedColor.equals(CardColor.NONE)*/); // allow any card to be played if none is set but one was wished last turn. That should not be happening
         return unset || played.getColor().equals(wishedColor) /*|| played.getColor().equals(CardColor.NONE)*/; // TODO: move right part to its own permissive rule. or maybe it already is because of the playAlways rule.
     }
 
