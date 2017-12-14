@@ -51,6 +51,9 @@ public class RulesContainer {
     }
 
 
+    /**
+     * Adds the card rule to the internal mapping and sets the number of cards of this type to 1 if no other value was set yet.
+     */
     public synchronized void addCardRule(BasicCardRule rule, String cardID) {
         JSONObject someCardID = this.cardRules.optJSONObject(cardID);
         if (someCardID == null) {
@@ -75,10 +78,39 @@ public class RulesContainer {
         }
 
         rulelist.put(ruleToJSON(rule));
+        if(!someCardID.has("number")){
+            setNumberOfCards(cardID, "1");
+        }
     }
 
-    public synchronized void setNumberOfCards(String cardID){
+    /**
+     * sets the Number of Cards in the deck of type cardID.
+     * (Adds the number to the Card. if the internal mapping is inexistent, it creates it. If there is already a number set, it will be overwritten.)
+     * */
+    public synchronized void setNumberOfCards(String cardID, String number) {
+        try {
+            if (!cardRules.has(cardID)) {
+                cardRules.put(cardID, new JSONObject());
+            }
+            cardRules.getJSONObject(cardID).put("number", number);
+        } catch (JSONException e) {
+            Log.w("RulesContainer", "setting number of cards failed.");
+            e.printStackTrace();
 
+        }
+
+    }
+
+    /**
+     * Convenience function to do <br><code>
+     *
+     addCardRule(cardRule, cardID);<br>
+     setNumberOfCards(cardID, number);
+     * </code><br> in one line
+     * */
+    public synchronized void addCardRuleWithNumber(BasicCardRule cardRule, String cardID, String number){
+        addCardRule(cardRule, cardID);
+        setNumberOfCards(cardID, number);
     }
 
     /**
@@ -86,14 +118,14 @@ public class RulesContainer {
      *
      * @return false if not found, true if removed
      */
-    public synchronized void removeCard(String cardID){
+    public synchronized void removeCard(String cardID) {
         cardRules.remove(cardID);
     }
 
     /**
      * Removes the cardRule specific to the card specified. Does nothing if not there
      */
-    public synchronized void removeCardRuleFromCard(String ruleName, String cardID){
+    public synchronized void removeCardRuleFromCard(String ruleName, String cardID) {
         try {
             cardRules.getJSONObject(cardID).remove(ruleName);
         } catch (JSONException e) {
@@ -104,8 +136,8 @@ public class RulesContainer {
     /**
      * @param ruleName will be removed from any card mappings it was in
      */
-    public synchronized void removeCardRule(String ruleName){
-        while(cardRules.keys().hasNext()){
+    public synchronized void removeCardRule(String ruleName) {
+        while (cardRules.keys().hasNext()) {
             String key = cardRules.keys().next();
             JSONObject cardMapping = null;
             try {
