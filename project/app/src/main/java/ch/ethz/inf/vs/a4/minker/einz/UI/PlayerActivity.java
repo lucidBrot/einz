@@ -381,10 +381,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         // TODO: this is only a temp fix
         int maxWidth = (trayStack.getWidth()>0)?trayStack.getWidth():1000;
-        int maxHeight = (trayStack.getHeight()>0)?trayStack.getHeight():1000;
-
         //final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
-        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, maxWidth,(int)(cardSizeRatio * (double)maxHeight), false);
+        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, maxWidth,(int)(cardSizeRatio * (double)maxWidth), false);
         trayStack.setImageBitmap(bitmapResized);
 
         //if()
