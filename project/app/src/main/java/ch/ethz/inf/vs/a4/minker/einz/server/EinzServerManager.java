@@ -213,7 +213,7 @@ public class EinzServerManager {
 
     private void initialiseNonStandardGame(EinzSpecifyRulesMessageBody specifyRulesMessageBody, ThreadedEinzServer server, ArrayList<Player> players) {
         getSFLock().writeLock().lock();
-
+        Log.d("servMan/initNonStandardGame", "Using the rules specified instead of the standard rules.");
         // Global Rules
         Collection<BasicGlobalRule> globalRules = specifyRulesMessageBody.getGlobalParsedRules(); // these are rule objects which already have their parameters set
         // Card Rules
@@ -745,6 +745,7 @@ public class EinzServerManager {
             if(numPlayersRegisteredWithoutSpectators()>0){
 
             finishRegistrationPhaseAndInitGame(); //serverFunctionInterfae.initializeStandardGame is contained in this call
+                setGamePhaseStarted(true);
             SFLock.writeLock().lock();
             serverFunctionInterface.startGame();
             SFLock.writeLock().unlock();}

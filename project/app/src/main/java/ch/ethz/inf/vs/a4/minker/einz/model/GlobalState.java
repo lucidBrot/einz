@@ -271,7 +271,7 @@ public class GlobalState {
         Log.d(Thread.currentThread().getName(), "removePlayer("+player.getName()+")");
         for (int i = 0; i < players.size(); i++) {
             PlayerContainer container = players.get(i);
-            if (container.player == player){
+            if (container.player.getName().equals(player.getName())){
                 players.remove(container);
                 break;
             }
