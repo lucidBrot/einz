@@ -35,7 +35,7 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
 
     public boolean isValidPlayCardPermissive(GlobalState state, Card played) { // allow only cards of the wished color or uncolored cards to be played
         Log.d("WishColorRule", "Wished color: " + wishedColor + ", played color: " + played.getColor());
-        boolean unset = (wishedColor==null || wishedColor.equals(CardColor.NONE)); // allow any card to be played if none is set
+        boolean unset = (wishedColor==null /*wishedColor.equals(CardColor.NONE)*/); // allow any card to be played if none is set
         return unset || played.getColor().equals(wishedColor) /*|| played.getColor().equals(CardColor.NONE)*/; // TODO: move right part to its own permissive rule. or maybe it already is because of the playAlways rule.
     }
 
@@ -83,7 +83,11 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
 
     @Override
     public GlobalState onPlayAssignedCardChoice(GlobalState state, String choice){
-        wishedColor = CardColor.valueOf(choice);
+        try{
+            wishedColor = CardColor.valueOf(choice);
+        } catch (Exception e){
+            wishedColor = null;
+        }
         System.err.println("Made choice " + choice);
         System.err.println("Made choice color" + wishedColor);
         return state;
