@@ -676,7 +676,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void setHand(ArrayList<Card> hand) {
-        Log.w("PlayerActivity", "setHand is currently enabled. This means that the cards for debugging will not be shown.");
+        // Log.w("PlayerActivity", "setHand is currently enabled. This means that the cards for debugging will not be shown.");
         // to disable, just comment out the following four lines
         int numberOfCardsBefore = cards.size();
         if(!checkCardsStillValid(hand)){

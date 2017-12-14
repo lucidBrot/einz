@@ -249,7 +249,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         }
         if (!CardRuleChecker.checkIsValidDrawCards(globalState, gameConfig)) {
             if (!DEBUG_MODE) {
-                MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "A rule doesn't allow you to draw cards.");
+                MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "a rule doesn't allow you to draw cards.");
             }
             return null;
         } else {

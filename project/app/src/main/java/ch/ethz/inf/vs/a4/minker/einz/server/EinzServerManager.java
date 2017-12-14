@@ -177,6 +177,7 @@ public class EinzServerManager {
         }
 
         getServerFunctionInterface().initialiseGame(this.server, players,deck, globalRules, cardRules);
+        getServerFunctionInterface().initialiseStandardGame(server, players);
         //</Debug>
 
         // TODO: not standard game but with rules, maybe call initialise earlier
