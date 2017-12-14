@@ -37,26 +37,26 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_centerHorizontal="true"
-                        android:clipChildren="false"
                         android:background="@android:color/holo_red_light"
+                        android:clipChildren="false"
                         android:gravity="center"
                         android:orientation="horizontal">
 
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="fill_parent"
-                            android:clipChildren="false"
                             android:layout_centerHorizontal="true"
                             android:layout_weight="2"
                             android:background="@android:color/holo_red_light"
+                            android:clipChildren="false"
                             android:gravity="center"
                             android:orientation="horizontal">
 
                             <FrameLayout
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:clipChildren="false"
                                 android:layout_weight="2"
+                                android:clipChildren="false"
                                 android:visibility="visible">
 
                                 <ImageView
@@ -79,8 +79,8 @@
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
                             android:layout_gravity="center"
-                            android:clipChildren="false"
                             android:layout_weight="3"
+                            android:clipChildren="false"
                             android:foregroundGravity="center">
 
                             <ImageView
@@ -109,6 +109,31 @@
                                 android:paddingRight="7dp"
                                 app:srcCompat="@drawable/card_choose_2" />
 
+                            <LinearLayout
+                                android:id="@+id/ll_its_your_turn"
+                                android:layout_width="match_parent"
+                                android:layout_height="50dp"
+                                android:layout_marginTop="10dp"
+                                android:alpha=".5"
+                                android:background="@drawable/button_black_transparent"
+                                android:elevation="0dp"
+                                android:gravity="center"
+                                android:orientation="vertical"
+                                android:visibility="visible">
+
+                                <TextView
+                                    android:id="@+id/tv_game_over"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:gravity="center"
+                                    android:text="It's your turn!"
+                                    android:textAlignment="center"
+                                    android:textColor="@android:color/black"
+                                    android:textSize="24sp" />
+
+                            </LinearLayout>
+
                         </FrameLayout>
 
                         <LinearLayout
@@ -124,7 +149,7 @@
                                 android:layout_weight="3"
                                 android:fadingEdge="horizontal|vertical"
                                 android:fadingEdgeLength="10dp"
-                                android:padding="5dp"
+                                android:padding="2dp"
                                 android:requiresFadingEdge="vertical">
 
                                 <LinearLayout
@@ -252,91 +277,142 @@
 
             </FrameLayout>
 
-            <ScrollView
-                android:id="@+id/sv_hand"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="10dp"
                 android:layout_weight="2"
-                android:background="@android:color/holo_orange_light"
-                android:scrollbarAlwaysDrawHorizontalTrack="false"
-                android:scrollbars="none">
+                android:animateLayoutChanges="false">
 
-                <android.support.v7.widget.GridLayout
-                    android:id="@+id/grid_layout"
+                <ScrollView
+                    android:id="@+id/sv_hand_scrollable"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginTop="10dp"
                     android:layout_weight="2"
-                    app:columnCount="8"
-                    app:rowCount="4"></android.support.v7.widget.GridLayout>
-            </ScrollView>
+                    android:background="@android:color/holo_orange_light"
+                    android:scrollbarAlwaysDrawHorizontalTrack="false"
+                    android:scrollbars="none"
+                    android:visibility="gone">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:animateLayoutChanges="true"
+                        android:orientation="horizontal">
+
+                        <android.support.v7.widget.GridLayout
+                            android:id="@+id/grid_layout_scrollable"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="0dp"
+                            android:layout_weight="7"
+                            android:animateLayoutChanges="false"
+                            app:columnCount="7">
+
+                        </android.support.v7.widget.GridLayout>
+
+                        <ImageView
+                            android:id="@+id/iv_scrollbar"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:padding="5dp"
+                            app:srcCompat="@drawable/button_red" />
+
+                    </LinearLayout>
+                </ScrollView>
+
+                <LinearLayout
+                    android:id="@+id/ll_hand"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="2"
+                    android:background="@android:color/holo_orange_light"
+                    android:scrollbarAlwaysDrawHorizontalTrack="false"
+                    android:scrollbars="none">
+
+                    <android.support.v7.widget.GridLayout
+                        android:id="@+id/grid_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="0dp"
+                        android:layout_weight="7"
+                        android:animateLayoutChanges="false"
+                        app:columnCount="8">
+
+                    </android.support.v7.widget.GridLayout>
+                </LinearLayout>
+            </FrameLayout>
 
         </LinearLayout>
 
         <LinearLayout
-                android:id="@+id/ll_endscreen"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone">
+            android:id="@+id/ll_endscreen"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="30dp"
+            android:background="@drawable/button_blue"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="invisible">
 
             <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_margin="30dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="30dp"
+                android:gravity="center"
+                android:orientation="vertical"
+                tools:background="@drawable/button_blue">
+
+                <TextView
+                    android:id="@+id/tv_game_over"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:orientation="vertical"
-                    tools:background="@drawable/button_blue">
+                    android:text="Game Over!"
+                    android:textAlignment="center"
+                    android:textColor="@color/blue_darker"
+                    android:textSize="30sp" />
 
                 <TextView
-                        android:id="@+id/tv_game_over"
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="Game Over!"
-                        android:textAlignment="center"
-                        android:textColor="@color/blue_darker"
-                        android:textSize="30sp"/>
-
-                <TextView
-                        android:id="@+id/tv_winner"
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="MissingNo Won!"
-                        android:textAlignment="center"
-                        android:textColor="@color/blue_darker"
-                        android:textSize="18sp"/>
+                    android:id="@+id/tv_winner"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="MissingNo Won!"
+                    android:textAlignment="center"
+                    android:textColor="@color/blue_darker"
+                    android:textSize="18sp" />
 
                 <ScrollView
-                        android:layout_width="match_parent"
-                        android:layout_height="0dp"
-                        android:layout_margin="10dp"
-                        android:layout_weight="8"
-                        android:background="@drawable/button_orange">
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_margin="10dp"
+                    android:layout_weight="8"
+                    android:background="@drawable/button_orange">
 
                     <LinearLayout
-                            android:id="@+id/ll_winning_players"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"/>
+                        android:id="@+id/ll_winning_players"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
                 </ScrollView>
 
                 <Button
-                        android:id="@+id/btn_end_game"
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        android:layout_marginBottom="10dp"
-                        android:layout_weight="1"
-                        android:background="@drawable/button_red"
-                        android:text="@android:string/ok"/>
+                    android:id="@+id/btn_end_game"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_red"
+                    android:text="@android:string/ok" />
             </LinearLayout>
         </LinearLayout>
+
     </FrameLayout>
 
 </LinearLayout>

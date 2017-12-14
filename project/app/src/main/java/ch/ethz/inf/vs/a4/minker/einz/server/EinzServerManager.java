@@ -781,7 +781,7 @@ public class EinzServerManager {
     public void playCard(EinzMessage message, String issuedByPlayer) {
         getSFLock().writeLock().lock();
         if(gamePhaseStarted) {
-            getServerFunctionInterface().play(((EinzPlayCardMessageBody) message.getBody()).getCard(), new Player(issuedByPlayer));
+            getServerFunctionInterface().play(((EinzPlayCardMessageBody) message.getBody()).getCard(), new Player(issuedByPlayer), ((EinzPlayCardMessageBody) message.getBody()).getPlayParameters());
             // fabian sends response
         } else {
             EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCardResponse");

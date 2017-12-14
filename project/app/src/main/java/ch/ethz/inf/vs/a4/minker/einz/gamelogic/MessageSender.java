@@ -137,7 +137,7 @@ public class MessageSender {
             activePlayer = "~null";
         }
         String cardsToDraw = Integer.toString(state.getCardsToDraw());
-        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
+        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw, state.getPlayParameters());
 
         //send each player a different PlayerState
         for (Player p : state.getPlayersOrdered()) {
@@ -279,7 +279,7 @@ public class MessageSender {
             activePlayer = "~null";
         }
         String cardsToDraw = Integer.toString(state.getCardsToDraw());
-        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
+        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw, state.getPlayParameters());
 
         //Send State to only one player
         ArrayList<JSONObject> possibleActions = new ArrayList<>();

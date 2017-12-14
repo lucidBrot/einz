@@ -1,8 +1,14 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Map;
+
 import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.SelectorRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
 
@@ -127,14 +133,37 @@ public class CardRuleChecker {
     }
 
     /**
+     * Called if a player played the card assigned with the rule and that rule requires a choice.
+     * @param state
+     * @param played
+     * @return modified state
+     */
+    public static GlobalState checkOnPlayAssignedCardChoice(GlobalState state, Card played, GameConfig gameConfig, JSONObject playParameter) {
+        for (BasicRule r: gameConfig.getRulesForCard(played)) {
+            if (r instanceof BasicCardRule && ((BasicCardRule) r).getAssignedTo().getID().equals(played.getID())){
+                if (r instanceof SelectorRule) {
+                    JSONObject param;
+                    try {
+                        param = playParameter.getJSONObject(r.getName());
+                    } catch (JSONException e){
+                        param = null;
+                    }
+                    state = ((SelectorRule) r).onPlayAssignedCardChoice(state, param);
+                }
+            }
+        }
+        return state;
+    }
+
+    /**
      * Called if a player played the card assigned with the rule
      * @param state
      * @param played
      * @return modified state
      */
     public static GlobalState checkOnPlayAssignedCard(GlobalState state, Card played, GameConfig gameConfig){
-        for (BasicRule r: gameConfig.allRules){
-            if (r instanceof BasicCardRule && ((BasicCardRule) r).getAssignedTo().equals(played)){
+        for (BasicRule r: gameConfig.getRulesForCard(played)){
+            if (r instanceof BasicCardRule && ((BasicCardRule) r).getAssignedTo().getID().equals(played.getID())){
                 state = ((BasicCardRule) r).onPlayAssignedCard(state, played);
             }
         }

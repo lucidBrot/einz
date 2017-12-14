@@ -22,6 +22,7 @@
         </activity>
         <activity
             android:name=".UI.PlayerActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
         <activity android:name=".server.Debug_ServerActivity" />
         <activity
@@ -31,7 +32,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="ch.ethz.inf.vs.a4.minker.einz.UI.MainActivity" />
         </activity>
-        <activity android:name=".UI.LobbyActivity" />
+        <activity android:name=".UI.LobbyActivity"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".UI.ClientSetupActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />

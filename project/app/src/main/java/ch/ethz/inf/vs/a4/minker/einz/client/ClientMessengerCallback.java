@@ -14,6 +14,7 @@ import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import ch.ethz.inf.vs.a4.minker.einz.sensors.OrientationGetter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,8 +30,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     private final EinzClient parentClient;
     private String previousPlayer = "~";
 
+
     /**
-     * @param lobbyUIInterface make sure to call {@link #setGameUIAndDisableLobbyUI(GameUIInterface)} after destroying the lobby
+     * @param lobbyUIInterface make sure to call {@link #setGameUIAndDisableLobbyUI(GameUIInterface)} after destroying the lobby, or at least to set LobbyUI to null
      * @param appContext just the Context of the application, for toasts and stuff
      * @param parentClient the client, duh.
      */
@@ -42,6 +44,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     }
 
     public void setGameUI(GameUIInterface gameUI){
+        if(gameUI!=null){
+            Log.d("ClientMessengerCallback", "set GameUI to "+gameUI.toString()+"    (LobbyUI : "+lobbyUI.toString()+")");
+        }
         this.gameUI = gameUI;
     }
 
@@ -129,7 +134,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 }
 
                 if(gameUI!=null){
-                    gameUI.onUpdateLobbyList(message.getBody().getAdmin(), players, spectators);
+                    //gameUI.onUpdateLobbyList(message.getBody().getAdmin(), players, spectators);
+                    gameUI.onUpdateLobbyList(message);
                 }
             }
         };

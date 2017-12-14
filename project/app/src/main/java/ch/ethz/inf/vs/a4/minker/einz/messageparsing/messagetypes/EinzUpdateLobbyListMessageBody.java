@@ -75,4 +75,8 @@ public class EinzUpdateLobbyListMessageBody extends EinzMessageBody {
     public String getAdmin() {
         return admin;
     }
+
+    public HashMap<String, JSONObject> getPlayerSeatings() {
+        return playerSeatings;
+    }
 }

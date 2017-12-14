@@ -46,6 +46,7 @@ public class GlobalState {
     private final int maxDiscardPileSize;
 
     private HashMap<String, Integer> points = new HashMap<String, Integer>(); // String for player.getName(),  String for points
+    private JSONObject playParameters = new JSONObject();
 
     /**
      * Creates an instance of a Global game state.
@@ -142,7 +143,7 @@ public class GlobalState {
      */
     public void addCardsToDiscardPile(List<Card> cards){
         discardPile.addAll(cards);
-        discardPile.subList(Math.max(0, discardPile.size() - maxDiscardPileSize), discardPile.size() - 1);
+        discardPile.subList(Math.max(0, discardPile.size() - maxDiscardPileSize), discardPile.size());
     }
 
     /**
@@ -349,14 +350,31 @@ public class GlobalState {
         for (int i = 0; i < stack.length(); i++){
             JSONObject cardObject = stack.optJSONObject(i);
 
-            JSONObject playParams = cardObject.optJSONObject("playParameters");
             Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(
                             cardObject.getString("ID"),
-                            cardObject.getString("origin"), playParams);
+                            cardObject.getString("origin"));
             deserializedState.discardPile.add(card);
         }
 
         return deserializedState;
+    }
+
+    /**
+     * returns the playParameter for this specific rule
+     * @param ruleName
+     * @return
+     */
+    public JSONObject getPlayParameter(String ruleName) {
+        return this.playParameters.optJSONObject(ruleName);
+    }
+
+    public void setPlayParameters(JSONObject playParameters) {
+        this.playParameters = playParameters;
+    }
+
+    public JSONObject getPlayParameters() {
+
+        return playParameters;
     }
 
     /**
