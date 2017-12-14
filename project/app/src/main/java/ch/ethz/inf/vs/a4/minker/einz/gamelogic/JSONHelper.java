@@ -124,7 +124,7 @@ public class JSONHelper {
                 if (r instanceof BasicCardRule && ((BasicCardRule) r).getAssignedTo().equals(c)) {
                     JSONObject specificRule = new JSONObject();
                     try {
-                        specificRule.put(((BasicCardRule) r).getAssignedTo().getID(), r.getName());
+                        specificRule.put("id", r.getName());
                         if(r instanceof ParametrizedRule) {
                             specificRule.put("parameters", ((ParametrizedRule) r).getParameterTypes());
                         } else {
@@ -150,7 +150,7 @@ public class JSONHelper {
         for (BasicGlobalRule r : config.globalRules) {
             JSONObject oneRule = new JSONObject();
             try {
-                oneRule.put("id", r.getName()); //TODO: Currently "id" is used as ID
+                oneRule.put("id", r.getName()); //TODO: Currently r.getName() is used as ID
                 if (r instanceof ParametrizedRule){
                     oneRule.put("parameters", ((ParametrizedRule) r).getParameterTypes());
                 } else {

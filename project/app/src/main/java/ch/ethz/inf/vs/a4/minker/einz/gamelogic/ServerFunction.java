@@ -133,7 +133,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
-                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<Player>( globalState.getPlayersOrdered()));
             }
         }
     }
@@ -254,7 +254,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         }
         if (!CardRuleChecker.checkIsValidDrawCards(globalState, gameConfig)) {
             if (!DEBUG_MODE) {
-                MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "A rule doesn't allow you to draw cards.");
+                MessageSender.sendDrawCardResponseFailure(p, threadedEinzServer, "a rule doesn't allow you to draw cards.");
             }
             return null;
         } else {
@@ -353,6 +353,9 @@ public class ServerFunction implements ServerFunctionDefinition {
                 }
             }
         }
+
+        //numberOfCardsInGame.put(cardLoader.getCardInstance("take4"), 200); // DEBUG
+
         GameConfig result = new GameConfig(numberOfCardsInGame);
         for (Player p : players) {
             result.addParticipant(p);

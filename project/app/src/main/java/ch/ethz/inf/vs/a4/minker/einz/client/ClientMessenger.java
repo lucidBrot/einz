@@ -5,8 +5,11 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSpecifyRulesMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
 
@@ -107,5 +110,4 @@ public class ClientMessenger implements EinzClientConnection.OnMessageReceived{
             throw new RuntimeException(e);
         }
     }
-
 }

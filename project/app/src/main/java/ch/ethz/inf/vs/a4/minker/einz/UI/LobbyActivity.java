@@ -94,6 +94,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             startServer();
             //((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.YELLOW); // CYAN for client, Yellow for server. yey.
             findViewById(R.id.btn_start_game).setVisibility(View.VISIBLE);
+            findViewById(R.id.iv_settings_button).setVisibility(View.VISIBLE);
             // wait for server to tell us it's ready so we can connect in onLocalServerReady()
         } else {
             // still display the IP/PORT info so that they can tell their friends
@@ -101,6 +102,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             /// Option to hide the infobox
             ///((CardView) findViewById(R.id.cv_lobby_server_info)).setVisibility(View.GONE);
             findViewById(R.id.btn_start_game).setVisibility(View.GONE);
+            findViewById(R.id.iv_settings_button).setVisibility(View.GONE);
 
             // get info
             this.serverPort = intent.getIntExtra("serverPort",-1);

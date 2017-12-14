@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.model;
 
 import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import org.json.JSONObject;
 
 /**
  * Basic class every Rule has to implement.
