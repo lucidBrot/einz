@@ -23,7 +23,7 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
 
     @Override
     public String getName() {
-        return "Wish color";
+        return "wishColorRule";
     }
 
     @Override
@@ -52,10 +52,10 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
 
         JSONObject params = state.getPlayParameter("wishColorRule");
         if(params!=null && !params.equals(new JSONObject())){
-            wishedColor = CardColor.valueOf(params.optString("wishedColor"));
+            wishedColor = CardColor.valueOf(params.optString("wishForColor"));
         } else {
 
-            wishedColor = CardColor.NONE;
+            wishedColor = null;
         }
         // Idee: wenn die Karte gespielt wird, muss die UI sowieso wissed dass der user eine farbe auswählen muss. Also user direkt farbe auswählen lassen.
         //      Danach die karte clientside mit diesem parameter setzen.
@@ -87,9 +87,10 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
             wishedColor = CardColor.valueOf(choice);
         } catch (Exception e){
             wishedColor = null;
+            Log.w("wishColorRule", "Color wished for was bad: "+choice);
         }
-        System.err.println("Made choice " + choice);
-        System.err.println("Made choice color" + wishedColor);
+        Log.d("wishColorRule","Made choice " + choice);
+        Log.d("wishColorRule","Made choice color" + wishedColor);
         return state;
     }
 }
