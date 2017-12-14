@@ -39,6 +39,7 @@ public class EinzServerManager {
 
     private final ThreadedEinzServer server;
     private ServerFunctionDefinition serverFunctionInterface;
+    private EinzSpecifyRulesMessageBody latestSpecifyRulesMessageBody;
 
     public ReentrantReadWriteLock getSFLock() {
         return SFLock;
@@ -113,95 +114,125 @@ public class EinzServerManager {
 
         //getServerFunctionInterface().initialiseStandardGame(server, players); // returns gamestate but also modifies it internally, so i can discard the return value if I want to
 
-        //<Debug>
-        HashMap<Card, Integer> deck = new HashMap<>();
-        CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
-        Card myCard = cardLoader.getCardInstance("take4");
-        deck.put(myCard, 2);
-        Collection<BasicGlobalRule> globalRules = new ArrayList<>();
-        StartGameWithCardsRule myStartGameWithCardsRule = new StartGameWithCardsRule();
-        try {
-            JSONObject param = new JSONObject();
-            param.put(StartGameWithCardsRule.getParameterName(), 7);
-            myStartGameWithCardsRule.setParameter(param);
-        } catch (JSONException e) {
-            e.printStackTrace();
+//        //<Debug>
+//        HashMap<Card, Integer> deck = new HashMap<>();
+//        CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
+//        Card myCard = cardLoader.getCardInstance("take4");
+//        deck.put(myCard, 2);
+//        Collection<BasicGlobalRule> globalRules = new ArrayList<>();
+//        StartGameWithCardsRule myStartGameWithCardsRule = new StartGameWithCardsRule();
+//        try {
+//            JSONObject param = new JSONObject();
+//            param.put(StartGameWithCardsRule.getParameterName(), 7);
+//            myStartGameWithCardsRule.setParameter(param);
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        globalRules.add(myStartGameWithCardsRule);
+//        globalRules.add(new WinOnNoCardsRule());
+//        globalRules.add(new ResetCardsToDrawRule());
+//        globalRules.add(new CountNumberOfCardsAsPoints());
+//        globalRules.add(new NextTurnRule());
+//        Map<Card, ArrayList<BasicCardRule>> cardRules = new HashMap<>();
+//        HashMap<String, ArrayList<BasicCardRule>> tempCardRules = new HashMap<>(); // same as cardRules but with ID string as identifier
+//        //Add all necessary CardRules
+//        for (CardText ct : CardText.values()) {
+//            if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
+//                for (CardColor cc : CardColor.values()) {
+//                    if (cc != CardColor.NONE) {
+//                        Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
+//
+//                        //deck.put(card, 1);
+//
+//                        //assign rules to the cards
+//                        ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
+//                        arr.add(new PlayColorRule());
+//                        arr.add(new PlayTextRule());
+//                        arr.add(new IsValidDrawRule());
+//                        tempCardRules.put(card.getID(), arr);
+//                    }
+//                }
+//            } else {
+//                if (ct.equals(CardText.CHANGECOLORPLUSFOUR)) {
+//                    Card card = cardLoader.getCardInstance("take4");
+//                    ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
+//                    arr.add(new PlayColorRule());
+//                    arr.add(new PlayTextRule());
+//                    arr.add(new IsValidDrawRule());
+//                    arr.add(new PlayAlwaysRule());
+//                    tempCardRules.put(card.getID(), arr);
+//                } else if (ct.equals(CardText.CHANGECOLORPLUSFOUR)) {
+//                    Card card = cardLoader.getCardInstance("choose");
+//                    ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
+//                    arr.add(new PlayColorRule());
+//                    arr.add(new PlayTextRule());
+//                    arr.add(new IsValidDrawRule());
+//                    tempCardRules.put(card.getID(), arr);
+//                    arr.add(new PlayAlwaysRule());
+//                }
+//            }
+//        }
+//        for (CardColor cc : CardColor.values()) {
+//
+//            if (cc != CardColor.NONE) {
+//                String card = cc.toString().toLowerCase() + "_" + CardText.SWITCHORDER.indicator;
+//                String card1 =cc.toString().toLowerCase() + "_" + CardText.PLUSTWO.indicator;
+//                String card2 =cc.toString().toLowerCase() + "_" + CardText.STOP.indicator;
+//                //assign rules to the cards
+//                ArrayList<BasicCardRule> arr =  tempCardRules.get(card);
+//                ArrayList<BasicCardRule> arr1 = tempCardRules.get(card);
+//                ArrayList<BasicCardRule> arr2 = tempCardRules.get(card2);
+//                arr.add(new ChangeDirectionRule());
+//                arr1.add(new DrawTwoCardsRule());
+//                arr2.add(new SkipRule());
+//                tempCardRules.put(card, arr);
+//                tempCardRules.put(card1, arr1);
+//                tempCardRules.put(card2, arr2);
+//                //It might make sense to somewhere specify all IDs that exist, so that we don't have to guess
+//            }
+//        }
+//
+//        // actually add these
+//        for(String id : tempCardRules.keySet()){
+//            cardRules.put(cardLoader.getCardInstance(id), tempCardRules.get(id));
+//        }
+//
+//        //getServerFunctionInterface().initialiseGame(this.server, players,deck, globalRules, cardRules);
+//        getServerFunctionInterface().initialiseStandardGame(server, players);
+//        //</Debug>
+
+        if(this.latestSpecifyRulesMessageBody == null){
+            getServerFunctionInterface().initialiseStandardGame(server, players);
+        } else {
+            initialiseNonStandardGame(latestSpecifyRulesMessageBody, server, players);
         }
-        globalRules.add(myStartGameWithCardsRule);
-        globalRules.add(new WinOnNoCardsRule());
-        globalRules.add(new ResetCardsToDrawRule());
-        globalRules.add(new CountNumberOfCardsAsPoints());
-        globalRules.add(new NextTurnRule());
-        Map<Card, ArrayList<BasicCardRule>> cardRules = new HashMap<>();
-        HashMap<String, ArrayList<BasicCardRule>> tempCardRules = new HashMap<>(); // same as cardRules but with ID string as identifier
-        //Add all necessary CardRules
-        for (CardText ct : CardText.values()) {
-            if (ct != CardText.CHANGECOLOR && ct != CardText.CHANGECOLORPLUSFOUR && ct != CardText.DEBUG) {
-                for (CardColor cc : CardColor.values()) {
-                    if (cc != CardColor.NONE) {
-                        Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
-
-                        //deck.put(card, 1);
-
-                        //assign rules to the cards
-                        ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
-                        arr.add(new PlayColorRule());
-                        arr.add(new PlayTextRule());
-                        arr.add(new IsValidDrawRule());
-                        tempCardRules.put(card.getID(), arr);
-                    }
-                }
-            } else {
-                if (ct.equals(CardText.CHANGECOLORPLUSFOUR)) {
-                    Card card = cardLoader.getCardInstance("take4");
-                    ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
-                    arr.add(new PlayColorRule());
-                    arr.add(new PlayTextRule());
-                    arr.add(new IsValidDrawRule());
-                    arr.add(new PlayAlwaysRule());
-                    tempCardRules.put(card.getID(), arr);
-                } else if (ct.equals(CardText.CHANGECOLORPLUSFOUR)) {
-                    Card card = cardLoader.getCardInstance("choose");
-                    ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
-                    arr.add(new PlayColorRule());
-                    arr.add(new PlayTextRule());
-                    arr.add(new IsValidDrawRule());
-                    tempCardRules.put(card.getID(), arr);
-                    arr.add(new PlayAlwaysRule());
-                }
-            }
-        }
-        for (CardColor cc : CardColor.values()) {
-
-            if (cc != CardColor.NONE) {
-                String card = cc.toString().toLowerCase() + "_" + CardText.SWITCHORDER.indicator;
-                String card1 =cc.toString().toLowerCase() + "_" + CardText.PLUSTWO.indicator;
-                String card2 =cc.toString().toLowerCase() + "_" + CardText.STOP.indicator;
-                //assign rules to the cards
-                ArrayList<BasicCardRule> arr =  tempCardRules.get(card);
-                ArrayList<BasicCardRule> arr1 = tempCardRules.get(card);
-                ArrayList<BasicCardRule> arr2 = tempCardRules.get(card2);
-                arr.add(new ChangeDirectionRule());
-                arr1.add(new DrawTwoCardsRule());
-                arr2.add(new SkipRule());
-                tempCardRules.put(card, arr);
-                tempCardRules.put(card1, arr1);
-                tempCardRules.put(card2, arr2);
-                //It might make sense to somewhere specify all IDs that exist, so that we don't have to guess
-            }
-        }
-
-        // actually add these
-        for(String id : tempCardRules.keySet()){
-            cardRules.put(cardLoader.getCardInstance(id), tempCardRules.get(id));
-        }
-
-        //getServerFunctionInterface().initialiseGame(this.server, players,deck, globalRules, cardRules);
-        getServerFunctionInterface().initialiseStandardGame(server, players);
-        //</Debug>
 
         // TODO: not standard game but with rules, maybe call initialise earlier
         SFLock.writeLock().unlock();
+    }
+
+    private void initialiseNonStandardGame(EinzSpecifyRulesMessageBody specifyRulesMessageBody, ThreadedEinzServer server, ArrayList<Player> players) {
+        getSFLock().writeLock().lock();
+
+        // Global Rules
+        Collection<BasicGlobalRule> globalRules = specifyRulesMessageBody.getGlobalParsedRules(); // these are rule objects which already have their parameters set
+        // Card Rules
+        Map<Card, ArrayList<BasicCardRule>> cardRules = specifyRulesMessageBody.getParsedCardRules();
+        // load deck by taking every mentioned card in cardRules
+        HashMap<Card, Integer> deck = specifyRulesMessageBody.getCardNumbers();
+
+        // initialise
+        getServerFunctionInterface().initialiseGame(server, players, deck, globalRules, cardRules);
+
+        getSFLock().writeLock().unlock();
+    }
+
+    public EinzSpecifyRulesMessageBody getLatestSpecifyRulesMessageBody() {
+        return latestSpecifyRulesMessageBody;
+    }
+
+    public void setLatestSpecifyRulesMessageBody(EinzSpecifyRulesMessageBody latestSpecifyRulesMessageBody) {
+        this.latestSpecifyRulesMessageBody = latestSpecifyRulesMessageBody;
     }
 
     public void loadAndRegisterNetworkingActions(EinzActionFactory actionFactory) throws JSONException, InvalidResourceFormatException, ClassNotFoundException {

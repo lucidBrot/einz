@@ -144,6 +144,12 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
             String id = o.getString("id");
             JSONObject object = o.getJSONObject("parameters");
             BasicGlobalRule rule =(BasicGlobalRule) rl.getInstanceOfRule("id");
+
+            // iterate over parameters and set them
+            if(rule instanceof ParametrizedRule){
+                ((ParametrizedRule) rule).setParameter(object);
+            }
+
             globalRules.add(rule);
         }
         this.parsedGlobalRules = globalRules;
