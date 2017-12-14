@@ -87,7 +87,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
-                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
             }
         }
     }
@@ -133,7 +133,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
-                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
             }
         }
     }
@@ -160,7 +160,7 @@ public class ServerFunction implements ServerFunctionDefinition {
      * @param p    the player that wants to play a card
      * @return whether the player is allowed to play the card he wants to play or not
      */
-    public boolean play(Card card, Player p) {
+    public boolean play(Card card, Player p, JSONObject playParameters) {
         if (globalState.isGameFinished()) {
             if (!DEBUG_MODE) {
                 MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
@@ -192,6 +192,8 @@ public class ServerFunction implements ServerFunctionDefinition {
         } else {
             player.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways, and sending the message only cares for its name attribute
             globalState.addCardToDiscardPile(card);
+            //globalState.setPlayParameters(playParameters);
+            globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
             globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
             globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
@@ -201,6 +203,13 @@ public class ServerFunction implements ServerFunctionDefinition {
             onChange();
             return true;
         }
+    }
+
+    /**
+     * calls {@link #play(Card, Player, JSONObject)} without a JSONObject for playParameters
+     */
+    public boolean play(Card card, Player p){
+        return play(card, p, new JSONObject());
     }
 
     /**
@@ -320,17 +329,22 @@ public class ServerFunction implements ServerFunctionDefinition {
                         }
                     }
                 }
-            } else if (ct != CardText.DEBUG) {
-                if (DEBUG_MODE) {
-                    Card card = new Card(CardColor.NONE + "_" + ct.indicator, ct.type, ct, CardColor.NONE, "drawable", "card_" + ct.indicator + "_" + CardColor.NONE);
-                    //NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
-                    //either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
-                    numberOfCardsInGame.put(card, 4);
-                    allCardsInGame.add(card);
-                } else {
-                    Card card = cardLoader.getCardInstance(CardColor.NONE.toString().toLowerCase() + "_" + ct.indicator);
-                    numberOfCardsInGame.put(card, 4);
-                    allCardsInGame.add(card);
+            } else {
+                switch (ct) {
+                    case DEBUG:
+                        break; // don't add this card
+                    case CHANGECOLOR:
+                        Card card = cardLoader.getCardInstance("choose");
+                        numberOfCardsInGame.put(card, 4);
+                        allCardsInGame.add(card);
+                        break;
+                    case CHANGECOLORPLUSFOUR:
+                        Card carD = cardLoader.getCardInstance("take4");
+                        numberOfCardsInGame.put(carD, 4);
+                        allCardsInGame.add(carD);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
@@ -406,6 +420,8 @@ public class ServerFunction implements ServerFunctionDefinition {
                 }
             }
         }
+        result.assignRuleToCard(new PlayAlwaysRule(), cardLoader.getCardInstance("choose"));
+        result.assignRuleToCard(new WishColorRule(), cardLoader.getCardInstance("choose"));
         if (DEBUG_MODE) {
             result.assignRuleToCard(new IsValidDrawRule(), new Card(CardColor.YELLOW + "_" + CardText.ZERO.indicator, CardText.ZERO.type,
                     CardText.ZERO, CardColor.YELLOW, "drawable", "card_" + CardText.ZERO.indicator + "_" + CardColor.YELLOW));

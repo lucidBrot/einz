@@ -64,14 +64,13 @@ public class EinzStateInfoParser extends EinzParser {
                 String ID = cardJSON.getString("ID");
                 String origin = cardJSON.getString("origin");
 
-                JSONObject playParams = cardJSON.optJSONObject("playParameters");
-
-                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin, playParams);
+                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin);
                 stack.add(card);
             }
             String whoseturn = globalstateJSON.getString("whoseturn");
             String drawxcardsmin = globalstateJSON.getString("drawxcardsmin");
-            globalstate = new GlobalStateParser(numcardsinhand, stack, whoseturn, drawxcardsmin);
+            JSONObject playParams = globalstateJSON.optJSONObject("playParameters");
+            globalstate = new GlobalStateParser(numcardsinhand, stack, whoseturn, drawxcardsmin, playParams);
         }
 
         //get playerstate. Again, if it is nulll, there was an error. otherwise, it should have all content
@@ -87,7 +86,7 @@ public class EinzStateInfoParser extends EinzParser {
 
                 JSONObject playParams = cardJSON.optJSONObject("playParameters");
 
-                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin, playParams);
+                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin);
                 // Card card = new Card(ID, origin, CardText.DEBUG, CardColor.BLUE, "drawable", "card_1_blue");
                 hand.add(card);
             }

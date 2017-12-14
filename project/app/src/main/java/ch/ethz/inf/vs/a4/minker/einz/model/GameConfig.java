@@ -23,11 +23,9 @@ public class GameConfig {
     public List<Participant> allParticipants;
 
 
-    private ClientCallbackService clientCallbackService;
-
     private List<Card> drawPile;
 
-    private Map<Card,Set<BasicCardRule>> rulePerCard;
+    private Map<String,Set<BasicCardRule>> rulePerCard;
 
     public GameConfig(Map<Card, Integer> numberOfCardsInGame){
         this.allCardsInGame = new HashSet<>();
@@ -55,10 +53,10 @@ public class GameConfig {
     }
 
     public void assignRuleToCard(BasicCardRule rule, Card card){
-        Set<BasicCardRule> ruleSet = rulePerCard.get(card);
+        Set<BasicCardRule> ruleSet = rulePerCard.get(card.getID());
         if(ruleSet == null){
             ruleSet = new HashSet<>();
-            rulePerCard.put(card, ruleSet);
+            rulePerCard.put(card.getID(), ruleSet);
         }
         rule.assignedTo = card;
         ruleSet.add(rule);
@@ -71,7 +69,10 @@ public class GameConfig {
     }
 
     public Set<BasicCardRule> getRulesForCard(Card card){
-        return new HashSet<>(rulePerCard.get(card));
+        if (rulePerCard.get(card.getID()) == null){
+            return new HashSet<>();
+        }
+        return new HashSet<>(rulePerCard.get(card.getID()));
     }
 
     public List<Card> getShuffledDrawPile(){
@@ -79,14 +80,6 @@ public class GameConfig {
         shuffledDrawPile.addAll(drawPile);
         Collections.shuffle(shuffledDrawPile);
         return shuffledDrawPile;
-    }
-
-    public void setClientCallbackService(ClientCallbackService service){
-        this.clientCallbackService = service;
-    }
-
-    public ClientCallbackService getClientCallbackService(){
-        return clientCallbackService;
     }
 
 }

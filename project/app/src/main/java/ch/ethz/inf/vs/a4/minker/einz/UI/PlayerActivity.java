@@ -35,6 +35,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import org.json.JSONArray;
+
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
@@ -53,6 +55,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMe
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
@@ -60,6 +63,9 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.Thread.sleep;
 
@@ -79,7 +85,7 @@ import static java.lang.Thread.sleep;
  * putExtra requires a parcelable, so instead pass the client via Globals
  */
 public class PlayerActivity extends FullscreenActivity implements GameUIInterface { // TODO: onStop and onResume - register this activity at client
-    private static final int NBR_ITEMS = 20;
+    private static final int MAXCARDINHAND = 24;
     private GridLayout mGrid;
     private ArrayList<Card> cardStack = new ArrayList<>();
     private ImageView trayStack,trayStack2;
@@ -94,7 +100,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private Card seconLastPlayedCard = null;
 
     private EinzClient ourClient;
+    private GridLayout mGridScrollable;
 
+    private Map<String, List<BasicCardRule>> ruleMapping;
 
     @Override
     protected void onStop() {
@@ -117,7 +125,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     ArrayList<String> availableActions = new ArrayList<>();
     ArrayList<String> allPlayers = new ArrayList<>();
     String colorChosen = "none";
-    ScrollView handScrollView;
+    LinearLayout llHand;
+    ScrollView svHand;
 
     private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
     private Looper backgroundLooper;
@@ -137,14 +146,19 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         trayStack2 = findViewById(R.id.tray_stack_2);
 
-        handScrollView = findViewById(R.id.sv_hand);
-        handScrollView.setOnDragListener(new HandDragListener());
+        mGrid = findViewById(R.id.grid_layout);
+        mGridScrollable = findViewById(R.id.grid_layout_scrollable);
+
+        svHand = findViewById(R.id.sv_hand_scrollable);
+        svHand.setOnDragListener(new HandDragListenerScrollable());
+
+        llHand = findViewById(R.id.ll_hand);
+        llHand.setOnDragListener(new HandDragListener());
 
         drawPile = findViewById(R.id.draw_pile);
         drawPile.setOnTouchListener(new DrawCardListener());
         drawPile.setTag("drawCard");
 
-        mGrid = findViewById(R.id.grid_layout);
         //mGrid.setOnDragListener(new HandDragListener());
 
         Button colorWheelBlueButton = findViewById(R.id.btn_colorwheel_blue);
@@ -188,7 +202,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         });
 
         Button endGame = findViewById(R.id.btn_end_game);
-        colorWheelBlueButton.setOnClickListener(new View.OnClickListener() {
+        endGame.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 goBackToMainMenu();
@@ -201,8 +215,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         Point size = new Point();
         display.getRealSize(size);
 
-        cardWidth  = (size.x / mGrid.getColumnCount());
-        cardHeight = (size.y / (3*mGrid.getRowCount()));
+        cardWidth  = (size.x / 8);
+        cardHeight = (size.y /(12));
         //initCards();
 
         //add cardDrawables to mgrid
@@ -221,20 +235,20 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         ourClient.getActionCallbackInterface().setGameUI(this);
     }
 
-    private int calculateNewIndex(float x, float y) {
+    private int calculateNewIndex(GridLayout gl,float x, float y) {
         // calculate which column to move to
-        final float cellWidth = mGrid.getWidth() / mGrid.getColumnCount();
+        final float cellWidth = gl.getWidth() / gl.getColumnCount();
         final int column = (int)(x / cellWidth);
 
         // calculate which row to move to
-        final float cellHeight = mGrid.getHeight() / mGrid.getRowCount();
+        final float cellHeight = gl.getHeight() / gl.getRowCount();
         final int row = (int)Math.floor(y / cellHeight);
 
         // the items in the GridLayout is organized as a wrapping list
         // and not as an actual grid, so this is how to get the new index
-        int index = row * mGrid.getColumnCount() + column;
-        if (index >= mGrid.getChildCount()) {
-            index = mGrid.getChildCount() - 1;
+        int index = row * gl.getColumnCount() + column;
+        if (index >= gl.getChildCount()) {
+            index = gl.getChildCount() - 1;
         }
 
         return index;
@@ -251,11 +265,15 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final View itemView = inflater.inflate(R.layout.card_view, mGrid, false);
         ImageView localImgView = (ImageView) itemView;
 
+        final View itemView2 = inflater.inflate(R.layout.card_view, mGridScrollable, false);
+        ImageView localImgView2 = (ImageView) itemView2;
+
         // added this temporary fix for the OOM error problem
         // TODO: add permanent fix
         // https://stackoverflow.com/a/13415604/2550406
 
         localImgView.setTag(cardAdded);
+        localImgView2.setTag(cardAdded);
 
         //((BitmapDrawable)localImgView.getDrawable()).getBitmap().recycle();
 
@@ -263,18 +281,53 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         localImgView.getLayoutParams().width  = cardWidth;
         localImgView.getLayoutParams().height = cardHeight;
 
-        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()))).getBitmap();
+        localImgView2.getLayoutParams().width  = cardWidth;
+        localImgView2.getLayoutParams().height = cardHeight;
+
+        Bitmap b;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
+        } else {
+            b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()))).getBitmap();
+        }
+
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, (int)(1.0/cardSizeRatio * (double)cardHeight),cardHeight, false);
+
         localImgView.setImageBitmap(bitmapResized);
+        localImgView2.setImageBitmap(bitmapResized);
 
         itemView.setOnTouchListener(new DragCardListener());
+
+        itemView2.setOnTouchListener(new DragCardListener());
+
         mGrid.addView(itemView);
+        mGridScrollable.addView(itemView2);
+    }
+
+    private void rearrangeHandTooBig(){
+        svHand.setVisibility(View.VISIBLE);
+        llHand.setVisibility(View.GONE);
+    }
+
+    private void rearrangeHandSmallEnough(){
+        llHand.setVisibility(View.VISIBLE);
+        svHand.setVisibility(View.GONE);
     }
 
     private void removeCardFromHand(Card cardRemoved){
         if(cardRemoved != null) {
-            cards.remove(cardRemoved);
+            if(!(mGridScrollable.getChildCount() == mGrid.getChildCount() && mGrid.getChildCount() == cards.size())){
+                System.out.println("will fail to remove card");
+            }
+
+            mGridScrollable.removeView(mGridScrollable.findViewWithTag(cardRemoved));
             mGrid.removeView(mGrid.findViewWithTag(cardRemoved));
+
+            cards.remove(cardRemoved);
+
+            if(cards.size() + 1 > MAXCARDINHAND && cards.size() <= MAXCARDINHAND){
+                rearrangeHandSmallEnough();
+            }
         }
     }
 
@@ -300,46 +353,31 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         } else {
             b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         }
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
+
+        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
         trayStack.setImageBitmap(bitmapResized);
 
         //if()
         double direction = Math.random() * 2*Math.PI;
-        double xTranslation = Math.cos(direction) * 1000;
-        double yTranslation = Math.sin(direction) * 1000;
+        double xTranslation = Math.cos(direction) * 1500;
+        double yTranslation = Math.sin(direction) * 1500;
 
-        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).setListener(new Animator.AnimatorListener() {
+        trayStack.setVisibility(View.VISIBLE);
+        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new Runnable() {
             @Override
-            public void onAnimationStart(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animator animator) {
-                trayStack.animate().translationX(0).translationY(0).setDuration(1000);
-            }
-
-            @Override
-            public void onAnimationCancel(Animator animator) {
-
-            }
-
-            @Override
-            public void onAnimationRepeat(Animator animator) {
+            public void run() {
+                trayStack.setVisibility(View.VISIBLE);
+                trayStack.animate().translationX(0).translationY(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(500).withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        trayStack2.setImageBitmap(bitmapResized);
+                    }
+                });
 
             }
         });
-    }
 
-    public void setSecondTopPlayedCard(Card cardToSet) {
 
-        //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
-
-        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack2.getWidth(),(int)(cardSizeRatio * (double)trayStack2.getWidth()), false);
-        trayStack2.setImageBitmap(bitmapResized);
-
-                //setlastplayedCard(cardToSet);
     }
 
     private void initCards(){
@@ -347,7 +385,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
         addCard(cardLoader.getCardInstance("yellow_1"));
         // </education>
-
+        /*
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_blue"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_red"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_1_yellow"));
@@ -361,7 +399,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_yellow"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_3_green"));
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
-        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));
+        addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));*/
     }
 
     public boolean checkCardsStillValid(ArrayList<Card> cardlist){
@@ -396,7 +434,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             public void run() {
                 try {
                     ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}}}");
+                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"}," +
+                                    "\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}, " +
+                                    "\"playParameters\":{\"Wish color\":\"GREEN\"}}}");
                 } catch (SendMessageFailureException e) {
                     e.printStackTrace();
                 }
@@ -439,6 +479,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void addToHand(ArrayList<Card> addedCards){
         for (Card currCard:addedCards){
             addCard(currCard);
+        }
+        if(cards.size() - addedCards.size() <= MAXCARDINHAND && cards.size() > MAXCARDINHAND){
+            rearrangeHandTooBig();
         }
     }
 
@@ -484,7 +527,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void hideColorWheel(){
         LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
-        colorWheel.setVisibility(View.GONE);
+        colorWheel.setVisibility(View.INVISIBLE);
     }
 
     public void onColorWheelButtonGreenClick(){
@@ -614,6 +657,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         endscreen.setVisibility(View.VISIBLE);
         LinearLayout winningPlayers = findViewById(R.id.ll_winning_players);
         HashMap<String,String> playerPoints = message.getBody().getPoints();
+
         for(String player:allPlayers){
 
             CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerpointlist_element, winningPlayers, false);
@@ -635,9 +679,15 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setHand(ArrayList<Card> hand) {
         Log.w("PlayerActivity", "setHand is currently enabled. This means that the cards for debugging will not be shown.");
         // to disable, just comment out the following four lines
+        int numberOfCardsBefore = cards.size();
         if(!checkCardsStillValid(hand)){
             clearHand();
             addToHand(hand);
+            if(numberOfCardsBefore > MAXCARDINHAND && cards.size() <= MAXCARDINHAND){
+                rearrangeHandSmallEnough();
+            } else if (numberOfCardsBefore <= MAXCARDINHAND && cards.size() > MAXCARDINHAND) {
+                rearrangeHandTooBig();
+            }
         }
     }
 
@@ -657,12 +707,17 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
             setCanDrawCard(true);
 
+            /*
             Context context = getApplicationContext();
             CharSequence text = "It's your turn " + ourClient.getUsername();
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
+            */
+            findViewById(R.id.ll_its_your_turn).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.ll_its_your_turn).setVisibility(View.GONE);
         }
 
         if(allPlayers.contains(playerThatStartedTurn)) {
@@ -689,6 +744,24 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         for(String currPlayer:playerList){
             addPlayerToList(currPlayer);
         }
+        ruleMapping = new HashMap<>();
+        Iterator<String> cardIDs = message.getBody().getCardRules().keys();
+        try {
+            while(cardIDs.hasNext()){
+                String cardID = cardIDs.next();
+                ArrayList<BasicCardRule> rulesForCard = new ArrayList<>();
+                JSONArray jsonRules = message.getBody().getCardRules().getJSONArray(cardID);
+                for(int i = 0; i < jsonRules.length(); i++){
+                    String ruleName = jsonRules.getJSONObject(i).getString("id");
+                    BasicCardRule ruleObject = (BasicCardRule) EinzSingleton.getInstance().getRuleLoader().getInstanceOfRule(ruleName);
+                    rulesForCard.add(ruleObject);
+                }
+                ruleMapping.put(cardID, rulesForCard);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
@@ -720,11 +793,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setStack(ArrayList<Card> stack) {
         if(!checkCardListIdentical(stack,cardStack)) {
             Card sndCard = null;
-
-            if (stack.size() > 1) {
-                sndCard = stack.get(stack.size() - 2);
-                setSecondTopPlayedCard(sndCard);
-            }
 
             final Card topCard = stack.get(stack.size() - 1);
 
@@ -809,12 +877,94 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                         // do nothing if hovering above own position
                         if (view == v) return true;
                         // get the new list index
-                        final int index = calculateNewIndex(event.getX(), event.getY());
+                        final int index = calculateNewIndex(mGrid,event.getX(), event.getY());
                         // remove the view from the old position
-                        mGrid.removeView(view);
-                        // and push to the new
-                        mGrid.addView(view, index);
+                        if(mGrid.indexOfChild(view)!=index) {
+                            mGrid.removeView(view);
+                            // and push to the new
+                            // card got removed in the meantime if not true
+                            if(mGrid.getChildCount() < cards.size()) {
+                                mGrid.addView(view, index);
+                            }
+                            //same shit for the other view
+                            View view2 = mGridScrollable.findViewWithTag(view.getTag());
+                            if (view2 != null) {
 
+                                if (index < mGridScrollable.getChildCount()) {
+                                    mGridScrollable.removeView(view2);
+
+                                    // card got removed in the meantime if not true
+                                    if(mGridScrollable.getChildCount() < cards.size()) {
+                                        mGridScrollable.addView(view2, index);
+                                    }
+                                }
+                            }
+                        }
+
+                        break;
+                    case DragEvent.ACTION_DROP:
+                        view.setVisibility(View.VISIBLE);
+
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        //view.setVisibility(View.VISIBLE);
+
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+
+            } else if (view != null && view instanceof ImageView && view.getTag().equals("drawCard")) {
+                switch (event.getAction()) {
+
+                    case DragEvent.ACTION_DROP:
+                        drawCard();
+                        System.out.println("drew card");
+
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+
+                        break;
+                    default:
+                        break;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    class HandDragListenerScrollable implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            final View view = (View) event.getLocalState();
+            if (view != null && view instanceof ImageView && view.getTag() instanceof Card) {
+
+                switch (event.getAction()) {
+                    case DragEvent.ACTION_DRAG_STARTED:
+                        view.setVisibility(View.INVISIBLE);
+                    case DragEvent.ACTION_DRAG_LOCATION:
+                        // do nothing if hovering above own position
+                        if (view == v) return true;
+                        // get the new list index
+                        final int index = calculateNewIndex(mGridScrollable,event.getX(), event.getY());
+                        // remove the view from the old position
+                        if(mGrid.indexOfChild(view)!=index) {
+
+                            mGridScrollable.removeView(view);
+                            // and push to the new
+                            mGridScrollable.addView(view, index);
+                            //same for other
+                            View view2 = mGrid.findViewWithTag(view.getTag());
+                            if (view2 != null) {
+                                if (index < mGrid.getChildCount()) {
+                                    mGrid.removeView(view2);
+
+                                    mGrid.addView(view2, index);
+                                }
+                            }
+                        }
                         break;
                     case DragEvent.ACTION_DROP:
                         view.setVisibility(View.VISIBLE);
