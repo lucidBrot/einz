@@ -70,7 +70,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
         trayStack2 = findViewById(R.id.tray_stack_spec_2);
 
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
-        ourClient.getActionCallbackInterface().setGameUI(this);
+
 
         // this.ourClient.getActionCallbackInterface().getPlayerSeatings()
     }
@@ -209,8 +209,8 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
             ourClient.getActionCallbackInterface().setGameUI(null);
     }
@@ -224,7 +224,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
-        // Log.d("DEBUG", "toost updateLobby");
+        Log.d("DEBUG", "toost updateLobby");
         playerSeating = message.getBody().getPlayerSeatings();
 
     }
