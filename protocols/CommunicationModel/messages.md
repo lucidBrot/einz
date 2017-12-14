@@ -591,7 +591,7 @@ The **Client** can request to play a card. The Server will play the card if it i
       "origin":"~stack"
     },
      "playParameters":{
-    	"wishColorRule":{"wishForColor":"blue"},
+    	"Wish Color":{"wishForColor":"blue"},
     	"ruleDank":{"xXx":"1337"}
     }
   }
@@ -604,7 +604,7 @@ This field will usually be ignored, unless a rule uses it. To use it, you can ca
 Example:
 
 ```java
-wishedColor = CardColor.valueOf(played.getPlayParameter("wishColorRule", "wishedColor")); 
+wishedColor = CardColor.valueOf(played.getPlayParameter("Wish Color", "wishedColor")); 
 // I added this as alternative idea (Eric, 10.12.2017)
         // Idee: wenn die Karte gespielt wird, muss die UI sowieso wissed dass der user eine farbe auswählen muss. Also user direkt farbe auswählen lassen.
         //      Danach die karte clientside mit diesem parameter setzen.
@@ -685,7 +685,7 @@ See [Card](#card) for more info!
       "whoseturn":"Ric",
       "drawxcardsmin":"2",
       "playParameters":{
-        "wishColorRule":{"wishForColor":"blue"},
+        "Wish Color":{"wishForColor":"blue"},
         "ruleDank":{"xXx":"1337"}
       }
     },
@@ -1006,6 +1006,6 @@ A rule is only specified by its identifier and maybe some parameters, already pr
 
 List here which rules require which parameter format.
 
-`wishColorRule`:`{"wishForColor":"blue"}`
+`Wish Color`:`{"wishForColor":"blue"}`
 
 Generally, we use the Rule's `.getName()` as identifiers for it.
