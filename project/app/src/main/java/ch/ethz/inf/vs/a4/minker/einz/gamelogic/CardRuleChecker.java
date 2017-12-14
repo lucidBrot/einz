@@ -142,11 +142,11 @@ public class CardRuleChecker {
         for (BasicRule r: gameConfig.getRulesForCard(played)) {
             if (r instanceof BasicCardRule && ((BasicCardRule) r).getAssignedTo().getID().equals(played.getID())){
                 if (r instanceof SelectorRule) {
-                    String param;
+                    JSONObject param;
                     try {
-                        param = playParameter.getString(r.getName());
+                        param = playParameter.getJSONObject(r.getName());
                     } catch (JSONException e){
-                        param = "";
+                        param = null;
                     }
                     state = ((SelectorRule) r).onPlayAssignedCardChoice(state, param);
                 }

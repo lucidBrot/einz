@@ -197,7 +197,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
             card.setOrigin(player.getName());
             globalState.addCardToDiscardPile(card);
-            //globalState.setPlayParameters(playParameters);
+            globalState.setPlayParameters(playParameters);
             globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
             globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
             globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
@@ -387,6 +387,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                             result.assignRuleToCard(new PlayTextRule(), card);
                             // lowercase issue was here as well
                         } else {
+
                             Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
                             //assign rules to the cards
                             result.assignRuleToCard(new PlayColorRule(), card);
@@ -401,8 +402,22 @@ public class ServerFunction implements ServerFunctionDefinition {
                     //either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
                     result.assignRuleToCard(new PlayAlwaysRule(), card);
                 } else {
-                    Card card = cardLoader.getCardInstance(CardColor.NONE.toString().toLowerCase() + "_" + ct.indicator);
+                    String id;
+                    switch(ct){
+                        case CHANGECOLOR:
+                            id="choose";
+                            break;
+                        case CHANGECOLORPLUSFOUR:
+                            id="take4";
+                            break;
+                        default:
+                            id="debug";//unexpected
+                            break;
+                    }
+                    // id = CardColor.NONE.toString().toLowerCase() + "_" + ct.indicator // seems wrong >.>
+                    Card card = cardLoader.getCardInstance(id);
                     result.assignRuleToCard(new PlayAlwaysRule(), card);
+                    result.assignRuleToCard(new WishColorRule(), card);
                 }
             }
         }
@@ -425,8 +440,8 @@ public class ServerFunction implements ServerFunctionDefinition {
                 }
             }
         }
-        result.assignRuleToCard(new PlayAlwaysRule(), cardLoader.getCardInstance("choose"));
-        result.assignRuleToCard(new WishColorRule(), cardLoader.getCardInstance("choose"));
+        //result.assignRuleToCard(new PlayAlwaysRule(), cardLoader.getCardInstance("choose"));
+        //result.assignRuleToCard(new WishColorRule(), cardLoader.getCardInstance("choose"));
         if (DEBUG_MODE) {
             result.assignRuleToCard(new IsValidDrawRule(), new Card(CardColor.YELLOW + "_" + CardText.ZERO.indicator, CardText.ZERO.type,
                     CardText.ZERO, CardColor.YELLOW, "drawable", "card_" + CardText.ZERO.indicator + "_" + CardColor.YELLOW));
