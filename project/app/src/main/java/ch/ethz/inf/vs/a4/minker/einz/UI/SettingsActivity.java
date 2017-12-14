@@ -25,6 +25,7 @@ public class SettingsActivity extends FullscreenActivity implements View.OnClick
         setContentView(R.layout.activity_settings);
 
         findViewById(R.id.btn_save_settings).setOnClickListener(this);
+        //ourClient.getActionCallbackInterface().setLobbyUI(this); // is already done in onResume
     }
 
     @Override
@@ -79,16 +80,16 @@ public class SettingsActivity extends FullscreenActivity implements View.OnClick
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if (this.ourClient != null && this.ourClient.getActionCallbackInterface() != null) {
             this.ourClient.getActionCallbackInterface().setLobbyUI(null); // make sure no callbacks to this activity are executed
         }
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
+    public void onResume() {
+        super.onResume();
         if (ourClient != null && ourClient.getActionCallbackInterface() != null)
             this.ourClient.getActionCallbackInterface().setLobbyUI(this);
     }

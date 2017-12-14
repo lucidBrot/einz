@@ -80,16 +80,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     // A: No. the host is almost the first to connect unless somebody is able to pinpoint very exactly when to connect,
     //    because the server tells the host client that it needs to connect
 
-    /**
-     * https://stackoverflow.com/questions/34195828/how-to-come-back-to-first-activity-without-its-oncreate-called
-     *
-     * @param intent
-     */
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        if(ourClient!=null && ourClient.getActionCallbackInterface()!=null){ourClient.getActionCallbackInterface().setLobbyUI(this);}
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -387,7 +377,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             case R.id.iv_settings_button:{
                 Intent intent = new Intent(this, SettingsActivity.class);
                 EinzSingleton.getInstance().setEinzClient(this.ourClient);
-                this.ourClient.getActionCallbackInterface().setLobbyUI(null); // TODO: what happens if a user joins during us setting up things?
+                //this.ourClient.getActionCallbackInterface().setLobbyUI(null); // this is already done onStop()
+                // TODO: what happens if a user joins during us setting up things?
                 startActivity(intent);
             }
         }
@@ -401,8 +392,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
+    public void onResume() {
+        super.onResume();
+        ourClient = EinzSingleton.getInstance().getEinzClient();
         if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
             this.ourClient.getActionCallbackInterface().setLobbyUI(this);
 
@@ -419,8 +411,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if(this.ourClient != null && this.ourClient.getActionCallbackInterface()!=null){
             this.ourClient.getActionCallbackInterface().setLobbyUI(null); // make sure no callbacks to this activity are executed
         }
