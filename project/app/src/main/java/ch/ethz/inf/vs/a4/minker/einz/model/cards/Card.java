@@ -120,6 +120,15 @@ public class Card {
         return card;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Card){
+            Card other = (Card) obj;
+            return other.getID().equals(this.getID()) && other.getColor().equals(this.getColor()) &&
+                    other.getText().equals(this.getText());
+        }
+        return super.equals(obj);
+    }
 
     //below was probably a bad idea. what happens with that if two different cards are compared (but they only differ in origin)
 //    /**

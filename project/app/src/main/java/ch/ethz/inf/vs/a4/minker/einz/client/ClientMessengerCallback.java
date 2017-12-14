@@ -15,6 +15,7 @@ import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import ch.ethz.inf.vs.a4.minker.einz.sensors.OrientationGetter;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     private final Context applicationContext;
     private final EinzClient parentClient;
     private String previousPlayer = "~";
+    private HashMap<String, JSONObject> playerSeatings = new HashMap<>();
 
 
     /**
@@ -135,7 +137,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
                 if(gameUI!=null){
                     //gameUI.onUpdateLobbyList(message.getBody().getAdmin(), players, spectators);
-                    gameUI.onUpdateLobbyList(message);
+                    gameUI.onUpdateLobbyList(message); // FIXME: seems not to be called on spectator
                 }
             }
         };
@@ -143,6 +145,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         runOnMainThread(runnable); // this is important because
                                     // a) to access the UI, this is needed
                                     // b) to be sure the Activity still exists after checking
+
+        // parse and store the orientation
+        this.playerSeatings = message.getBody().getPlayerSeatings();
         Log.d("ClientMessengerCallback", "updated LobbyList");
 
     }
@@ -457,5 +462,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         });
         Handler mainHandler = new Handler(this.applicationContext.getMainLooper());
         mainHandler.post(runnable);
+    }
+
+    public HashMap<String, JSONObject> getPlayerSeatings() {
+        return playerSeatings;
     }
 }

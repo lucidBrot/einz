@@ -84,10 +84,10 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState = new GlobalState(10, players);
             this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
-            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
+            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
-                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
             }
         }
     }
@@ -130,10 +130,10 @@ public class ServerFunction implements ServerFunctionDefinition {
                 r.initialize(gameConfig);
             }
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
-            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
+            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
-                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, (ArrayList) globalState.getPlayersOrdered());
+                MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
             }
         }
     }
@@ -148,7 +148,8 @@ public class ServerFunction implements ServerFunctionDefinition {
         // gameConfig is null here if initialiseGame/initialiseStandartGame is not called properly
         globalState = GlobalRuleChecker.checkOnStartGame(globalState, gameConfig);
         globalState.nextTurn(); //Sets the active player to the one specified in initialiseGame
-        onChange();
+        onChange(); //this is not really needed since it gets called in drawCard already when
+        // players get their starting hand, but since it doesnt hurt to call onChange to much I still leave this here
     }
 
     /**
@@ -156,37 +157,53 @@ public class ServerFunction implements ServerFunctionDefinition {
      * OnPlayRules get applied after the player plays his card
      *
      * @param card the card to be played
-     * @param p    the player that wants to play a card
+     * @param player    the player that wants to play a card
      * @return whether the player is allowed to play the card he wants to play or not
      */
-    public boolean play(Card card, Player p, JSONObject playParameters) {
+    public boolean play(Card card, Player player, JSONObject playParameters) {
         if (globalState.isGameFinished()) {
             if (!DEBUG_MODE) {
-                MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, false);
             }
             return false;
         }
-        Player player = globalState.getActivePlayer();
-        if (player == null || !player.getName().equals(p.getName())) {
+        Player wantsToPlay = new Player("~Player");
+        for(Player p: globalState.getPlayersOrdered()){
+            if(player.getName().equals(p.getName())){
+                wantsToPlay = p;
+            }
+        }
+        //Check if the player even has the card he wants to play
+        boolean hasCard = false;
+        for (Card c : wantsToPlay.hand) {
+            if (c.getID().equals(card.getID())) {
+                hasCard = true;
+            }
+        }
+
+        Player activePlayer = globalState.getActivePlayer();
+        if (activePlayer == null || !activePlayer.getName().equals(wantsToPlay.getName()) || !hasCard) {
             if (!DEBUG_MODE) {
-                MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, false);
             }
             return false; //TODO: Check in rules whether its a players turn
         }
         if (!CardRuleChecker.checkIsValidPlayCard(globalState, card, gameConfig)) {
             if (!DEBUG_MODE) {
-                MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, false);
             }
             return false;
         } else {
-            player.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways, and sending the message only cares for its name attribute
+            activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
+            card.setOrigin(player.getName());
             globalState.addCardToDiscardPile(card);
             globalState.setPlayParameters(playParameters);
+            globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
             globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
             globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             if (!DEBUG_MODE) {
-                MessageSender.sendPlayCardResponse(p, threadedEinzServer, true);
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, true);
             }
             onChange();
             return true;
@@ -370,6 +387,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                             result.assignRuleToCard(new PlayTextRule(), card);
                             // lowercase issue was here as well
                         } else {
+
                             Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
                             //assign rules to the cards
                             result.assignRuleToCard(new PlayColorRule(), card);
@@ -384,8 +402,22 @@ public class ServerFunction implements ServerFunctionDefinition {
                     //either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
                     result.assignRuleToCard(new PlayAlwaysRule(), card);
                 } else {
-                    Card card = cardLoader.getCardInstance(CardColor.NONE.toString().toLowerCase() + "_" + ct.indicator);
+                    String id;
+                    switch(ct){
+                        case CHANGECOLOR:
+                            id="choose";
+                            break;
+                        case CHANGECOLORPLUSFOUR:
+                            id="take4";
+                            break;
+                        default:
+                            id="debug";//unexpected
+                            break;
+                    }
+                    // id = CardColor.NONE.toString().toLowerCase() + "_" + ct.indicator // seems wrong >.>
+                    Card card = cardLoader.getCardInstance(id);
                     result.assignRuleToCard(new PlayAlwaysRule(), card);
+                    result.assignRuleToCard(new WishColorRule(), card);
                 }
             }
         }
@@ -408,6 +440,8 @@ public class ServerFunction implements ServerFunctionDefinition {
                 }
             }
         }
+        //result.assignRuleToCard(new PlayAlwaysRule(), cardLoader.getCardInstance("choose"));
+        //result.assignRuleToCard(new WishColorRule(), cardLoader.getCardInstance("choose"));
         if (DEBUG_MODE) {
             result.assignRuleToCard(new IsValidDrawRule(), new Card(CardColor.YELLOW + "_" + CardText.ZERO.indicator, CardText.ZERO.type,
                     CardText.ZERO, CardColor.YELLOW, "drawable", "card_" + CardText.ZERO.indicator + "_" + CardColor.YELLOW));

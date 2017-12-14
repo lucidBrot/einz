@@ -27,9 +27,9 @@ public class ChangeDirectionRule extends BasicCardRule {
     public GlobalState onPlayAssignedCard(GlobalState state, Card played) {
         List<Player> players = state.getPlayersOrdered();
         int currentPlayer = players.indexOf(state.getActivePlayer());
-        int nextPlayerIndex = (currentPlayer + (state.playOrderIsForwards? 1 : -1 + players.size() )) % players.size();
-        state.nextPlayer = players.get(nextPlayerIndex);
         state.playOrderIsForwards = !state.playOrderIsForwards;
+        int nextPlayerIndex = (currentPlayer + (state.playOrderIsForwards? 1 : -1) + players.size()) % players.size();
+        state.nextPlayer = players.get(nextPlayerIndex);
         return state;
     }
 }

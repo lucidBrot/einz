@@ -35,12 +35,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import org.json.JSONArray;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
@@ -56,13 +69,19 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMe
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.Thread.sleep;
 
@@ -98,7 +117,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     private EinzClient ourClient;
     private GridLayout mGridScrollable;
+    private HashMap<String, Double> orientationOfPlayer = new HashMap<>();
 
+    private Map<String, List<BasicCardRule>> ruleMapping;
 
     @Override
     protected void onStop() {
@@ -114,7 +135,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             ourClient.getActionCallbackInterface().setGameUI(this);
     }
 
-    private int cardHeight,cardWidth;
+    private int cardHeight,cardWidth,cardBigWidth,cardBigHeight;
 
     ArrayList<Integer> cardDrawables = new ArrayList<>();
     ArrayList<Card> cards = new ArrayList<>();
@@ -220,6 +241,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         Point size = new Point();
         display.getRealSize(size);
 
+        double cardBigWidth_double = (((double) size.x) / 7.)*3.;
+        cardBigWidth = (int) cardBigWidth_double;
+        cardBigHeight = (int) ((double)cardBigWidth * cardSizeRatio);
         cardWidth  = (size.x / 8);
         cardHeight = (size.y /(12));
         //initCards();
@@ -343,14 +367,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setTopPlayedCard(Card cardToSet) {
 
         //((BitmapDrawable)trayStack.getDrawable()).getBitmap().recycle();
-        if(trayStack.getWidth()<=0||trayStack.getHeight()<=0){
-            Log.w("PlayerActivity/setTopPlayedCard", "using sleep hack because trayStack had height or width 0 or less");
-            try {
-                sleep(10);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
 
         Bitmap b = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -359,11 +375,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         }
 
-        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
+        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, cardBigWidth,cardBigHeight, false);
         trayStack.setImageBitmap(bitmapResized);
 
-        //if()
-        double direction = Math.random() * 2*Math.PI;
+        double direction;
+
+        if(orientationOfPlayer.containsKey(currentlyActivePlayer) && !Double.isNaN(orientationOfPlayer.get(currentlyActivePlayer))) {
+            if(currentlyActivePlayer.equals(ourClient.getUsername())){
+                direction = - 3.0/2.0 * Math.PI;
+            } else {
+                direction = orientationOfPlayer.get(currentlyActivePlayer);
+            }
+
+        } else {
+            direction = Math.random() * 2 * Math.PI;
+        }
+
         double xTranslation = Math.cos(direction) * 1500;
         double yTranslation = Math.sin(direction) * 1500;
 
@@ -434,6 +461,24 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     public void playCard(final Card playedCard){
+/*
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONObject playParameters = new JSONObject();
+                    JSONObject wishForColor = new JSONObject();
+                    wishForColor.put("wishForColor","GREEN");
+                    playParameters.put("wishColorRule", wishForColor);
+                    EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCard");
+                    EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(playedCard, playParameters);
+                    EinzMessage<EinzPlayCardMessageBody> message = new EinzMessage<>(header, body);
+                    ourClient.getConnection().sendMessage(message);
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+*/
         hideColorWheel();
 
         setlastplayedCard(playedCard);
@@ -451,6 +496,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
+
                 }
             });
         }
@@ -472,16 +518,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void onColorWheelButtonGreenClick(){
         hideColorWheel();
-        String chosenColor = "green";
+        final String chosenColor = "green";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
@@ -492,16 +544,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void onColorWheelButtonRedClick(){
         hideColorWheel();
-        String chosenColor = "red";
+        final String chosenColor = "red";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
@@ -512,16 +570,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void onColorWheelButtonBlueClick(){
         hideColorWheel();
-        String chosenColor = "blue";
+        final String chosenColor = "blue";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
@@ -532,16 +596,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void onColorWheelButtonYellowClick(){
         hideColorWheel();
-        String chosenColor = "yellow";
+        final String chosenColor = "yellow";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
@@ -817,9 +887,30 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
         ArrayList<String> playerList = message.getBody().getTurnOrder();
+
         for(String currPlayer:playerList){
             addPlayerToList(currPlayer);
+            double orientation = Math.random() * 2 * Math.PI;
+            orientationOfPlayer.put(currPlayer,orientation);
         }
+        ruleMapping = new HashMap<>();
+        Iterator<String> cardIDs = message.getBody().getCardRules().keys();
+        try {
+            while(cardIDs.hasNext()){
+                String cardID = cardIDs.next();
+                ArrayList<BasicCardRule> rulesForCard = new ArrayList<>();
+                JSONArray jsonRules = message.getBody().getCardRules().getJSONArray(cardID);
+                for(int i = 0; i < jsonRules.length(); i++){
+                    String ruleName = jsonRules.getJSONObject(i).getString("id");
+                    BasicCardRule ruleObject = (BasicCardRule) EinzSingleton.getInstance().getRuleLoader().getInstanceOfRule(ruleName);
+                    rulesForCard.add(ruleObject);
+                }
+                ruleMapping.put(cardID, rulesForCard);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
