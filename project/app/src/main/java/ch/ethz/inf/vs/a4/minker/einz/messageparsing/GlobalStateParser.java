@@ -113,12 +113,18 @@ public class GlobalStateParser {
         //get drawxcardsmin
         String drawxcardsmin = getDrawxCardsMin();
 
+        // if playParameters not set, set to empty
+        if(playParameters==null){
+            playParameters = new JSONObject();
+        }
+
         //put it all together
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("numcardsinhand", numcardsinhandJSON);
         jsonObject.put("stack", stackJSON);
         jsonObject.put("whoseturn", whoseturn);
         jsonObject.put("drawxcardsmin", drawxcardsmin);
+        jsonObject.put("playParameters", playParameters);
 
         return jsonObject;
     }

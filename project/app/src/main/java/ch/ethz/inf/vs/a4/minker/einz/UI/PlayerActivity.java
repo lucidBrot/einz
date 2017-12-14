@@ -35,8 +35,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import org.json.JSONArray;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
@@ -44,6 +51,9 @@ import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
@@ -59,13 +69,19 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMe
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
+
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import static java.lang.Thread.sleep;
 
@@ -103,6 +119,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private GridLayout mGridScrollable;
     private HashMap<String, Double> orientationOfPlayer = new HashMap<>();
 
+    private Map<String, List<BasicCardRule>> ruleMapping;
 
     @Override
     protected void onStop() {
@@ -444,6 +461,24 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     public void playCard(final Card playedCard){
+/*
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONObject playParameters = new JSONObject();
+                    JSONObject wishForColor = new JSONObject();
+                    wishForColor.put("wishForColor","GREEN");
+                    playParameters.put("wishColorRule", wishForColor);
+                    EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCard");
+                    EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(playedCard, playParameters);
+                    EinzMessage<EinzPlayCardMessageBody> message = new EinzMessage<>(header, body);
+                    ourClient.getConnection().sendMessage(message);
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+*/
         hideColorWheel();
 
         setlastplayedCard(playedCard);
@@ -461,6 +496,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
+
                 }
             });
         }
@@ -857,6 +893,24 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             double orientation = Math.random() * 2 * Math.PI;
             orientationOfPlayer.put(currPlayer,orientation);
         }
+        ruleMapping = new HashMap<>();
+        Iterator<String> cardIDs = message.getBody().getCardRules().keys();
+        try {
+            while(cardIDs.hasNext()){
+                String cardID = cardIDs.next();
+                ArrayList<BasicCardRule> rulesForCard = new ArrayList<>();
+                JSONArray jsonRules = message.getBody().getCardRules().getJSONArray(cardID);
+                for(int i = 0; i < jsonRules.length(); i++){
+                    String ruleName = jsonRules.getJSONObject(i).getString("id");
+                    BasicCardRule ruleObject = (BasicCardRule) EinzSingleton.getInstance().getRuleLoader().getInstanceOfRule(ruleName);
+                    rulesForCard.add(ruleObject);
+                }
+                ruleMapping.put(cardID, rulesForCard);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override

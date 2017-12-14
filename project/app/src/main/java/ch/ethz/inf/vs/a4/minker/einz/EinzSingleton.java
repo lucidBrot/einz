@@ -11,9 +11,11 @@ public class EinzSingleton {
 
     private EinzClient client;
     private final CardLoader cardLoader;
+    private final RuleLoader ruleLoader;
 
     private EinzSingleton(){
         this.cardLoader = new CardLoader();
+        this.ruleLoader = new RuleLoader();
     }
 
     public static EinzSingleton getInstance(){
@@ -33,5 +35,9 @@ public class EinzSingleton {
 
     public CardLoader getCardLoader() {
         return cardLoader;
+    }
+
+    public RuleLoader getRuleLoader() {
+        return ruleLoader;
     }
 }
