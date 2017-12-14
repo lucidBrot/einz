@@ -589,10 +589,29 @@ The **Client** can request to play a card. The Server will play the card if it i
     "card":{
       "ID":"cardID1337",
       "origin":"~stack"
+    },
+     "playParameters":{
+    	"wishColorRule":{"wishForColor":"blue"},
+    	"ruleDank":{"xXx":"1337"}
     }
   }
 }
 ```
+
+`playParameters` is a list of *JSONObjects*  which represent settings specific to this card ID when played. Exampli gratuita, a player might play a card that allows them to wish for a color. It is easiest when that selection is sent with the playCard Request.
+
+This field will usually be ignored, unless a rule uses it. To use it, you can call `message.getPlayParameters("wishForColors")` to get the *String* associated with *"wishForColors"* or `message.getPlayParameters()` to get the whole *JSONObject* list. 
+Example:
+
+```java
+wishedColor = CardColor.valueOf(played.getPlayParameter("wishColorRule", "wishedColor")); 
+// I added this as alternative idea (Eric, 10.12.2017)
+        // Idee: wenn die Karte gespielt wird, muss die UI sowieso wissed dass der user eine farbe auswählen muss. Also user direkt farbe auswählen lassen.
+        //      Danach die karte clientside mit diesem parameter setzen.
+        //      Wenn server die karte erhält wird diese regel getriggert und die liest den parameter aus.
+```
+
+Make sure to use a rule name coherent with our rules.
 
 ## PlayCardResponse
 
@@ -644,6 +663,8 @@ The states will be empty if there was a GetState request while not appropriate -
 
 See [Card](#card) for more info!
 
+`playParameters` comes from PlayCard when a color was wished.
+
 ```Json
 {
   "header":{
@@ -662,7 +683,11 @@ See [Card](#card) for more info!
         {"ID":"cardID1337", "origin":"Rip"}
       ],
       "whoseturn":"Ric",
-      "drawxcardsmin":"2"
+      "drawxcardsmin":"2",
+      "playParameters":{
+        "wishColorRule":{"wishForColor":"blue"},
+        "ruleDank":{"xXx":"1337"}
+      }
     },
     "playerstate":{
       "hand":[
@@ -821,11 +846,7 @@ The drawn cards, setup so that the UI will know where they came from in order to
 ```json
 {
   "ID":"cardID1337",
-  "origin":"stack",
-  "playParameters":{
-    	"ruleWish":{"wishForColor":"blue"},
-    	"ruleDank":{"xXx":"1337"}
-	}
+  "origin":"stack"
 }
 ```
 
@@ -841,20 +862,6 @@ Not that the tilde is not allowed within usernames, so this is clear specificati
 `ID` is an identifier to find the corresponding card in the resources / local memory.
 
 The [card](#card) does not have to be unique, there may be multiple copies of the same card in play.
-
-`playParameters` is a list of *JSONObjects*  which represent settings specific to this card ID when played. Exampli gratuita, a player might play a card that allows them to wish for a color. It is easiest when that selection is sent with the playCard Request.
-This field will usually be ignored, unless a rule uses it. To use it, you can call `yourCard.getPlayParameters("wishForColors")` to get the *String* associated with *"wishForColors"* or `yourCard.getPlayParameters()` to get the whole *JSONObject* list. 
-Example:
-
-```java
-wishedColor = CardColor.valueOf(played.getPlayParameter("wishColorRule", "wishedColor")); 
-// I added this as alternative idea (Eric, 10.12.2017)
-        // Idee: wenn die Karte gespielt wird, muss die UI sowieso wissed dass der user eine farbe auswählen muss. Also user direkt farbe auswählen lassen.
-        //      Danach die karte clientside mit diesem parameter setzen.
-        //      Wenn server die karte erhält wird diese regel getriggert und die liest den parameter aus.
-```
-
-
 
 ## PossibleActions
 
@@ -998,3 +1005,5 @@ A rule is only specified by its identifier and maybe some parameters, already pr
 ## Custom Rule Actions
 
 List here which rules require which parameter format.
+
+`wishColorRule`:`{"wishForColor":"blue"}`

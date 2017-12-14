@@ -35,18 +35,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
@@ -119,6 +125,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     ArrayList<String> allPlayers = new ArrayList<>();
     String colorChosen = "none";
     LinearLayout llHand;
+    LinearLayout llGame;
     ScrollView svHand;
 
     private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
@@ -138,6 +145,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         trayStack.setOnDragListener(new TrayDragListener());
 
         trayStack2 = findViewById(R.id.tray_stack_2);
+
+        llGame = findViewById(R.id.ll_game);
+        llGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                hideColorWheel();
+            }
+        });
 
         mGrid = findViewById(R.id.grid_layout);
         mGridScrollable = findViewById(R.id.grid_layout_scrollable);
@@ -277,7 +292,13 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         localImgView2.getLayoutParams().width  = cardWidth;
         localImgView2.getLayoutParams().height = cardHeight;
 
-        Bitmap b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()))).getBitmap();
+        Bitmap b;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
+        } else {
+            b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()))).getBitmap();
+        }
+
         Bitmap bitmapResized = Bitmap.createScaledBitmap(b, (int)(1.0/cardSizeRatio * (double)cardHeight),cardHeight, false);
 
         localImgView.setImageBitmap(bitmapResized);
@@ -297,17 +318,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     private void rearrangeHandSmallEnough(){
-        svHand.setVisibility(View.GONE);
         llHand.setVisibility(View.VISIBLE);
+        svHand.setVisibility(View.GONE);
     }
 
     private void removeCardFromHand(Card cardRemoved){
         if(cardRemoved != null) {
-            int numberOfCardsBefore = cards.size();
-            cards.remove(cardRemoved);
-            mGrid.removeView(mGrid.findViewWithTag(cardRemoved));
+            if(!(mGridScrollable.getChildCount() == mGrid.getChildCount() && mGrid.getChildCount() == cards.size())){
+                System.out.println("will fail to remove card");
+            }
+
             mGridScrollable.removeView(mGridScrollable.findViewWithTag(cardRemoved));
-            if(numberOfCardsBefore > MAXCARDINHAND && cards.size() <= MAXCARDINHAND){
+            mGrid.removeView(mGrid.findViewWithTag(cardRemoved));
+
+            cards.remove(cardRemoved);
+
+            if(cards.size() + 1 > MAXCARDINHAND && cards.size() <= MAXCARDINHAND){
                 rearrangeHandSmallEnough();
             }
         }
@@ -411,17 +437,144 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     public void playCard(final Card playedCard){
-        this.backgroundHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"},\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}}}");
-                } catch (SendMessageFailureException e) {
-                    e.printStackTrace();
+        hideColorWheel();
+
+        setlastplayedCard(playedCard);
+
+        if (isWishingCard(playedCard)){
+            displayColorWheel();
+        } else {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
+                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
                 }
-            }
-        });
+            });
+        }
+    }
+
+    private boolean isWishingCard(Card playedCard) {
+        return playedCard.getID().equals("take4") || playedCard.getID().equals("choose");
+    }
+
+    public void displayColorWheel(){
+        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
+        colorWheel.setVisibility(View.VISIBLE);
+    }
+
+    public void hideColorWheel(){
+        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
+        colorWheel.setVisibility(View.INVISIBLE);
+    }
+
+    public void onColorWheelButtonGreenClick(){
+        hideColorWheel();
+        final String chosenColor = "green";
+        colorChosen = chosenColor;
+        if(isWishingCard(lastPlayedCard)) {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+    public void onColorWheelButtonRedClick(){
+        hideColorWheel();
+        final String chosenColor = "red";
+        colorChosen = chosenColor;
+        if(isWishingCard(lastPlayedCard)) {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+    public void onColorWheelButtonBlueClick(){
+        hideColorWheel();
+        final String chosenColor = "blue";
+        colorChosen = chosenColor;
+        if(isWishingCard(lastPlayedCard)) {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+    }
+
+    public void onColorWheelButtonYellowClick(){
+        hideColorWheel();
+        final String chosenColor = "yellow";
+        colorChosen = chosenColor;
+        if(isWishingCard(lastPlayedCard)) {
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
     }
 
     public void drawCard(){
@@ -457,13 +610,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     public void addToHand(ArrayList<Card> addedCards){
-        int nrOfCardsBefore = cards.size();
         for (Card currCard:addedCards){
-            int numberOfCardsBefore = cards.size();
             addCard(currCard);
-            if(numberOfCardsBefore <= MAXCARDINHAND && cards.size() > MAXCARDINHAND){
-                rearrangeHandTooBig();
-            }
+        }
+        if(cards.size() - addedCards.size() <= MAXCARDINHAND && cards.size() > MAXCARDINHAND){
+            rearrangeHandTooBig();
         }
     }
 
@@ -500,36 +651,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             playerList.addView(usercard);
             allPlayers.add(addedPlayer);
         }
-    }
-
-    public void displayColorWheel(){
-        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
-        colorWheel.setVisibility(View.VISIBLE);
-    }
-
-    public void hideColorWheel(){
-        LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
-        colorWheel.setVisibility(View.INVISIBLE);
-    }
-
-    public void onColorWheelButtonGreenClick(){
-        hideColorWheel();
-        colorChosen = "green";
-    }
-
-    public void onColorWheelButtonRedClick(){
-        hideColorWheel();
-        colorChosen = "red";
-    }
-
-    public void onColorWheelButtonBlueClick(){
-        hideColorWheel();
-        colorChosen = "blue";
-    }
-
-    public void onColorWheelButtonYellowClick(){
-        hideColorWheel();
-        colorChosen = "yellow";
     }
 
     public void removePlayerFromList(String playerToBeRemoved){
@@ -689,12 +810,17 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
             setCanDrawCard(true);
 
+            /*
             Context context = getApplicationContext();
             CharSequence text = "It's your turn " + ourClient.getUsername();
             int duration = Toast.LENGTH_SHORT;
 
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
+            */
+            findViewById(R.id.ll_its_your_turn).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.ll_its_your_turn).setVisibility(View.GONE);
         }
 
         if(allPlayers.contains(playerThatStartedTurn)) {
@@ -838,9 +964,27 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                         // get the new list index
                         final int index = calculateNewIndex(mGrid,event.getX(), event.getY());
                         // remove the view from the old position
-                        mGrid.removeView(view);
-                        // and push to the new
-                        mGrid.addView(view, index);
+                        if(mGrid.indexOfChild(view)!=index) {
+                            mGrid.removeView(view);
+                            // and push to the new
+                            // card got removed in the meantime if not true
+                            if(mGrid.getChildCount() < cards.size()) {
+                                mGrid.addView(view, index);
+                            }
+                            //same shit for the other view
+                            View view2 = mGridScrollable.findViewWithTag(view.getTag());
+                            if (view2 != null) {
+
+                                if (index < mGridScrollable.getChildCount()) {
+                                    mGridScrollable.removeView(view2);
+
+                                    // card got removed in the meantime if not true
+                                    if(mGridScrollable.getChildCount() < cards.size()) {
+                                        mGridScrollable.addView(view2, index);
+                                    }
+                                }
+                            }
+                        }
 
                         break;
                     case DragEvent.ACTION_DROP:
@@ -848,7 +992,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
-                        view.setVisibility(View.VISIBLE);
+                        //view.setVisibility(View.VISIBLE);
 
                         break;
                     default:
@@ -891,10 +1035,21 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                         // get the new list index
                         final int index = calculateNewIndex(mGridScrollable,event.getX(), event.getY());
                         // remove the view from the old position
-                        mGridScrollable.removeView(view);
-                        // and push to the new
-                        mGridScrollable.addView(view, index);
+                        if(mGrid.indexOfChild(view)!=index) {
 
+                            mGridScrollable.removeView(view);
+                            // and push to the new
+                            mGridScrollable.addView(view, index);
+                            //same for other
+                            View view2 = mGrid.findViewWithTag(view.getTag());
+                            if (view2 != null) {
+                                if (index < mGrid.getChildCount()) {
+                                    mGrid.removeView(view2);
+
+                                    mGrid.addView(view2, index);
+                                }
+                            }
+                        }
                         break;
                     case DragEvent.ACTION_DROP:
                         view.setVisibility(View.VISIBLE);
@@ -968,7 +1123,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     case DragEvent.ACTION_DROP:
                         ImageView tmpView = (ImageView) view;
 
-                        setlastplayedCard((Card)tmpView.getTag());
+                        //setlastplayedCard((Card)tmpView.getTag());
                         //remove card from inner cardlist
                          playCard((Card)tmpView.getTag());
 

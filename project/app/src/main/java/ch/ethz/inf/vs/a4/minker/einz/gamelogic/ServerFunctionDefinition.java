@@ -13,6 +13,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
+import org.json.JSONObject;
 
 /**
  * Created by Fabian on 09.11.2017.
@@ -58,6 +59,8 @@ public interface ServerFunctionDefinition {
      * @param p    the player that wants to playe a card
      * @return whether the player is allowed to play the card he wants to play or not
      */
+    public boolean play(Card card, Player p, JSONObject playParameters);
+
     public boolean play(Card card, Player p);
 
     /**

@@ -34,7 +34,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
 
     /**
-     * @param lobbyUIInterface make sure to call {@link #setGameUIAndDisableLobbyUI(GameUIInterface)} after destroying the lobby
+     * @param lobbyUIInterface make sure to call {@link #setGameUIAndDisableLobbyUI(GameUIInterface)} after destroying the lobby, or at least to set LobbyUI to null
      * @param appContext just the Context of the application, for toasts and stuff
      * @param parentClient the client, duh.
      */
@@ -46,6 +46,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     }
 
     public void setGameUI(GameUIInterface gameUI){
+        if(gameUI!=null){
+            Log.d("ClientMessengerCallback", "set GameUI to "+gameUI.toString()+"    (LobbyUI : "+lobbyUI.toString()+")");
+        }
         this.gameUI = gameUI;
     }
 

@@ -22,6 +22,10 @@ public class PlayAlwaysRule extends BasicCardRule {
 
     @Override
     public boolean isValidPlayCardPermissive(GlobalState state, Card played) {
-        return true;
+        if(played.getID().equals(assignedTo.getID())){ //Changed this so only the assigned card can always be played
+            return true;
+        } else {
+            return false;
+        }
     }
 }
