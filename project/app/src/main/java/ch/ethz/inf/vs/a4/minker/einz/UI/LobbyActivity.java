@@ -95,6 +95,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             //((CardView) findViewById(R.id.cv_lobby_server_info)).setCardBackgroundColor(Color.YELLOW); // CYAN for client, Yellow for server. yey.
             findViewById(R.id.btn_start_game).setVisibility(View.VISIBLE);
             findViewById(R.id.iv_settings_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.iv_settings_button).setOnClickListener(this);
             // wait for server to tell us it's ready so we can connect in onLocalServerReady()
         } else {
             // still display the IP/PORT info so that they can tell their friends
@@ -148,8 +149,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 // and it is inconvenient to have to go back after getting "Plz be at least one player"
             }
         });
-
-
 
     }
 
@@ -369,7 +368,12 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     @Override
     public void onClick(View view) {
         //TODO: button to start game if you're the host, handle the onclick
-        //TODO: settings if you're the host
+        switch (view.getId()){
+            case R.id.iv_settings_button:{
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+            }
+        }
     }
 
     @Override
