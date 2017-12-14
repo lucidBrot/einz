@@ -46,7 +46,7 @@ public class GlobalState {
     private final int maxDiscardPileSize;
 
     private HashMap<String, Integer> points = new HashMap<String, Integer>(); // String for player.getName(),  String for points
-    private JSONObject playParameters;
+    private JSONObject playParameters = new JSONObject();
 
     /**
      * Creates an instance of a Global game state.
