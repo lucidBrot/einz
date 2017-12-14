@@ -124,7 +124,7 @@ public class JSONHelper {
                 if (r instanceof BasicCardRule && ((BasicCardRule) r).getAssignedTo().equals(c)) {
                     JSONObject specificRule = new JSONObject();
                     try {
-                        specificRule.put(((BasicCardRule) r).getAssignedTo().getID(), r.getName());
+                        specificRule.put("id", r.getName());
                         if(r instanceof ParametrizedRule) {
                             specificRule.put("parameters", ((ParametrizedRule) r).getParameterTypes());
                         } else {
