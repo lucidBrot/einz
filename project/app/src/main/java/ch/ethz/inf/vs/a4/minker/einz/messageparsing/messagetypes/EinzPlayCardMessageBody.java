@@ -18,7 +18,7 @@ public class EinzPlayCardMessageBody extends EinzMessageBody{
       "ID":"cardID1337"
     },
      "playParameters":{
-    	"wishColorRule":{"wishForColor":"blue"},
+    	"Wish Color":{"wishForColor":"blue"},
     	"ruleDank":{"xXx":"1337"}
     }
 
@@ -38,7 +38,7 @@ public class EinzPlayCardMessageBody extends EinzMessageBody{
     /**
      * Initializes the PlayCardMessageBody with the card to play and additional parameters that should be of the form <br><code>
      *     {<br>
-     *          "wishColorRule":{"wishForColor":"blue"},<br>
+     *          "Wish color":{"wishForColor":"blue"},<br>
      *              "ruleDank":{"xXx":"1337"}<br>
      *      }
      * </code>

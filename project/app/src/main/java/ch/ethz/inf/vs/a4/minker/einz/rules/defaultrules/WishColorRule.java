@@ -19,11 +19,14 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
 
     private CardColor wishedColor = null;
 
-    private boolean wished = false; // true if the last played card was a wish card. Unused yet, or so it seems
+    /**
+     * Determines if a card has been wished
+     */
+    private boolean wished = false;
 
     @Override
     public String getName() {
-        return "wishColorRule";
+        return "Wish Color";
     }
 
     @Override
@@ -33,38 +36,16 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
 
     @Override
 
-    public boolean isValidPlayCardPermissive(GlobalState state, Card played) { // allow only cards of the wished color or uncolored cards to be played
-        Log.d("WishColorRule#"+this.toString(), "Wished color was: " + wishedColor + ", played color: " + played.getColor());
-        if(!wished){
-            return false; // some other rule has to decide if this is valid, so we don't set this. cuz we're permissive.
-        }
-        boolean unset = (wishedColor==null /*wishedColor.equals(CardColor.NONE)*/); // allow any card to be played if none is set but one was wished last turn. That should not be happening
-        return unset || played.getColor().equals(wishedColor) /*|| played.getColor().equals(CardColor.NONE)*/; // TODO: move right part to its own permissive rule. or maybe it already is because of the playAlways rule.
+    public boolean isValidPlayCardPermissive(GlobalState state, Card played) {
+
+        Log.d("WishColorRule#" + this.toString(), "Wished color was: " + wishedColor + ", played color: " + played.getColor());
+
+        return wished && (played.getColor().equals(wishedColor));
     }
 
     @Override
     public GlobalState onPlayAssignedCard(GlobalState state, Card played) {
-        // wished = true;
-        /*ArrayList<String> options = new ArrayList<>();
-        for(CardColor color : CardColor.values()){
-            options.add(color.color);
-        }
-
-        String result = config.getClien tCallbackService().getSelectionFromPlayer(state.getActivePlayer(), options);
-        wishedColor = CardColor.valueOf(result);*/
-
-        /*JSONObject params = state.getPlayParameter("wishColorRule");
-        if(params!=null && !params.equals(new JSONObject())){
-            wishedColor = CardColor.valueOf(params.optString("wishForColor"));
-        } else {
-
-            wishedColor = null;
-        }
-        Log.d("WishColorRule", "set wished color to "+(wishedColor==null?"null":wishedColor));*/
-        // Idee: wenn die Karte gespielt wird, muss die UI sowieso wissed dass der user eine farbe auswählen muss. Also user direkt farbe auswählen lassen.
-        //      Danach die karte clientside mit diesem parameter setzen.
-        //      Wenn server die karte erhält wird diese regel getriggert und die liest den parameter aus.
-
+        wished = true;
         return state;
     }
 
@@ -86,11 +67,11 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
     }
 
     @Override
-    public GlobalState onPlayAssignedCardChoice(GlobalState state, JSONObject playParamsForMe){
+    public GlobalState onPlayAssignedCardChoice(GlobalState state, JSONObject rulePlayParams){
         wished = true;
         String choice = "";
         try{
-            choice = playParamsForMe.getString("wishForColor").toUpperCase();
+            choice = rulePlayParams.getString("wishForColor").toUpperCase();
             wishedColor = CardColor.valueOf(choice);
         } catch (Exception e){
             wishedColor = null;
