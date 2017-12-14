@@ -377,7 +377,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             case R.id.iv_settings_button:{
                 Intent intent = new Intent(this, SettingsActivity.class);
                 EinzSingleton.getInstance().setEinzClient(this.ourClient);
-                this.ourClient.getActionCallbackInterface().setLobbyUI(null); // this is already done onPause(), and that should happen before the new activitie's oncreate but better safe than sorry
+                //this.ourClient.getActionCallbackInterface().setLobbyUI(null); // this is already done onPause(), and that should happen before the new activitie's oncreate but better safe than sorry
                 // TODO: what happens if a user joins during us setting up things?
                 startActivity(intent);
             }
