@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.model;
 
+import org.json.JSONObject;
+
 import java.util.List;
 
 /**
@@ -16,5 +18,5 @@ public interface SelectorRule {
      */
     List<String> getChoices(GlobalState state);
 
-    GlobalState onPlayAssignedCardChoice(GlobalState state, String choice);
+    GlobalState onPlayAssignedCardChoice(GlobalState state, JSONObject rulePlayParams);
 }
