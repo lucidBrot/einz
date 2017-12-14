@@ -49,7 +49,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     public void setGameUI(GameUIInterface gameUI){
         if(gameUI!=null){
-            Log.d("ClientMessengerCallback", "set GameUI to "+gameUI.toString()+"    (LobbyUI : "+(lobbyUI==null?"null":lobbyUI.toString())+")");
+            Log.d("ClientMessengerCallback", "set GameUI to " + gameUI.toString() + "    (LobbyUI : " +
+                    (lobbyUI != null ? lobbyUI.toString() : "null") + ")");
         }
         this.gameUI = gameUI;
     }

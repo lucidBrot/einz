@@ -3,15 +3,16 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
+
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.RulesContainer;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
-
 import java.util.ArrayList;
 
 public class SettingsActivity extends FullscreenActivity implements View.OnClickListener, LobbyUIInterface {
@@ -93,4 +94,6 @@ public class SettingsActivity extends FullscreenActivity implements View.OnClick
         if (ourClient != null && ourClient.getActionCallbackInterface() != null)
             this.ourClient.getActionCallbackInterface().setLobbyUI(this);
     }
+
+
 }

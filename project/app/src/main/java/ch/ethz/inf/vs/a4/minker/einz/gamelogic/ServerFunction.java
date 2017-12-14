@@ -194,19 +194,44 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
             return false;
         } else {
-            activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
-            card.setOrigin(player.getName());
-            globalState.addCardToDiscardPile(card);
-            globalState.setPlayParameters(playParameters);
-            globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
-            globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
-            globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
-            globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
-            if (!DEBUG_MODE) {
-                MessageSender.sendPlayCardResponse(player, threadedEinzServer, true);
+//<<<<<<< Updated upstream
+            try {
+                activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
+                card.setOrigin(player.getName());
+                globalState.addCardToDiscardPile(card);
+                //globalState.setPlayParameters(playParameters);
+                globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
+                globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
+                globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+                globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+                if (!DEBUG_MODE) {
+                    MessageSender.sendPlayCardResponse(player, threadedEinzServer, true);
+//=======
+//            try {
+//                player.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways, and sending the message only cares for its name attribute
+//                globalState.addCardToDiscardPile(card);
+//                //globalState.setPlayParameters(playParameters);
+//                globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
+//                globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
+//                globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+//                globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+//                if (!DEBUG_MODE) {
+//                    MessageSender.sendPlayCardResponse(p, threadedEinzServer, true);
+//                }
+//                onChange();
+//                return true;
+//            } catch (Exception e){
+//                MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
+//                e.printStackTrace();
+//>>>>>>> Stashed changes
+
+                }
+                return true;
+            } catch (Exception e) {
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, false);
+                e.printStackTrace();
+                return false;
             }
-            onChange();
-            return true;
         }
     }
 
@@ -340,7 +365,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                         break; // don't add this card
                     case CHANGECOLOR:
                         Card card = cardLoader.getCardInstance("choose");
-                        numberOfCardsInGame.put(card, 4);
+                        numberOfCardsInGame.put(card, 20);
                         allCardsInGame.add(card);
                         break;
                     case CHANGECOLORPLUSFOUR:

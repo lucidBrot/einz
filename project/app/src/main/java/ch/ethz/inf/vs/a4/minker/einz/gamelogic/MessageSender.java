@@ -137,7 +137,7 @@ public class MessageSender {
             activePlayer = "~null";
         }
         String cardsToDraw = Integer.toString(state.getCardsToDraw());
-        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw, state.getPlayParameters());
+        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
 
         //send each player a different PlayerState
         for (Player p : state.getPlayersOrdered()) {
@@ -257,7 +257,7 @@ public class MessageSender {
             ///<old>/// points.put(state.getFinishedPlayers().get(i).getName(), Integer.toString(state.getFinishedPlayers().size() - i));
             // TODO move this functionality to rules
         }*/
-        EinzGameOverMessageBody body = new EinzGameOverMessageBody(state.getPoints(), true);
+        EinzGameOverMessageBody body = new EinzGameOverMessageBody(state.getPointMapping(), true);
         EinzMessage<EinzGameOverMessageBody> message = new EinzMessage<>(header, body);
         tes.getServerManager().broadcastMessageToAllPlayers(message);
         tes.getServerManager().broadcastMessageToAllSpectators(message);
@@ -279,7 +279,7 @@ public class MessageSender {
             activePlayer = "~null";
         }
         String cardsToDraw = Integer.toString(state.getCardsToDraw());
-        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw, state.getPlayParameters());
+        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
 
         //Send State to only one player
         ArrayList<JSONObject> possibleActions = new ArrayList<>();

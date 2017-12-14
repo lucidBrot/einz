@@ -150,7 +150,7 @@ public class JSONHelper {
         for (BasicGlobalRule r : config.globalRules) {
             JSONObject oneRule = new JSONObject();
             try {
-                oneRule.put("id", r.getName()); //TODO: Currently r.getName() is used as ID
+                oneRule.put("id", r.getName()); //TODO: Currently "id" is used as ID (@whoever which is right so leave it)
                 if (r instanceof ParametrizedRule){
                     oneRule.put("parameters", ((ParametrizedRule) r).getParameterTypes());
                 } else {

@@ -152,7 +152,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 // and it is inconvenient to have to go back after getting "Plz be at least one player"
             }
         });
-
+        
         //if(ourClient!=null && ourClient.getActionCallbackInterface()!=null){ourClient.getActionCallbackInterface().setLobbyUI(this);}
 
     }
