@@ -148,7 +148,8 @@ public class ServerFunction implements ServerFunctionDefinition {
         // gameConfig is null here if initialiseGame/initialiseStandartGame is not called properly
         globalState = GlobalRuleChecker.checkOnStartGame(globalState, gameConfig);
         globalState.nextTurn(); //Sets the active player to the one specified in initialiseGame
-        onChange();
+        onChange(); //this is not really needed since it gets called in drawCard already when
+        // players get their starting hand, but since it doesnt hurt to call onChange to much I still leave this here
     }
 
     /**
@@ -167,7 +168,17 @@ public class ServerFunction implements ServerFunctionDefinition {
             return false;
         }
         Player player = globalState.getActivePlayer();
-        if (player == null || !player.getName().equals(p.getName())) {
+
+
+        //Check if the active player even has the card he wants to play
+        boolean hasCard = false;
+        for (Card c : p.hand) {
+            if (c.getID() == card.getID()) {
+                hasCard = true;
+            }
+        }
+
+        if (player == null || !player.getName().equals(p.getName()) || !hasCard) {
             if (!DEBUG_MODE) {
                 MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
             }
@@ -364,7 +375,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                         }
                     }
                 }
-            } else if(ct != CardText.DEBUG){
+            } else if (ct != CardText.DEBUG) {
                 if (DEBUG_MODE) {
                     Card card = new Card(CardColor.NONE + "_" + ct.indicator, ct.type, ct, CardColor.NONE, "drawable", "card_" + ct.indicator + "_" + CardColor.NONE);
                     //NOTE: above line used bad ID because it was uppercase and the json file contains lowercase
