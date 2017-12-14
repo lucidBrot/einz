@@ -143,7 +143,7 @@ public class GlobalState {
      */
     public void addCardsToDiscardPile(List<Card> cards){
         discardPile.addAll(cards);
-        discardPile.subList(Math.max(0, discardPile.size() - maxDiscardPileSize), discardPile.size() - 1);
+        discardPile.subList(Math.max(0, discardPile.size() - maxDiscardPileSize), discardPile.size());
     }
 
     /**

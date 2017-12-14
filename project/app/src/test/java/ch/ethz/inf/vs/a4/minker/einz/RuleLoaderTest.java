@@ -49,7 +49,7 @@ public class RuleLoaderTest {
         try {
             loader.loadRules(arr);
         } catch (Exception e){
-
+            e.printStackTrace();
         }
         assertTrue(loader.getRulesNames().size() == 9);
         for(String name : loader.getRulesNames()){

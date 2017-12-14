@@ -110,6 +110,9 @@ public class Card {
         JSONObject card = new JSONObject();
         try {
             card.put("ID", this.ID);
+            if(this.origin==null){
+                this.origin=CardOrigin.UNSPECIFIED.value;
+            }
             card.put("origin", this.origin);
         } catch (JSONException e) {
             e.printStackTrace(); // this will not happen. EVER.
@@ -117,6 +120,15 @@ public class Card {
         return card;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Card){
+            Card other = (Card) obj;
+            return other.getID().equals(this.getID()) && other.getColor().equals(this.getColor()) &&
+                    other.getText().equals(this.getText());
+        }
+        return super.equals(obj);
+    }
 
     //below was probably a bad idea. what happens with that if two different cards are compared (but they only differ in origin)
 //    /**
