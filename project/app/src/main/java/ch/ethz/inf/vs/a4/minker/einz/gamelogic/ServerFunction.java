@@ -176,7 +176,7 @@ public class ServerFunction implements ServerFunctionDefinition {
         //Check if the player even has the card he wants to play
         boolean hasCard = false;
         for (Card c : wantsToPlay.hand) {
-            if (c.getID() == card.getID()) {
+            if (c.getID().equals(card.getID())) {
                 hasCard = true;
             }
         }
