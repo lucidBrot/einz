@@ -386,7 +386,12 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         double direction;
 
         if(orientationOfPlayer.containsKey(currentlyActivePlayer) && !Double.isNaN(orientationOfPlayer.get(currentlyActivePlayer))) {
-            direction = orientationOfPlayer.get(currentlyActivePlayer);
+            if(currentlyActivePlayer.equals(ourClient.getUsername())){
+                direction = - 3.0/2.0 * Math.PI;
+            } else {
+                direction = orientationOfPlayer.get(currentlyActivePlayer);
+            }
+
         } else {
             direction = Math.random() * 2 * Math.PI;
         }
