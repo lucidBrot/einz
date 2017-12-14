@@ -1,7 +1,10 @@
 package ch.ethz.inf.vs.a4.minker.einz.model;
 
 
+import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Basic rule class for rules not applicable to cards.
@@ -129,4 +132,6 @@ public abstract class BasicGlobalRule extends BasicRule {
     }
 
     public GlobalState onGameOver(GlobalState state){return state;}
+
+
 }
