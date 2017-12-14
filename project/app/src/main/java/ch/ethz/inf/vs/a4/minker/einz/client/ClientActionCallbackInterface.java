@@ -5,6 +5,7 @@ import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -47,4 +48,5 @@ public interface ClientActionCallbackInterface {
     void setGameUI(GameUIInterface gameUI);
     void setLobbyUI(LobbyUIInterface lobbyUI);
     HashMap<String, JSONObject> getPlayerSeatings();
+    void sendSpecifyRules(JSONObject cardRules, JSONArray globalRules);
 }
