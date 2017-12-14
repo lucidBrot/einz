@@ -493,10 +493,11 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     ]
     }
      */
-    private void sendSpecifyRules(JSONObject cardRules, JSONArray globalRules){
+    public void sendSpecifyRules(JSONObject cardRules, JSONArray globalRules){
         EinzMessageHeader header = new EinzMessageHeader("startgame", "SpecifyRules");
         EinzSpecifyRulesMessageBody body = new EinzSpecifyRulesMessageBody(cardRules, globalRules);
         EinzMessage<EinzSpecifyRulesMessageBody> message = new EinzMessage<>(header, body);
         this.parentClient.getConnection().sendMessageRetryXTimes(3,message);
     }
+
 }
