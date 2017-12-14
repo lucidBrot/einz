@@ -35,6 +35,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import org.json.JSONArray;
 
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
@@ -43,22 +46,12 @@ import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzGameOverMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzInitGameMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzKickFailureMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -433,11 +426,17 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             @Override
             public void run() {
                 try {
-                    ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"}," +
-                                    "\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}, " +
-                                    "\"playParameters\":{\"Wish color\":\"GREEN\"}}}");
+                    JSONObject playParameters = new JSONObject();
+                    JSONObject wishForColor = new JSONObject();
+                    wishForColor.put("wishForColor","GREEN");
+                    playParameters.put("wishColorRule", wishForColor);
+                    EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCard");
+                    EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(playedCard, playParameters);
+                    EinzMessage<EinzPlayCardMessageBody> message = new EinzMessage<>(header, body);
+                    ourClient.getConnection().sendMessage(message);
                 } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
