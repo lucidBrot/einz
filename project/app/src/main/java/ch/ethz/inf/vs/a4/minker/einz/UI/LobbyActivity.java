@@ -371,6 +371,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         switch (view.getId()){
             case R.id.iv_settings_button:{
                 Intent intent = new Intent(this, SettingsActivity.class);
+                EinzSingleton.getInstance().setEinzClient(this.ourClient);
                 startActivity(intent);
             }
         }

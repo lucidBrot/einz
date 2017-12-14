@@ -791,7 +791,8 @@ public class EinzServerManager {
 
     public void specifyRules(EinzSpecifyRulesMessageBody body) {
         getSFLock().writeLock().lock();
-        getServerFunctionInterface().initialiseGame(this.server, getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());
+        //getServerFunctionInterface().initialiseGame(this.server, getPlayersAsPlayers(), body.getCardNumbers(),body.getGlobalParsedRules(), body.getParsedCardRules());
+        initialiseNonStandardGame(body, server, getPlayersAsPlayers());
         getSFLock().writeLock().unlock();
     }
 
