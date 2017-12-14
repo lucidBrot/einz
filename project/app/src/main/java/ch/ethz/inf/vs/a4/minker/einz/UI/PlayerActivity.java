@@ -35,6 +35,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
@@ -472,16 +475,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void onColorWheelButtonGreenClick(){
         hideColorWheel();
-        String chosenColor = "green";
+        final String chosenColor = "green";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
@@ -492,16 +501,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void onColorWheelButtonRedClick(){
         hideColorWheel();
-        String chosenColor = "red";
+        final String chosenColor = "red";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
@@ -512,16 +527,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void onColorWheelButtonBlueClick(){
         hideColorWheel();
-        String chosenColor = "blue";
+        final String chosenColor = "blue";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
@@ -532,16 +553,22 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void onColorWheelButtonYellowClick(){
         hideColorWheel();
-        String chosenColor = "yellow";
+        final String chosenColor = "yellow";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
