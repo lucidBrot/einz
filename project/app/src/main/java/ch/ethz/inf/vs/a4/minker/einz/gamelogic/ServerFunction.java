@@ -348,6 +348,9 @@ public class ServerFunction implements ServerFunctionDefinition {
                 }
             }
         }
+
+        //numberOfCardsInGame.put(cardLoader.getCardInstance("take4"), 200); // DEBUG
+
         GameConfig result = new GameConfig(numberOfCardsInGame);
         for (Player p : players) {
             result.addParticipant(p);

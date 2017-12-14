@@ -116,7 +116,7 @@ public class EinzServerManager {
         //<Debug>
         HashMap<Card, Integer> deck = new HashMap<>();
         CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
-        Card myCard = cardLoader.getCardInstance("debug");
+        Card myCard = cardLoader.getCardInstance("take4");
         deck.put(myCard, 2);
         Collection<BasicGlobalRule> globalRules = new ArrayList<>();
         StartGameWithCardsRule myStartGameWithCardsRule = new StartGameWithCardsRule();
@@ -131,6 +131,7 @@ public class EinzServerManager {
         globalRules.add(new WinOnNoCardsRule());
         globalRules.add(new ResetCardsToDrawRule());
         globalRules.add(new CountNumberOfCardsAsPoints());
+        globalRules.add(new NextTurnRule());
         Map<Card, ArrayList<BasicCardRule>> cardRules = new HashMap<>();
         HashMap<String, ArrayList<BasicCardRule>> tempCardRules = new HashMap<>(); // same as cardRules but with ID string as identifier
         //Add all necessary CardRules
@@ -146,8 +147,27 @@ public class EinzServerManager {
                         ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
                         arr.add(new PlayColorRule());
                         arr.add(new PlayTextRule());
+                        arr.add(new IsValidDrawRule());
                         tempCardRules.put(card.getID(), arr);
                     }
+                }
+            } else {
+                if (ct.equals(CardText.CHANGECOLORPLUSFOUR)) {
+                    Card card = cardLoader.getCardInstance("take4");
+                    ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
+                    arr.add(new PlayColorRule());
+                    arr.add(new PlayTextRule());
+                    arr.add(new IsValidDrawRule());
+                    arr.add(new PlayAlwaysRule());
+                    tempCardRules.put(card.getID(), arr);
+                } else if (ct.equals(CardText.CHANGECOLORPLUSFOUR)) {
+                    Card card = cardLoader.getCardInstance("choose");
+                    ArrayList<BasicCardRule> arr = new ArrayList<BasicCardRule>();
+                    arr.add(new PlayColorRule());
+                    arr.add(new PlayTextRule());
+                    arr.add(new IsValidDrawRule());
+                    tempCardRules.put(card.getID(), arr);
+                    arr.add(new PlayAlwaysRule());
                 }
             }
         }
@@ -176,7 +196,7 @@ public class EinzServerManager {
             cardRules.put(cardLoader.getCardInstance(id), tempCardRules.get(id));
         }
 
-        getServerFunctionInterface().initialiseGame(this.server, players,deck, globalRules, cardRules);
+        //getServerFunctionInterface().initialiseGame(this.server, players,deck, globalRules, cardRules);
         getServerFunctionInterface().initialiseStandardGame(server, players);
         //</Debug>
 
