@@ -484,7 +484,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     try {
                         JSONObject playParameters;
                         try {
-                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            playParameters = new JSONObject("{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}}");
                             EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
                             EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
                             ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
@@ -510,7 +510,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     try {
                         JSONObject playParameters;
                         try {
-                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            playParameters = new JSONObject("{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}}");
                             EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
                             EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
                             ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
@@ -536,7 +536,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     try {
                         JSONObject playParameters;
                         try {
-                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            playParameters = new JSONObject("{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}}");
                             EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
                             EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
                             ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
@@ -562,7 +562,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                     try {
                         JSONObject playParameters;
                         try {
-                            playParameters = new JSONObject("playParameters:{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}");
+                            playParameters = new JSONObject("{\"wishColorRule\":{\"wishForColor\":\"" + chosenColor + "\"}}");
                             EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
                             EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
                             ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
