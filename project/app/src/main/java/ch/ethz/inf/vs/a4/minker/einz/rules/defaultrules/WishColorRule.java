@@ -30,7 +30,7 @@ public class WishColorRule extends BasicCardRule {
 
     @Override
     public boolean isValidPlayCardPermissive(GlobalState state, Card played) { // allow only cards of the wished color or uncolored cards to be played
-        return played.getColor().equals(wishedColor) || played.getColor().equals(CardColor.NONE);
+        return played.getColor().equals(wishedColor) /*|| played.getColor().equals(CardColor.NONE)*/; // TODO: move right part to its own permissive rule. or maybe it already is because of the playAlways rule.
     }
 
     @Override
