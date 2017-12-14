@@ -422,21 +422,48 @@ public class ServerFunction implements ServerFunctionDefinition {
             }
         }
 
+
+
         for (CardColor cc : CardColor.values()) {
+            //Create a new rule for each color
+            DrawCardsRule drawCardsRule = new DrawCardsRule();
+            JSONObject drawCardsRuleParameter = new JSONObject();
+            try {
+                drawCardsRuleParameter.put("Cards to draw", 2);
+                drawCardsRule.setParameter(drawCardsRuleParameter);
+            } catch (JSONException e) {
+                throw new RuntimeException();
+            }
 
             if (cc != CardColor.NONE) {
                 if (DEBUG_MODE) {
                     result.assignRuleToCard(new ChangeDirectionRule(), new Card(cc + "_" + CardText.SWITCHORDER.indicator, CardText.SWITCHORDER.type,
                             CardText.SWITCHORDER, cc, "drawable", "card_" + CardText.SWITCHORDER.indicator + "_" + cc));
-                    result.assignRuleToCard(new DrawTwoCardsRule(), new Card(cc + "_" + CardText.PLUSTWO.indicator, CardText.PLUSTWO.type,
+                    result.assignRuleToCard(drawCardsRule, new Card(cc + "_" + CardText.PLUSTWO.indicator, CardText.PLUSTWO.type,
                             CardText.PLUSTWO, cc, "drawable", "card_" + CardText.PLUSTWO.indicator + "_" + cc));
                     result.assignRuleToCard(new SkipRule(), new Card(cc + "_" + CardText.STOP.indicator, CardText.STOP.type,
                             CardText.STOP, cc, "drawable", "card_" + CardText.STOP.indicator + "_" + cc));
                 } else {
                     result.assignRuleToCard(new ChangeDirectionRule(), cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + CardText.SWITCHORDER.indicator));
-                    result.assignRuleToCard(new DrawTwoCardsRule(), cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + CardText.PLUSTWO.indicator));
+                    result.assignRuleToCard(drawCardsRule, cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + CardText.PLUSTWO.indicator));
                     result.assignRuleToCard(new SkipRule(), cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + CardText.STOP.indicator));
                     //It might make sense to somewhere specify all IDs that exist, so that we don't have to guess
+                }
+            } else {
+                DrawCardsRule drawCardsRule2 = new DrawCardsRule();
+                JSONObject drawCardsRule2Parameter = new JSONObject();
+                try {
+                    drawCardsRule2Parameter = new JSONObject();
+                    drawCardsRule2Parameter.put("Cards to draw", 4);
+                    drawCardsRule2.setParameter(drawCardsRule2Parameter);
+                } catch (JSONException e) {
+                    throw new RuntimeException();
+                }
+                if(DEBUG_MODE){
+                    result.assignRuleToCard(drawCardsRule2, new Card(cc + "_" + CardText.CHANGECOLORPLUSFOUR.indicator, CardText.CHANGECOLORPLUSFOUR.type,
+                            CardText.CHANGECOLORPLUSFOUR, cc, "drawable", "card_" + CardText.CHANGECOLORPLUSFOUR.indicator + "_" + cc));
+                } else {
+                    result.assignRuleToCard(drawCardsRule2, cardLoader.getCardInstance(CardText.CHANGECOLORPLUSFOUR.indicator));
                 }
             }
         }
@@ -454,7 +481,6 @@ public class ServerFunction implements ServerFunctionDefinition {
         result.addGlobalRule(new NextTurnRule());
         result.addGlobalRule(new NextTurnRule2());
 
-        //Initialise all the rules with the gameConfig
         //Initialise all the rules with the gameConfig
         for (BasicRule r : result.allRules) {
             r.initialize(result);
