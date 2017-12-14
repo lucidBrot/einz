@@ -1,7 +1,10 @@
-package ch.ethz.inf.vs.a4.minker.einz.messageparsing;
+package ch.ethz.inf.vs.a4.minker.einz.client;
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSpecifyRulesMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.ParametrizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,12 +24,11 @@ public class RulesContainer {
         return new EinzSpecifyRulesMessageBody(this.cardRules, this.globalRules);
     }
 
-    public void addGlobalRuleWithoutParameters(String ruleName){
-        this.addGlobalRuleWithParameters(ruleName, null);
+    public void addGlobalRule(BasicGlobalRule rule){
+        String id = rule.getName();
+        JSONObject params = null;
+        if(rule instanceof ParametrizedRule){params = ((ParametrizedRule) rule).getParameter();}
     }
-    
-
-    public void addGlobalRule(BasicGlobalRule rule)
     public void addCardRule(String ruleName, String cardID);
     public void setNumberOfCards(String cardID)
 }

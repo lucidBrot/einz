@@ -59,6 +59,17 @@ public class StartGameWithCardsRule extends BasicGlobalRule implements Parametri
         return types;
     }
 
+    @Override
+    public JSONObject getParameter() {
+        JSONObject ret = new JSONObject();
+        try {
+            ret.put(parameterName, startCards);
+        } catch (JSONException e) {
+            // this is fine
+        }
+        return ret;
+    }
+
     public static String getParameterName() {
         return parameterName;
     }

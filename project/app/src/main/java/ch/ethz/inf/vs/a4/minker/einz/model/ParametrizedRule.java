@@ -24,5 +24,9 @@ public interface ParametrizedRule {
      * @return Mapping between a name and a input type.
      */
     Map<String, ParameterType> getParameterTypes();
-    
+
+    /**
+     * @return The Parameter-containing JSONObject. See messages.md for documentation
+     */
+    JSONObject getParameter();
 }
