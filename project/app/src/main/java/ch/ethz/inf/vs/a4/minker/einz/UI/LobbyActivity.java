@@ -80,10 +80,23 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     // A: No. the host is almost the first to connect unless somebody is able to pinpoint very exactly when to connect,
     //    because the server tells the host client that it needs to connect
 
+    /**
+     * https://stackoverflow.com/questions/34195828/how-to-come-back-to-first-activity-without-its-oncreate-called
+     *
+     * @param intent
+     */
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        if(ourClient!=null && ourClient.getActionCallbackInterface()!=null){ourClient.getActionCallbackInterface().setLobbyUI(this);}
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lobby);
+
+        Log.d("TEMP", "onCreate");
 
         Intent intent = getIntent();
         this.host = intent.getBooleanExtra("host", false);
@@ -149,6 +162,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 // and it is inconvenient to have to go back after getting "Plz be at least one player"
             }
         });
+
+        //if(ourClient!=null && ourClient.getActionCallbackInterface()!=null){ourClient.getActionCallbackInterface().setLobbyUI(this);}
 
     }
 

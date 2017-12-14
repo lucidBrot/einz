@@ -35,7 +35,8 @@
         </activity>
         <activity
             android:name=".UI.LobbyActivity"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask"/> <!-- onCreate will thus be called only once, thus not creating multiple clients/servers -->
         <activity
             android:name=".UI.ClientSetupActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
