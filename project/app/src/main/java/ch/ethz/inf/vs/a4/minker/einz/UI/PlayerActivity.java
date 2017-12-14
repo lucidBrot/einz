@@ -101,6 +101,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     private EinzClient ourClient;
     private GridLayout mGridScrollable;
+    private HashMap<String, Double> orientationOfPlayer = new HashMap<>();
 
 
     @Override
@@ -365,8 +366,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
         trayStack.setImageBitmap(bitmapResized);
 
-        //if()
-        double direction = Math.random() * 2*Math.PI;
+        double direction;
+
+        if(orientationOfPlayer.containsKey(currentlyActivePlayer) && !Double.isNaN(orientationOfPlayer.get(currentlyActivePlayer))) {
+            direction = orientationOfPlayer.get(currentlyActivePlayer);
+        } else {
+            direction = Math.random() * 2 * Math.PI;
+        }
+
         double xTranslation = Math.cos(direction) * 1500;
         double yTranslation = Math.sin(direction) * 1500;
 
@@ -844,8 +851,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
         ArrayList<String> playerList = message.getBody().getTurnOrder();
+
         for(String currPlayer:playerList){
             addPlayerToList(currPlayer);
+            double orientation = Math.random() * 2 * Math.PI;
+            orientationOfPlayer.put(currPlayer,orientation);
         }
     }
 
