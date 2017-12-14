@@ -37,7 +37,7 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
         Log.d("WishColorRule", "Wished color: " + wishedColor + ", played color: " + played.getColor());
         return played.getColor().equals(wishedColor) /*|| played.getColor().equals(CardColor.NONE)*/; // TODO: move right part to its own permissive rule. or maybe it already is because of the playAlways rule.
     }
-    
+
     @Override
     public GlobalState onPlayAssignedCard(GlobalState state, Card played) {
         wished = true;

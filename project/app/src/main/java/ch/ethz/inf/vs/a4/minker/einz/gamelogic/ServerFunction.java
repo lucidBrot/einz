@@ -385,7 +385,20 @@ public class ServerFunction implements ServerFunctionDefinition {
                     //either use uppercase everywhere or use lowercase. Or make sure both are equivalent.
                     result.assignRuleToCard(new PlayAlwaysRule(), card);
                 } else {
-                    Card card = cardLoader.getCardInstance(CardColor.NONE.toString().toLowerCase() + "_" + ct.indicator);
+                    String id;
+                    switch(ct){
+                        case CHANGECOLOR:
+                            id="choose";
+                            break;
+                        case CHANGECOLORPLUSFOUR:
+                            id="take4";
+                            break;
+                        default:
+                            id="debug";//unexpected
+                            break;
+                    }
+                    // id = CardColor.NONE.toString().toLowerCase() + "_" + ct.indicator // seems wrong >.>
+                    Card card = cardLoader.getCardInstance(id);
                     result.assignRuleToCard(new PlayAlwaysRule(), card);
                 }
             }
