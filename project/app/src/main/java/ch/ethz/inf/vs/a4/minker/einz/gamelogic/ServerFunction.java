@@ -328,11 +328,9 @@ public class ServerFunction implements ServerFunctionDefinition {
                             numberOfCardsInGame.put(card, 2);
                             allCardsInGame.add(card);
                         } else {
-                            /*
                             Card card = cardLoader.getCardInstance(cc.toString().toLowerCase() + "_" + ct.indicator);
                             numberOfCardsInGame.put(card, 2);
                             allCardsInGame.add(card);
-                            */ //TODO: ADD THESE CARDS AGAIN
                         }
                     }
                 }
