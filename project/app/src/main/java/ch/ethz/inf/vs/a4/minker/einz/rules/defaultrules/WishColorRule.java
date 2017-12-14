@@ -16,7 +16,7 @@ public class WishColorRule extends BasicCardRule {
 
     private CardColor wishedColor = null;
 
-    private boolean wished = false;
+    private boolean wished = false; // true if the last played card was a wish card. Unused yet, or so it seems
 
     @Override
     public String getName() {
@@ -29,8 +29,8 @@ public class WishColorRule extends BasicCardRule {
     }
 
     @Override
-    public boolean isValidPlayCardPermissive(GlobalState state, Card played) {
-        return played.getColor().equals(wishedColor);
+    public boolean isValidPlayCardPermissive(GlobalState state, Card played) { // allow only cards of the wished color or uncolored cards to be played
+        return played.getColor().equals(wishedColor) || played.getColor().equals(CardColor.NONE);
     }
 
     @Override
