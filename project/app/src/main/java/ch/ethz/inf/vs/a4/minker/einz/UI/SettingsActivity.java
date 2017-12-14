@@ -56,7 +56,7 @@ public class SettingsActivity extends FullscreenActivity implements View.OnClick
 
     @Override
     public void setLobbyList(ArrayList<String> players, ArrayList<String> spectators) {
-        Log.d("TEMP", "users: "+players.get(players.size()-1));
+        //Log.d("TEMP", "users: "+players.get(players.size()-1)); // WORKS!! :)
     }
 
     @Override

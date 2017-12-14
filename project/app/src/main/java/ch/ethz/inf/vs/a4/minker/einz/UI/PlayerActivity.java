@@ -100,7 +100,7 @@ import static java.lang.Thread.sleep;
 /**
  * putExtra requires a parcelable, so instead pass the client via Globals
  */
-public class PlayerActivity extends FullscreenActivity implements GameUIInterface { // TODO: onStop and onResume - register this activity at client
+public class PlayerActivity extends FullscreenActivity implements GameUIInterface {
     private static final int MAXCARDINHAND = 24;
     private GridLayout mGrid;
     private ArrayList<Card> cardStack = new ArrayList<>();
@@ -122,8 +122,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private Map<String, List<BasicCardRule>> ruleMapping;
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
             ourClient.getActionCallbackInterface().setGameUI(null);
     }
@@ -261,7 +261,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             mGrid.addView(itemView);
         }*/
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
-        ourClient.getActionCallbackInterface().setGameUI(this);
+
+        // this line is already done in onResume()
+        //ourClient.getActionCallbackInterface().setGameUI(this);
     }
 
     private int calculateNewIndex(GridLayout gl,float x, float y) {
