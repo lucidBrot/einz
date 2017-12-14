@@ -264,6 +264,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         } else {
             // lobbyUI == null and gameUI == null
             // uhm... that means that neither is currently existing. maybe, the lobbyUI has been paused.
+            /*
             runOnMainThread(new Runnable() {
                 @Override
                 public void run() {
@@ -285,7 +286,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 public void run() {
                     gameUI.onInitGame(message);
                 }
-            });
+            });*/
+            Log.e("ClientMessengerCallback","Didn't have an activity that could have handled onInitGame");
         }
 
         Log.d("CliMesssengerCallback", "Game Initialized");

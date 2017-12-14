@@ -24,6 +24,9 @@ public class RulesContainer {
     }
 
     public EinzSpecifyRulesMessageBody toMessageBody() {
+        if(this.cardRules.length()<=0){
+            this.addCard("debug", 1);
+        }
         return new EinzSpecifyRulesMessageBody(this.cardRules, this.globalRules);
     }
 
@@ -99,6 +102,24 @@ public class RulesContainer {
 
         }
 
+        JSONArray rulelist = null;
+        try {
+            rulelist = cardRules.getJSONObject(cardID).optJSONArray("rulelist");
+            if (rulelist == null) {
+                rulelist = new JSONArray();
+                cardRules.getJSONObject(cardID).put("rulelist", rulelist);
+
+            }
+        } catch (JSONException e) {
+            Log.w("RulesContainer", "Tried adding a CardRule but failed v2");
+            return;
+        }
+
+
+    }
+
+    public synchronized void addCard(String cardId, Integer number){
+        this.setNumberOfCards(cardId, String.valueOf(number));
     }
 
     /**

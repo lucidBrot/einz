@@ -82,9 +82,10 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
                 Card card = cl.getCardInstance(cardIDKey);
                 cardNumbers.put(card, numberOfCopies);
 
-                JSONArray arr = object.getJSONArray("rulelist");
-                for (int i=0; i<object.getJSONArray("rulelist").length(); i++) {
-                    JSONObject o = arr.getJSONObject(i);
+                JSONArray arr = object.optJSONArray("rulelist");
+                if(arr==null){arr = new JSONArray();}
+                for (int i=0; i<arr.length(); i++) {
+                    JSONObject o = arr.getJSONObject(i); // TODO: more defensive coding here. every get would be better as an opt with a null check
                     String id = o.getString("id");
                     JSONObject parameters = o.getJSONObject("parameters");
                     BasicCardRule rule = (BasicCardRule) rl.getInstanceOfRule(id);

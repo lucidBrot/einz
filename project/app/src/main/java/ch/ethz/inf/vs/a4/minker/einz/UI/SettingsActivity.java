@@ -34,7 +34,12 @@ public class SettingsActivity extends FullscreenActivity implements View.OnClick
 
     private void saveAndSend() {
         saveSettings();
-        EinzSingleton.getInstance().getEinzClient().getConnection().sendMessageRetryXTimes(3,this.rulesContainer.toMessage());
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                EinzSingleton.getInstance().getEinzClient().getConnection().sendMessageRetryXTimes(3, rulesContainer.toMessage());
+            }
+        }).start();
     }
 
     private void saveSettings() {
