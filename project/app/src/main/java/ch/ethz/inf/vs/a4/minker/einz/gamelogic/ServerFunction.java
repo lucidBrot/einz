@@ -84,7 +84,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState = new GlobalState(10, players);
             this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
-            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
+            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
                 MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
@@ -130,7 +130,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                 r.initialize(gameConfig);
             }
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
-            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card
+            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             if (!DEBUG_MODE) {
                 MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<Player>( globalState.getPlayersOrdered()));
@@ -157,40 +157,45 @@ public class ServerFunction implements ServerFunctionDefinition {
      * OnPlayRules get applied after the player plays his card
      *
      * @param card the card to be played
-     * @param p    the player that wants to play a card
+     * @param player    the player that wants to play a card
      * @return whether the player is allowed to play the card he wants to play or not
      */
-    public boolean play(Card card, Player p, JSONObject playParameters) {
+    public boolean play(Card card, Player player, JSONObject playParameters) {
         if (globalState.isGameFinished()) {
             if (!DEBUG_MODE) {
-                MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, false);
             }
             return false;
         }
-        Player player = globalState.getActivePlayer();
-
-
-        //Check if the active player even has the card he wants to play
+        Player wantsToPlay = new Player("~Player");
+        for(Player p: globalState.getPlayersOrdered()){
+            if(player.getName().equals(p.getName())){
+                wantsToPlay = p;
+            }
+        }
+        //Check if the player even has the card he wants to play
         boolean hasCard = false;
-        for (Card c : p.hand) {
-            if (c.getID() == card.getID()) {
+        for (Card c : wantsToPlay.hand) {
+            if (c.getID().equals(card.getID())) {
                 hasCard = true;
             }
         }
 
-        if (player == null || !player.getName().equals(p.getName()) || !hasCard) {
+        Player activePlayer = globalState.getActivePlayer();
+        if (activePlayer == null || !activePlayer.getName().equals(wantsToPlay.getName()) || !hasCard) {
             if (!DEBUG_MODE) {
-                MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, false);
             }
             return false; //TODO: Check in rules whether its a players turn
         }
         if (!CardRuleChecker.checkIsValidPlayCard(globalState, card, gameConfig)) {
             if (!DEBUG_MODE) {
-                MessageSender.sendPlayCardResponse(p, threadedEinzServer, false);
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, false);
             }
             return false;
         } else {
-            player.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways, and sending the message only cares for its name attribute
+            activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
+            card.setOrigin(player.getName());
             globalState.addCardToDiscardPile(card);
             globalState.setPlayParameters(playParameters);
             globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
@@ -198,7 +203,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
             if (!DEBUG_MODE) {
-                MessageSender.sendPlayCardResponse(p, threadedEinzServer, true);
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, true);
             }
             onChange();
             return true;

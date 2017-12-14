@@ -2,8 +2,12 @@ package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.JSONHelper;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 
 public interface ClientActionCallbackInterface {
 
@@ -42,4 +46,5 @@ public interface ClientActionCallbackInterface {
     void setGameUIAndDisableLobbyUI(GameUIInterface gameUI);
     void setGameUI(GameUIInterface gameUI);
     void setLobbyUI(LobbyUIInterface lobbyUI);
+    HashMap<String, JSONObject> getPlayerSeatings();
 }

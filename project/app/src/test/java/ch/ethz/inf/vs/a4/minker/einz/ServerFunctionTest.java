@@ -47,13 +47,15 @@ public class ServerFunctionTest {
         ArrayList<Player> players = new ArrayList<>();
         Player peter = new Player("Peter");
         Player paul = new Player("Paul");
+        Player hanz = new Player("Hanz");
         players.add(peter);
         players.add(paul);
+        players.add(hanz);
         ServerFunction s = new ServerFunction(true);
         s.initialiseStandardGame(null, players);
         s.startGame();
 
-        int barrier = 100;
+        int barrier = 200;
         while (!s.getGlobalState().isGameFinished() && barrier > 0) {
             for (Player p : s.getGlobalState().getPlayersOrdered()) {
                 int tries = p.hand.size();
