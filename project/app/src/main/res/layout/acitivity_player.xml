@@ -13,6 +13,7 @@
         android:layout_height="match_parent">
 
         <LinearLayout
+            android:id="@+id/ll_game"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -189,92 +190,6 @@
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/ll_colorwheel"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:visibility="gone">
-
-                    <LinearLayout
-                        android:layout_width="300dp"
-                        android:layout_height="300dp"
-                        android:alpha=".8"
-                        android:background="@drawable/button_choose4_background"
-                        android:orientation="vertical">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:orientation="horizontal">
-
-                            <Button
-                                android:id="@+id/btn_colorwheel_red"
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginBottom="2dp"
-                                android:layout_marginLeft="10dp"
-                                android:layout_marginRight="2dp"
-                                android:layout_marginTop="10dp"
-                                android:layout_weight="1"
-                                android:background="@drawable/button_choose4_topleft"
-                                android:gravity="bottom"
-                                android:textAlignment="center" />
-
-                            <Button
-                                android:id="@+id/btn_colorwheel_yellow"
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginBottom="2dp"
-                                android:layout_marginLeft="2dp"
-                                android:layout_marginRight="10dp"
-                                android:layout_marginTop="10dp"
-                                android:layout_weight="1"
-                                android:background="@drawable/button_choose4_topright"
-                                android:gravity="bottom"
-                                android:textAlignment="center" />
-
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:orientation="horizontal">
-
-                            <Button
-                                android:id="@+id/btn_colorwheel_green"
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginBottom="10dp"
-                                android:layout_marginLeft="10dp"
-                                android:layout_marginRight="2dp"
-                                android:layout_marginTop="2dp"
-                                android:layout_weight="1"
-                                android:background="@drawable/button_choose4_bottomleft"
-                                android:gravity="top"
-                                android:textAlignment="center" />
-
-                            <Button
-                                android:id="@+id/btn_colorwheel_blue"
-                                android:layout_width="0dp"
-                                android:layout_height="match_parent"
-                                android:layout_marginBottom="10dp"
-                                android:layout_marginLeft="2dp"
-                                android:layout_marginRight="10dp"
-                                android:layout_marginTop="2dp"
-                                android:layout_weight="1"
-                                android:background="@drawable/button_choose4_bottomright"
-                                android:elevation="0dp"
-                                android:gravity="top"
-                                android:textAlignment="center" />
-
-                        </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-
             </FrameLayout>
 
             <FrameLayout
@@ -355,7 +270,7 @@
             android:background="@drawable/button_blue"
             android:gravity="center"
             android:orientation="horizontal"
-            android:visibility="invisible">
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -410,6 +325,93 @@
                     android:layout_weight="1"
                     android:background="@drawable/button_red"
                     android:text="@android:string/ok" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_colorwheel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="top|center"
+            android:orientation="horizontal"
+            android:paddingTop="100dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="300dp"
+                android:layout_height="300dp"
+                android:alpha=".8"
+                android:background="@drawable/button_choose4_background"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_colorwheel_red"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button_choose4_topleft"
+                        android:gravity="bottom"
+                        android:textAlignment="center" />
+
+                    <Button
+                        android:id="@+id/btn_colorwheel_yellow"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginLeft="2dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button_choose4_topright"
+                        android:gravity="bottom"
+                        android:textAlignment="center" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_colorwheel_green"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="2dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button_choose4_bottomleft"
+                        android:gravity="top"
+                        android:textAlignment="center" />
+
+                    <Button
+                        android:id="@+id/btn_colorwheel_blue"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="2dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/button_choose4_bottomright"
+                        android:elevation="0dp"
+                        android:gravity="top"
+                        android:textAlignment="center" />
+
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 

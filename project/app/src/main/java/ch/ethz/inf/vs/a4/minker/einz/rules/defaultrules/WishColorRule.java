@@ -90,7 +90,7 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
         wished = true;
         String choice = "";
         try{
-            choice = playParamsForMe.getString("wishForColor");
+            choice = playParamsForMe.getString("wishForColor").toUpperCase();
             wishedColor = CardColor.valueOf(choice);
         } catch (Exception e){
             wishedColor = null;
