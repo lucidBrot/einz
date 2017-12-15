@@ -31,7 +31,7 @@ public class RulesContainer {
     }
 
     public EinzSpecifyRulesMessageBody toMessageBody() {
-        if(this.cardRules.length()<=0){
+        if (this.cardRules.length() <= 0) {
             this.addCard("debug", 1);
         }
         return new EinzSpecifyRulesMessageBody(this.cardRules, this.globalRules);
@@ -89,7 +89,7 @@ public class RulesContainer {
         }
 
         rulelist.put(ruleToJSON(rule));
-        if(!someCardID.has("number")){
+        if (!someCardID.has("number")) {
             setNumberOfCards(cardID, "1");
         }
     }
@@ -99,15 +99,15 @@ public class RulesContainer {
      * (Adds the number to the Card. if the internal mapping is inexistent, it creates it. If there is already a number set, it will be overwritten.)
      * fails with a log message and returns if the input number is bad.
      * Do not pass negative numbers
-     * */
+     */
     public synchronized void setNumberOfCards(String cardID, String number) {
         try {
-            if(Integer.valueOf(number) < 0){
-                Log.w("RulesContainer", "bad number "+number+" for card "+cardID);
+            if (Integer.valueOf(number) < 0) {
+                Log.w("RulesContainer", "bad number " + number + " for card " + cardID);
                 return;
             }
-        } catch (Exception e){
-            Log.w("RulesContainer", "bad number "+number+" for card "+cardID);
+        } catch (Exception e) {
+            Log.w("RulesContainer", "bad number " + number + " for card " + cardID);
             e.printStackTrace();
             return;
         }
@@ -141,18 +141,18 @@ public class RulesContainer {
     /**
      * Same as {@link #setNumberOfCards}
      */
-    public synchronized void addCard(String cardId, Integer number){
+    public synchronized void addCard(String cardId, Integer number) {
         this.setNumberOfCards(cardId, String.valueOf(number));
     }
 
     /**
      * Convenience function to do <br><code>
-     *
-     addCardRule(cardRule, cardID);<br>
-     setNumberOfCards(cardID, number);
+     * <p>
+     * addCardRule(cardRule, cardID);<br>
+     * setNumberOfCards(cardID, number);
      * </code><br> in one line
-     * */
-    public synchronized void addCardRuleWithNumber(BasicCardRule cardRule, String cardID, String number){
+     */
+    public synchronized void addCardRuleWithNumber(BasicCardRule cardRule, String cardID, String number) {
         addCardRule(cardRule, cardID);
         setNumberOfCards(cardID, number);
     }
@@ -237,7 +237,7 @@ public class RulesContainer {
      */
     public static RulesContainer getDefaultRulesInstance() {
         RulesContainer container = new RulesContainer();
-        if(defaultInstance == null){
+        if (defaultInstance == null) {
             defaultInstance = container;
         } else {
             return defaultInstance; // don't compute multiple times
@@ -245,8 +245,8 @@ public class RulesContainer {
 
         // load deck
         CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
-        for(String cardID : cardLoader.getCardIDs()){
-            if(!cardID.equals("debug")){ // add all cards except debug card
+        for (String cardID : cardLoader.getCardIDs()) {
+            if (!cardID.equals("debug")) { // add all cards except debug card
                 container.addCard(cardID, 2); // add every card twice into the deck
             }
         }
@@ -271,16 +271,16 @@ public class RulesContainer {
 //                        arr.add(new PlayTextRule());
 //                        arr.add(new IsValidDrawRule());
 //                        tempCardRules.put(card.getID(), arr);
-        for(String cardID : cardLoader.getCardIDs()){
-            switch(cardID){
-                case "debug":{
-                    container.addCardRule(new PlayColorRule(), cardID);
-                    container.addCardRule(new PlayTextRule(), cardID);
-                    container.addCardRule(new IsValidDrawRule(), cardID);
-                    container.addCardRule(new PlayAlwaysRule(), cardID);
+        for (String cardID : cardLoader.getCardIDs()) {
+            switch (cardID) {
+                case "debug": {
+                    container.addCardRuleWithNumber(new PlayColorRule(), cardID, "0");
+                    container.addCardRuleWithNumber(new PlayTextRule(), cardID, "0");
+                    container.addCardRuleWithNumber(new IsValidDrawRule(), cardID, "0");
+                    container.addCardRuleWithNumber(new PlayAlwaysRule(), cardID, "0");
                     break;
                 }
-                case "take4":{
+                case "take4": {
                     container.addCardRule(new PlayColorRule(), cardID);
                     container.addCardRule(new PlayTextRule(), cardID);
                     container.addCardRule(new IsValidDrawRule(), cardID);
@@ -288,7 +288,7 @@ public class RulesContainer {
                     container.addCardRule(new WishColorRule(), cardID);
                     break;
                 }
-                case "choose":{
+                case "choose": {
                     container.addCardRule(new PlayColorRule(), cardID);
                     container.addCardRule(new PlayTextRule(), cardID);
                     container.addCardRule(new IsValidDrawRule(), cardID);
@@ -302,14 +302,16 @@ public class RulesContainer {
                     container.addCardRule(new IsValidDrawRule(), cardID);
                     // differentiate further
                     Card tempCard = cardLoader.getCardInstance(cardID);
-                    switch(tempCard.getText()){
-                        case STOP:{
+                    switch (tempCard.getText()) {
+                        case STOP: {
                             container.addCardRule(new SkipRule(), cardID);
-                            break;}
-                        case PLUSTWO:{
+                            break;
+                        }
+                        case PLUSTWO: {
                             container.addCardRule(new DrawTwoCardsRule(), cardID);
-                            break;}
-                        case SWITCHORDER:{
+                            break;
+                        }
+                        case SWITCHORDER: {
                             container.addCardRule(new ChangeDirectionRule(), cardID);
                         }
                     }
