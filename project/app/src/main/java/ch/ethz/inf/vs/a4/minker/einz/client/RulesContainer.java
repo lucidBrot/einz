@@ -56,6 +56,7 @@ public class RulesContainer {
 
     /**
      * Adds the card rule to the internal mapping and sets the number of cards of this type to 1 if no other value was set yet.
+     * Overwrites previous settings for this (rule, cardID) combination
      */
     public synchronized void addCardRule(BasicCardRule rule, String cardID) {
         JSONObject someCardID = this.cardRules.optJSONObject(cardID);

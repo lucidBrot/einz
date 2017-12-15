@@ -85,11 +85,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     // A: No. the host is almost the first to connect unless somebody is able to pinpoint very exactly when to connect,
     //    because the server tells the host client that it needs to connect
 
-    // SETTINGS Variables
-    private RulesContainer rulesContainer = new RulesContainer();
-    private HashMap<View, BasicGlobalRule> globalRulesM = new HashMap<>(); // contains the rules that can be reused by the UI
-    private HashMap<View, Card> cardsM = new HashMap(); // contains the rules that can be reused by the UI
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -645,12 +640,23 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     // -------------------------- SETTINGS ---------------------------------
 
+    // SETTINGS Variables
+    private RulesContainer rulesContainer = new RulesContainer();
+    private HashMap<View, BasicGlobalRule> globalRulesM = new HashMap<>(); // contains the rules that can be reused by the UI
+    private HashMap<View, Card> cardsM = new HashMap<>(); // contains the rules that can be reused by the UI
+    private HashMap<Card, HashMap<View, BasicCardRule>> cardRulesM = new HashMap<>(); // contains the cardRules which correspond to specific cards
+
+    // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
+    // Cards each have one View which has multiple settings, so they are mapped <View, Card>
+    // CardRules each have one inner View per (Cardview, Cardruleview) combination, so they are be mapped <Card, <View, Rule>>
+    // The reason we use rule instances is that you can set parameters on them.
+
     private void initialiseMappingFromViewToRules() {
-        // TODO: initialize the globalRulesM and cardRulesM
+        // TODO: initialize the globalRulesM and cardRulesM and cardsM
     }
 
     /**
-     * Adds the toggled view's rule (stored already in {@link #globalRulesM} or {@link #cardRulesM}
+     * Adds the toggled view's rule (stored already in {@link #globalRulesM} or {@link #cardsM}
      * or removes it, depending on the passed boolean <code>useThisRule</code><br>
      * This method overwrites any previous settings for the same view (i.e. rule)
      *
@@ -687,6 +693,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
     }
 
+    /**
+     * Turn use of Card on or off
+     * @param view
+     * @param useThisCard
+     */
     private void onCardToggled(View view, boolean useThisCard){
         // TODO: maybe store this setting and restore it when the card is untoggled? Or maybe that is too much effort for a useless feature
         Card card = this.cardsM.get(view);
@@ -698,6 +709,24 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             } else {
                 this.rulesContainer.removeCard(card.getID());
             }
+        }
+    }
+
+    private void onCardRuleToggled(Card card, View cardRuleView, boolean toggledOn){
+        HashMap<View, BasicCardRule> map = this.cardRulesM.get(card);
+        BasicCardRule rule = null;
+        if(map != null){
+            rule = map.get(cardRuleView);
+        }
+        if(map == null || rule == null){
+            Log.w("LobbySettings/onCardRuleToggled", "You triggered a cardRuleToggle for something that wasn't registered");
+            return;
+        }
+
+        if(toggledOn) {
+            this.rulesContainer.addCardRule(rule, card.getID());
+        } else{
+            this.rulesContainer.removeCardRule(rule.getName());
         }
     }
 
