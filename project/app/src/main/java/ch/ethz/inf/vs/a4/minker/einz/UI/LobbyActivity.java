@@ -16,9 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.*;
-import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
-import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
-import ch.ethz.inf.vs.a4.minker.einz.R;
+import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.RulesContainer;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
@@ -30,6 +28,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFai
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
@@ -645,14 +644,52 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private HashMap<View, BasicGlobalRule> globalRulesM = new HashMap<>(); // contains the rules that can be reused by the UI
     private HashMap<View, Card> cardsM = new HashMap<>(); // contains the rules that can be reused by the UI
     private HashMap<Card, HashMap<View, BasicCardRule>> cardRulesM = new HashMap<>(); // contains the cardRules which correspond to specific cards
+    private RuleLoader ruleLoader = EinzSingleton.getInstance().getRuleLoader();
+    private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
 
     // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
     // Cards each have one View which has multiple settings, so they are mapped <View, Card>
-    // CardRules each have one inner View per (Cardview, Cardruleview) combination, so they are be mapped <Card, <View, Rule>>
+    // CardRules each have one inner View per (Cardview, Cardruleview) combination, so they are mapped <Card, <View, Rule>>
     // The reason we use rule instances is that you can set parameters on them.
 
     private void initialiseMappingFromViewToRules() {
         // TODO: initialize the globalRulesM and cardRulesM and cardsM
+
+        // for all cards, store them in cardsM
+        for (String cardID : cardLoader.getCardIDs()){
+            View cardView = generateCardView();
+            Card card = cardLoader.getCardInstance(cardID);
+            this.cardsM.put(cardView, card);
+        }
+
+        // for all GlobalRules, store them in globalRulesM
+        // for all BasicCardRules, store them in every Card-representing view
+        for(String ruleName : ruleLoader.getRulesNames()){
+            BasicRule rule = ruleLoader.getInstanceOfRule(ruleName);
+            if( rule instanceof  BasicGlobalRule){ // TODO: set initial parameters on the rule and set them also when the user changes them
+                View view = generateGlobalRuleView(rule);
+                this.globalRulesM.put(view, (BasicGlobalRule) rule);
+            } else if(rule instanceof BasicCardRule){
+                // add cardruleview to all card views
+                for(View cView : this.cardsM.keySet()){
+                    Card theCard = this.cardsM.get(cView);
+                    View cardRuleView = generateCardRuleView(rule, cView, theCard);
+                    cView.setChildCardRule(cardRuleView);
+                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
+                }
+            }
+            // else wth are you, rule?
+        }
+
+        // display all global rules
+        for(View view : globalRulesM.keySet()){
+            addViewToGlobalRulesViewsList(view);
+        }
+
+        // display all card-respective rules
+        for(View cardView : this.cardsM.keySet()){
+            addViewToCardViewsList(cardView);
+        }
     }
 
     /**

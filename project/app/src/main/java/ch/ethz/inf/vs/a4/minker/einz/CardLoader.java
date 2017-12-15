@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
@@ -83,6 +84,10 @@ public class CardLoader {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Set<String> getCardIDs(){
+        return cardMapping.keySet();
     }
 
     /**
