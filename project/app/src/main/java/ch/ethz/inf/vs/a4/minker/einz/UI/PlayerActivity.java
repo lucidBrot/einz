@@ -1031,7 +1031,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void onSendPlayParameters(JSONObject playParameters) {
         JSONObject wishColorRule;
 
-        wishColorRule = playParameters.optJSONObject("wishColorRule");
+        wishColorRule = playParameters.optJSONObject("Wish Color");
 
         String wishedColor;
 
