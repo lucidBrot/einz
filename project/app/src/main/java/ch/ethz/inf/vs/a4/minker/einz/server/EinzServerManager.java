@@ -202,8 +202,10 @@ public class EinzServerManager {
 //        //</Debug>
 
         if(this.latestSpecifyRulesMessageBody == null){
+            Log.d("servMan/initialiseGame", "running standard game (defined locally in server)");
             getServerFunctionInterface().initialiseStandardGame(server, players);
         } else {
+            Log.d("servMan/initialiseGame", "running non-standard game (defined by client)");
             initialiseNonStandardGame(latestSpecifyRulesMessageBody, server, players);
         }
 
