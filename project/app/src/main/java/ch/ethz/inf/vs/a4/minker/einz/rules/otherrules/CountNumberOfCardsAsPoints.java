@@ -34,7 +34,7 @@ public class CountNumberOfCardsAsPoints extends BasicGlobalRule {
             for(Card c : p.hand){
                 i++;
             }
-            state.getPoints().put(p.getName(), i);
+            state.getPointMapping().put(p.getName(), i);
         }
         return state;
     }

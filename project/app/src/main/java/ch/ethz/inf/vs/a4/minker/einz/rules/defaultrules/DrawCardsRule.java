@@ -77,4 +77,19 @@ public class DrawCardsRule extends BasicCardRule implements ParametrizedRule {
         types.put(parameterName, ParameterType.NUMBER);
         return types;
     }
+
+    @Override
+    public JSONObject getParameter() {
+        JSONObject ret = new JSONObject();
+        try {
+            ret.put(parameterName, cardsToDraw);
+        } catch (JSONException e) {
+            // this is fine
+        }
+        return ret;
+    }
+
+    public static String getParameterName() {
+        return parameterName;
+    }
 }

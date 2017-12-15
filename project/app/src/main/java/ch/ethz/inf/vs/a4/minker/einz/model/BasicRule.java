@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.model;
 
 import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import org.json.JSONObject;
 
 /**
  * Basic class every Rule has to implement.
@@ -20,6 +21,7 @@ public abstract class BasicRule {
 
     /**
      * The Name of the Rule. Used as identifier for the rule
+     * This is ment to be shown to a user so please choose a readable Name!
      * @return The Name of the Rule
      */
     public abstract String getName();

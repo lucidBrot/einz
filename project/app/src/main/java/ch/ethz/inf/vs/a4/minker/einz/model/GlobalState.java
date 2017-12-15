@@ -45,8 +45,7 @@ public class GlobalState {
 
     private final int maxDiscardPileSize;
 
-    private HashMap<String, Integer> points = new HashMap<String, Integer>(); // String for player.getName(),  String for points
-    private JSONObject playParameters = new JSONObject();
+    private HashMap<String, Integer> points; // String for player.getName(),  String for points
 
     /**
      * Creates an instance of a Global game state.
@@ -68,6 +67,7 @@ public class GlobalState {
         this.finishedPlayers = new ArrayList<>();
         this.drawPile = new LinkedList<>();
         this.discardPile = new LinkedList<>();
+        this.points = new HashMap<>();
     }
 
     /**
@@ -96,26 +96,31 @@ public class GlobalState {
     }
 
     /**
-     * @return a <literal>HashMap<name of player, points></literal>
-     */
-    public HashMap<String, Integer> getPoints() {
-        return points;
-    }
-
-    public void setPoints(HashMap<String, Integer> points) {
-        this.points = points;
-    }
-
-    /**
      * Adds the (possibly negative) points to the score of the player identified by his name.
      * If there were no points previously, it will set them to the new value
      */
-    public void addPoints(String playerName, Integer points){
-        if(this.getPoints().containsKey(playerName)){
-            this.getPoints().put(playerName, this.getPoints().get(playerName)+ points);
+    public void addPoints(String playerName, Integer pointsToAdd){
+        if(points.containsKey(playerName)){
+            points.put(playerName, points.get(playerName) + pointsToAdd);
         } else {
-            this.getPoints().put(playerName, points);
+            points.put(playerName, pointsToAdd);
         }
+    }
+
+    /**
+     * Returns the current Points for a Player. If the given Player does not have any Points set
+     * null is returned
+     * @param playerName The Name of the player to get the points for
+     * @return Number of points or null if the player could not be found
+     */
+    public Integer getPointsForPlayer(String playerName){
+        if(!points.containsKey(playerName))
+            return null;
+        return points.get(playerName);
+    }
+
+    public HashMap<String, Integer> getPointMapping(){
+        return new HashMap<>(points);
     }
 
     /**
@@ -248,18 +253,21 @@ public class GlobalState {
     }
 
     /**
-     * adds the specified player to the finished players and removes any players with the same name from the list of players.
-     * Does both only if there was at least one player with that name in that list.
-     * <b>Make sure the actual reallife person players have unique names or rewrite this message</b>
+     * Moves the player Object from the list of active Players to the list of finished players.
+     * @param player The Player to set finished
      */
     public void setPlayerFinished(Player player){
         Log.d(Thread.currentThread().getName(), "setPlayerFinished("+player.getName()+")");
         for(int i=0; i<players.size(); i++){
             PlayerContainer pc = players.get(i);
             if(pc.player.getName().equals(player.getName())){
-                //this.players.remove(pc);
-                this.finishedPlayers.add(player);
+                players.remove(pc);
+                finishedPlayers.add(player);
+                break;
             }
+        }
+        if(nextPlayer.getName().equals(player.getName())){
+            advanceNextPlayer();
         }
     }
 
@@ -271,10 +279,13 @@ public class GlobalState {
         Log.d(Thread.currentThread().getName(), "removePlayer("+player.getName()+")");
         for (int i = 0; i < players.size(); i++) {
             PlayerContainer container = players.get(i);
-            if (container.player == player){
+            if (container.player.getName().equals(player.getName())){
                 players.remove(container);
                 break;
             }
+        }
+        if(nextPlayer.getName().equals(player.getName())){
+            advanceNextPlayer();
         }
     }
 
@@ -284,19 +295,25 @@ public class GlobalState {
      */
     public void nextTurn(){
         activePlayer = nextPlayer;
+        advanceNextPlayer();
+    }
 
-        //Changed this loop so it owrks with PlayerContainer <-> Player
-        int playerIndex = -1;
+    private void advanceNextPlayer(){
+        int playerIndex = 0;
         for(int i=0; i < players.size(); i++){
             if(players.get(i).player.equals(nextPlayer)){
                 playerIndex = i;
+                break;
             }
         }
-
-        if(playOrderIsForwards){
-            nextPlayer = players.get((playerIndex + 1) % players.size()).player;
-        } else {
-            nextPlayer = players.get((playerIndex + players.size() - 1) % players.size()).player;
+        if(players.size() > 0) {
+            //The code below crashes if the last player in the game finishes and we dont check for this case, since he already got removed
+            //If that's the case, we don't need to set the nextPlayer, since there are no players left
+            if (playOrderIsForwards) {
+                nextPlayer = players.get((playerIndex + 1) % players.size()).player;
+            } else {
+                nextPlayer = players.get((playerIndex + players.size() - 1) % players.size()).player;
+            }
         }
     }
 
@@ -357,24 +374,6 @@ public class GlobalState {
         }
 
         return deserializedState;
-    }
-
-    /**
-     * returns the playParameter for this specific rule
-     * @param ruleName
-     * @return
-     */
-    public JSONObject getPlayParameter(String ruleName) {
-        return this.playParameters.optJSONObject(ruleName);
-    }
-
-    public void setPlayParameters(JSONObject playParameters) {
-        this.playParameters = playParameters;
-    }
-
-    public JSONObject getPlayParameters() {
-
-        return playParameters;
     }
 
     /**

@@ -55,8 +55,9 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     private ArrayList<Card> stack = new ArrayList<>();
 
     private String currentlyActivePlayer = "~";
-    private HashMap<String,String> playerDirections = new HashMap<>();
-    private HashMap<String, JSONObject> playerSeating;
+    private HashMap<String, String> playerDirections = new HashMap<>();
+    private HashMap<String, JSONObject> playerSeating = new HashMap<>();
+    private HashMap<String,Double> orientationOfPlayer = new HashMap<>();
 
 
     @Override
@@ -69,7 +70,8 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
         trayStack2 = findViewById(R.id.tray_stack_spec_2);
 
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
-        ourClient.getActionCallbackInterface().setGameUI(this);
+
+        //ourClient.getActionCallbackInterface().setGameUI(this);
 
         // this.ourClient.getActionCallbackInterface().getPlayerSeatings()
     }
@@ -146,17 +148,30 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
         trayStack.setImageBitmap(bitmapResized);
 
 
-        double specOrientation = Double.NaN,playerOrientation = Double.NaN;
+        //double specOrientation = Double.NaN,playerOrientation = Double.NaN;
+
+        /*
         if(playerSeating != null) {
             specOrientation = JSONToOrientation(playerSeating.get(ourClient.getUsername()));
             playerOrientation = JSONToOrientation(playerSeating.get(currentlyActivePlayer));
         }
+        */
 
+        /*
         double direction;
         if(Double.isNaN(specOrientation) || Double.isNaN(playerOrientation)){
             direction = Math.random() * 2*Math.PI;
         } else {
             direction = (Math.PI + playerOrientation) - specOrientation;
+        }
+        */
+
+        double direction;
+
+        if(orientationOfPlayer.containsKey(currentlyActivePlayer) && !Double.isNaN(orientationOfPlayer.get(currentlyActivePlayer))) {
+            direction = orientationOfPlayer.get(currentlyActivePlayer);
+        } else {
+            direction = Math.random() * 2 * Math.PI;
         }
         double xTranslation = Math.cos(direction) * 1500;
         double yTranslation = Math.sin(direction) * 1500;
@@ -195,8 +210,8 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        super.onPause();
         if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
             ourClient.getActionCallbackInterface().setGameUI(null);
     }
@@ -210,7 +225,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
 
     @Override
     public void onUpdateLobbyList(EinzMessage<EinzUpdateLobbyListMessageBody> message) {
-        // Log.d("DEBUG", "toost updateLobby");
+        Log.d("DEBUG", "toost updateLobby");
         playerSeating = message.getBody().getPlayerSeatings();
 
     }
@@ -298,8 +313,11 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     @Override
     public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
         ArrayList<String> playerList = message.getBody().getTurnOrder();
+
         for(String currPlayer:playerList){
             addPlayerToList(currPlayer);
+            double orientation = Math.random() * 2 * Math.PI;
+            orientationOfPlayer.put(currPlayer,orientation);
         }
     }
 

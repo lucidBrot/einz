@@ -21,9 +21,9 @@
 
     <color name="red_wine">#870000</color>
 
-    <color name="green_default">#1FFC35</color>
-    <color name="green_dark">#06C619</color>
-    <color name="green_darker">#00950F</color>
+    <color name="green_default">#14e929</color>
+    <color name="green_dark">#06c619</color>
+    <color name="green_darker">#027c0e</color>
 
     <color name="card_green">#00FF31</color>
     <color name="card_red">#FF0000</color>

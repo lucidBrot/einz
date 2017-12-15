@@ -7,82 +7,219 @@
     android:background="@color/red_default"
     tools:context="ch.ethz.inf.vs.a4.minker.einz.UI.LobbyActivity">
 
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
-
-    <LinearLayout
-        android:layout_width="0dp"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="4"
-        android:orientation="vertical">
+        android:animateLayoutChanges="true">
 
-        <Space
+        <LinearLayout
+            android:id="@+id/ll_settingsframe"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_height="match_parent"
+            android:background="@color/blue_default"
+            android:visibility="gone"
+            tools:context="ch.ethz.inf.vs.a4.minker.einz.UI.SettingsActivity">
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/cv_lobby_server_info"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="2"
-            android:textAlignment="center"
-            app:cardBackgroundColor="@color/orange_default"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="4dp">
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:textAlignment="center">
-
-                <TextView
-                    android:id="@+id/tv_lobby_ip"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="IP"
-                    android:textAlignment="center"
-                    android:textColor="@color/orange_brown"
-                    android:textSize="18sp" />
-
-                <TextView
-                    android:id="@+id/tv_lobby_port"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="PORT"
-                    android:textAlignment="center"
-                    android:textColor="@color/orange_brown"
-                    android:textSize="18sp" />
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="8"
-            android:background="@drawable/button_blue"
-            android:scrollbarStyle="outsideOverlay">
-
-            <LinearLayout
-                android:id="@+id/ll_lobbylist"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_below="@id/cv_lobby_server_info"
-                android:layout_weight="8"
+                android:layout_weight="5"
                 android:orientation="vertical">
-                <!-- will be set dynamically from LobbyActivity. Will then purge all content -->
-                <!--
+
+                <ToggleButton
+                    android:id="@+id/btn_lobby_default_rules_toggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/button_green"
+                    android:checked="false"
+                    android:textColor="@color/green_darker"
+                    android:textOff="use default settings"
+                    android:textOn="use custom settings" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="3"
+                    android:background="@drawable/button_red"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Global Rules"
+                        android:textAlignment="center"
+                        android:textColor="@color/red_darker"
+                        android:textSize="18sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/button_orange"
+                        android:orientation="vertical">
+
+                        <ScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <LinearLayout
+                                android:id="@+id/ll_global_rules"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical" />
+                        </ScrollView>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="3"
+                    android:background="@drawable/button_red"
+                    android:orientation="vertical"
+                    android:padding="5dp">
+
+                    <TextView
+                        android:id="@+id/textView2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Card Rules"
+                        android:textAlignment="center"
+                        android:textColor="@color/red_darker"
+                        android:textSize="18sp" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/button_orange"
+                        android:orientation="vertical">
+
+                        <ScrollView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <LinearLayout
+                                android:id="@+id/ll_card_rules"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical" />
+                        </ScrollView>
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_save_settings"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_orange"
+                    android:elevation="8dp"
+                    android:text="Save Settings"
+                    android:textColor="@color/orange_brown" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_lobbyframe"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:visibility="visible">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="4"
+                android:orientation="vertical">
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/cv_lobby_server_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:textAlignment="center"
+                    app:cardBackgroundColor="@color/orange_default"
+                    app:cardCornerRadius="10dp"
+                    app:cardElevation="4dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:textAlignment="center">
+
+                        <TextView
+                            android:id="@+id/tv_lobby_ip"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="IP"
+                            android:textAlignment="center"
+                            android:textColor="@color/orange_brown"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tv_lobby_port"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="PORT"
+                            android:textAlignment="center"
+                            android:textColor="@color/orange_brown"
+                            android:textSize="18sp" />
+                    </LinearLayout>
+                </android.support.v7.widget.CardView>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="8"
+                    android:background="@drawable/button_blue"
+                    android:scrollbarStyle="outsideOverlay">
+
+                    <LinearLayout
+                        android:id="@+id/ll_lobbylist"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_below="@id/cv_lobby_server_info"
+                        android:layout_weight="8"
+                        android:orientation="vertical">
+                        <!-- will be set dynamically from LobbyActivity. Will then purge all content -->
+                        <!--
         <android.support.v7.widget.CardView android:layout_width="match_parent"
                                             android:layout_height="wrap_content">
             <LinearLayout android:layout_width="wrap_content"
@@ -101,34 +238,52 @@
             </LinearLayout>
         </android.support.v7.widget.CardView>
         -->
+                    </LinearLayout>
+                </ScrollView>
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <Button
+                    android:id="@+id/btn_start_game"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_orange"
+                    android:text="Start Game"
+                    android:textAllCaps="false"
+                    android:textColor="@color/orange_brown"
+                    android:visibility="gone" />
+
+                <Space
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
             </LinearLayout>
-        </ScrollView>
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="top|center"
+                android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_start_game"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/button_orange"
-            android:text="Start Game"
-            android:textAllCaps="false"
-            android:textColor="@color/orange_brown"
-            android:visibility="gone" />
+                <ImageView
+                    android:id="@+id/iv_settings_button"
+                    android:layout_width="30dp"
+                    android:layout_height="40dp"
+                    android:layout_margin="10dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_orange"
+                    android:elevation="5dp"
+                    android:padding="5dp"
+                    android:src="@drawable/settings_icon_brown"
+                    android:visibility="gone" />
+            </LinearLayout>
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-    </LinearLayout>
-
-    <Space
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
+        </LinearLayout>
+    </FrameLayout>
 
 </LinearLayout>

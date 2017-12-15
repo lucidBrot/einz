@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.model;
 
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import org.json.JSONObject;
 
 /**
  * Basic Rule Class for rules applicable to cards.

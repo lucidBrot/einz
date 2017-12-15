@@ -123,6 +123,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
             globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
+
             MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
         }
     }
@@ -177,17 +178,23 @@ public class ServerFunction implements ServerFunctionDefinition {
             MessageSender.sendPlayCardResponse(player, threadedEinzServer, false);
             return false;
         } else {
-            activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
-            card.setOrigin(player.getName());
-            globalState.addCardToDiscardPile(card);
-            globalState.setPlayParameters(playParameters);
-            globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
-            globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
-            globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
-            globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
-            MessageSender.sendPlayCardResponse(player, threadedEinzServer, true);
-            onChange();
-            return true;
+            try {
+                activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
+                card.setOrigin(player.getName());
+                globalState.addCardToDiscardPile(card);
+                //globalState.setPlayParameters(playParameters);
+                globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
+                globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
+                globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+                globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, true);
+                onChange();
+                return true;
+            } catch (Exception e) {
+                MessageSender.sendPlayCardResponse(player, threadedEinzServer, false);
+                e.printStackTrace();
+                return false;
+            }
         }
     }
 
@@ -315,16 +322,17 @@ public class ServerFunction implements ServerFunctionDefinition {
                         }
                     }
                     break;
+
             }
 
         }
-
         //Create the gameConfig with the cards and  add the players to it
+        //numberOfCardsInGame.put(cardLoader.getCardInstance("take4"), 200); // DEBUG
+
         GameConfig result = new GameConfig(numberOfCardsInGame);
         for (Player p : players) {
             result.addParticipant(p);
         }
-
 
 
         //Add all necessary CardRules
@@ -390,7 +398,8 @@ public class ServerFunction implements ServerFunctionDefinition {
         }
         //result.assignRuleToCard(new PlayAlwaysRule(), cardLoader.getCardInstance("choose"));
         //result.assignRuleToCard(new WishColorRule(), cardLoader.getCardInstance("choose"));
-        result.assignRuleToCard(new IsValidDrawRule(), cardLoader.getCardInstance(CardColor.YELLOW.toString().toLowerCase() + "_" + CardText.ZERO.indicator));
+        result.assignRuleToCard(new IsValidDrawRule(),
+                cardLoader.getCardInstance(CardColor.YELLOW.toString().toLowerCase() + "_" + CardText.ZERO.indicator));
 
 
         /*Add all necessary GlobalRules

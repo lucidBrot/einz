@@ -36,6 +36,9 @@ The sources worth mentioning:
 
   https://stackoverflow.com/questions/496321/utf-8-utf-16-and-utf-32
 
+* Fixing the Activity Lifecycle: Apparently, `onStop` is called *after* the next Activity has concluded `onCreate`
+  https://stackoverflow.com/questions/17214452/onstart-of-new-activity-is-called-before-onstop-of-parent
+
 
 
 # Libraries

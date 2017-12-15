@@ -1,5 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes;
 
+import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.ParametrizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
@@ -20,8 +23,10 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
 
     private final JSONObject cardRules; // contains a list of JSONObjects, each having id and parameters - for every CardID
     private final JSONArray globalRules; // contains a list of JSONObjects, each having id and parameters
-    private boolean neverParsedCardRulesBefore = true; private boolean neverParsedGlobalRulesBefore = true;
-    private boolean lastCardRulesResult; private boolean lastGlobalRulesResult;
+    private boolean neverParsedCardRulesBefore = true;
+    private boolean neverParsedGlobalRulesBefore = true;
+    private boolean lastCardRulesResult;
+    private boolean lastGlobalRulesResult;
     private HashMap<Card, ArrayList<BasicCardRule>> parsedCardRules = new HashMap<>();
     private HashMap<Card, Integer> cardNumbers = new HashMap<>();
     private ArrayList<BasicGlobalRule> parsedGlobalRules = new ArrayList<>();
@@ -31,6 +36,7 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
 
     /**
      * <img src="../../../../../../../../../../../../../../protocols/docScreenshots/SpecifyRulesJSON.png"/>
+     *
      * @param cardRules
      * @param globalRules
      */
@@ -49,12 +55,13 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
 
     /**
      * <img src="../parsertypes/doc-files/etjgJ2D.jpg"/><br>Consider this an easter-egg
+     *
      * @return the body as JSONobject, ready to be included as "body":{this returned Object} in a message
      */
     @Override
     public JSONObject toJSON() throws JSONException {
         JSONObject body = new JSONObject();
-        body.put("cardRules",this.cardRules);
+        body.put("cardRules", this.cardRules);
         body.put("globalRules", this.globalRules);
         return body;
     }
@@ -64,15 +71,15 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
      * @return false if failed, else true
      * Parses what it needs to later access that
      **/
-    private boolean parseCardRulesFurther(){
-        if(!neverParsedCardRulesBefore){ // only recalculate if never calculated before. because the variables are final
+    private boolean parseCardRulesFurther() {
+        if (!neverParsedCardRulesBefore) { // only recalculate if never calculated before. because the variables are final
             return lastCardRulesResult;
         }
         HashMap<Card, ArrayList<BasicCardRule>> parsedCardRules = new HashMap<>();
         HashMap<Card, Integer> cardNumbers = new HashMap<>();
-        CardLoader cl = new CardLoader();
+        CardLoader cl = EinzSingleton.getInstance().getCardLoader();
         Iterator<String> cards = this.cardRules.keys();
-        RuleLoader rl = new RuleLoader();
+        RuleLoader rl = EinzSingleton.getInstance().getRuleLoader();
         try {
             while (cards.hasNext()) {
                 ArrayList<BasicCardRule> rules = new ArrayList<>();
@@ -82,14 +89,21 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
                 Card card = cl.getCardInstance(cardIDKey);
                 cardNumbers.put(card, numberOfCopies);
 
-                JSONArray arr = object.getJSONArray("rulelist");
-                for (int i=0; i<object.getJSONArray("rulelist").length(); i++) {
-                    JSONObject o = arr.getJSONObject(i);
+                JSONArray arr = object.optJSONArray("rulelist");
+                if (arr == null) {
+                    arr = new JSONArray();
+                }
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject o = arr.getJSONObject(i); // TODO: more defensive coding here. every get would be better as an opt with a null check
                     String id = o.getString("id");
-                    JSONObject parameters = o.getJSONObject("parameters");
+                    JSONObject parameters = o.optJSONObject("parameters");
+                    if(parameters==null){parameters = new JSONObject();}
                     BasicCardRule rule = (BasicCardRule) rl.getInstanceOfRule(id);
-                    if(rule instanceof ParametrizedRule){
-                        ((ParametrizedRule)rule).setParameter(parameters);
+                    if(rule==null){
+                        Log.w("SpecifyRules/parseCardRulesFurther", "unmapped rule id "+id);
+                        continue;} // Don't add unmapped rule.
+                    if (rule instanceof ParametrizedRule) {
+                        ((ParametrizedRule) rule).setParameter(parameters);
                     }
                     rules.add(rule);
 
@@ -99,7 +113,7 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
             }
             this.parsedCardRules = parsedCardRules;
             this.cardNumbers = cardNumbers;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
         return true;
@@ -109,8 +123,8 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
      * @return null if something went wrong. If null, you should probably inform the admin with a toast.
      * This method could also return an empty HashMap, if there was no error but the content was empty.
      */
-    public HashMap<Card, Integer> getCardNumbers(){
-        if(!parseCardRulesFurther()){
+    public HashMap<Card, Integer> getCardNumbers() {
+        if (!parseCardRulesFurther()) {
             return null;
         }
 
@@ -122,39 +136,49 @@ public class EinzSpecifyRulesMessageBody extends EinzMessageBody {
      * @return null if something went wrong. If null, you should probably inform the admin with a toast.
      * This method could also return an empty HashMap, if there was no error but the content was empty.
      */
-    public HashMap<Card, ArrayList<BasicCardRule>> getParsedCardRules(){
-        if(!parseCardRulesFurther()){
+    public HashMap<Card, ArrayList<BasicCardRule>> getParsedCardRules() {
+        if (!parseCardRulesFurther()) {
             return null;
         }
         return this.parsedCardRules;
     }
 
-    private boolean parseGlobalRulesFurther(){
-        if(!neverParsedGlobalRulesBefore){
+    private boolean parseGlobalRulesFurther() {
+        if (!neverParsedGlobalRulesBefore) {
             return lastGlobalRulesResult;
         }
 
         ArrayList<BasicGlobalRule> globalRules = new ArrayList<>();
-        CardLoader cl = new CardLoader();
-        RuleLoader rl = new RuleLoader();
+        CardLoader cl = EinzSingleton.getInstance().getCardLoader();
+        RuleLoader rl = EinzSingleton.getInstance().getRuleLoader();
 
-        try{
-        for(int i=0; i<this.globalRules.length(); i++){
-            JSONObject o = this.globalRules.getJSONObject(i);
-            String id = o.getString("id");
-            JSONObject object = o.getJSONObject("parameters");
-            BasicGlobalRule rule =(BasicGlobalRule) rl.getInstanceOfRule("id");
-            globalRules.add(rule);
-        }
-        this.parsedGlobalRules = globalRules;
-        return true;}
-        catch(Exception e){
+        try {
+            for (int i = 0; i < this.globalRules.length(); i++) {
+                JSONObject o = this.globalRules.getJSONObject(i);
+                String id = o.getString("id");
+                JSONObject object = o.getJSONObject("parameters");
+                BasicRule rule_ = (BasicRule) rl.getInstanceOfRule(id);
+                if(! (rule_ instanceof BasicGlobalRule)){
+                    continue;
+                }
+                BasicGlobalRule rule = (BasicGlobalRule) rule_;
+
+                // iterate over parameters and set them
+                if (rule instanceof ParametrizedRule) {
+                    ((ParametrizedRule) rule).setParameter(object);
+                }
+
+                globalRules.add(rule);
+            }
+            this.parsedGlobalRules = globalRules;
+            return true;
+        } catch (Exception e) {
             return false;
         }
     }
 
-    public ArrayList<BasicGlobalRule> getGlobalParsedRules(){
-        if(!parseGlobalRulesFurther()){
+    public ArrayList<BasicGlobalRule> getGlobalParsedRules() {
+        if (!parseGlobalRulesFurther()) {
             return null;
         }
 

@@ -9,12 +9,14 @@ import android.widget.Toast;
 
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
 import ch.ethz.inf.vs.a4.minker.einz.sensors.OrientationGetter;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -47,7 +49,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
     public void setGameUI(GameUIInterface gameUI){
         if(gameUI!=null){
-            Log.d("ClientMessengerCallback", "set GameUI to "+gameUI.toString()+"    (LobbyUI : "+lobbyUI.toString()+")");
+            Log.d("ClientMessengerCallback", "set GameUI to " + gameUI.toString() + "    (LobbyUI : " +
+                    (lobbyUI != null ? lobbyUI.toString() : "null") + ")");
         }
         this.gameUI = gameUI;
     }
@@ -57,6 +60,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
      */
     public void setLobbyUI(LobbyUIInterface lobbyUI){
         this.lobbyUI = lobbyUI;
+        Log.d("ClientMessengerCallback", "set lobbyUI to "+(lobbyUI==null?"null":lobbyUI.toString()));
     }
 
     /**
@@ -262,6 +266,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         } else {
             // lobbyUI == null and gameUI == null
             // uhm... that means that neither is currently existing. maybe, the lobbyUI has been paused.
+            /*
             runOnMainThread(new Runnable() {
                 @Override
                 public void run() {
@@ -283,7 +288,8 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                 public void run() {
                     gameUI.onInitGame(message);
                 }
-            });
+            });*/
+            Log.e("ClientMessengerCallback","Didn't have an activity that could have handled onInitGame");
         }
 
         Log.d("CliMesssengerCallback", "Game Initialized");
@@ -467,4 +473,35 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     public HashMap<String, JSONObject> getPlayerSeatings() {
         return playerSeatings;
     }
+
+    /**
+     * Retries 3 times to send that message, but that should not need to be done actually, because the client will be ready when this message is sent.
+     * @param cardRules a list of JSONObjects consisting of attributes as defined in the docsumentation:
+     *                  A String id and a JSONObject parameters, as well as a number that says how many cards of this type should be in the deck
+     * @param globalRules an Array of JSONObjects, consisting of a number and a ruleslist
+     *                    <br><br>
+     *
+     *                     "cardRules":{
+    "someCardID":{
+    "rulelist":[
+    {"id":"instantWinOnCardPlayed", "parameters":{}},
+    {"id":"chooseColorCard", "parameters":{"param1":"lulz",
+    "lolcat":"foobar"}}
+    ],
+    "number":"3"
+    },
+    "otherCardID":{
+    "number":"7",
+    "rulelist":[
+    {"id":"instantWinOnCardPlayed", "parameters":{}}
+    ]
+    }
+     */
+    public void sendSpecifyRules(JSONObject cardRules, JSONArray globalRules){
+        EinzMessageHeader header = new EinzMessageHeader("startgame", "SpecifyRules");
+        EinzSpecifyRulesMessageBody body = new EinzSpecifyRulesMessageBody(cardRules, globalRules);
+        EinzMessage<EinzSpecifyRulesMessageBody> message = new EinzMessage<>(header, body);
+        this.parentClient.getConnection().sendMessageRetryXTimes(3,message);
+    }
+
 }
