@@ -428,6 +428,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     public void onBackPressed() {
         super.onBackPressed();
         cleanupActivity();
+        //TODO @Eric/@Chris Check if in SettingsState or LobbyState and do SaveAndGoBack if in SettingsState
     }
 
 
