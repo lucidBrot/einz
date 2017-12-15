@@ -77,7 +77,10 @@ public class ServerFunction implements ServerFunctionDefinition {
             globalState = new GlobalState(10, players);
             this.gameConfig = createStandardConfig(players); //Create new standard GameConfig
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
-            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
+            while(globalState.getDiscardPile() == null || globalState.getDiscardPile().size() < 1 ||
+                    globalState.getTopCardDiscardPile().getColor() == CardColor.NONE) {
+                globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
+            }
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
             MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
         }
@@ -121,7 +124,10 @@ public class ServerFunction implements ServerFunctionDefinition {
                 r.initialize(gameConfig);
             }
             globalState.addCardsToDrawPile(gameConfig.getShuffledDrawPile()); //Set the drawPile of the GlobalState
-            globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
+            while(globalState.getDiscardPile() == null || globalState.getDiscardPile().size() < 1 ||
+                    globalState.getTopCardDiscardPile().getColor() == CardColor.NONE) {
+                globalState.addCardsToDiscardPile(globalState.drawCards(1)); //Set the starting card without an origin
+            }
             globalState.nextPlayer = globalState.getPlayersOrdered().get(0); //There currently is no active player, nextplayer will start the game in startGame
 
             MessageSender.sendInitGameToAll(threadedEinzServer, gameConfig, new ArrayList<>(globalState.getPlayersOrdered()));
