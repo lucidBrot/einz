@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.RuleLoader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSpecifyRulesMessageBody;
@@ -16,6 +17,8 @@ public class RulesContainer {
 
     private JSONObject cardRules = new JSONObject();
     private JSONArray globalRules = new JSONArray();
+
+    private static RuleLoader defaultInstance = null;
 
     private EinzMessageHeader header = new EinzMessageHeader("startgame", "SpecifyRules");
 
@@ -223,5 +226,13 @@ public class RulesContainer {
             Log.e("RulesContainer", "Failed to transform BasicGlobalRule to JSON");
         }
         return ruleObj;
+    }
+
+    /**
+     * returns a container with the default rules loaded
+     */
+    public static RulesContainer getDefaultRulesInstance() {
+        RulesContainer container = new RulesContainer();
+
     }
 }

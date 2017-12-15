@@ -400,6 +400,20 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 onSettingsSaveClick();
                 break;
             }
+
+            case R.id.btn_lobby_default_rules_toggle:{
+                onDefaultRulesToggle((ToggleButton) view);
+                break;
+            }
+        }
+    }
+
+    private void onDefaultRulesToggle(ToggleButton button) {
+        if(button.isChecked()){
+            this.rulesContainer = RulesContainer.getDefaultRulesInstance();
+        } else {
+            // TODO: grey out disabled options when isChecked and enable again when Checked
+            loadUISettingsIntoRulesContainer();
         }
     }
 
@@ -774,6 +788,4 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private Integer getNumCardsFromView(View view) {
         return 1; // TODO: load the number from the view
     }
-
-
 }
