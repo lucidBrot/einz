@@ -38,7 +38,8 @@ public class RuleLoader {
         }
         try {
             Class ruleClass = Class.forName(ruleMapping.get(ruleName));
-            return (BasicRule) ruleClass.newInstance();
+            BasicRule b = (BasicRule) ruleClass.newInstance();
+            return b;
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e){
             e.printStackTrace();
         }
