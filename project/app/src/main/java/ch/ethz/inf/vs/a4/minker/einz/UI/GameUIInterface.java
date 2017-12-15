@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -55,6 +57,8 @@ public interface GameUIInterface {
     void setStack(ArrayList<Card> stack);
 
     void onKeepaliveTimeout();
+
+    void onSendPlayParameters(JSONObject playParameters);
 
     // TODO: customActionRule..?
 }

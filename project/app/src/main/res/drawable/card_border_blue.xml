@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="251dp"
+    android:height="351dp"
+    android:viewportWidth="251"
+    android:viewportHeight="351">
+
+    <path
+        android:fillColor="@color/card_blue"
+        android:fillType="evenOdd"
+        android:strokeWidth="1"
+        android:pathData="M46,0 L205,0 C230.405,-4.66684e-15,251,20.5949,251,46 L251,305
+C251,330.405,230.405,351,205,351 L46,351 C20.5949,351,3.11123e-15,330.405,0,305
+L0,46 L0,46 C-3.11123e-15,20.5949,20.5949,4.66684e-15,46,0 L46,0 Z M57,10 L57,10
+C31.5949,10,11,30.5949,11,56 L11,56 L11,295 C11,320.405,31.5949,341,57,341
+L194,341 C219.405,341,240,320.405,240,295 L240,56 C240,30.5949,219.405,10,194,10
+L57,10 Z" />
+</vector>

@@ -74,6 +74,8 @@ import ch.ethz.inf.vs.a4.minker.einz.model.SelectorRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WishColorRule;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -105,7 +107,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private static final int MAXCARDINHAND = 24;
     private GridLayout mGrid;
     private ArrayList<Card> cardStack = new ArrayList<>();
-    private ImageView trayStack,trayStack2;
+    private ImageView trayStack,trayStack2,colorBorder;
 
     private String currentlyActivePlayer = "~";
 
@@ -122,6 +124,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private HashMap<String, Double> orientationOfPlayer = new HashMap<>();
 
     private Map<String, List<BasicCardRule>> ruleMapping;
+    private String frameColor = "NONE";
 
     private int cardHeight;
     private int cardWidth;
@@ -166,6 +169,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         trayStack = findViewById(R.id.tray_stack);
         trayStack.setOnDragListener(new TrayDragListener());
+
+        colorBorder = findViewById(R.id.iv_wished_color);
 
         trayStack2 = findViewById(R.id.tray_stack_2);
 
@@ -401,7 +406,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         double xTranslation = Math.cos(direction) * 1500;
         double yTranslation = Math.sin(direction) * 1500;
 
-        trayStack.setVisibility(View.VISIBLE);
+        trayStack.setVisibility(View.GONE);
+        colorBorder.setVisibility(View.GONE);
+
         trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new Runnable() {
             @Override
             public void run() {
@@ -409,6 +416,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                 trayStack.animate().translationX(0).translationY(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(500).withEndAction(new Runnable() {
                     @Override
                     public void run() {
+                        setFrameColor();
                         trayStack2.setImageBitmap(bitmapResized);
                     }
                 });
@@ -417,6 +425,30 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         });
 
 
+    }
+
+    private void setFrameColor() {
+        switch (frameColor){
+            case "GREEN":
+                colorBorder.setVisibility(View.VISIBLE);
+                colorBorder.setImageResource(R.drawable.card_border_green);
+                break;
+            case "RED":
+                colorBorder.setVisibility(View.VISIBLE);
+                colorBorder.setImageResource(R.drawable.card_border_red);
+                break;
+            case "BLUE":
+                colorBorder.setVisibility(View.VISIBLE);
+                colorBorder.setImageResource(R.drawable.card_border_blue);
+                break;
+            case "YELLOW":
+                colorBorder.setVisibility(View.VISIBLE);
+                colorBorder.setImageResource(R.drawable.card_border_yellow);
+                break;
+            default:
+
+                break;
+        }
     }
 
     private void initCards(){
@@ -993,6 +1025,37 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     public void onKeepaliveTimeout() {
         // TODO: what to do when lost connection? probably return to main menu
+    }
+
+    @Override
+    public void onSendPlayParameters(JSONObject playParameters) {
+        JSONObject wishColorRule;
+
+        wishColorRule = playParameters.optJSONObject("wishColorRule");
+
+        String wishedColor;
+
+        if (wishColorRule != null){
+            wishedColor = wishColorRule.optString("wishForColor");
+        } else {
+            wishedColor = null;
+        }
+
+        if(wishedColor != null){
+            if(isValidColor(wishedColor)){
+                frameColor = wishedColor.toUpperCase();
+            } else {
+                frameColor = "NONE";
+            }
+        } else {
+            frameColor = "NONE";
+        }
+
+    }
+
+    private boolean isValidColor(String inColor) {
+        inColor = inColor.toUpperCase();
+        return inColor.equals("BLUE") || inColor.equals("GREEN") || inColor.equals("YELLOW") || inColor.equals("RED");
     }
 
     class DragCardListener implements View.OnTouchListener {
