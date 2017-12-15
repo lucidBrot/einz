@@ -58,6 +58,8 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     private HashMap<String, String> playerDirections = new HashMap<>();
     private HashMap<String, JSONObject> playerSeating = new HashMap<>();
     private HashMap<String,Double> orientationOfPlayer = new HashMap<>();
+    private String frameColor = "NONE";
+    private ImageView colorBorder;
 
 
     @Override
@@ -66,6 +68,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
         setContentView(R.layout.activity_spectator);
 
         trayStack = findViewById(R.id.tray_stack_spec);
+        colorBorder = findViewById(R.id.iv_wished_color);
 
         trayStack2 = findViewById(R.id.tray_stack_spec_2);
 
@@ -178,19 +181,52 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
 
         Log.d("Translation","x: " + String.valueOf(xTranslation) + " y: "+yTranslation);
 
-        trayStack.setVisibility(View.INVISIBLE);
-        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).withEndAction(new Runnable() {
+        trayStack.setVisibility(View.GONE);
+        colorBorder.setVisibility(View.GONE);
+
+        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new Runnable() {
             @Override
             public void run() {
                 trayStack.setVisibility(View.VISIBLE);
-                trayStack.animate().translationX(0).translationY(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(1000).withEndAction(new Runnable() {
+                trayStack.animate().translationX(0).translationY(0).setInterpolator(new AccelerateDecelerateInterpolator()).setDuration(500).withEndAction(new Runnable() {
                     @Override
                     public void run() {
+                        setFrameColor();
                         trayStack2.setImageBitmap(bitmapResized);
                     }
                 });
+
             }
         });
+    }
+
+    private void setFrameColor() {
+        switch (frameColor){
+            case "GREEN":
+                colorBorder.setVisibility(View.VISIBLE);
+                colorBorder.setImageResource(R.drawable.card_border_green);
+                break;
+            case "RED":
+                colorBorder.setVisibility(View.VISIBLE);
+                colorBorder.setImageResource(R.drawable.card_border_red);
+                break;
+            case "BLUE":
+                colorBorder.setVisibility(View.VISIBLE);
+                colorBorder.setImageResource(R.drawable.card_border_blue);
+                break;
+            case "YELLOW":
+                colorBorder.setVisibility(View.VISIBLE);
+                colorBorder.setImageResource(R.drawable.card_border_yellow);
+                break;
+            default:
+
+                break;
+        }
+    }
+
+    private boolean isValidColor(String inColor) {
+        inColor = inColor.toUpperCase();
+        return inColor.equals("BLUE") || inColor.equals("GREEN") || inColor.equals("YELLOW") || inColor.equals("RED");
     }
 
     public void setSecondTopPlayedCard(Card cardToSet) {
@@ -368,5 +404,30 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     @Override
     public void onKeepaliveTimeout() {
 
+    }
+
+    @Override
+    public void onSendPlayParameters(JSONObject playParameters) {
+        JSONObject wishColorRule;
+
+        wishColorRule = playParameters.optJSONObject("Wish Color");
+
+        String wishedColor;
+
+        if (wishColorRule != null){
+            wishedColor = wishColorRule.optString("wishForColor");
+        } else {
+            wishedColor = null;
+        }
+
+        if(wishedColor != null){
+            if(isValidColor(wishedColor)){
+                frameColor = wishedColor.toUpperCase();
+            } else {
+                frameColor = "NONE";
+            }
+        } else {
+            frameColor = "NONE";
+        }
     }
 }

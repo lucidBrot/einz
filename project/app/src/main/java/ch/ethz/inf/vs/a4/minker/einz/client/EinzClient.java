@@ -61,8 +61,8 @@ public class EinzClient implements Runnable {
      */
     public EinzClient(String serverIP, int serverPort, Context appContext, String username, String role, boolean isHost, LobbyUIInterface lobbyUI) {
 
-        OrientationGetter oG = new OrientationGetter(appContext);
-        oG.getOrientation(this);
+        /*OrientationGetter oG = new OrientationGetter(appContext);
+        oG.getOrientation(this);*/
 
         this.serverIP = serverIP;
         this.serverPort = serverPort;
@@ -86,7 +86,7 @@ public class EinzClient implements Runnable {
 
     //sets the orientation of client when enough sensorValues are read
     public void setOrientation(double orientation){
-        this.orientation = orientation;
+        //this.orientation = orientation;
     }
 
     /**
