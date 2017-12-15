@@ -89,8 +89,20 @@ public class RulesContainer {
     /**
      * sets the Number of Cards in the deck of type cardID.
      * (Adds the number to the Card. if the internal mapping is inexistent, it creates it. If there is already a number set, it will be overwritten.)
+     * fails with a log message and returns if the input number is bad.
+     * Do not pass negative numbers
      * */
     public synchronized void setNumberOfCards(String cardID, String number) {
+        try {
+            if(Integer.valueOf(number) < 0){
+                Log.w("RulesContainer", "bad number "+number+" for card "+cardID);
+                return;
+            }
+        } catch (Exception e){
+            Log.w("RulesContainer", "bad number "+number+" for card "+cardID);
+            e.printStackTrace();
+            return;
+        }
         try {
             if (!cardRules.has(cardID)) {
                 cardRules.put(cardID, new JSONObject());

@@ -30,6 +30,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFai
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import info.whitebyte.hotspotmanager.WifiApManager;
@@ -87,7 +88,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     // SETTINGS Variables
     private RulesContainer rulesContainer = new RulesContainer();
     private HashMap<View, BasicGlobalRule> globalRulesM = new HashMap<>(); // contains the rules that can be reused by the UI
-    private HashMap<View, BasicCardRule> cardRulesM = new HashMap(); // contains the rules that can be reused by the UI
+    private HashMap<View, Card> cardsM = new HashMap(); // contains the rules that can be reused by the UI
 
 
     @Override
@@ -644,7 +645,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     // -------------------------- SETTINGS ---------------------------------
 
-    private void initialiseMappingFromViewToRules(){
+    private void initialiseMappingFromViewToRules() {
         // TODO: initialize the globalRulesM and cardRulesM
     }
 
@@ -659,12 +660,25 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private void onGlobalRuleToggled(View view, boolean useThisRule) {
         BasicGlobalRule rule = this.globalRulesM.get(view);
         if (rule == null) {
-            Log.w("LobbySettings", "This rule View has no assicated rule instance");
+            Log.w("LobbySettings", "This rule View has no assicated GlobalRule instance");
         } else {
             if (useThisRule) {
                 this.rulesContainer.addGlobalRule(rule);
             } else {
                 this.rulesContainer.removeGlobalRule(rule);
+            }
+        }
+    }
+
+    private void onCardNumChanged(View view, int num) {
+        Card card = this.cardsM.get(view);
+        if (card == null) {
+            Log.w("LobbySettings", "This rule View has no assiciated Card instance");
+        } else {
+            if (num <= 0) {
+                this.rulesContainer.removeCard(card.getID());
+            } else {
+                this.rulesContainer.setNumberOfCards(card.getID(), String.valueOf(num));
             }
         }
     }
