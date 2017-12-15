@@ -309,11 +309,13 @@ public class GlobalState {
                 break;
             }
         }
-        if(playOrderIsForwards){
-            nextPlayer = players.get((playerIndex + 1) % players.size()).player;
-        } else {
-            nextPlayer = players.get((playerIndex + players.size() - 1) % players.size()).player;
-        }
+        if(players.size()>0) {
+            if (playOrderIsForwards) {
+                nextPlayer = players.get((playerIndex + 1) % players.size()).player;
+            } else {
+                nextPlayer = players.get((playerIndex + players.size() - 1) % players.size()).player;
+            }
+        } // else whatever. TODO: set this to null or what should be done here?
     }
 
     public JSONObject getLastRuleSelection() {
