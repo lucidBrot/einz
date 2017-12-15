@@ -35,6 +35,7 @@ import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import info.whitebyte.hotspotmanager.WifiApManager;
 import org.json.JSONException;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -43,6 +44,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
 import static java.lang.Thread.sleep;
 
@@ -414,7 +417,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         if(button.isChecked()){
             this.rulesContainer = RulesContainer.getDefaultRulesInstance();
             try {
-                Log.d("LobbySettings", "using default rules: "+this.rulesContainer.toMessage().getBody().toJSON().toString());
+                String msg = this.rulesContainer.toMessage().getBody().toJSON().toString();
+                Log.d("LobbySettings", "using default rules: "+msg);
+
             } catch (JSONException e) {
                 Log.w("LobbySettings", "Failed to log");
                 e.printStackTrace();
