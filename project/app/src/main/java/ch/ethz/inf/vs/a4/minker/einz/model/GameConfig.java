@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.model;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.Debug;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
 import java.util.ArrayList;
@@ -59,7 +60,9 @@ public class GameConfig {
             ruleSet = new HashSet<>();
             rulePerCard.put(card.getID(), ruleSet);
         }
-        Log.d("GameConfig/TEMP", "rule: "+(rule==null?"null":rule.toString()));
+        if(Debug.logRuleSpam) {
+            Log.d("GameConfig", "rule: " + (rule == null ? "null" : rule.toString()));
+        }
         rule.assignedTo = card;
         ruleSet.add(rule);
         allRules.add(rule);

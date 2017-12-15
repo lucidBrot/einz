@@ -14,6 +14,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".UI.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,6 +29,7 @@
         <activity android:name=".server.Debug_ServerActivity" />
         <activity
             android:name=".UI.ServerSetupActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -39,12 +41,16 @@
             android:launchMode="singleTask"/> <!-- onCreate will thus be called only once, thus not creating multiple clients/servers -->
         <activity
             android:name=".UI.ClientSetupActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
         <activity
             android:name=".UI.FullscreenActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
-        <activity android:name=".UI.SpectatorActivity" />
-        <activity android:name=".UI.SettingsActivity"></activity>
+        <activity android:name=".UI.SpectatorActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".UI.SettingsActivity"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

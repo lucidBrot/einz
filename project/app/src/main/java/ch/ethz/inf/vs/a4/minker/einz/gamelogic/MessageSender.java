@@ -24,7 +24,6 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFa
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.GlobalStateParser;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.PlayerState;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import ch.ethz.inf.vs.a4.minker.einz.server.UserNotRegisteredException;
@@ -137,7 +136,7 @@ public class MessageSender {
             activePlayer = "~null";
         }
         String cardsToDraw = Integer.toString(state.getCardsToDraw());
-        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
+        GlobalState parser = state;
 
         //send each player a different PlayerState
         for (Player p : state.getPlayersOrdered()) {
@@ -279,7 +278,7 @@ public class MessageSender {
             activePlayer = "~null";
         }
         String cardsToDraw = Integer.toString(state.getCardsToDraw());
-        GlobalStateParser parser = new GlobalStateParser(numCardsInHand, stack, activePlayer, cardsToDraw);
+        GlobalState parser = state;
 
         //Send State to only one player
         ArrayList<JSONObject> possibleActions = new ArrayList<>();
