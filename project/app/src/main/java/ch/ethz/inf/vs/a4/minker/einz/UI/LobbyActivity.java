@@ -33,6 +33,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import info.whitebyte.hotspotmanager.WifiApManager;
+import org.json.JSONException;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -104,6 +105,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             findViewById(R.id.iv_settings_button).setVisibility(View.VISIBLE);
             findViewById(R.id.iv_settings_button).setOnClickListener(this);
             findViewById(R.id.btn_save_settings).setOnClickListener(this);
+            findViewById(R.id.btn_lobby_default_rules_toggle).setOnClickListener(this);
             // wait for server to tell us it's ready so we can connect in onLocalServerReady()
         } else {
             // still display the IP/PORT info so that they can tell their friends
@@ -411,9 +413,15 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private void onDefaultRulesToggle(ToggleButton button) {
         if(button.isChecked()){
             this.rulesContainer = RulesContainer.getDefaultRulesInstance();
+            try {
+                Log.d("LobbySettings", "using default rules: "+this.rulesContainer.toMessage().getBody().toJSON().toString());
+            } catch (JSONException e) {
+                Log.w("LobbySettings", "Failed to log");
+                e.printStackTrace();
+            }
         } else {
             // TODO: grey out disabled options when isChecked and enable again when Checked
-            loadUISettingsIntoRulesContainer();
+            //loadUISettingsIntoRulesContainer();
         }
     }
 
@@ -666,45 +674,45 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     // CardRules each have one inner View per (Cardview, Cardruleview) combination, so they are mapped <Card, <View, Rule>>
     // The reason we use rule instances is that you can set parameters on them.
 
-    private void initialiseMappingFromViewToRules() {
-        // TODO: initialize the globalRulesM and cardRulesM and cardsM
-
-        // for all cards, store them in cardsM
-        for (String cardID : cardLoader.getCardIDs()){
-            View cardView = generateCardView();
-            Card card = cardLoader.getCardInstance(cardID);
-            this.cardsM.put(cardView, card);
-        }
-
-        // for all GlobalRules, store them in globalRulesM
-        // for all BasicCardRules, store them in every Card-representing view
-        for(String ruleName : ruleLoader.getRulesNames()){
-            BasicRule rule = ruleLoader.getInstanceOfRule(ruleName);
-            if( rule instanceof  BasicGlobalRule){ // TODO: set initial parameters on the rule and set them also when the user changes them
-                View view = generateGlobalRuleView(rule);
-                this.globalRulesM.put(view, (BasicGlobalRule) rule);
-            } else if(rule instanceof BasicCardRule){
-                // add cardruleview to all card views
-                for(View cView : this.cardsM.keySet()){
-                    Card theCard = this.cardsM.get(cView);
-                    View cardRuleView = generateCardRuleView(rule, cView, theCard);
-                    cView.setChildCardRule(cardRuleView);
-                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
-                }
-            }
-            // else wth are you, rule?
-        }
-
-        // display all global rules
-        for(View view : globalRulesM.keySet()){
-            addViewToGlobalRulesViewsList(view);
-        }
-
-        // display all card-respective rules
-        for(View cardView : this.cardsM.keySet()){
-            addViewToCardViewsList(cardView);
-        }
-    }
+//    private void initialiseMappingFromViewToRules() {
+//        // TODO: initialize the globalRulesM and cardRulesM and cardsM
+//
+//        // for all cards, store them in cardsM
+//        for (String cardID : cardLoader.getCardIDs()){
+//            View cardView = new generateCardView();
+//            Card card = cardLoader.getCardInstance(cardID);
+//            this.cardsM.put(cardView, card);
+//        }
+//
+//        // for all GlobalRules, store them in globalRulesM
+//        // for all BasicCardRules, store them in every Card-representing view
+//        for(String ruleName : ruleLoader.getRulesNames()){
+//            BasicRule rule = ruleLoader.getInstanceOfRule(ruleName);
+//            if( rule instanceof  BasicGlobalRule){ // TODO: set initial parameters on the rule and set them also when the user changes them
+//                View view = generateGlobalRuleView(rule);
+//                this.globalRulesM.put(view, (BasicGlobalRule) rule);
+//            } else if(rule instanceof BasicCardRule){
+//                // add cardruleview to all card views
+//                for(View cView : this.cardsM.keySet()){
+//                    Card theCard = this.cardsM.get(cView);
+//                    View cardRuleView = generateCardRuleView(rule, cView, theCard);
+//                    cView.setChildCardRule(cardRuleView);
+//                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
+//                }
+//            }
+//            // else wth are you, rule?
+//        }
+//
+//        // display all global rules
+//        for(View view : globalRulesM.keySet()){
+//            addViewToGlobalRulesViewsList(view);
+//        }
+//
+//        // display all card-respective rules
+//        for(View cardView : this.cardsM.keySet()){
+//            addViewToCardViewsList(cardView);
+//        }
+//    }
 
     /**
      * Adds the toggled view's rule (stored already in {@link #globalRulesM} or {@link #cardsM}

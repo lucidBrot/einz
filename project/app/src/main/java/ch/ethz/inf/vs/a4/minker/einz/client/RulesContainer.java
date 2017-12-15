@@ -199,7 +199,7 @@ public class RulesContainer {
             return new JSONObject();
         }
         String id = rule.getName();
-        JSONObject params = null;
+        JSONObject params = new JSONObject();
         if (rule instanceof ParametrizedRule) {
             params = ((ParametrizedRule) rule).getParameter();
         }
