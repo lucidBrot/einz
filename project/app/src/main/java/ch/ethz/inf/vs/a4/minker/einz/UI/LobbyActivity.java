@@ -683,5 +683,5 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
     }
 
-    
+
 }
