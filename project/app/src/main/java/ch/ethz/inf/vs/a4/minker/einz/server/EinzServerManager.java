@@ -5,12 +5,12 @@ import android.util.Log;
 import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.model.Player;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.model.Spectator;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.GlobalStateParser;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.PlayerState;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
@@ -865,7 +865,7 @@ public class EinzServerManager {
         getSFLock().readLock().lock();
         EinzMessageHeader header = new EinzMessageHeader("stateinfo", "StateInfo");
 
-        GlobalStateParser globalState=null;
+        GlobalState globalState=null;
         PlayerState playerState=null;
 
         if(gamePhaseStarted){

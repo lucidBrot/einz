@@ -953,16 +953,16 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     @Override
-    public void setNumCardsInHandOfEachPlayer(HashMap<String, String> numCardsInHandOfEachPlayer) {
+    public void setNumCardsInHandOfEachPlayer(HashMap<String, Integer> numCardsInHandOfEachPlayer) {
         for (String currPlayer:allPlayers){
-            String numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
+            Integer numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
             LinearLayout playerList = findViewById(R.id.ll_playerlist);
             View cardViewOfPlayer = playerList.findViewWithTag(currPlayer);
 
             if(cardViewOfPlayer instanceof CardView){
                 View textViewOfNrOfCards = cardViewOfPlayer.findViewById(R.id.tv_nr_of_cards);
                 if(textViewOfNrOfCards instanceof TextView){
-                    ((TextView) textViewOfNrOfCards).setText(numOfCurrplayerCards);
+                    ((TextView) textViewOfNrOfCards).setText(numOfCurrplayerCards.toString());
                 }
             } else if(cardViewOfPlayer == null){
                 /*
