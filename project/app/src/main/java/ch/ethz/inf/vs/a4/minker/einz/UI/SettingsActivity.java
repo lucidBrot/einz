@@ -14,7 +14,7 @@ import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.RulesContainer;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import java.util.ArrayList;
-
+@Deprecated
 public class SettingsActivity extends FullscreenActivity implements View.OnClickListener, LobbyUIInterface {
 
     private RulesContainer rulesContainer = new RulesContainer();

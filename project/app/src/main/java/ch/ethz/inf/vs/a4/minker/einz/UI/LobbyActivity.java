@@ -20,6 +20,7 @@ import ch.ethz.inf.vs.a4.minker.einz.EinzConstants;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
+import ch.ethz.inf.vs.a4.minker.einz.client.RulesContainer;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
@@ -69,6 +70,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     private HandlerThread backgroundThread = new HandlerThread("Networking"); // one background thread instead of many short-lived
 
+    private RulesContainer rulesContainer = new RulesContainer();
     private boolean host; // if this device is hosting the server
     private String username;
     private String role;
@@ -99,6 +101,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             findViewById(R.id.btn_start_game).setVisibility(View.VISIBLE);
             findViewById(R.id.iv_settings_button).setVisibility(View.VISIBLE);
             findViewById(R.id.iv_settings_button).setOnClickListener(this);
+            findViewById(R.id.btn_save_settings).setOnClickListener(this);
             // wait for server to tell us it's ready so we can connect in onLocalServerReady()
         } else {
             // still display the IP/PORT info so that they can tell their friends
@@ -370,18 +373,55 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
     }
 
+
+
     @Override
     public void onClick(View view) {
         //TODO: button to start game if you're the host, handle the onclick
         switch (view.getId()){
             case R.id.iv_settings_button:{
+                /*
                 Intent intent = new Intent(this, SettingsActivity.class);
                 EinzSingleton.getInstance().setEinzClient(this.ourClient);
                 //this.ourClient.getActionCallbackInterface().setLobbyUI(null); // this is already done onPause(), and that should happen before the new activitie's oncreate but better safe than sorry
                 // TODO: what happens if a user joins during us setting up things?
                 startActivity(intent);
+                */
+                onSettingsClick();
+                break;
+            }
+
+            case R.id.btn_save_settings: {
+                onSettingsSaveClick();
+                break;
             }
         }
+    }
+
+
+    public void onSettingsClick(){
+        findViewById(R.id.ll_lobbyframe).setVisibility(View.GONE);
+        findViewById(R.id.ll_settingsframe).setVisibility(View.VISIBLE);
+    }
+
+    public void onSettingsSaveClick(){
+        saveAndSend();
+        findViewById(R.id.ll_settingsframe).setVisibility(View.GONE);
+        findViewById(R.id.ll_lobbyframe).setVisibility(View.VISIBLE);
+    }
+
+    private void saveAndSend() {
+        saveSettings();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                ourClient.getConnection().sendMessageRetryXTimes(3, rulesContainer.toMessage());
+            }
+        }).start();
+    }
+
+    private void saveSettings() {
+        // TODO: write settings as profile (that can be loaded again after app restart) to disk?
     }
 
     @Override
