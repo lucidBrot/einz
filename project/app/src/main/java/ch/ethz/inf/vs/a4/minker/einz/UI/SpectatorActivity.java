@@ -410,7 +410,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     public void onSendPlayParameters(JSONObject playParameters) {
         JSONObject wishColorRule;
 
-        wishColorRule = playParameters.optJSONObject("wishColorRule");
+        wishColorRule = playParameters.optJSONObject("Wish Color");
 
         String wishedColor;
 
