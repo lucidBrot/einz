@@ -679,45 +679,45 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     // CardRules each have one inner View per (Cardview, Cardruleview) combination, so they are mapped <Card, <View, Rule>>
     // The reason we use rule instances is that you can set parameters on them.
 
-//    private void initialiseMappingFromViewToRules() {
-//        // TODO: initialize the globalRulesM and cardRulesM and cardsM
-//
-//        // for all cards, store them in cardsM
-//        for (String cardID : cardLoader.getCardIDs()){
-//            View cardView = new generateCardView();
-//            Card card = cardLoader.getCardInstance(cardID);
-//            this.cardsM.put(cardView, card);
-//        }
-//
-//        // for all GlobalRules, store them in globalRulesM
-//        // for all BasicCardRules, store them in every Card-representing view
-//        for(String ruleName : ruleLoader.getRulesNames()){
-//            BasicRule rule = ruleLoader.getInstanceOfRule(ruleName);
-//            if( rule instanceof  BasicGlobalRule){ // TODO: set initial parameters on the rule and set them also when the user changes them
-//                View view = generateGlobalRuleView(rule);
-//                this.globalRulesM.put(view, (BasicGlobalRule) rule);
-//            } else if(rule instanceof BasicCardRule){
-//                // add cardruleview to all card views
-//                for(View cView : this.cardsM.keySet()){
-//                    Card theCard = this.cardsM.get(cView);
-//                    View cardRuleView = generateCardRuleView(rule, cView, theCard);
-//                    cView.setChildCardRule(cardRuleView);
-//                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
-//                }
-//            }
-//            // else wth are you, rule?
-//        }
-//
-//        // display all global rules
-//        for(View view : globalRulesM.keySet()){
-//            addViewToGlobalRulesViewsList(view);
-//        }
-//
-//        // display all card-respective rules
-//        for(View cardView : this.cardsM.keySet()){
-//            addViewToCardViewsList(cardView);
-//        }
-//    }
+    private void initialiseMappingFromViewToRules() {
+        // TODO: initialize the globalRulesM and cardRulesM and cardsM
+
+        // for all cards, store them in cardsM
+        for (String cardID : cardLoader.getCardIDs()){
+            View cardView = new generateCardView();
+            Card card = cardLoader.getCardInstance(cardID);
+            this.cardsM.put(cardView, card);
+        }
+
+        // for all GlobalRules, store them in globalRulesM
+        // for all BasicCardRules, store them in every Card-representing view
+        for(String ruleName : ruleLoader.getRulesNames()){
+            BasicRule rule = ruleLoader.getInstanceOfRule(ruleName);
+            if( rule instanceof  BasicGlobalRule){ // TODO: set initial parameters on the rule and set them also when the user changes them
+                View view = generateGlobalRuleView(rule);
+                this.globalRulesM.put(view, (BasicGlobalRule) rule);
+            } else if(rule instanceof BasicCardRule){
+                // add cardruleview to all card views
+                for(View cView : this.cardsM.keySet()){
+                    Card theCard = this.cardsM.get(cView);
+                    View cardRuleView = generateCardRuleView(rule, cView, theCard);
+                    cView.setChildCardRule(cardRuleView);
+                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
+                }
+            }
+            // else wth are you, rule?
+        }
+
+        // display all global rules
+        for(View view : globalRulesM.keySet()){
+            addViewToGlobalRulesViewsList(view);
+        }
+
+        // display all card-respective rules
+        for(View cardView : this.cardsM.keySet()){
+            addViewToCardViewsList(cardView);
+        }
+    }
 
     /**
      * Adds the toggled view's rule (stored already in {@link #globalRulesM} or {@link #cardsM}
