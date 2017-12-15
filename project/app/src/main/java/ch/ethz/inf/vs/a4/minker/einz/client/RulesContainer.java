@@ -239,6 +239,8 @@ public class RulesContainer {
         RulesContainer container = new RulesContainer();
         if(defaultInstance == null){
             defaultInstance = container;
+        } else {
+            return defaultInstance; // don't compute multiple times
         }
 
         // load deck
@@ -270,31 +272,52 @@ public class RulesContainer {
 //                        arr.add(new IsValidDrawRule());
 //                        tempCardRules.put(card.getID(), arr);
         for(String cardID : cardLoader.getCardIDs()){
-            if(!cardID.equals("debug")){ // add all cards except debug card
-                if( !cardID.equals("take4") && !cardID.equals("choose")) {
+            switch(cardID){
+                case "debug":{
                     container.addCardRule(new PlayColorRule(), cardID);
                     container.addCardRule(new PlayTextRule(), cardID);
                     container.addCardRule(new IsValidDrawRule(), cardID);
-                } else {
-                    container.addCardRule(new PlayColorRule(), cardID);
-                    container.addCardRule(new PlayTextRule(), cardID);
-                    container.addCardRule(new IsValidDrawRule(), cardID);
-                    container.addCardRule(new PlayAlwaysRule(), cardID); // allow the special cards to always be played
+                    container.addCardRule(new PlayAlwaysRule(), cardID);
+                    break;
                 }
-            } else {
-                // what to do with the debug cards
-                container.addCardRule(new PlayColorRule(), cardID);
-                container.addCardRule(new PlayTextRule(), cardID);
-                container.addCardRule(new IsValidDrawRule(), cardID);
-                container.addCardRule(new PlayAlwaysRule(), cardID);
+                case "take4":{
+                    container.addCardRule(new PlayColorRule(), cardID);
+                    container.addCardRule(new PlayTextRule(), cardID);
+                    container.addCardRule(new IsValidDrawRule(), cardID);
+                    container.addCardRule(new PlayAlwaysRule(), cardID);
+                    break;
+                }
+                case "choose":{
+                    container.addCardRule(new PlayColorRule(), cardID);
+                    container.addCardRule(new PlayTextRule(), cardID);
+                    container.addCardRule(new IsValidDrawRule(), cardID);
+                    container.addCardRule(new PlayAlwaysRule(), cardID);
+                    break;
+                }
+                default: {
+                    container.addCardRule(new PlayColorRule(), cardID);
+                    container.addCardRule(new PlayTextRule(), cardID);
+                    container.addCardRule(new IsValidDrawRule(), cardID);
+                    // differentiate further
+                    Card tempCard = cardLoader.getCardInstance(cardID);
+                    switch(tempCard.getText()){
+                        case STOP:{
+                            container.addCardRule(new SkipRule(), cardID);
+                            break;}
+                        case PLUSTWO:{
+                            container.addCardRule(new DrawTwoCardsRule(), cardID);
+                            break;}
+                        case SWITCHORDER:{
+                            container.addCardRule(new ChangeDirectionRule(), cardID);
+                        }
+                    }
+                    break;
+                }
+
             }
-
-            // STOP, Switch, drawtwo
- //           arr.add(new ChangeDirectionRule());
-//                arr1.add(new DrawTwoCardsRule());
-//                arr2.add(new SkipRule());
         }
-
+        // now we have registered cardRules
         defaultInstance = container;
+        return defaultInstance;
     }
 }
