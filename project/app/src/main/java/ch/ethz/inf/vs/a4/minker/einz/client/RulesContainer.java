@@ -118,6 +118,9 @@ public class RulesContainer {
 
     }
 
+    /**
+     * Same as {@link #setNumberOfCards}
+     */
     public synchronized void addCard(String cardId, Integer number){
         this.setNumberOfCards(cardId, String.valueOf(number));
     }
