@@ -365,7 +365,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         final HashMap<String,String> numCardsInHandOfEachPlayer = message.getBody().getGlobalstate().getNumCardsInHand();
 
         final ArrayList<Card> currStack = message.getBody().getGlobalstate().getStack();
-        final JSONObject playParameters = message.getBody().getGlobalstate().getPlayParameters();
+        //final JSONObject playParameters = message.getBody();
 
         Runnable runnable = new Runnable() {
             @Override
@@ -378,7 +378,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                     gameUI.setActions(actions);
                     gameUI.setNumCardsInHandOfEachPlayer(numCardsInHandOfEachPlayer);
                     gameUI.setStack(currStack);
-                    gameUI.onSendPlayParameters(playParameters);
+                    //gameUI.onSendPlayParameters(playParameters);
 
                     String whoseCurrentTurn = message.getBody().getGlobalstate().getWhoseTurn();
                     if(!whoseCurrentTurn.equals(previousPlayer)){
