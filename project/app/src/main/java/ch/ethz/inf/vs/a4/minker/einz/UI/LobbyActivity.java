@@ -670,10 +670,14 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
     }
 
+    /**
+     * @param view The view that represents the card (with the options like number of them, what cardrules, whether to ues it, etc)
+     * @param num
+     */
     private void onCardNumChanged(View view, int num) {
         Card card = this.cardsM.get(view);
         if (card == null) {
-            Log.w("LobbySettings", "This rule View has no assiciated Card instance");
+            Log.w("LobbySettings/onCardNumChanged", "This rule View has no assiciated Card instance");
         } else {
             if (num <= 0) {
                 this.rulesContainer.removeCard(card.getID());
@@ -681,6 +685,28 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 this.rulesContainer.setNumberOfCards(card.getID(), String.valueOf(num));
             }
         }
+    }
+
+    private void onCardToggled(View view, boolean useThisCard){
+        // TODO: maybe store this setting and restore it when the card is untoggled? Or maybe that is too much effort for a useless feature
+        Card card = this.cardsM.get(view);
+        if (card == null) {
+            Log.w("LobbySettings/onCardToggled", "This rule View has no assiciated Card instance");
+        } else{
+            if( useThisCard){
+                this.rulesContainer.addCard(card.getID(), getNumCardsFromView(view));
+            } else {
+                this.rulesContainer.removeCard(card.getID());
+            }
+        }
+    }
+
+    /**
+     * @param view the view that corresponds to the card
+     * @return the number of cards of this kind in the deck
+     */
+    private Integer getNumCardsFromView(View view) {
+        return 1; // TODO: load the number from the view
     }
 
 
