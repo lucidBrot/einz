@@ -988,6 +988,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setNumCardsInHandOfEachPlayer(HashMap<String, Integer> numCardsInHandOfEachPlayer) {
         for (String currPlayer:allPlayers){
             Integer numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
+            if(numOfCurrplayerCards==null){numOfCurrplayerCards=0;} // added this so it doesn't crash. does =0 make sense?
             LinearLayout playerList = findViewById(R.id.ll_playerlist);
             View cardViewOfPlayer = playerList.findViewWithTag(currPlayer);
 
