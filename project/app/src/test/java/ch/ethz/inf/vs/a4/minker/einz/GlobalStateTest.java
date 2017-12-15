@@ -54,10 +54,41 @@ public class GlobalStateTest {
             serializedState.put("numCardsInHand", hand);
             serializedState.put("stack", stack);
 
+            JSONObject lastRuleSelection = new JSONObject();
+            lastRuleSelection.put("rule","data");
+
+            serializedState.put("lastRuleSelection", lastRuleSelection);
+
             return serializedState;
 
         } catch (Exception e){
             throw new RuntimeException("Failed initializing");
+        }
+    }
+
+    private void loadTestCards(){
+        String JSONString = "[\n" +
+                "  {\n" +
+                "    \"ID\":\"yellow_2\", \"name\":\"Yellow 0\", \"text\":\"ZERO\", \"color\":\"YELLOW\", \"resourceGroup\":\"drawable\", \"resourceName\":\"card_0_yellow\",\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"ID\":\"yellow_3\", \"name\":\"Yellow 1\", \"text\":\"ONE\", \"color\":\"YELLOW\", \"resourceGroup\":\"drawable\", \"resourceName\":\"card_1_yellow\",\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"ID\":\"blue_1\", \"name\":\"Yellow 2\", \"text\":\"TWO\", \"color\":\"YELLOW\",\"resourceGroup\":\"drawable\", \"resourceName\":\"card_2_yellow\",\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"ID\":\"asdf\", \"name\":\"Yellow 2\", \"text\":\"TWO\", \"color\":\"YELLOW\",\"resourceGroup\":\"drawable\", \"resourceName\":\"card_2_yellow\",\n" +
+                "  },\n" +
+                "  {\n" +
+                "    \"ID\":\"hoi\", \"name\":\"Yellow 2\", \"text\":\"TWO\", \"color\":\"YELLOW\",\"resourceGroup\":\"drawable\", \"resourceName\":\"card_2_yellow\",\n" +
+                "  },\n" +
+                "]";
+
+        try {
+            EinzSingleton.getInstance().getCardLoader().loadCards( new JSONArray(JSONString));
+        } catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -80,6 +111,8 @@ public class GlobalStateTest {
         cards.add(new String[] {"blue_1", "Kunz"});
         cards.add(new String[] {"asdf", "hoi"});
         cards.add(new String[] {"hoi", "temmmie"});
+
+        loadTestCards();
 
 
         JSONObject serializedState =  generateSerializedGlobalState(activePlayer,cardsToDraw,players,handSize,cards);

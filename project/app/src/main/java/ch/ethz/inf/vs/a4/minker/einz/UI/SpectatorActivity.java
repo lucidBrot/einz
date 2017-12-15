@@ -358,9 +358,9 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     }
 
     @Override
-    public void setNumCardsInHandOfEachPlayer(HashMap<String, String> numCardsInHandOfEachPlayer) {
+    public void setNumCardsInHandOfEachPlayer(HashMap<String, Integer> numCardsInHandOfEachPlayer) {
         for (String currPlayer:allPlayers){
-            String numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
+            Integer numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
 
             GridLayout playerList = findViewById(R.id.gl_playerlist);
             View cardViewOfPlayer = playerList.findViewWithTag(currPlayer);
@@ -368,7 +368,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
             if(cardViewOfPlayer instanceof CardView){
                 View textViewOfNrOfCards = cardViewOfPlayer.findViewById(R.id.tv_nr_of_cards);
                 if(textViewOfNrOfCards instanceof TextView){
-                    ((TextView) textViewOfNrOfCards).setText(numOfCurrplayerCards);
+                    ((TextView) textViewOfNrOfCards).setText(numOfCurrplayerCards.toString());
                 }
             } else if(cardViewOfPlayer == null){
                 /*

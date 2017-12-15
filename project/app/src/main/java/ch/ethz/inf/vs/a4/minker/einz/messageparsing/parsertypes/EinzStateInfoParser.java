@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz.messageparsing.parsertypes;
 import android.util.Log;
 
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.*;
@@ -43,33 +44,10 @@ public class EinzStateInfoParser extends EinzParser {
         JSONObject body = message.getJSONObject("body");
 
         //get global state if it is not null (could happen if error on getting state)
-        GlobalStateParser globalstate = null;
+        GlobalState globalstate = null;
         if(body.has("globalstate")) {
             JSONObject globalstateJSON = body.getJSONObject("globalstate");
-            // if the globalstate object exists, then it should contain all details
-            JSONArray numcardsinhandJSON = globalstateJSON.getJSONArray("numcardsinhand");
-            HashMap<String, String> numcardsinhand = new HashMap<>();
-
-            for (int i=0; i<numcardsinhandJSON.length(); i++) {
-                JSONObject entry = numcardsinhandJSON.getJSONObject(i);
-                String name = entry.getString("name");
-                String num = entry.getString("handSize");
-                numcardsinhand.put(name, num);
-            }
-            JSONArray stackJSON = globalstateJSON.getJSONArray("stack");
-            CardLoader cardLoader = new CardLoader();
-            ArrayList<Card> stack = new ArrayList<>();
-            for (int i = 0; i < stackJSON.length(); i++) {
-                JSONObject cardJSON = stackJSON.getJSONObject(i);
-                String ID = cardJSON.getString("ID");
-                String origin = cardJSON.getString("origin");
-
-                Card card = EinzSingleton.getInstance().getCardLoader().getCardInstance(ID, origin);
-                stack.add(card);
-            }
-            String whoseturn = globalstateJSON.getString("whoseturn");
-            String drawxcardsmin = globalstateJSON.getString("drawxcardsmin");
-            globalstate = new GlobalStateParser(numcardsinhand, stack, whoseturn, drawxcardsmin);
+            globalstate = GlobalState.fromJSON(globalstateJSON);
         }
 
         //get playerstate. Again, if it is nulll, there was an error. otherwise, it should have all content

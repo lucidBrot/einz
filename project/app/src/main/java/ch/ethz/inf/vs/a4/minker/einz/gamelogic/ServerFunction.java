@@ -199,11 +199,11 @@ public class ServerFunction implements ServerFunctionDefinition {
                 activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
                 card.setOrigin(player.getName());
                 globalState.addCardToDiscardPile(card);
-                //globalState.setPlayParameters(playParameters);
                 globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
                 globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
                 globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
                 globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+                globalState.setLastRuleSelection(playParameters);
                 if (!DEBUG_MODE) {
                     MessageSender.sendPlayCardResponse(player, threadedEinzServer, true);
 //=======

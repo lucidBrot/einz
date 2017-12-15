@@ -14,6 +14,12 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
  * Created by silvia on 11/17/17.
  */
 //this class is used for EinzSendStateMessageBody
+
+/**
+ * This class is deprecated and should be deleted. it is also not used anywhere anymore
+ * It is replaced by GlobalState itself.
+ */
+@Deprecated
 public class GlobalStateParser {
     private HashMap<String, String> numcardsinhand;
     private ArrayList<Card> stack;

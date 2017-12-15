@@ -285,6 +285,7 @@ public class RulesContainer {
                     container.addCardRule(new PlayTextRule(), cardID);
                     container.addCardRule(new IsValidDrawRule(), cardID);
                     container.addCardRule(new PlayAlwaysRule(), cardID);
+                    container.addCardRule(new WishColorRule(), cardID);
                     break;
                 }
                 case "choose":{
@@ -292,6 +293,7 @@ public class RulesContainer {
                     container.addCardRule(new PlayTextRule(), cardID);
                     container.addCardRule(new IsValidDrawRule(), cardID);
                     container.addCardRule(new PlayAlwaysRule(), cardID);
+                    container.addCardRule(new WishColorRule(), cardID);
                     break;
                 }
                 default: {

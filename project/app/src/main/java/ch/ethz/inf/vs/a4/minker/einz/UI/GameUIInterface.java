@@ -50,7 +50,7 @@ public interface GameUIInterface {
 
     void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
 
-    void setNumCardsInHandOfEachPlayer(HashMap<String ,String> numCardsInHandOfEachPlayer);
+    void setNumCardsInHandOfEachPlayer(HashMap<String ,Integer> numCardsInHandOfEachPlayer);
 
     void onUpdateLobbyList(String admin, ArrayList<String> players, ArrayList<String> spectators);
 

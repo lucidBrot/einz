@@ -47,6 +47,8 @@ public class GlobalState {
 
     private HashMap<String, Integer> points; // String for player.getName(),  String for points
 
+    private JSONObject lastRuleSelection;
+
     /**
      * Creates an instance of a Global game state.
      * @param maxDiscardPileSize Sets the maximum size of the Discard Pile
@@ -68,6 +70,7 @@ public class GlobalState {
         this.drawPile = new LinkedList<>();
         this.discardPile = new LinkedList<>();
         this.points = new HashMap<>();
+        this.lastRuleSelection = new JSONObject();
     }
 
     /**
@@ -313,6 +316,13 @@ public class GlobalState {
         }
     }
 
+    public JSONObject getLastRuleSelection() {
+        return lastRuleSelection;
+    }
+
+    public void setLastRuleSelection(JSONObject lastRuleSelection) {
+        this.lastRuleSelection = lastRuleSelection;
+    }
 
     /**
      * Serializes the GlobalState object to JSON.
@@ -341,14 +351,18 @@ public class GlobalState {
         serializedState.put("cardsToDraw", cardsToDraw);
         serializedState.put("numCardsInHand", numCardsInHand);
         serializedState.put("stack",stack);
+        serializedState.put("lastRuleSelection", lastRuleSelection);
 
         return serializedState;
     }
 
     public static GlobalState fromJSON(JSONObject jsonObject) throws  JSONException{
         GlobalState deserializedState = new GlobalState();
+
         deserializedState.activePlayer = new Player(jsonObject.getString("activePlayer"));
         deserializedState.cardsToDraw = jsonObject.getInt("cardsToDraw");
+        deserializedState.lastRuleSelection = jsonObject.getJSONObject("lastRuleSelection");
+
         JSONArray numCardsInHand = jsonObject.getJSONArray("numCardsInHand");
         JSONArray stack = jsonObject.getJSONArray("stack");
 
@@ -371,6 +385,8 @@ public class GlobalState {
 
         return deserializedState;
     }
+
+
 
     /**
      * Private Container class to handle the missing hand on client-side
