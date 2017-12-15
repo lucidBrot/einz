@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.util.Log;
+import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
+import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.RuleLoader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
@@ -9,6 +11,8 @@ import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.ParametrizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.*;
+import ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountNumberOfCardsAsPoints;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,7 +22,7 @@ public class RulesContainer {
     private JSONObject cardRules = new JSONObject();
     private JSONArray globalRules = new JSONArray();
 
-    private static RuleLoader defaultInstance = null;
+    private static RulesContainer defaultInstance = null;
 
     private EinzMessageHeader header = new EinzMessageHeader("startgame", "SpecifyRules");
 
@@ -233,6 +237,64 @@ public class RulesContainer {
      */
     public static RulesContainer getDefaultRulesInstance() {
         RulesContainer container = new RulesContainer();
+        if(defaultInstance == null){
+            defaultInstance = container;
+        }
 
+        // load deck
+        CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
+        for(String cardID : cardLoader.getCardIDs()){
+            if(!cardID.equals("debug")){ // add all cards except debug card
+                container.addCard(cardID, 2); // add every card twice into the deck
+            }
+        }
+
+        // load global rules
+        StartGameWithCardsRule myStartGameWithCardsRule = new StartGameWithCardsRule();
+        try {
+            JSONObject param = new JSONObject();
+            param.put(StartGameWithCardsRule.getParameterName(), 7);
+            myStartGameWithCardsRule.setParameter(param);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        container.addGlobalRule(myStartGameWithCardsRule);
+        container.addGlobalRule(new WinOnNoCardsRule());
+        container.addGlobalRule(new CountNumberOfCardsAsPoints());
+        container.addGlobalRule(new NextTurnRule());
+        container.addGlobalRule(new NextTurnRule2()); // one of these is for starting the next turn after drawing, the other for starting after playing
+
+        // load card rules
+        //                        arr.add(new PlayColorRule());
+//                        arr.add(new PlayTextRule());
+//                        arr.add(new IsValidDrawRule());
+//                        tempCardRules.put(card.getID(), arr);
+        for(String cardID : cardLoader.getCardIDs()){
+            if(!cardID.equals("debug")){ // add all cards except debug card
+                if( !cardID.equals("take4") && !cardID.equals("choose")) {
+                    container.addCardRule(new PlayColorRule(), cardID);
+                    container.addCardRule(new PlayTextRule(), cardID);
+                    container.addCardRule(new IsValidDrawRule(), cardID);
+                } else {
+                    container.addCardRule(new PlayColorRule(), cardID);
+                    container.addCardRule(new PlayTextRule(), cardID);
+                    container.addCardRule(new IsValidDrawRule(), cardID);
+                    container.addCardRule(new PlayAlwaysRule(), cardID); // allow the special cards to always be played
+                }
+            } else {
+                // what to do with the debug cards
+                container.addCardRule(new PlayColorRule(), cardID);
+                container.addCardRule(new PlayTextRule(), cardID);
+                container.addCardRule(new IsValidDrawRule(), cardID);
+                container.addCardRule(new PlayAlwaysRule(), cardID);
+            }
+
+            // STOP, Switch, drawtwo
+ //           arr.add(new ChangeDirectionRule());
+//                arr1.add(new DrawTwoCardsRule());
+//                arr2.add(new SkipRule());
+        }
+
+        defaultInstance = container;
     }
 }
