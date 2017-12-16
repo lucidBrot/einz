@@ -69,6 +69,9 @@ public class Debug {
                 Log.w("Debug", "using Keepalive but without debug logging for it.");
             }
         }
+        if(logRuleSpam){
+            Log.w("Debug", "using logRuleSpam, that means it will clutter the log messages with Rule registration messages serverside");
+        }
     }
 
     /**
