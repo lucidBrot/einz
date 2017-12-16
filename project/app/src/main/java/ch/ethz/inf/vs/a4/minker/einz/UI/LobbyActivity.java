@@ -111,8 +111,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             // initialize layouts for settings
             globalRuleList = findViewById(R.id.ll_global_rules);
             cardList = findViewById(R.id.ll_card_rules);
-            // TODO: // popupCardRuleListM = findViewById(R.id.ll_popup_card_rules);
-            popupCardRuleListM = new HashMap<>();
+
         } else {
             // still display the IP/PORT info so that they can tell their friends
 
@@ -706,7 +705,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
     private LinearLayout globalRuleList; // the list for global rules
     private LinearLayout cardList; // the list for card views
-    private HashMap<Card, LinearLayout> popupCardRuleListM; // this lists for popup card rules' views // TODO: instanciate
 
     // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
     // Cards each have one View which has multiple settings, so they are mapped <View, Card>
@@ -734,7 +732,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 // add cardruleview to all card views
                 for(View cView : this.cardsM.keySet()){
                     Card theCard = this.cardsM.get(cView);
-                    generateCardRuleViewAndAddToItsPopup(rule, cView);
+                    // the cardRule views are generated onClick
                     this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
                 }
             }
@@ -769,7 +767,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         });
 
         // display all card-respective rules
-        for(View cardView : cardViews){
+        for(final View cardView : cardViews){
             addViewToCardViewsList(cardView);
             // TODO: sort cardrules in the popup
 
@@ -779,23 +777,27 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             btnCardRules.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    LinearLayout mypopupLL = popupCardRuleListM.get(card);
-                    if(mypopupLL!=null){
                         // TODO: show popup for cardrules
-                    } else {
-                        Log.w("LobbySettings", "popup was null and I'm not sure why. Not doing anything...");
+                    Log.w("LobbySettings", "popup not yet coded");
+                    //
+                    LinearLayout myPopupLL = (LinearLayout) LayoutInflater.from(LobbyActivity.this).inflate(R.layout.linearlayout_settings_cardrule_popup, (LinearLayout) findViewById(R.id.ll_card_popup_settingsframe), false);
+
+                    for(BasicCardRule cardRule : cardRulesM.get(card).values()){
+                        generateCardRuleViewAndAddToItsPopup(cardRule, cardView, myPopupLL);
                     }
+
+                    // show popup
+                    LinearLayout settingsFrame = ((LinearLayout) findViewById(R.id.ll_card_popup_settingsframe));
+                    settingsFrame.addView(myPopupLL);
+                    settingsFrame.setVisibility(View.VISIBLE);
                 }
             });
         }
     }
 
-    private View generateCardRuleViewAndAddToItsPopup(BasicRule rule, View cView) {
+    private View generateCardRuleViewAndAddToItsPopup(BasicRule rule, View cView, LinearLayout myPopupLL) {
         Card theCard = cardsM.get(cView);
-        LinearLayout myPopupLL = popupCardRuleListM.get(theCard);
-        if(myPopupLL == null){
-//            myPopupLL = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.ll_rules_popup, cView, false); // TODO: use correct layout
-        }
+
         CardView cardRuleView = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_settings_cardrule_popup_element, myPopupLL, false);
 
         CheckBox checkBox = (CheckBox) cardRuleView.findViewById(R.id.cb_card_rule);
