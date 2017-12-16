@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
@@ -30,7 +31,9 @@ import java.util.HashMap;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
+import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
@@ -41,6 +44,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayCardRes
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzPlayerFinishedMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSendStateMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
@@ -464,7 +468,29 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
 
     @Override
     public void onKeepaliveTimeout() {
+        goBackToMainMenu();
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        disconnect();
+        goBackToMainMenu();
+    }
+
+    private void disconnect() {
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                EinzUnregisterRequestMessageBody body = new EinzUnregisterRequestMessageBody(ourClient.getUsername());
+                EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
+                try {
+                    ourClient.getConnection().sendMessage(new EinzMessage<>(header, body));
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

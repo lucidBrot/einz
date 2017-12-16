@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 
 import java.util.ArrayList;
 
@@ -13,6 +15,8 @@ public interface LobbyUIInterface {
     public void setAdmin(String username);
 
     void onRegistrationFailed(EinzRegisterFailureMessageBody body);
+
+    void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message);
 
     public void startGameUIWithThisAsContext();
 
