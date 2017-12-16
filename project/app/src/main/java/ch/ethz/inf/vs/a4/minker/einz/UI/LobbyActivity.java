@@ -399,7 +399,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     @Override
     public void onClick(View view) {
-        //TODO: button to start game if you're the host, handle the onclick
         switch (view.getId()) {
             case R.id.iv_settings_button: {
                 onSettingsClick();
@@ -479,7 +478,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
 
         for(Card card : cardRulesM.keySet()){
-            for(BasicCardRule cardRule : cardRulesM.get(card).values()){
+            for(BasicCardRule cardRule : cardRulesM.get(card)){
                 // for all cardrules belonging to card, add them
                 this.rulesContainer.addCardRule(cardRule, card.getID()); // TODO: set cardRule params based on the view before storing it
             }
@@ -701,7 +700,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private RulesContainer rulesContainer = new RulesContainer();
     private HashMap<View, BasicGlobalRule> globalRulesM = new HashMap<>(); // contains the rules that can be reused by the UI
     private HashMap<View, Card> cardsM = new HashMap<>(); // contains the rules that can be reused by the UI
-    private HashMap<Card, HashMap<View, BasicCardRule>> cardRulesM = new HashMap<>(); // contains the cardRules which correspond to specific cards
+    private HashMap<Card, ArrayList<BasicCardRule>> cardRulesM = new HashMap<>(); // contains the cardRules which correspond to specific cards
     private RuleLoader ruleLoader = EinzSingleton.getInstance().getRuleLoader();
     private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
     private LinearLayout globalRuleList; // the list for global rules
@@ -719,7 +718,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             Card card = cardLoader.getCardInstance(cardID);
             View cardView = generateCardView(card);
             this.cardsM.put(cardView, card);
-            this.cardRulesM.put(card, new HashMap<View, BasicCardRule>());
+            this.cardRulesM.put(card, new ArrayList<BasicCardRule>());
         }
 
         android.support.v4.util.ArraySet<BasicCardRule> allCardRules = new android.support.v4.util.ArraySet<>();
@@ -781,9 +780,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             btnCardRules.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                        // TODO: show popup for cardrules
-                    Log.w("LobbySettings", "popup not yet coded");
-                    //
                     final LinearLayout myPopupLL = (LinearLayout) LayoutInflater.from(LobbyActivity.this).inflate(R.layout.linearlayout_settings_cardrule_popup, (LinearLayout) findViewById(R.id.ll_settingsframe), false);
                     final LinearLayout settingsFrame = ((LinearLayout) findViewById(R.id.ll_card_popup_settingsframe));
                     final LinearLayout popupContainer = myPopupLL.findViewById(R.id.ll_popup_container);
@@ -800,7 +796,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                         @Override
                         public void onClick(View view) {
                             // when the popup is closed
-                            // TODO: store changes
+                            //TODO storeCardSpecificRules(popupContainer, card);
                             settingsFrame.removeView(myPopupLL);
                         }
                     });
@@ -813,6 +809,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         Card theCard = cardsM.get(cView);
 
         CardView cardRuleView = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_settings_cardrule_popup_element, popupList, false);
+        cardRuleView.setTag(rule); // used in onCardRuleToggled
 
         CheckBox checkBox = (CheckBox) cardRuleView.findViewById(R.id.cb_card_rule);
         checkBox.setText(rule.getName());
@@ -960,16 +957,14 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
     }
 
+    /**
+     *
+     * @param card
+     * @param cardRuleView should have a Tag set that is of type BasicCardRule
+     * @param toggledOn
+     */
     private void onCardRuleToggled(Card card, View cardRuleView, boolean toggledOn){
-        HashMap<View, BasicCardRule> map = this.cardRulesM.get(card);
-        BasicCardRule rule = null;
-        if(map != null){
-            rule = map.get(cardRuleView);
-        }
-        if(map == null || rule == null){
-            Log.w("LobbySettings/onCardRuleToggled", "You triggered a cardRuleToggle for something that wasn't registered");
-            return;
-        }
+        BasicCardRule rule = (BasicCardRule) cardRuleView.getTag();
 
         if(toggledOn) {
             this.rulesContainer.addCardRule(rule, card.getID());
