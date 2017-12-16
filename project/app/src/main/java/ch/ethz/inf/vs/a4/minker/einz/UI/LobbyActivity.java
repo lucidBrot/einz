@@ -12,7 +12,9 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.text.format.Formatter;
 import android.util.ArraySet;
 import android.util.Log;
@@ -424,7 +426,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     }
 
     private void onDefaultRulesToggle(ToggleButton button) {
-        if (button.isChecked()) {
+        toggleDefaultRules(button.isChecked());
+    }
+
+    private void toggleDefaultRules(boolean defaultRulesOn){
+        if(defaultRulesOn){
             this.usingDefaultRules = true;
             setUIToDefaultSettings();
             this.rulesContainer = RulesContainer.getDefaultRulesInstance();
@@ -437,7 +443,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 e.printStackTrace();
             }
         } else {
-
             this.usingDefaultRules = false;
         }
     }
@@ -590,6 +595,14 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 this.rulesContainer.addCardRuleKeepPreviousNumber(cardRule, card.getID());
             }
         }
+    }
+
+    /**
+     * An overly sensitive reaction: whenever a player changed something, he is not using default rules. If he maybe changed something he isn't either.
+     * Hopefully called on all onClick events of the contents of these settings
+     */
+    private void onAnythingMaybeChanged(){
+        toggleDefaultRules(false);
     }
 
     @Override
@@ -1011,11 +1024,34 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 }
                 etParams.setVisibility(View.VISIBLE);
             }
+            etParams.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    onAnythingMaybeChanged();
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+
+                }
+            }); // onAnythingMaybeChanged when this is edited
         }
 
         // load UI looks from current settings
         checkBox.setChecked(this.rulesContainer.containsCardRule(rule.getName(), theCard.getID()));
         //checkBox.setChecked(cardRulesM.get(theCard).contains(rule));//That approach didn't work
+
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                onAnythingMaybeChanged();
+            }
+        });// onAnythingMaybeChanged when this is changed
 
         // TODO: place parameters from default rules also in cardrules ui
 
@@ -1037,6 +1073,22 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
         etNumberOfCards.setSingleLine();
         etNumberOfCards.setInputType(InputType.TYPE_CLASS_NUMBER);
+        etNumberOfCards.addTextChangedListener(new TextWatcher() { // call onAnythingMaybeChanged if this is edited
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                onAnythingMaybeChanged();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        }); // call onAnythingMaybeChanged when the text changes
 
         tvCardID.setText(card.getName());
 
@@ -1055,6 +1107,12 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
         CheckBox checkBox = globalRuleView.findViewById(R.id.cb_global_rule);
         checkBox.setText(rule.getName()); // set description for user
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                onAnythingMaybeChanged();
+            }
+        });
 
         // setting a tag because Chris said this might be useful. Don't know yet for what
         globalRuleView.setTag(rule);
@@ -1074,6 +1132,22 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 // the current usecase for DrawCard rule and StartWithCardsRule
                 EditText etParam = (EditText) globalRuleView.findViewById(R.id.et_global_rule_param);
                 etParam.setSingleLine();
+                etParam.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                        onAnythingMaybeChanged();
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable editable) {
+
+                    }
+                }); // call onAnythingMaybeChanged if this is edited
                 String paramName = paramTypes.keySet().iterator().next(); // just get that one element out of the set
                 ParameterType paramType = paramTypes.get(paramName);
                 if (paramType.equals(ParameterType.NUMBER)) {
