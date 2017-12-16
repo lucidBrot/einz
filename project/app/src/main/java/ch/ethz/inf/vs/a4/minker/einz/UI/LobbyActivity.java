@@ -460,7 +460,31 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     private void saveSettings() {
         // TODO: write settings as profile (that can be loaded again after app restart) to disk?
-        // TODO: write current UI state to rulesContainer
+        Log.w("LobbySettings", "SaveSettings is probable unfinished if this log is still here.");
+        this.rulesContainer = new RulesContainer(); // clear old settings
+
+        for(BasicGlobalRule globalRule : globalRulesM.values()){
+            this.rulesContainer.addGlobalRule(globalRule);
+        }
+
+        for(View view : cardsM.keySet()){
+            Integer num = 0;
+            try {
+                EditText et = (EditText) view.findViewById(R.id.et_number_of_cards);
+                num = (Integer.valueOf((et).getText().toString()));
+            }catch (Exception e){
+                num = 0;
+            }
+            this.rulesContainer.addCard(cardsM.get(view).getID(), num);
+        }
+
+        for(Card card : cardRulesM.keySet()){
+            for(BasicCardRule cardRule : cardRulesM.get(card).values()){
+                // for all cardrules belonging to card, add them
+                this.rulesContainer.addCardRule(cardRule, card.getID()); // TODO: set cardRule params based on the view before storing it
+            }
+        }
+
     }
 
     @Override
