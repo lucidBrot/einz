@@ -30,6 +30,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.SwapHandCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
 /**
@@ -185,7 +186,7 @@ public class ServerFunction implements ServerFunctionDefinition {
             return false;
         } else {
             try {
-                activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
+                activePlayer.removeCardFromHandWhereIDMatches(card);
                 card.setOrigin(player.getName());
                 globalState.addCardToDiscardPile(card);
                 globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
@@ -325,6 +326,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                             numberOfCardsInGame.put(card, 2);
                             allCardsInGame.add(card);
                         }
+
                     }
                     break;
 
@@ -349,6 +351,9 @@ public class ServerFunction implements ServerFunctionDefinition {
                         //assign rules to the cards
                         result.assignRuleToCard(new PlayColorRule(), card);
                         result.assignRuleToCard(new PlayTextRule(), card);
+                        if(ct.equals(CardText.ZERO)){
+                            result.assignRuleToCard(new SwapHandCardRule(), card);
+                        }
                     }
                 }
             } else if (ct != CardText.DEBUG) {

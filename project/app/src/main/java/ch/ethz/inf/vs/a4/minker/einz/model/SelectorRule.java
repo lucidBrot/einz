@@ -2,7 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.model;
 
 import org.json.JSONObject;
 
-import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Created by Josua on 12/4/17.
@@ -16,7 +16,9 @@ public interface SelectorRule {
      * @param state Current game-state.
      * @return A List of choices
      */
-    List<String> getChoices(GlobalState state);
+    ArrayList<String> getChoices(GlobalState state);
+
+    String getSelectionTitle();
 
     GlobalState onPlayAssignedCardChoice(GlobalState state, JSONObject rulePlayParams);
 }

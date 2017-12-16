@@ -58,8 +58,13 @@ public class WishColorRule extends BasicCardRule implements SelectorRule {
     }
 
     @Override
-    public List<String> getChoices(GlobalState state) {
-        List<String> result = new ArrayList<>();
+    public String getSelectionTitle() {
+         return "Choose a color";
+    }
+
+    @Override
+    public ArrayList<String> getChoices(GlobalState state) {
+        ArrayList<String> result = new ArrayList<>();
         for(CardColor color : CardColor.values()){
             result.add(color.name());
         }

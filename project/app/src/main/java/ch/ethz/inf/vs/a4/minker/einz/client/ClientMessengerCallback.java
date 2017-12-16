@@ -309,7 +309,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
-                EinzMessage<EinzDrawCardsSuccessMessageBody> msg2 =msg;
+                EinzMessage<EinzDrawCardsSuccessMessageBody> msg2 = msg;
                 gameUI.onDrawCardsSuccess(msg2);
             }
         };
@@ -381,6 +381,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                     gameUI.setNumCardsInHandOfEachPlayer(numCardsInHandOfEachPlayer);
                     gameUI.setStack(currStack);
                     gameUI.onSendPlayParameters(playParameters);
+                    gameUI.onSendState(message);
 
                     String whoseCurrentTurn = message.getBody().getGlobalstate().getActivePlayer().getName();
                     if(!whoseCurrentTurn.equals(previousPlayer)){

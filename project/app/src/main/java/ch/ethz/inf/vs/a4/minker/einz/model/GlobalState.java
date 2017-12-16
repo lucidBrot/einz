@@ -335,8 +335,8 @@ public class GlobalState {
 
     private void advanceNextPlayer() {
         int playerIndex = 0;
-        for (int i = 0; i < players.size(); i++) {
-            if (players.get(i).player.equals(nextPlayer)) {
+        for(int i=0; i < players.size(); i++){
+            if(players.get(i).player.getName().equals(nextPlayer.getName())){
                 playerIndex = i;
                 break;
             }
