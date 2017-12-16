@@ -438,7 +438,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 e.printStackTrace();
             }
         } else {
-            //TODO: loadUISettingsIntoRulesContainer();
+
             this.usingDefaultRules = false;
         }
     }
@@ -934,7 +934,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         this.cardRulesM.put(card, list);
     }
 
-    private View generateCardRuleViewAndAddToItsPopup(BasicRule rule, View cView, LinearLayout popupList) {
+    private View generateCardRuleViewAndAddToItsPopup(BasicCardRule rule, View cView, LinearLayout popupList) {
         Card theCard = cardsM.get(cView);
 
         CardView cardRuleView = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_settings_cardrule_popup_element, popupList, false);
@@ -959,6 +959,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 etParams.setVisibility(View.VISIBLE);
             }
         }
+
+        // load UI looks from current settings
+        checkBox.setChecked(this.rulesContainer.containsCardRule(rule.getName(), theCard.getID()));
+
+        // TODO: place parameters from default rules also in cardrules
 
         if(popupList!=null) {
             popupList.addView(cardRuleView);

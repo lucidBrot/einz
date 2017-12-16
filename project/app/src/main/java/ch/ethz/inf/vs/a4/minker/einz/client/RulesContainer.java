@@ -17,6 +17,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 public class RulesContainer {
 
     private JSONObject cardRules = new JSONObject();
@@ -381,5 +383,53 @@ public class RulesContainer {
         if(this.cardRules.optJSONObject(cardID).has("number")){
             addCardRule(cardRule, cardID);
         }
+    }
+
+    public boolean containsCardRule(String ruleName, String cardID) {
+        boolean ret = this.cardRules.has(cardID);
+        if(!ret){return false;}
+        JSONArray jrulelist = this.cardRules.optJSONObject(cardID).optJSONArray("rulelist");
+        if(jrulelist==null){return false;}
+        JSONObject jrule = null;
+        for(int i=0; i<jrulelist.length(); i++){
+            jrule = jrulelist.optJSONObject(i);
+            try {
+                if(jrule!=null && jrule.getString("id").equals(ruleName)){
+                    break;
+                } else {
+                    jrule = null;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                jrule = null;
+            }
+        }
+        if(jrule==null){return false;}
+        return  true;
+    }
+
+    public JSONObject getCardRule(String ruleName, String cardID){
+        if(!containsCardRule(ruleName, cardID)){
+            return null;
+        }
+
+        JSONArray jrulelist = this.cardRules.optJSONObject(cardID).optJSONArray("rulelist");
+        if(jrulelist==null){return null;}
+        JSONObject jrule = null;
+        for(int i=0; i<jrulelist.length(); i++){
+            jrule = jrulelist.optJSONObject(i);
+            try {
+                if(jrule!=null && jrule.getString("id").equals(ruleName)){
+                    break;
+                } else {
+                    jrule = null;
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                jrule = null;
+            }
+        }
+        if(jrule==null){return null;}
+        return jrule;
     }
 }
