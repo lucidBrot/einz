@@ -49,8 +49,6 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar.FullScreen" />
         <activity android:name=".UI.SpectatorActivity"
             android:screenOrientation="portrait"/>
-        <activity android:name=".UI.SettingsActivity"
-            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

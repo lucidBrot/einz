@@ -18,7 +18,7 @@
             android:layout_height="match_parent"
             android:background="@color/blue_default"
             android:visibility="gone"
-            tools:context="ch.ethz.inf.vs.a4.minker.einz.UI.SettingsActivity">
+            tools:context="ch.ethz.inf.vs.a4.minker.einz.UI.LobbyActivity">
 
             <Space
                 android:layout_width="0dp"
