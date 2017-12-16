@@ -704,8 +704,19 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             // else wth are you, rule?
         }
 
+        // sort global rules alphabetically
+        ArrayList<View> sortedGlobalRulesKeys = new ArrayList<>(globalRulesM.keySet());
+        Collections.sort(sortedGlobalRulesKeys, new Comparator<View>() {
+            @Override
+            public int compare(View view, View t1) {
+                String v0 = globalRulesM.get(view).getName();
+                String v1 = globalRulesM.get(t1).getName();
+                return v0.compareTo(v1);
+            }
+        });
+
         // display all global rules
-        for(View view : globalRulesM.keySet()){
+        for(View view : sortedGlobalRulesKeys){
             addViewToGlobalRulesViewsList(view);
         }
 
@@ -714,8 +725,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         Collections.sort(cardViews, new Comparator<View>() {
             @Override
             public int compare(View view, View t1) {
-                String id0 = ((Card) cardsM.get(view)).getID();
-                String id1 = ((Card) cardsM.get(t1)).getID();
+                String id0 = ((Card) cardsM.get(view)).getName();
+                String id1 = ((Card) cardsM.get(t1)).getName();
                 return id0.compareTo(id1);
             }
         });
