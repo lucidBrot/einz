@@ -39,10 +39,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Locale;
+import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 
@@ -112,6 +109,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
             // initialize layouts for settings
             globalRuleList = findViewById(R.id.ll_global_rules);
+            cardList = findViewById(R.id.ll_card_rules);
         } else {
             // still display the IP/PORT info so that they can tell their friends
 
@@ -670,6 +668,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private RuleLoader ruleLoader = EinzSingleton.getInstance().getRuleLoader();
     private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
     private LinearLayout globalRuleList; // the list for global rules
+    private LinearLayout cardList;
 
     // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
     // Cards each have one View which has multiple settings, so they are mapped <View, Card>
@@ -680,11 +679,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // TODO: initialize the globalRulesM and cardRulesM and cardsM
 
         // for all cards, store them in cardsM
-//        for (String cardID : cardLoader.getCardIDs()){
-//            View cardView = new generateCardView();
-//            Card card = cardLoader.getCardInstance(cardID);
-//            this.cardsM.put(cardView, card);
-//        }
+        for (String cardID : cardLoader.getCardIDs()){
+            Card card = cardLoader.getCardInstance(cardID);
+            View cardView = generateCardView(card);
+            this.cardsM.put(cardView, card);
+        }
 
         // for all GlobalRules, store them in globalRulesM
         // for all BasicCardRules, store them in every Card-representing view
@@ -695,12 +694,12 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 this.globalRulesM.put(view, (BasicGlobalRule) rule);
             } else if(rule instanceof BasicCardRule){
                 // add cardruleview to all card views
-//                for(View cView : this.cardsM.keySet()){
+                for(View cView : this.cardsM.keySet()){
 //                    Card theCard = this.cardsM.get(cView);
 //                    View cardRuleView = generateCardRuleView(rule, cView, theCard);
 //                    cView.setChildCardRule(cardRuleView);
 //                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
-//                }
+                }
             }
             // else wth are you, rule?
         }
@@ -710,10 +709,49 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             addViewToGlobalRulesViewsList(view);
         }
 
+        // sort card views by card name
+        ArrayList<View> cardViews = new ArrayList<>(this.cardsM.keySet());
+        Collections.sort(cardViews, new Comparator<View>() {
+            @Override
+            public int compare(View view, View t1) {
+                String id0 = ((Card) cardsM.get(view)).getID();
+                String id1 = ((Card) cardsM.get(t1)).getID();
+                return id0.compareTo(id1);
+            }
+        });
+
         // display all card-respective rules
-        for(View cardView : this.cardsM.keySet()){
-//            addViewToCardViewsList(cardView);
+        for(View cardView : cardViews){
+            addViewToCardViewsList(cardView);
+//            setOnClickToShowCardRulesListForThisCard
         }
+    }
+
+    private void addViewToCardViewsList(View cardView) {
+        cardList.addView(cardView);
+    }
+
+    private View generateCardView(Card card) {
+        CardView cardView = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_settings_cardrule_element, cardList, false);
+        TextView tvCardID = (TextView) cardView.findViewById(R.id.tv_card_name);
+        EditText etNumberOfCards = (EditText) cardView.findViewById(R.id.et_number_of_cards);
+        Button btnCardRules = (Button) cardView.findViewById(R.id.btn_card_rules);
+
+        etNumberOfCards.setSingleLine();
+        etNumberOfCards.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        tvCardID.setText(card.getName());
+
+        cardView.setTag(card); // yet to be used
+
+        btnCardRules.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: show cardrule list popup
+            }
+        });
+
+        return cardView;
     }
 
     private void addViewToGlobalRulesViewsList(View view) {
