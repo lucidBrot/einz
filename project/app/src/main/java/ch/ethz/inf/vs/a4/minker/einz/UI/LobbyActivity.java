@@ -1004,6 +1004,14 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
     }
 
+    /**
+     * Feel free to discard the returned view. This methods creates a view for the cardRules popup and loads it in.
+     * You can call this method on every popup load
+     * @param rule
+     * @param cView
+     * @param popupList
+     * @return
+     */
     private View generateCardRuleViewAndAddToItsPopup(BasicCardRule rule, View cView, LinearLayout popupList) {
         Card theCard = cardsM.get(cView);
 
@@ -1027,6 +1035,23 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                     etParams.setInputType(InputType.TYPE_CLASS_TEXT);
                 }
                 etParams.setVisibility(View.VISIBLE);
+
+                BasicCardRule defaultRule = RulesContainer.getDefaultRulesInstance().getCardRule(rule.getName(), theCard.getID(), ruleLoader);
+                if (defaultRule instanceof ParametrizedRule) {
+                    Iterator<String> keys = ((ParametrizedRule) rule).getParameter().keys();
+                    while (keys.hasNext()) {
+                        String key = keys.next();
+                        String r = ((ParametrizedRule) rule).getParameter().optString(key);
+                        String def = ((ParametrizedRule) defaultRule).getParameter().optString(key);
+                        /// this only works when the rule was correctly initialized and the editText as well
+                        // fix idea: check also if edittext string is empty
+                        String ettext = etParams.getText().toString();
+                        if (r.equals(ettext) || ettext.equals("")) {
+
+                            etParams.setText(def);
+                        }
+                    }
+                }
             }
             etParams.addTextChangedListener(new TextWatcher() {
                 @Override

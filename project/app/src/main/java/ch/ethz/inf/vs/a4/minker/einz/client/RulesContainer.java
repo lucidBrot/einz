@@ -9,6 +9,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzSpecifyRulesMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.ParametrizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.*;
@@ -345,6 +346,18 @@ public class RulesContainer {
                     container.addCardRule(new WishColorRule(), cardID);
                     break;
                 }
+                // Debug case to try if loading parameters works for cardrules
+//                case "blue_1":
+//                    try {
+//                        JSONObject drawParam = new JSONObject();
+//                        drawParam.put("Cards to draw", 4);
+//                        BasicCardRule rule = new DrawCardsRule();
+//                        ((ParametrizedRule) rule).setParameter(drawParam);
+//                        Log.e("TEMP", "JSON: "+drawParam);
+//                        container.addCardRule(rule, cardID);
+//                    } catch (JSONException e){
+//                        e.printStackTrace();
+//                    }
                 default: {
                     container.addCardRule(new PlayColorRule(), cardID);
                     container.addCardRule(new PlayTextRule(), cardID);
@@ -408,7 +421,15 @@ public class RulesContainer {
         return  true;
     }
 
-    public JSONObject getCardRule(String ruleName, String cardID){
+    /**
+     * returns null if not found, otherwise a new instance of the rule you wanted, but with the right parameters.
+     * Make sure the ruleLoader you provide is initialized with that rule - otherwise this method will also return null.
+     * @param ruleName
+     * @param cardID
+     * @param ruleLoader
+     * @return
+     */
+    public BasicCardRule getCardRule(String ruleName, String cardID,RuleLoader ruleLoader){
         if(!containsCardRule(ruleName, cardID)){
             return null;
         }
@@ -416,10 +437,12 @@ public class RulesContainer {
         JSONArray jrulelist = this.cardRules.optJSONObject(cardID).optJSONArray("rulelist");
         if(jrulelist==null){return null;}
         JSONObject jrule = null;
+        String name = null;
         for(int i=0; i<jrulelist.length(); i++){
             jrule = jrulelist.optJSONObject(i);
             try {
-                if(jrule!=null && jrule.getString("id").equals(ruleName)){
+                name = jrule.getString("id");
+                if(jrule!=null && name.equals(ruleName)){
                     break;
                 } else {
                     jrule = null;
@@ -430,6 +453,22 @@ public class RulesContainer {
             }
         }
         if(jrule==null){return null;}
-        return jrule;
+
+        if(!ruleLoader.getRulesNames().contains(name)){return null;}
+
+        BasicCardRule rule = (BasicCardRule) ruleLoader.getInstanceOfRule(name);
+        JSONObject params = jrule.optJSONObject("parameters");
+        if(rule instanceof ParametrizedRule && params!=null){
+            try {
+                ((ParametrizedRule) rule).setParameter(params);
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.w("RulesContainer", "failed to get you a cardrule of type "+name);
+                return null;
+            }
+        }
+
+        return rule;
+
     }
 }
