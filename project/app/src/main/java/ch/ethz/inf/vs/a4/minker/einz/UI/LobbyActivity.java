@@ -799,6 +799,10 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     // The reason we use rule instances is that you can set parameters on them.
 
     private void initialiseMappingFromViewToRules() {
+        // remove all views from the settings part
+        globalRuleList.removeAllViews();
+        cardList.removeAllViews();
+
 
         // for all cards, store them in cardsM
         for (String cardID : cardLoader.getCardIDs()){
