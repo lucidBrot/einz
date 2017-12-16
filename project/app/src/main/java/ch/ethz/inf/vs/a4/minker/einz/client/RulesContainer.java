@@ -346,7 +346,8 @@ public class RulesContainer {
                     container.addCardRule(new WishColorRule(), cardID);
                     break;
                 }
-                // Debug case to try if loading parameters works for cardrules
+//                // Debug case to try if loading parameters works for cardrules
+//                // fall-through case
 //                case "blue_1":
 //                    try {
 //                        JSONObject drawParam = new JSONObject();

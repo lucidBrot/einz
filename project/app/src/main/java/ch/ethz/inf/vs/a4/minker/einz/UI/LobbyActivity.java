@@ -1043,6 +1043,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                         String key = keys.next();
                         String r = ((ParametrizedRule) rule).getParameter().optString(key);
                         String def = ((ParametrizedRule) defaultRule).getParameter().optString(key);
+                        Integer def2 = ((ParametrizedRule) defaultRule).getParameter().optInt(key);
+                        //Log.e("TEMP", "DOES BOTH WORK? \t  "+def+" , "+def2);
                         /// this only works when the rule was correctly initialized and the editText as well
                         // fix idea: check also if edittext string is empty
                         String ettext = etParams.getText().toString();
