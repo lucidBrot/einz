@@ -673,7 +673,7 @@ See [Card](#card) for more info!
   },
   "body":{
     "globalstate":{
-      "numcardsinhand":[
+      "numCardsInHand":[
         {"name":"Eric", "handSize":"3"},
         {"name":"Rip","handSize":"100"},
         {"name":"Ric","handSize":"2"}
@@ -682,9 +682,9 @@ See [Card](#card) for more info!
         {"ID":"cardID01", "origin":"~talon"},
         {"ID":"cardID1337", "origin":"Rip"}
       ],
-      "whoseturn":"Ric",
-      "drawxcardsmin":"2",
-      "playParameters":{
+      "activePlayer":"Ric",
+      "cardsToDraw":"2",
+      "lastPlayParameters":{
         "Wish Color":{"wishForColor":"blue"},
         "ruleDank":{"xXx":"1337"}
       }
@@ -812,29 +812,33 @@ See [Card](#card) for more info!
 
 ```json
 {
-  "globalstate":{
-    "numcardsinhand":[
+   "globalstate":{
+      "numCardsInHand":[
         {"name":"Eric", "handSize":"3"},
         {"name":"Rip","handSize":"100"},
         {"name":"Ric","handSize":"2"}
       ],
-    "stack":[
-      {"ID":"cardID01", "origin":"~talon"},
-      {"ID":"cardID1337", "origin":"Rip"}
-    ],
-    "whoseturn":"Ric",
-    "drawxcardsmin":"2"
-  },
+      "stack":[
+        {"ID":"cardID01", "origin":"~talon"},
+        {"ID":"cardID1337", "origin":"Rip"}
+      ],
+      "activePlayer":"Ric",
+      "cardsToDraw":"2",
+      "lastPlayParameters":{
+        "Wish Color":{"wishForColor":"blue"},
+        "ruleDank":{"xXx":"1337"}
+      }
+    },
   "playerstate":{
     "hand":[
       {"ID":"cardID03", "origin":"Eric"}
     ],
   "possibleactions":
-        [
-          {"actionName":"leaveGame","parameters":{}},
-          {"actionName":"drawCards", "parameters":{}},
-          {"actionName":"playCard", "parameters":{"playableCards":["cardID1", "cardID1337"]}}
-        ]
+    [
+      {"actionName":"leaveGame","parameters":{}},
+      {"actionName":"drawCards", "parameters":{}},
+      {"actionName":"playCard", "parameters":{"playableCards":["cardID1", "cardID1337"]}}
+    ]
   }
 }
 ```

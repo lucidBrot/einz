@@ -667,16 +667,17 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     private void showSelector(String title, Map<String, String> choices, String ruleName) {
         ArrayList<String> values = new ArrayList<>();
-        ArrayList<String> keys = new ArrayList<>();
-        for (String key : choices.keySet()) {
-            keys.add(key);
-            values.add(choices.get(key));
+
+        ArrayList<String> text = new ArrayList<>();
+        for(String key : choices.keySet()){
+            values.add(key);
+            text.add(choices.get(key));
         }
 
         selector = new SelectorFragment();
         Bundle arguments = new Bundle();
         arguments.putString(SelectorFragment.TITLE_KEY, title);
-        arguments.putStringArrayList(SelectorFragment.CHOICE_LIST_TEXT, keys);
+        arguments.putStringArrayList(SelectorFragment.CHOICE_LIST_TEXT, text);
         arguments.putStringArrayList(SelectorFragment.CHOICE_LIST_VALUES, values);
         arguments.putString(SelectorFragment.RULE_NAME, ruleName);
         selector.setArguments(arguments);
@@ -815,7 +816,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void goBackToMainMenu() {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK );
         startActivity(intent);
+        finish();
     }
 
     @Override
