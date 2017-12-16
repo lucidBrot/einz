@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.text.InputType;
 import android.text.format.Formatter;
+import android.util.ArraySet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -721,7 +722,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             this.cardRulesM.put(card, new HashMap<View, BasicCardRule>());
         }
 
-        ArrayList<BasicCardRule> allCardRules = new ArrayList<>();
+        android.support.v4.util.ArraySet<BasicCardRule> allCardRules = new android.support.v4.util.ArraySet<>();
 
         // for all GlobalRules, store them in globalRulesM
         // for all BasicCardRules, store them in every Card-representing view
@@ -776,23 +777,25 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             // prepare for RULES popup
             Button btnCardRules = cardView.findViewById(R.id.btn_card_rules);
             final Card card = cardsM.get(cardView);
-            final ArrayList<BasicCardRule> allCardRulesf = allCardRules;
+            final  android.support.v4.util.ArraySet<BasicCardRule> allCardRulesf = allCardRules;
             btnCardRules.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                         // TODO: show popup for cardrules
                     Log.w("LobbySettings", "popup not yet coded");
                     //
-                    final LinearLayout myPopupLL = (LinearLayout) LayoutInflater.from(LobbyActivity.this).inflate(R.layout.linearlayout_settings_cardrule_popup, (LinearLayout) findViewById(R.id.ll_card_popup_settingsframe), false);
+                    final LinearLayout myPopupLL = (LinearLayout) LayoutInflater.from(LobbyActivity.this).inflate(R.layout.linearlayout_settings_cardrule_popup, (LinearLayout) findViewById(R.id.ll_settingsframe), false);
+                    final LinearLayout settingsFrame = ((LinearLayout) findViewById(R.id.ll_card_popup_settingsframe));
+                    final LinearLayout popupContainer = myPopupLL.findViewById(R.id.ll_popup_container);
 
                     for(BasicCardRule cardRule : allCardRulesf){
-                        generateCardRuleViewAndAddToItsPopup(cardRule, cardView, myPopupLL);
+                        generateCardRuleViewAndAddToItsPopup(cardRule, cardView, popupContainer);
                     }
 
                     // show popup
-                    final LinearLayout settingsFrame = ((LinearLayout) findViewById(R.id.ll_card_popup_settingsframe));
                     settingsFrame.addView(myPopupLL);
                     settingsFrame.setVisibility(View.VISIBLE);
+
                     settingsFrame.findViewById(R.id.btn_save_cardrule_popup).setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -806,10 +809,10 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
     }
 
-    private View generateCardRuleViewAndAddToItsPopup(BasicRule rule, View cView, LinearLayout myPopupLL) {
+    private View generateCardRuleViewAndAddToItsPopup(BasicRule rule, View cView, LinearLayout popupList) {
         Card theCard = cardsM.get(cView);
 
-        CardView cardRuleView = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_settings_cardrule_popup_element, myPopupLL, false);
+        CardView cardRuleView = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_settings_cardrule_popup_element, popupList, false);
 
         CheckBox checkBox = (CheckBox) cardRuleView.findViewById(R.id.cb_card_rule);
         checkBox.setText(rule.getName());
@@ -831,8 +834,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             }
         }
 
-        if(myPopupLL!=null) {
-            myPopupLL.addView(cardRuleView);
+        if(popupList!=null) {
+            popupList.addView(cardRuleView);
         }
         return cardRuleView;
     }
