@@ -486,7 +486,24 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             }
         }
 
-        // TODO: reset cardrule view on popup show.
+
+        /* //that doesn't work... changing the popup loader now so that it always sets the current rules of the rulesContainer
+        // cardrules will always display what currently is set in the cardRulesM
+        // the below code is copypasted and modified from the initialization
+        // for all cards, store them in cardsM
+        for (String cardID : cardLoader.getCardIDs()){
+            Card card = cardLoader.getCardInstance(cardID);
+            View cardView = generateCardView(card);
+            this.cardsM.put(cardView, card);
+            ArrayList<BasicCardRule> list = new ArrayList<>();
+            for(String ruleName : ruleLoader.getRulesNames()){
+                if(this.rulesContainer.containsCardRule(ruleName, cardID)){
+                    list.add((BasicCardRule) ruleLoader.getInstanceOfRule(ruleName));
+                }
+            }
+            this.cardRulesM.put(card, list);
+        }
+        */
     }
 
 
@@ -802,6 +819,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // remove all views from the settings part
         globalRuleList.removeAllViews();
         cardList.removeAllViews();
+        cardsM.clear();
+        cardRulesM.clear();
+        globalRulesM.clear();
 
 
         // for all cards, store them in cardsM
@@ -904,6 +924,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 }
             });
         }
+
+        // initialize looks with default rules
+        setUIToDefaultSettings();
     }
 
     /**
@@ -936,6 +959,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             }
         }
         this.cardRulesM.put(card, list);
+
+        // store also in the current container. It will be overwritten in the end, but is used in the meantime to load rule settings for cardrules
+        for(BasicCardRule rule : list) {
+            this.rulesContainer.addCardRule(rule, card.getID());
+        }
     }
 
     private View generateCardRuleViewAndAddToItsPopup(BasicCardRule rule, View cView, LinearLayout popupList) {
@@ -966,8 +994,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
         // load UI looks from current settings
         checkBox.setChecked(this.rulesContainer.containsCardRule(rule.getName(), theCard.getID()));
+        //checkBox.setChecked(cardRulesM.get(theCard).contains(rule));//That approach didn't work
 
-        // TODO: place parameters from default rules also in cardrules
+        // TODO: place parameters from default rules also in cardrules ui
 
         if(popupList!=null) {
             popupList.addView(cardRuleView);
