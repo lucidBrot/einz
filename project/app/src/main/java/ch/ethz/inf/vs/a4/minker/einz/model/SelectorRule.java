@@ -20,5 +20,7 @@ public interface SelectorRule {
 
     String getSelectionTitle();
 
+
+
     GlobalState onPlayAssignedCardChoice(GlobalState state, JSONObject rulePlayParams);
 }

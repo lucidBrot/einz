@@ -14,5 +14,5 @@
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.SkipRule",
   "ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountNumberOfCardsAsPoints",
   "ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountRankFinishedAsPoints",
-  "ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.SwapHandCardRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.SwapHandCardRule"
 ]

@@ -66,6 +66,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobby
 import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.model.SelectorRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
+import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WishColorRule;
 
 import java.util.ArrayList;
@@ -1040,7 +1041,12 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     private boolean isValidColor(String inColor) {
         inColor = inColor.toUpperCase();
-        return inColor.equals("BLUE") || inColor.equals("GREEN") || inColor.equals("YELLOW") || inColor.equals("RED");
+        for(CardColor color : CardColor.values()){
+            if(color.color.equals(inColor)){
+                return true;
+            }
+        }
+        return false;//   inColor.equals("BLUE") || inColor.equals("GREEN") || inColor.equals("YELLOW") || inColor.equals("RED");
     }
 
     class DragCardListener implements View.OnTouchListener {
