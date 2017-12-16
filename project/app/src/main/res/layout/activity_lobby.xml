@@ -43,77 +43,77 @@
                     android:textOn="use custom settings" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_weight="3"
-                    android:background="@drawable/button_red"
-                    android:orientation="vertical"
-                    android:padding="5dp">
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="3"
+                        android:background="@drawable/button_red"
+                        android:orientation="vertical"
+                        android:padding="5dp" android:id="@+id/ll_settings_global_rules">
 
                     <TextView
-                        android:id="@+id/textView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Global Rules"
-                        android:textAlignment="center"
-                        android:textColor="@color/red_darker"
-                        android:textSize="18sp" />
+                            android:id="@+id/textView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Global Rules"
+                            android:textAlignment="center"
+                            android:textColor="@color/red_darker"
+                            android:textSize="18sp"/>
 
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/button_orange"
-                        android:orientation="vertical">
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/button_orange"
+                            android:orientation="vertical">
 
                         <ScrollView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
 
                             <LinearLayout
-                                android:id="@+id/ll_global_rules"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical" />
+                                    android:id="@+id/ll_global_rules"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"/>
                         </ScrollView>
                     </LinearLayout>
 
                 </LinearLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginTop="10dp"
-                    android:layout_weight="3"
-                    android:background="@drawable/button_red"
-                    android:orientation="vertical"
-                    android:padding="5dp">
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="3"
+                        android:background="@drawable/button_red"
+                        android:orientation="vertical"
+                        android:padding="5dp" android:id="@+id/ll_settings_cards">
 
                     <TextView
-                        android:id="@+id/textView2"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Card Rules"
-                        android:textAlignment="center"
-                        android:textColor="@color/red_darker"
-                        android:textSize="18sp" />
+                            android:id="@+id/textView2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Card Rules"
+                            android:textAlignment="center"
+                            android:textColor="@color/red_darker"
+                            android:textSize="18sp"/>
 
                     <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/button_orange"
-                        android:orientation="vertical">
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/button_orange"
+                            android:orientation="vertical">
 
                         <ScrollView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent">
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent">
 
                             <LinearLayout
-                                android:id="@+id/ll_card_rules"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical" />
+                                    android:id="@+id/ll_card_rules"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"/>
                         </ScrollView>
                     </LinearLayout>
 

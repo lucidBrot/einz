@@ -438,6 +438,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         } else {
             // TODO: grey out disabled options when isChecked and enable again when Checked
             //loadUISettingsIntoRulesContainer();
+
         }
     }
 
@@ -489,7 +490,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             }catch (Exception e){
                 num = 0;
             }
-            this.rulesContainer.addCard(cardsM.get(view).getID(), num);
+            if(num!=0){this.rulesContainer.addCard(cardsM.get(view).getID(), num);} // only send cards that make sense to send
+            else {this.rulesContainer.removeCard(cardsM.get(view).getID());} // if 0 make sure the card is not set
         }
 
         for(Card card : cardRulesM.keySet()){
