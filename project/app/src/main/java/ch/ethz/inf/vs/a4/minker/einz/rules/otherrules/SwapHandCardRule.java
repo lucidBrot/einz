@@ -35,11 +35,13 @@ public class SwapHandCardRule extends BasicCardRule implements SelectorRule {
     @Override
     public Map<String, String> getChoices(GlobalState state) {
         Map<String, String> result = new LinkedHashMap<>();
-        result.put("Don't swap", "Don't swap");
+        result.put("~keep", "Don't swap");
         HashMap<String, Integer> players = state.getPlayerHandSizeOrdered();
         for(String player : players.keySet()){
             if(!player.equals(state.getActivePlayer().getName())){
                 result.put(player, player + " (" + players.get(player) + " Cards)");
+            } else {
+                result.put("~keep", "Don't swap (" + players.get(player) + " Cards)" );
             }
         }
         return result;
