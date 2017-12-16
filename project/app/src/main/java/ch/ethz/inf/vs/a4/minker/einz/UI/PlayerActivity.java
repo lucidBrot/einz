@@ -47,6 +47,7 @@ import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterRequestMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
@@ -274,8 +275,25 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        disconnect();
+        goBackToMainMenu();
         // TODO: directly stop server and client
         //      currently, back only takes the user to the LobbyActivity, where they have to press back again.
+    }
+
+    private void disconnect() {
+        this.backgroundHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                EinzUnregisterRequestMessageBody body = new EinzUnregisterRequestMessageBody(ourClient.getUsername());
+                EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterRequest");
+                try {
+                    ourClient.getConnection().sendMessage(new EinzMessage<>(header, body));
+                } catch (SendMessageFailureException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private int calculateNewIndex(GridLayout gl, float x, float y) {
@@ -669,7 +687,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         ArrayList<String> values = new ArrayList<>();
 
         ArrayList<String> text = new ArrayList<>();
-        for(String key : choices.keySet()){
+        for (String key : choices.keySet()) {
             values.add(key);
             text.add(choices.get(key));
         }
@@ -816,7 +834,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     public void goBackToMainMenu() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK );
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
     }
@@ -828,7 +846,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message) {
-
+        goBackToMainMenu();
     }
 
     @Override
@@ -886,7 +904,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         LinearLayout endscreen = findViewById(R.id.ll_endscreen);
         endscreen.setVisibility(View.VISIBLE);
         HashMap<String, String> playerPoints = message.getBody().getPoints();
-
+        Log.e("Test", "points" + message.getBody().getPoints());
         String winner = "MissingNo";
         int winnerPoints = Integer.MAX_VALUE;
         for (String player : allPlayers) {
@@ -902,33 +920,36 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             // set text
             tv_username.setText(player);
             String points = playerPoints.get(player);
-            int intPoints = Integer.parseInt(points);
-            tv_points.setText(playerPoints.get(player));
-            usercard.setTag(intPoints);
+            if (points != null) {
+                int intPoints = Integer.parseInt(points);
+                tv_points.setText(playerPoints.get(player));
+                usercard.setTag(intPoints);
 
-            if(intPoints < winnerPoints){
-                winner = player;
-                winnerPoints = intPoints;
-            }
-
-            // add view
-            //winningPlayers.addView(usercard);
-            if(winningPlayers.getChildCount() > 0) {
-                for (int i = 0; i < winningPlayers.getChildCount(); i++) {
-                    View v = winningPlayers.getChildAt(i);
-                    if (intPoints < (int) v.getTag()) {
-                        winningPlayers.addView(usercard, i);
-                        break;
-                    } else if (i == winningPlayers.getChildCount() - 1) {
-                        winningPlayers.addView(usercard);
-                        break;
-                    }
+                if (intPoints < winnerPoints) {
+                    winner = player;
+                    winnerPoints = intPoints;
                 }
-            } else {
-                winningPlayers.addView(usercard);
+
+
+                // add view
+                //winningPlayers.addView(usercard);
+                if (winningPlayers.getChildCount() > 0) {
+                    for (int i = 0; i < winningPlayers.getChildCount(); i++) {
+                        View v = winningPlayers.getChildAt(i);
+                        if (intPoints < (int) v.getTag()) {
+                            winningPlayers.addView(usercard, i);
+                            break;
+                        } else if (i == winningPlayers.getChildCount() - 1) {
+                            winningPlayers.addView(usercard);
+                            break;
+                        }
+                    }
+                } else {
+                    winningPlayers.addView(usercard);
+                }
             }
         }
-        ((TextView)findViewById(R.id.tv_winner)).setText(winner + " won!");
+        ((TextView) findViewById(R.id.tv_winner)).setText(winner + " won!");
 
     }
 
@@ -1064,6 +1085,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onKeepaliveTimeout() {
+        goBackToMainMenu();
         // TODO: what to do when lost connection? probably return to main menu
     }
 

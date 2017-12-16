@@ -36,10 +36,6 @@ public class EinzClient implements Runnable {
     private boolean dead;
     public KeepaliveScheduler keepaliveScheduler;
 
-    public String getUsername() {
-        return username;
-    }
-
     private String username;
     private String role;
     private double orientation = 0;
@@ -151,6 +147,11 @@ public class EinzClient implements Runnable {
     public EinzClientConnection getConnection() {
         return connection;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
 
     public ClientActionCallbackInterface getActionCallbackInterface() {
         return actionCallbackInterface;

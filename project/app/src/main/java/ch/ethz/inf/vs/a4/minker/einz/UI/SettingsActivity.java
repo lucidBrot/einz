@@ -12,7 +12,10 @@ import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.RulesContainer;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
+
 import java.util.ArrayList;
 @Deprecated
 public class SettingsActivity extends FullscreenActivity implements View.OnClickListener, LobbyUIInterface {
@@ -77,6 +80,11 @@ public class SettingsActivity extends FullscreenActivity implements View.OnClick
 
     @Override
     public void onKeepaliveTimeout() {
+
+    }
+
+    @Override
+    public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message) {
 
     }
 

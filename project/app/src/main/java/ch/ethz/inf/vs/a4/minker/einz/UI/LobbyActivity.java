@@ -30,6 +30,10 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.*;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
@@ -86,6 +90,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     // Q: what if the host is not the first user to connect? stop server and restart?
     // A: No. the host is almost the first to connect unless somebody is able to pinpoint very exactly when to connect,
     //    because the server tells the host client that it needs to connect
+
+    private boolean inSettingMode = false;
 
 
     @Override
@@ -440,12 +446,14 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         findViewById(R.id.ll_lobbyframe).setVisibility(View.GONE);
         findViewById(R.id.ll_settingsframe).setVisibility(View.VISIBLE);
         initialiseMappingFromViewToRules();
+        inSettingMode = true;
     }
 
     public void onSettingsSaveClick() {
         saveAndSend();
         findViewById(R.id.ll_settingsframe).setVisibility(View.GONE);
         findViewById(R.id.ll_lobbyframe).setVisibility(View.VISIBLE);
+        inSettingMode = false;
     }
 
     private void saveAndSend() {
@@ -492,11 +500,29 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        cleanupActivity();
+        //super.onBackPressed();
+        if(!inSettingMode) {
+            cleanupActivity();
+            super.onBackPressed();
+        } else {
+            onSettingsSaveClick();
+        }
         //TODO @Eric/@Chris Check if in SettingsState or LobbyState and do SaveAndGoBack if in SettingsState
     }
 
+    @Override
+    public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message) {
+        if(!host) {
+            goBackToMainMenu();
+        }
+    }
+
+    public void goBackToMainMenu() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
 
     @Override
     public void onResume() {

@@ -284,8 +284,10 @@ public class ServerFunction implements ServerFunctionDefinition {
      */
     public void removePlayer(Player player) {
         globalState.removePlayer(player);
-        if (globalState.getPlayersOrdered().size() < 1) {
+        if (globalState.getPlayersOrdered().size() <= 1) {
             endGame();
+        } else {
+            onChange();
         }
     }
 

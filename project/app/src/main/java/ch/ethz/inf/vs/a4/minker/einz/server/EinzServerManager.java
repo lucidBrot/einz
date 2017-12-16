@@ -460,6 +460,9 @@ public class EinzServerManager {
                 SFLock.writeLock().lock();
                 if(role.equals("player")) {
                     serverFunctionInterface.removePlayer(new Player(username));
+                    if(getAdminUsername().equals(username)){
+                        server.shutdown();
+                    }
                 } else if(role.equals("specator")){
                     // could inform fabian but he doesn't care
                 }

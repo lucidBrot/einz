@@ -172,7 +172,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
     }
 
     @Override
-    public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message){
+    public void onUnregisterResponse(final EinzMessage<EinzUnregisterResponseMessageBody> message){
         EinzUnregisterResponseMessageBody body = message.getBody();
         final String username = body.getUsername();
         final String reason = body.getReason();
@@ -190,7 +190,13 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
                     if(username.equals(parentClient.getUsername())){
                         parentClient.shutdown(false);
                         Toast.makeText(applicationContext, "You have been disconnected. Reason: "+reason, Toast.LENGTH_LONG).show();
-                        onKeepaliveTimeout(); // TODO: give this a less toasty feeling
+                        //onKeepaliveTimeout(); // TODO: give this a less toasty feeling
+                        if(lobbyUI!=null){
+                            lobbyUI.onUnregisterResponse(message);
+                        }
+                        if(gameUI!=null){
+                            gameUI.onUnregisterResponse(message);
+                        }
 
                     } else {
                         Toast.makeText(applicationContext, username+" has been disconnected. Reason: "+reason, Toast.LENGTH_LONG).show();

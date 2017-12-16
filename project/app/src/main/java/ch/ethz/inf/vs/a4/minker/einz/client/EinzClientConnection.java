@@ -146,7 +146,9 @@ public class EinzClientConnection implements Runnable, SendMessageCallback {
                         mMessageListener.messageReceived(mServerMessage);
                     } else {
                         // not sure when this would happen
+                        // When server dies this happens
                         Log.w("EinzClientConnection", "UNEXPECTED: message or listener was null. Stopping client.");
+                        this.parentClient.getActionCallbackInterface().onKeepaliveTimeout();
                         stopClient();
                     }
                 }

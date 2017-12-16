@@ -312,6 +312,9 @@ public class GlobalState {
                 break;
             }
         }
+        if (activePlayer.getName().equals(player.getName())) {
+            nextTurn();
+        }
         if (nextPlayer.getName().equals(player.getName())) {
             advanceNextPlayer();
         }
@@ -329,6 +332,9 @@ public class GlobalState {
                 players.remove(container);
                 break;
             }
+        }
+        if (activePlayer.getName().equals(player.getName())) {
+            nextTurn();
         }
         if (nextPlayer.getName().equals(player.getName())) {
             advanceNextPlayer();
