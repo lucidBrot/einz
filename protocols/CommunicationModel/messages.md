@@ -684,7 +684,7 @@ See [Card](#card) for more info!
       ],
       "whoseturn":"Ric",
       "drawxcardsmin":"2",
-      "playParameters":{
+      "lastPlayParameters":{
         "Wish Color":{"wishForColor":"blue"},
         "ruleDank":{"xXx":"1337"}
       }
