@@ -6,7 +6,6 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 
 /**
  * Created by Fabian on 11.12.2017.
- * @Josua: If you have different rules in mind for the rules.defaultrules, feel free to change this
  */
 
 public class NextTurnRule2 extends BasicGlobalRule {

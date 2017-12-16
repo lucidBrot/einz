@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -48,13 +50,15 @@ public interface GameUIInterface {
 
     void onInitGame(EinzMessage<EinzInitGameMessageBody> message);
 
-    void setNumCardsInHandOfEachPlayer(HashMap<String ,String> numCardsInHandOfEachPlayer);
+    void setNumCardsInHandOfEachPlayer(HashMap<String ,Integer> numCardsInHandOfEachPlayer);
 
     void onUpdateLobbyList(String admin, ArrayList<String> players, ArrayList<String> spectators);
 
     void setStack(ArrayList<Card> stack);
 
     void onKeepaliveTimeout();
+
+    void onSendPlayParameters(JSONObject playParameters);
 
     // TODO: customActionRule..?
 }

@@ -6,6 +6,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
 
 /**
  * Created by Josua on 11/24/17.
+ * There exists a parametrized version of this (DrawCardsRule)
  */
 
 public class DrawTwoCardsRule extends BasicCardRule {

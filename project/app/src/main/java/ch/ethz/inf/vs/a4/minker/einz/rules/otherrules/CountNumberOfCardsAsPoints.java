@@ -23,19 +23,27 @@ public class CountNumberOfCardsAsPoints extends BasicGlobalRule {
      * Called after a player satisfies a winning condition
      *
      * @param state
+     * @return
+     */
+    @Override
+    public GlobalState onGameOver(GlobalState state) {
+        for(Player p : state.getAllPlayers()){
+            state.setPointsForPlayer(p.getName(), p.hand.size());
+        }
+        return state;
+    }
+
+    /**
+     * Called after a player satisfies a winning condition.
+     * Ends the game.
+     *
+     * @param state
      * @param player The Player that has finished
      * @return
      */
     @Override
     public GlobalState onPlayerFinished(GlobalState state, Player player) {
         state.finishGame();
-        for(Player p : state.getPlayersOrdered()){
-            int i = 0;
-            for(Card c : p.hand){
-                i++;
-            }
-            state.getPointMapping().put(p.getName(), i);
-        }
         return state;
     }
 
