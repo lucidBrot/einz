@@ -427,6 +427,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private void onDefaultRulesToggle(ToggleButton button) {
         if(button.isChecked()){
             this.usingDefaultRules = true;
+            setUIToDefaultSettings();
             this.rulesContainer = RulesContainer.getDefaultRulesInstance();
             try {
                 String msg = this.rulesContainer.toMessage().getBody().toJSON().toString();
@@ -440,6 +441,52 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             //TODO: loadUISettingsIntoRulesContainer();
             this.usingDefaultRules = false;
         }
+    }
+
+    private void setUIToDefaultSettings() {
+        // cardsM should be unchanged and contain all cards
+        // globalRulesM should be unchanged and contains all globalRules
+        // cardRulesM is only changed in the end of the popup so we do not need to re-set this as long as we re-set the UI
+        RulesContainer container = RulesContainer.getDefaultRulesInstance();
+
+        // set card numbers to default
+        for (View view : cardsM.keySet()){
+            EditText et = view.findViewById(R.id.et_number_of_cards);
+            if(et!=null){
+                et.setText(String.valueOf(container.getNumberOfCards(cardsM.get(view).getID())));
+            }
+        }
+
+        // check global rules as default
+        for (View view : globalRulesM.keySet()){
+            BasicGlobalRule rule = globalRulesM.get(view);
+            BasicGlobalRule defaultRule = container.getGlobalRule(rule.getName());
+            if(defaultRule==null){
+                ((CheckBox) view.findViewById(R.id.cb_global_rule)).setChecked(false);
+            } else {
+                ((CheckBox) view.findViewById(R.id.cb_global_rule)).setChecked(true);
+                // show default parameters
+                try {
+                    EditText et = view.findViewById(R.id.et_global_rule_param);
+                    if (et != null && rule instanceof ParametrizedRule && defaultRule instanceof ParametrizedRule) {
+                        Iterator<String> keys = ((ParametrizedRule) rule).getParameter().keys();
+                        while (keys.hasNext()) {
+                            String key = keys.next();
+                            String r = ((ParametrizedRule) rule).getParameter().optString(key);
+                            String def = ((ParametrizedRule) defaultRule).getParameter().optString(key);
+                            if (r.equals(et.getText().toString())) {
+                                et.setText(def);
+                            }
+                        }
+                    }
+                } catch (Exception e){
+                    Toast.makeText(this, "resetting UI to default rules failed", Toast.LENGTH_SHORT).show();
+                    Log.w("LobbySettings", "Failed to load parameters for rule while fitting UI to default rules");
+                }
+            }
+        }
+
+        // TODO: reset cardrule view on popup show.
     }
 
 
@@ -737,9 +784,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     // SETTINGS Variables
     private RulesContainer rulesContainer = new RulesContainer();
-    private HashMap<View, BasicGlobalRule> globalRulesM = new HashMap<>(); // contains the rules that can be reused by the UI
-    private HashMap<View, Card> cardsM = new HashMap<>(); // contains the rules that can be reused by the UI
-    private HashMap<Card, ArrayList<BasicCardRule>> cardRulesM = new HashMap<>(); // contains the cardRules which correspond to specific cards
+    private HashMap<View, BasicGlobalRule> globalRulesM = new HashMap<>(); // contains the rules that can be reused by the UI. Never changed after initialization
+    private HashMap<View, Card> cardsM = new HashMap<>(); // contains the rules that can be reused by the UI. Never changed after initialization
+    private HashMap<Card, ArrayList<BasicCardRule>> cardRulesM = new HashMap<>(); // contains the cardRules which correspond to specific cards. Changed after every popup close
     private RuleLoader ruleLoader = EinzSingleton.getInstance().getRuleLoader();
     private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
     private LinearLayout globalRuleList; // the list for global rules

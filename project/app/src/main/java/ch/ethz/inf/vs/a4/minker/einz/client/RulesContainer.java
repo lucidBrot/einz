@@ -42,6 +42,42 @@ public class RulesContainer {
     }
 
     /**
+     * Highly inefficient.
+     * @return a new instance with the parameters as set here or null if not set at all
+     */
+    public synchronized BasicGlobalRule getGlobalRule(String ruleName){
+        int i = 0;
+        JSONObject ruleObj = globalRules.optJSONObject(i);
+        String id;
+        if(ruleObj!=null)id = ruleObj.optString("id"); else {return null;}
+
+        while (ruleObj != null && !id.equals(ruleName)) {
+            if (id.equals(ruleName)) {
+                break;
+            }
+            i++;
+            ruleObj = globalRules.optJSONObject(i);
+            if(ruleObj!=null) {id = ruleObj.optString("id");} else {break;}
+        }
+        if(ruleObj!=null){
+            // found id at index i
+            BasicGlobalRule rule = (BasicGlobalRule) EinzSingleton.getInstance().getRuleLoader().getInstanceOfRule(id);
+            JSONObject params = ruleObj.optJSONObject("parameters");
+            if(params!=null && rule instanceof ParametrizedRule && rule != null){
+                try {
+                    ((ParametrizedRule) rule).setParameter(params);
+                } catch (JSONException e) {
+                    Log.e("RulesContainer", "failed setting rule parameters"+ params.toString());
+                    e.printStackTrace();
+                }
+            }
+            return rule;
+        }
+
+        return null;
+    }
+
+    /**
      * Removes the first rule with equivalent content to <code>rule</code>
      *
      * @return false if not found, true if removed
@@ -91,6 +127,17 @@ public class RulesContainer {
         rulelist.put(ruleToJSON(rule));
         if (!someCardID.has("number")) {
             setNumberOfCards(cardID, "1");
+        }
+    }
+
+    public synchronized int getNumberOfCards(String cardID){
+        if (!cardRules.has(cardID)) {
+            return 0;
+        }
+        try {
+            return cardRules.getJSONObject(cardID).getInt("number");
+        } catch (JSONException e) {
+            return 0;
         }
     }
 
