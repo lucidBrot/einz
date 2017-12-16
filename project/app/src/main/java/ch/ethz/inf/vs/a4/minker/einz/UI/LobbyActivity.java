@@ -721,6 +721,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             this.cardRulesM.put(card, new HashMap<View, BasicCardRule>());
         }
 
+        ArrayList<BasicCardRule> allCardRules = new ArrayList<>();
+
         // for all GlobalRules, store them in globalRulesM
         // for all BasicCardRules, store them in every Card-representing view
         for(String ruleName : ruleLoader.getRulesNames()){
@@ -733,7 +735,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 for(View cView : this.cardsM.keySet()){
                     Card theCard = this.cardsM.get(cView);
                     // the cardRule views are generated onClick
-                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
+                    allCardRules.add((BasicCardRule) rule); // the onClick requires this
                 }
             }
             // else wth are you, rule?
@@ -774,22 +776,31 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             // prepare for RULES popup
             Button btnCardRules = cardView.findViewById(R.id.btn_card_rules);
             final Card card = cardsM.get(cardView);
+            final ArrayList<BasicCardRule> allCardRulesf = allCardRules;
             btnCardRules.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                         // TODO: show popup for cardrules
                     Log.w("LobbySettings", "popup not yet coded");
                     //
-                    LinearLayout myPopupLL = (LinearLayout) LayoutInflater.from(LobbyActivity.this).inflate(R.layout.linearlayout_settings_cardrule_popup, (LinearLayout) findViewById(R.id.ll_card_popup_settingsframe), false);
+                    final LinearLayout myPopupLL = (LinearLayout) LayoutInflater.from(LobbyActivity.this).inflate(R.layout.linearlayout_settings_cardrule_popup, (LinearLayout) findViewById(R.id.ll_card_popup_settingsframe), false);
 
-                    for(BasicCardRule cardRule : cardRulesM.get(card).values()){
+                    for(BasicCardRule cardRule : allCardRulesf){
                         generateCardRuleViewAndAddToItsPopup(cardRule, cardView, myPopupLL);
                     }
 
                     // show popup
-                    LinearLayout settingsFrame = ((LinearLayout) findViewById(R.id.ll_card_popup_settingsframe));
+                    final LinearLayout settingsFrame = ((LinearLayout) findViewById(R.id.ll_card_popup_settingsframe));
                     settingsFrame.addView(myPopupLL);
                     settingsFrame.setVisibility(View.VISIBLE);
+                    settingsFrame.findViewById(R.id.btn_save_cardrule_popup).setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            // when the popup is closed
+                            // TODO: store changes
+                            settingsFrame.removeView(myPopupLL);
+                        }
+                    });
                 }
             });
         }
