@@ -95,7 +95,7 @@ import static java.lang.Thread.sleep;
  */
 public class PlayerActivity extends FullscreenActivity implements GameUIInterface, SelectorFragment.SelectorCallbackInterface {
     private static final int MAXCARDINHAND = 24;
-    private GridLayout mGrid;
+    private GridLayout mGrid,mGridScrollable;
     private ArrayList<Card> cardStack = new ArrayList<>();
     private ImageView trayStack,trayStack2,colorBorder;
 
@@ -110,7 +110,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private Card seconLastPlayedCard = null;
 
     private EinzClient ourClient;
-    private GridLayout mGridScrollable;
     private HashMap<String, Double> orientationOfPlayer = new HashMap<>();
 
     private Map<String, List<BasicCardRule>> ruleMapping;
@@ -179,11 +178,13 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         mGrid = findViewById(R.id.grid_layout);
         mGridScrollable = findViewById(R.id.grid_layout_scrollable);
 
-        svHand = findViewById(R.id.sv_hand_scrollable);
-        svHand.setOnDragListener(new HandDragListenerScrollable());
+        mGridScrollable.setOnDragListener(new HandDragListenerScrollable());
 
+        svHand = findViewById(R.id.sv_hand_scrollable);
         llHand = findViewById(R.id.ll_hand);
+
         llHand.setOnDragListener(new HandDragListener());
+
 
         drawPile = findViewById(R.id.draw_pile);
         drawPile.setOnTouchListener(new DrawCardListener());
