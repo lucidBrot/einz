@@ -110,6 +110,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             // initialize layouts for settings
             globalRuleList = findViewById(R.id.ll_global_rules);
             cardList = findViewById(R.id.ll_card_rules);
+            // TODO: // popupCardRuleListM = findViewById(R.id.ll_popup_card_rules);
+            popupCardRuleListM = new HashMap<>();
         } else {
             // still display the IP/PORT info so that they can tell their friends
 
@@ -448,6 +450,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     private void saveSettings() {
         // TODO: write settings as profile (that can be loaded again after app restart) to disk?
+        // TODO: write current UI state to rulesContainer
     }
 
     @Override
@@ -668,7 +671,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private RuleLoader ruleLoader = EinzSingleton.getInstance().getRuleLoader();
     private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
     private LinearLayout globalRuleList; // the list for global rules
-    private LinearLayout cardList;
+    private LinearLayout cardList; // the list for card views
+    private HashMap<Card, LinearLayout> popupCardRuleListM; // this lists for popup card rules' views // TODO: instanciate
 
     // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
     // Cards each have one View which has multiple settings, so they are mapped <View, Card>
@@ -676,13 +680,13 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     // The reason we use rule instances is that you can set parameters on them.
 
     private void initialiseMappingFromViewToRules() {
-        // TODO: initialize the globalRulesM and cardRulesM and cardsM
 
         // for all cards, store them in cardsM
         for (String cardID : cardLoader.getCardIDs()){
             Card card = cardLoader.getCardInstance(cardID);
             View cardView = generateCardView(card);
             this.cardsM.put(cardView, card);
+            this.cardRulesM.put(card, new HashMap<View, BasicCardRule>());
         }
 
         // for all GlobalRules, store them in globalRulesM
@@ -695,10 +699,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             } else if(rule instanceof BasicCardRule){
                 // add cardruleview to all card views
                 for(View cView : this.cardsM.keySet()){
-//                    Card theCard = this.cardsM.get(cView);
-//                    View cardRuleView = generateCardRuleView(rule, cView, theCard);
-//                    cView.setChildCardRule(cardRuleView);
-//                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
+                    Card theCard = this.cardsM.get(cView);
+                    generateCardRuleViewAndAddToItsPopup(rule, cView);
+                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
                 }
             }
             // else wth are you, rule?
@@ -734,15 +737,64 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // display all card-respective rules
         for(View cardView : cardViews){
             addViewToCardViewsList(cardView);
-//            setOnClickToShowCardRulesListForThisCard
+            // TODO: sort cardrules in the popup
+
+            // prepare for RULES popup
+            Button btnCardRules = cardView.findViewById(R.id.btn_card_rules);
+            final Card card = cardsM.get(cardView);
+            btnCardRules.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    LinearLayout mypopupLL = popupCardRuleListM.get(card);
+                    if(mypopupLL!=null){
+                        // TODO: show popup for cardrules
+                    } else {
+                        Log.w("LobbySettings", "popup was null and I'm not sure why. Not doing anything...");
+                    }
+                }
+            });
         }
+    }
+
+    private View generateCardRuleViewAndAddToItsPopup(BasicRule rule, View cView) {
+        Card theCard = cardsM.get(cView);
+        LinearLayout myPopupLL = popupCardRuleListM.get(theCard);
+        if(myPopupLL == null){
+//            myPopupLL = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.ll_rules_popup, cView, false); // TODO: use correct layout
+        }
+        CardView cardRuleView = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_settings_cardrule_popup_element, myPopupLL, false);
+
+        CheckBox checkBox = (CheckBox) cardRuleView.findViewById(R.id.cb_card_rule);
+        checkBox.setText(rule.getName());
+
+        EditText etParams = (EditText) cardRuleView.findViewById(R.id.et_card_rule_param);
+        etParams.setSingleLine();
+        etParams.setVisibility(View.INVISIBLE);
+        if(rule instanceof ParametrizedRule){
+            HashMap<String, ParameterType> paramTypes = new HashMap<String, ParameterType>(((ParametrizedRule) rule).getParameterTypes());
+            if(paramTypes.size()>1){
+                String paramName = paramTypes.keySet().iterator().next(); // just get that one element out of the set
+                ParameterType paramType = paramTypes.get(paramName);
+                if(paramType.equals(ParameterType.NUMBER)) {
+                    etParams.setInputType(InputType.TYPE_CLASS_NUMBER);
+                } else {
+                    etParams.setInputType(InputType.TYPE_CLASS_TEXT);
+                }
+                etParams.setVisibility(View.VISIBLE);
+            }
+        }
+
+        if(myPopupLL!=null) {
+            myPopupLL.addView(cardRuleView);
+        }
+        return cardRuleView;
     }
 
     private void addViewToCardViewsList(View cardView) {
         cardList.addView(cardView);
     }
 
-    private View generateCardView(Card card) {
+    private View generateCardView(final Card card) {
         CardView cardView = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_settings_cardrule_element, cardList, false);
         TextView tvCardID = (TextView) cardView.findViewById(R.id.tv_card_name);
         EditText etNumberOfCards = (EditText) cardView.findViewById(R.id.et_number_of_cards);
@@ -754,13 +806,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         tvCardID.setText(card.getName());
 
         cardView.setTag(card); // yet to be used
-
-        btnCardRules.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO: show cardrule list popup
-            }
-        });
 
         return cardView;
     }
@@ -787,9 +832,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             etParam.setVisibility(View.INVISIBLE);
         } else {
             HashMap<String, ParameterType> paramTypes = new HashMap<String, ParameterType>(((ParametrizedRule) rule).getParameterTypes());
-            if(paramTypes == null){
-                Log.e("LobbySettings", "parameterTypes of rule were null but that really was unexpected!");
-            }
 
             if (paramTypes.size()>1){
                 Log.w("LobbySettings", "Layout does not yet support more than one parameter per rule"); // TODO: multiple parameters for one rule?
