@@ -875,7 +875,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // for all BasicCardRules, store them in every Card-representing view
         for (String ruleName : ruleLoader.getRulesNames()) {
             BasicRule rule = ruleLoader.getInstanceOfRule(ruleName);
-            if (rule instanceof BasicGlobalRule) { // TODO: set initial parameters on the rule and set them also when the user changes them
+            if (rule instanceof BasicGlobalRule) {
                 View view = generateGlobalRuleView(rule);
                 this.globalRulesM.put(view, (BasicGlobalRule) rule);
             } else if (rule instanceof BasicCardRule) {
@@ -1018,7 +1018,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         etParams.setVisibility(View.INVISIBLE);
         if (rule instanceof ParametrizedRule) {
             HashMap<String, ParameterType> paramTypes = new HashMap<String, ParameterType>(((ParametrizedRule) rule).getParameterTypes());
-            if (paramTypes.size() > 1) {
+            if (paramTypes.size() >= 1) {
                 String paramName = paramTypes.keySet().iterator().next(); // just get that one element out of the set
                 ParameterType paramType = paramTypes.get(paramName);
                 if (paramType.equals(ParameterType.NUMBER)) {
