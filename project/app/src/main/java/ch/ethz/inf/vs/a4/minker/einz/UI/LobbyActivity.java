@@ -11,6 +11,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Bundle;
 import android.support.v7.widget.CardView;
+import android.text.InputType;
 import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,9 +27,7 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzRegisterFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzStartGameMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
-import ch.ethz.inf.vs.a4.minker.einz.model.BasicGlobalRule;
-import ch.ethz.inf.vs.a4.minker.einz.model.BasicRule;
+import ch.ethz.inf.vs.a4.minker.einz.model.*;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
@@ -110,6 +109,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             findViewById(R.id.btn_save_settings).setOnClickListener(this);
             findViewById(R.id.btn_lobby_default_rules_toggle).setOnClickListener(this);
             // wait for server to tell us it's ready so we can connect in onLocalServerReady()
+
+            // initialize layouts for settings
+            globalRuleList = findViewById(R.id.ll_global_rules);
         } else {
             // still display the IP/PORT info so that they can tell their friends
 
@@ -390,13 +392,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         //TODO: button to start game if you're the host, handle the onclick
         switch (view.getId()) {
             case R.id.iv_settings_button: {
-                /*
-                Intent intent = new Intent(this, SettingsActivity.class);
-                EinzSingleton.getInstance().setEinzClient(this.ourClient);
-                //this.ourClient.getActionCallbackInterface().setLobbyUI(null); // this is already done onPause(), and that should happen before the new activitie's oncreate but better safe than sorry
-                // TODO: what happens if a user joins during us setting up things?
-                startActivity(intent);
-                */
                 onSettingsClick();
                 break;
             }
@@ -434,6 +429,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     public void onSettingsClick() {
         findViewById(R.id.ll_lobbyframe).setVisibility(View.GONE);
         findViewById(R.id.ll_settingsframe).setVisibility(View.VISIBLE);
+        initialiseMappingFromViewToRules();
     }
 
     public void onSettingsSaveClick() {
@@ -673,6 +669,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private HashMap<Card, HashMap<View, BasicCardRule>> cardRulesM = new HashMap<>(); // contains the cardRules which correspond to specific cards
     private RuleLoader ruleLoader = EinzSingleton.getInstance().getRuleLoader();
     private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
+    private LinearLayout globalRuleList; // the list for global rules
 
     // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
     // Cards each have one View which has multiple settings, so they are mapped <View, Card>
@@ -683,11 +680,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // TODO: initialize the globalRulesM and cardRulesM and cardsM
 
         // for all cards, store them in cardsM
-        for (String cardID : cardLoader.getCardIDs()){
-            View cardView = new generateCardView();
-            Card card = cardLoader.getCardInstance(cardID);
-            this.cardsM.put(cardView, card);
-        }
+//        for (String cardID : cardLoader.getCardIDs()){
+//            View cardView = new generateCardView();
+//            Card card = cardLoader.getCardInstance(cardID);
+//            this.cardsM.put(cardView, card);
+//        }
 
         // for all GlobalRules, store them in globalRulesM
         // for all BasicCardRules, store them in every Card-representing view
@@ -698,12 +695,12 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 this.globalRulesM.put(view, (BasicGlobalRule) rule);
             } else if(rule instanceof BasicCardRule){
                 // add cardruleview to all card views
-                for(View cView : this.cardsM.keySet()){
-                    Card theCard = this.cardsM.get(cView);
-                    View cardRuleView = generateCardRuleView(rule, cView, theCard);
-                    cView.setChildCardRule(cardRuleView);
-                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
-                }
+//                for(View cView : this.cardsM.keySet()){
+//                    Card theCard = this.cardsM.get(cView);
+//                    View cardRuleView = generateCardRuleView(rule, cView, theCard);
+//                    cView.setChildCardRule(cardRuleView);
+//                    this.cardRulesM.get(theCard).put(cView, (BasicCardRule) rule);
+//                }
             }
             // else wth are you, rule?
         }
@@ -715,8 +712,54 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
         // display all card-respective rules
         for(View cardView : this.cardsM.keySet()){
-            addViewToCardViewsList(cardView);
+//            addViewToCardViewsList(cardView);
         }
+    }
+
+    private void addViewToGlobalRulesViewsList(View view) {
+        globalRuleList.addView(view);
+    }
+
+    private View generateGlobalRuleView(BasicRule rule) {
+        CardView globalRuleView = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_settings_globalrule_element, globalRuleList, false);
+        // false because I don't want to add this view yet
+
+        CheckBox checkBox = globalRuleView.findViewById(R.id.cb_global_rule);
+        checkBox.setText(rule.getName()); // set description for user
+
+        // setting a tag because Chris said this might be useful. Don't know yet for what
+        globalRuleView.setTag(rule);
+        // I could use getTag to get that rule back, or find by tag to get the view
+
+        // set parameter view
+        if(!(rule instanceof ParametrizedRule)){
+            // No need for params
+            EditText etParam = (EditText) globalRuleView.findViewById(R.id.et_global_rule_param);
+            etParam.setVisibility(View.INVISIBLE);
+        } else {
+            HashMap<String, ParameterType> paramTypes = new HashMap<String, ParameterType>(((ParametrizedRule) rule).getParameterTypes());
+            if(paramTypes == null){
+                Log.e("LobbySettings", "parameterTypes of rule were null but that really was unexpected!");
+            }
+
+            if (paramTypes.size()>1){
+                Log.w("LobbySettings", "Layout does not yet support more than one parameter per rule"); // TODO: multiple parameters for one rule?
+            } else {
+                // the current usecase for DrawCard rule and StartWithCardsRule
+                EditText etParam = (EditText) globalRuleView.findViewById(R.id.et_global_rule_param);
+                etParam.setSingleLine();
+                String paramName = paramTypes.keySet().iterator().next(); // just get that one element out of the set
+                ParameterType paramType = paramTypes.get(paramName);
+                if(paramType.equals(ParameterType.NUMBER)) {
+                    etParam.setInputType(InputType.TYPE_CLASS_NUMBER);
+                } else {
+                    etParam.setInputType(InputType.TYPE_CLASS_TEXT);
+                }
+                etParam.setVisibility(View.VISIBLE);
+            }
+        }
+
+        return globalRuleView;
     }
 
     /**
