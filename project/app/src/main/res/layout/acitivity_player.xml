@@ -345,6 +345,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/button_red"
                     android:text="@android:string/ok" />
+
             </LinearLayout>
         </LinearLayout>
 
@@ -434,6 +435,18 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/selector_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop ="50dp"
+            android:layout_marginBottom="50dp"
+            android:gravity="top|center"
+            android:orientation="horizontal"
+            android:visibility="gone"/>
 
     </FrameLayout>
 

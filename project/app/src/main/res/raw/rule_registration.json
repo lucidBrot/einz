@@ -1,17 +1,20 @@
 [
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ChangeDirectionRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.DrawCardsRule",
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.DrawTwoCardsRule",
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.GameEndsOnWinRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.IsValidDrawRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule2",
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayAlwaysRule",
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayColorRule",
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.PlayTextRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.ResetCardsToDrawRule",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.SkipRule",
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.StartGameWithCardsRule",
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WinOnNoCardsRule",
   "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WishColorRule",
-  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.IsValidDrawRule",
-  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule2",
-  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.NextTurnRule",
-  "ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.SkipRule",
   "ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountNumberOfCardsAsPoints",
-  "ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountRankFinishedAsPoints"
+  "ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountRankFinishedAsPoints",
+  "ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.SwapHandCardRule"
 ]

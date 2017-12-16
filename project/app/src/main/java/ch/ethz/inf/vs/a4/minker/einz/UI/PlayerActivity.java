@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
-import android.animation.Animator;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +17,6 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.GridLayout;
-import android.transition.Explode;
 import android.util.Log;
 import android.view.Display;
 import android.view.DragEvent;
@@ -24,9 +24,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,10 +32,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
+
 import org.json.JSONArray;
 
 import org.json.JSONException;
@@ -54,8 +49,6 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 
 import ch.ethz.inf.vs.a4.minker.einz.model.BasicCardRule;
 
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageBody;
-import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzCustomActionResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsFailureMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzDrawCardsSuccessMessageBody;
@@ -70,14 +63,11 @@ import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzShowToastMe
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUnregisterResponseMessageBody;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.EinzUpdateLobbyListMessageBody;
 
+import ch.ethz.inf.vs.a4.minker.einz.model.GlobalState;
 import ch.ethz.inf.vs.a4.minker.einz.model.SelectorRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
-import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.WishColorRule;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,7 +93,7 @@ import static java.lang.Thread.sleep;
 /**
  * putExtra requires a parcelable, so instead pass the client via Globals
  */
-public class PlayerActivity extends FullscreenActivity implements GameUIInterface {
+public class PlayerActivity extends FullscreenActivity implements GameUIInterface, SelectorFragment.SelectorCallbackInterface {
     private static final int MAXCARDINHAND = 24;
     private GridLayout mGrid;
     private ArrayList<Card> cardStack = new ArrayList<>();
@@ -143,6 +133,10 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     private HandlerThread backgroundThread = new HandlerThread("NetworkingPlayerActivity");
     private Looper backgroundLooper;
     private Handler backgroundHandler;
+
+    private SelectorFragment selector;
+
+    private GlobalState currentGlobalState;
 
     @Override
     protected void onPause() {
@@ -272,8 +266,15 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         }*/
         this.ourClient = EinzSingleton.getInstance().getEinzClient();
 
-        // this line is already done in onResume()
-        //ourClient.getActionCallbackInterface().setGameUI(this);
+//        View fragmentView = findViewById(R.id.selector_fragment);
+//        fragmentView.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        // TODO: directly stop server and client
+        //      currently, back only takes the user to the LobbyActivity, where they have to press back again.
     }
 
     private int calculateNewIndex(GridLayout gl,float x, float y) {
@@ -499,54 +500,21 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         return(stringOfGotCards.equals(stringOfOwnCards));
     }
 
-    public void playCard(final Card playedCard){
-
-/*
-<<<<<<< Updated upstream
-=======
-        if(ruleMapping.containsKey(playedCard.getID())){
-            List<BasicCardRule> rules = ruleMapping.get(playedCard.getID());
-            for(BasicCardRule rule : rules){
-                if(rule instanceof SelectorRule && colorChosen.equals("NONE")){
-                    displayColorWheel();
-                    return;
-                }
-            }
-
-        }
->>>>>>> Stashed changes
-        this.backgroundHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-<<<<<<< Updated upstream
-                    JSONObject playParameters = new JSONObject();
-                    JSONObject wishForColor = new JSONObject();
-                    wishForColor.put("wishForColor","GREEN");
-                    playParameters.put("Wish Color", wishForColor);
-                    EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCard");
-                    EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(playedCard, playParameters);
-                    EinzMessage<EinzPlayCardMessageBody> message = new EinzMessage<>(header, body);
-                    ourClient.getConnection().sendMessage(message);
-=======
-                    ourClient.getConnection().sendMessage(
-                            "{\"header\":{\"messagegroup\":\"playcard\",\"messagetype\":\"PlayCard\"}," +
-                                    "\"body\":{\"card\":{\"ID\":\"" + playedCard.getID() + "\",\"origin\":\"" + playedCard.getOrigin() + "\"}, " +
-                                    "\"playParameters\":{\"Wish color\":\"" + colorChosen + "\"}}}");
-                    colorChosen = "none";
->>>>>>> Stashed changes
-                } catch (SendMessageFailureException e) {
-                    e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-*/
+    public void playCard(final Card playedCard) {
         hideColorWheel();
 
         setlastplayedCard(playedCard);
 
-        if (isWishingCard(playedCard)){
+        if (isWishingCard(playedCard)) {
             displayColorWheel();
-        } else {
+        } else if(isSelectorCard(playedCard)){
+            for(BasicCardRule rule : ruleMapping.get(playedCard.getID())) {
+                if(rule instanceof SelectorRule) {
+                    SelectorRule selectorRule = ((SelectorRule) rule);
+                    showSelector(selectorRule.getSelectionTitle(), selectorRule.getChoices(currentGlobalState), rule.getName());
+                }
+            }
+        }else {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
@@ -565,6 +533,20 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     private boolean isWishingCard(Card playedCard) {
         List<BasicCardRule> rules = ruleMapping.get(playedCard.getID());
+        if(rules == null){
+            return false;
+        }
+
+        for(BasicCardRule rule : rules){
+            if(rule instanceof WishColorRule){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isSelectorCard(Card played){
+        List<BasicCardRule> rules = ruleMapping.get(played.getID());
         if(rules == null){
             return false;
         }
@@ -592,24 +574,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final String chosenColor = "green";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
-            this.backgroundHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        JSONObject playParameters;
-                        try {
-                            playParameters = new JSONObject("{\"Wish Color\":{\"wishForColor\":\"" + chosenColor + "\"}}");
-                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
-                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } catch (SendMessageFailureException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            onItemSelected(chosenColor, "Wish Color");
         }
     }
 
@@ -618,24 +583,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final String chosenColor = "red";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
-            this.backgroundHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        JSONObject playParameters;
-                        try {
-                            playParameters = new JSONObject("{\"Wish Color\":{\"wishForColor\":\"" + chosenColor + "\"}}");
-                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
-                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } catch (SendMessageFailureException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+            onItemSelected(chosenColor, "Wish Color");
         }
     }
 
@@ -644,16 +592,67 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final String chosenColor = "blue";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
+            onItemSelected(chosenColor, "Wish Color");
+        }
+    }
+
+    public void onColorWheelButtonYellowClick(){
+        hideColorWheel();
+        final String chosenColor = "yellow";
+        colorChosen = chosenColor;
+        if(isWishingCard(lastPlayedCard)) {
+            onItemSelected(chosenColor, "Wish Color");
+        }
+    }
+//    @Deprecated
+//    private void colorWheelButtonSendMessage(final String chosenColor){
+//        this.backgroundHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    JSONObject playParameters;
+//                    try {
+//                        playParameters = new JSONObject("{\"Wish Color\":{\"wishForColor\":\"" + chosenColor + "\"}}");
+//                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+//                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+//                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                } catch (SendMessageFailureException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
+
+    @Override
+    public void onItemSelected(final String selection, final String ruleName){
+        hideSelector();
+        Log.d("SelectorCallback", "Got selectorCallback \"" + selection + "\"");
+
+        List<BasicCardRule> rules = ruleMapping.get(lastPlayedCard.getID());
+        SelectorRule selectorRule = null;
+        for(BasicCardRule rule : rules){
+            if(rule.getName().equals(ruleName)){
+                selectorRule = (SelectorRule) rule;
+            }
+        }
+
+        if(selectorRule != null) {
+            final SelectorRule finalRule = selectorRule;
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         JSONObject playParameters;
                         try {
-                            playParameters = new JSONObject("{\"Wish Color\":{\"wishForColor\":\"" + chosenColor + "\"}}");
-                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
-                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                            playParameters = new JSONObject();
+                            JSONObject ruleParameter = finalRule.makeSelectionReadyForSend(selection);
+                            playParameters.put(ruleName, ruleParameter);
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard, playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header, body));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -665,29 +664,39 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         }
     }
 
-    public void onColorWheelButtonYellowClick(){
-        hideColorWheel();
-        final String chosenColor = "yellow";
-        colorChosen = chosenColor;
-        if(isWishingCard(lastPlayedCard)) {
-            this.backgroundHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        JSONObject playParameters;
-                        try {
-                            playParameters = new JSONObject("{\"Wish Color\":{\"wishForColor\":\"" + chosenColor + "\"}}");
-                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
-                            EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                            ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    } catch (SendMessageFailureException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+    private void showSelector(String title, Map<String, String> choices, String ruleName){
+        ArrayList<String> values = new ArrayList<>();
+        ArrayList<String> keys = new ArrayList<>();
+        for(String key : choices.keySet()){
+            keys.add(key);
+            values.add(choices.get(key));
+        }
+
+        selector = new SelectorFragment();
+        Bundle arguments = new Bundle();
+        arguments.putString(SelectorFragment.TITLE_KEY, title);
+        arguments.putStringArrayList(SelectorFragment.CHOICE_LIST_TEXT, keys);
+        arguments.putStringArrayList(SelectorFragment.CHOICE_LIST_VALUES, values);
+        arguments.putString(SelectorFragment.RULE_NAME, ruleName);
+        selector.setArguments(arguments);
+
+        View fragment = findViewById(R.id.selector_fragment);
+        fragment.setVisibility(View.VISIBLE);
+
+        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        fragmentTransaction.add(R.id.selector_fragment, selector);
+        fragmentTransaction.commit();
+    }
+
+    private void hideSelector(){
+        View fragment = findViewById(R.id.selector_fragment);
+        fragment.setVisibility(View.GONE);
+
+        Fragment currentFragment = getFragmentManager().findFragmentById(R.id.selector_fragment);
+        if(currentFragment != null) {
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.remove(currentFragment);
+            fragmentTransaction.commit();
         }
     }
 
@@ -855,7 +864,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onSendState(EinzMessage<EinzSendStateMessageBody> message) {
-
+        currentGlobalState = message.getBody().getGlobalstate();
     }
 
     @Override
@@ -981,7 +990,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -1056,7 +1064,12 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     private boolean isValidColor(String inColor) {
         inColor = inColor.toUpperCase();
-        return inColor.equals("BLUE") || inColor.equals("GREEN") || inColor.equals("YELLOW") || inColor.equals("RED");
+        for(CardColor color : CardColor.values()){
+            if(color.color.equals(inColor)){
+                return true;
+            }
+        }
+        return false;//   inColor.equals("BLUE") || inColor.equals("GREEN") || inColor.equals("YELLOW") || inColor.equals("RED");
     }
 
     class DragCardListener implements View.OnTouchListener {
@@ -1314,12 +1327,5 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             }
             return false;
         }
-    }
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        // TODO: directly stop server and client
-        //      currently, back only takes the user to the LobbyActivity, where they have to press back again.
     }
 }

@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
-import android.util.Log;
-
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -30,6 +28,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardColor;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.CardText;
 import ch.ethz.inf.vs.a4.minker.einz.model.GameConfig;
+import ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.SwapHandCardRule;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 
 /**
@@ -185,13 +184,14 @@ public class ServerFunction implements ServerFunctionDefinition {
             return false;
         } else {
             try {
-                activePlayer.removeCardFromHandWhereIDMatches(card); // but p has an empty hand anyways , and sending the message only cares for its name attribute
+                activePlayer.removeCardFromHandWhereIDMatches(card);
                 card.setOrigin(player.getName());
                 globalState.addCardToDiscardPile(card);
                 globalState = CardRuleChecker.checkOnPlayAssignedCardChoice(globalState, card, gameConfig, playParameters);
                 globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
                 globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
                 globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
+                globalState.setLastPlayParameters(playParameters);
                 MessageSender.sendPlayCardResponse(player, threadedEinzServer, true);
                 onChange();
                 return true;
@@ -325,6 +325,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                             numberOfCardsInGame.put(card, 2);
                             allCardsInGame.add(card);
                         }
+
                     }
                     break;
 
@@ -349,6 +350,9 @@ public class ServerFunction implements ServerFunctionDefinition {
                         //assign rules to the cards
                         result.assignRuleToCard(new PlayColorRule(), card);
                         result.assignRuleToCard(new PlayTextRule(), card);
+                        if(ct.equals(CardText.ZERO)){
+                            result.assignRuleToCard(new SwapHandCardRule(), card);
+                        }
                     }
                 }
             } else if (ct != CardText.DEBUG) {
