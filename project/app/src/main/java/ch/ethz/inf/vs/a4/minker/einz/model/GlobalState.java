@@ -155,7 +155,9 @@ public class GlobalState {
      * @param cards List of cards to add to the discardPile
      */
     public void addCardsToDiscardPile(List<Card> cards) {
-        discardPile.addAll(cards);
+        discardPile.addAll(cards); // TODO: this triggers a nullpointerexception ( ava.lang.NullPointerException: Attempt to invoke interface method 'int java.util.Collection.size()' on a null object reference
+                                    //        at java.util.LinkedList.addAll(LinkedList.java:386)
+                                    //        at ch.ethz.inf.vs.a4.minker.einz.model.GlobalState.addCardsToDiscardPile(GlobalState.java:158) )
         discardPile.subList(Math.max(0, discardPile.size() - maxDiscardPileSize), discardPile.size());
     }
 

@@ -324,4 +324,15 @@ public class RulesContainer {
         defaultInstance = container;
         return defaultInstance;
     }
+
+    /**
+     * calls {@link #addCardRule} only if the card already has a number. This has the effect that the previously set number will always be kept
+     * @param cardRule
+     * @param cardID
+     */
+    public void addCardRuleKeepPreviousNumber(BasicCardRule cardRule, String cardID) {
+        if(this.cardRules.optJSONObject(cardID).has("number")){
+            addCardRule(cardRule, cardID);
+        }
+    }
 }

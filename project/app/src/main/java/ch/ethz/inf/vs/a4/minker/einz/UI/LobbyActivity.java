@@ -35,6 +35,7 @@ import ch.ethz.inf.vs.a4.minker.einz.server.ServerActivityCallbackInterface;
 import ch.ethz.inf.vs.a4.minker.einz.server.ThreadedEinzServer;
 import info.whitebyte.hotspotmanager.WifiApManager;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.Inet4Address;
@@ -457,6 +458,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }).start();
     }
 
+    /**
+     * assumes the fields globalRulesM and cardsM and cardRulesM are appropriately set and stores the settings in the rulesContainer
+     */
     private void saveSettings() {
         // TODO: write settings as profile (that can be loaded again after app restart) to disk?
         Log.w("LobbySettings", "SaveSettings is probable unfinished if this log is still here.");
@@ -480,7 +484,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         for(Card card : cardRulesM.keySet()){
             for(BasicCardRule cardRule : cardRulesM.get(card)){
                 // for all cardrules belonging to card, add them
-                this.rulesContainer.addCardRule(cardRule, card.getID()); // TODO: set cardRule params based on the view before storing it
+                this.rulesContainer.addCardRuleKeepPreviousNumber(cardRule, card.getID());
             }
         }
 
@@ -796,13 +800,45 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                         @Override
                         public void onClick(View view) {
                             // when the popup is closed
-                            //TODO storeCardSpecificRules(popupContainer, card);
+                            storeCardSpecificRules(popupContainer, card); // set for all cardrules their setting in cardRulesM only if checked. if checked, store with new params
                             settingsFrame.removeView(myPopupLL);
                         }
                     });
                 }
             });
         }
+    }
+
+    /**
+     * Overwrites the settings for this card
+     * @param popupContainer
+     * @param card
+     */
+    private void storeCardSpecificRules(LinearLayout popupContainer, Card card) {
+        ArrayList<BasicCardRule> list = new ArrayList<>();
+        for(int i=0; i<popupContainer.getChildCount(); i++){
+            View view = popupContainer.getChildAt(i);
+            CheckBox cb = view.findViewById(R.id.cb_card_rule);
+            EditText et = view.findViewById(R.id.et_card_rule_param);
+            if(cb!=null && et!=null){
+                // That may be only some view with the same fields but different purpose, but if it has them, I can use them. That's fine by me.
+                if(cb.isChecked()) {
+                    BasicCardRule rule = (BasicCardRule) view.getTag();
+                    if(rule instanceof ParametrizedRule){
+                        try {
+                            String firstParamName = ((ParametrizedRule) rule).getParameterTypes().keySet().iterator().next();
+                            JSONObject params = new JSONObject();
+                            params.put(firstParamName, et.getText().toString());
+                            ((ParametrizedRule) rule).setParameter(params); // TODO: handle more than one parameter
+                        } catch ( JSONException e){
+                            Log.e("LobbySettings", "failed to save "+rule.getName()+" for card "+card.getID());
+                        }
+                    }
+                    list.add(rule);
+                }
+            }
+        }
+        this.cardRulesM.put(card, list);
     }
 
     private View generateCardRuleViewAndAddToItsPopup(BasicRule rule, View cView, LinearLayout popupList) {
