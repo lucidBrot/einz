@@ -285,7 +285,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             }
 
 
-
         }
 
         if (this.host) {
@@ -417,7 +416,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 break;
             }
 
-            case R.id.btn_lobby_default_rules_toggle:{
+            case R.id.btn_lobby_default_rules_toggle: {
                 onDefaultRulesToggle((ToggleButton) view);
                 break;
             }
@@ -425,13 +424,13 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     }
 
     private void onDefaultRulesToggle(ToggleButton button) {
-        if(button.isChecked()){
+        if (button.isChecked()) {
             this.usingDefaultRules = true;
             setUIToDefaultSettings();
             this.rulesContainer = RulesContainer.getDefaultRulesInstance();
             try {
                 String msg = this.rulesContainer.toMessage().getBody().toJSON().toString();
-                Log.d("LobbySettings", "using default rules: "+msg);
+                Log.d("LobbySettings", "using default rules: " + msg);
 
             } catch (JSONException e) {
                 Log.w("LobbySettings", "Failed to log");
@@ -444,24 +443,25 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     }
 
     private void setUIToDefaultSettings() {
+        usingDefaultRules = true;
         // cardsM should be unchanged and contain all cards
         // globalRulesM should be unchanged and contains all globalRules
         // cardRulesM is only changed in the end of the popup so we do not need to re-set this as long as we re-set the UI
         RulesContainer container = RulesContainer.getDefaultRulesInstance();
 
         // set card numbers to default
-        for (View view : cardsM.keySet()){
+        for (View view : cardsM.keySet()) {
             EditText et = view.findViewById(R.id.et_number_of_cards);
-            if(et!=null){
+            if (et != null) {
                 et.setText(String.valueOf(container.getNumberOfCards(cardsM.get(view).getID())));
             }
         }
 
         // check global rules as default
-        for (View view : globalRulesM.keySet()){
+        for (View view : globalRulesM.keySet()) {
             BasicGlobalRule rule = globalRulesM.get(view);
             BasicGlobalRule defaultRule = container.getGlobalRule(rule.getName());
-            if(defaultRule==null){
+            if (defaultRule == null) {
                 ((CheckBox) view.findViewById(R.id.cb_global_rule)).setChecked(false);
             } else {
                 ((CheckBox) view.findViewById(R.id.cb_global_rule)).setChecked(true);
@@ -479,7 +479,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                             }
                         }
                     }
-                } catch (Exception e){
+                } catch (Exception e) {
                     Toast.makeText(this, "resetting UI to default rules failed", Toast.LENGTH_SHORT).show();
                     Log.w("LobbySettings", "Failed to load parameters for rule while fitting UI to default rules");
                 }
@@ -535,7 +535,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
      * assumes the fields globalRulesM and cardsM and cardRulesM are appropriately set and stores the settings in the rulesContainer
      */
     private void saveSettings() {
-        if(usingDefaultRules){
+        if (usingDefaultRules) {
             this.rulesContainer = RulesContainer.getDefaultRulesInstance();
             return;
         }
@@ -544,27 +544,48 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         Log.w("LobbySettings", "SaveSettings is probable unfinished if this log is still here.");
         this.rulesContainer = new RulesContainer(); // clear old settings
 
-        for(View view : globalRulesM.keySet()){
+        for (View view : globalRulesM.keySet()) {
             CheckBox cb = view.findViewById(R.id.cb_global_rule);
-            if(cb!=null && cb.isChecked()) {
+            if (cb != null && cb.isChecked()) {
+                BasicGlobalRule rule = globalRulesM.get(view);
+                if (rule instanceof ParametrizedRule && rule!=null) {
+                    EditText et = view.findViewById(R.id.et_global_rule_param);
+                    if(et!=null) {
+                        String firstParamName = ((ParametrizedRule) rule).getParameterTypes().keySet().iterator().next();
+                        JSONObject parameters = new JSONObject();
+                        try {
+                            parameters.put(firstParamName, et.getText().toString());
+                            ((ParametrizedRule) rule).setParameter(parameters);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Log.w("LobbySettings", "failed to read parameter of a parametrized global rule :"+rule.getName());
+                    }
+                }
                 this.rulesContainer.addGlobalRule(globalRulesM.get(view));
             }
         }
 
-        for(View view : cardsM.keySet()){
+        for (View view : cardsM.keySet()) {
             Integer num = 0;
             try {
                 EditText et = (EditText) view.findViewById(R.id.et_number_of_cards);
                 num = (Integer.valueOf((et).getText().toString()));
-            }catch (Exception e){
+            } catch (Exception e) {
+                Log.w("LobbySettings", "number of cards was not a number");
                 num = 0;
             }
-            if(num!=0){this.rulesContainer.addCard(cardsM.get(view).getID(), num);} // only send cards that make sense to send
-            else {this.rulesContainer.removeCard(cardsM.get(view).getID());} // if 0 make sure the card is not set
+            if (num != 0) {
+                this.rulesContainer.addCard(cardsM.get(view).getID(), num);
+            } // only send cards that make sense to send
+            else {
+                this.rulesContainer.removeCard(cardsM.get(view).getID());
+            } // if 0 make sure the card is not set
         }
 
-        for(Card card : cardRulesM.keySet()){
-            for(BasicCardRule cardRule : cardRulesM.get(card)){
+        for (Card card : cardRulesM.keySet()) {
+            for (BasicCardRule cardRule : cardRulesM.get(card)) {
                 // for all cardrules belonging to card, add them
                 this.rulesContainer.addCardRuleKeepPreviousNumber(cardRule, card.getID());
             }
@@ -574,7 +595,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        if(!inSettingMode) {
+        if (!inSettingMode) {
             cleanupActivity();
             super.onBackPressed();
         } else {
@@ -585,7 +606,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     @Override
     public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message) {
-        if(!host) {
+        if (!host) {
             goBackToMainMenu();
         }
     }
@@ -808,7 +829,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
     private LinearLayout globalRuleList; // the list for global rules
     private LinearLayout cardList; // the list for card views
-    private boolean usingDefaultRules = true;
+    private boolean usingDefaultRules = false;
 
     // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
     // Cards each have one View which has multiple settings, so they are mapped <View, Card>
@@ -820,12 +841,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         globalRuleList.removeAllViews();
         cardList.removeAllViews();
         cardsM.clear();
-        cardRulesM.clear();
         globalRulesM.clear();
 
 
         // for all cards, store them in cardsM
-        for (String cardID : cardLoader.getCardIDs()){
+        for (String cardID : cardLoader.getCardIDs()) {
             Card card = cardLoader.getCardInstance(cardID);
             View cardView = generateCardView(card);
             this.cardsM.put(cardView, card);
@@ -836,14 +856,14 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
         // for all GlobalRules, store them in globalRulesM
         // for all BasicCardRules, store them in every Card-representing view
-        for(String ruleName : ruleLoader.getRulesNames()){
+        for (String ruleName : ruleLoader.getRulesNames()) {
             BasicRule rule = ruleLoader.getInstanceOfRule(ruleName);
-            if( rule instanceof  BasicGlobalRule){ // TODO: set initial parameters on the rule and set them also when the user changes them
+            if (rule instanceof BasicGlobalRule) { // TODO: set initial parameters on the rule and set them also when the user changes them
                 View view = generateGlobalRuleView(rule);
                 this.globalRulesM.put(view, (BasicGlobalRule) rule);
-            } else if(rule instanceof BasicCardRule){
+            } else if (rule instanceof BasicCardRule) {
                 // add cardruleview to all card views
-                for(View cView : this.cardsM.keySet()){
+                for (View cView : this.cardsM.keySet()) {
                     Card theCard = this.cardsM.get(cView);
                     // the cardRule views are generated onClick
                     allCardRules.add((BasicCardRule) rule); // the onClick requires this
@@ -864,7 +884,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         });
 
         // display all global rules
-        for(View view : sortedGlobalRulesKeys){
+        for (View view : sortedGlobalRulesKeys) {
             addViewToGlobalRulesViewsList(view);
         }
 
@@ -889,10 +909,10 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 return n0.compareTo(n1);
             }
         });
-        final  ArrayList<BasicCardRule> allCardRulesf = sortedAllCardRules;
+        final ArrayList<BasicCardRule> allCardRulesf = sortedAllCardRules;
 
         // display all card-respective rules
-        for(final View cardView : cardViews){
+        for (final View cardView : cardViews) {
             addViewToCardViewsList(cardView);
 
             // prepare for RULES popup
@@ -905,7 +925,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                     final LinearLayout settingsFrame = ((LinearLayout) findViewById(R.id.ll_card_popup_settingsframe));
                     final LinearLayout popupContainer = myPopupLL.findViewById(R.id.ll_popup_container);
 
-                    for(BasicCardRule cardRule : allCardRulesf){
+                    for (BasicCardRule cardRule : allCardRulesf) {
                         generateCardRuleViewAndAddToItsPopup(cardRule, cardView, popupContainer);
                     }
 
@@ -931,27 +951,28 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     /**
      * Overwrites the settings for this card
+     *
      * @param popupContainer
      * @param card
      */
     private void storeCardSpecificRules(LinearLayout popupContainer, Card card) {
         ArrayList<BasicCardRule> list = new ArrayList<>();
-        for(int i=0; i<popupContainer.getChildCount(); i++){
+        for (int i = 0; i < popupContainer.getChildCount(); i++) {
             View view = popupContainer.getChildAt(i);
             CheckBox cb = view.findViewById(R.id.cb_card_rule);
             EditText et = view.findViewById(R.id.et_card_rule_param);
-            if(cb!=null && et!=null){
+            if (cb != null && et != null) {
                 // That may be only some view with the same fields but different purpose, but if it has them, I can use them. That's fine by me.
-                if(cb.isChecked()) {
+                if (cb.isChecked()) {
                     BasicCardRule rule = (BasicCardRule) view.getTag();
-                    if(rule instanceof ParametrizedRule){
+                    if (rule instanceof ParametrizedRule) {
                         try {
                             String firstParamName = ((ParametrizedRule) rule).getParameterTypes().keySet().iterator().next();
                             JSONObject params = new JSONObject();
                             params.put(firstParamName, et.getText().toString());
                             ((ParametrizedRule) rule).setParameter(params); // TODO: handle more than one parameter
-                        } catch ( JSONException e){
-                            Log.e("LobbySettings", "failed to save "+rule.getName()+" for card "+card.getID());
+                        } catch (JSONException e) {
+                            Log.e("LobbySettings", "failed to save " + rule.getName() + " for card " + card.getID());
                         }
                     }
                     list.add(rule);
@@ -961,7 +982,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         this.cardRulesM.put(card, list);
 
         // store also in the current container. It will be overwritten in the end, but is used in the meantime to load rule settings for cardrules
-        for(BasicCardRule rule : list) {
+        for (BasicCardRule rule : list) {
             this.rulesContainer.addCardRule(rule, card.getID());
         }
     }
@@ -978,12 +999,12 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         EditText etParams = (EditText) cardRuleView.findViewById(R.id.et_card_rule_param);
         etParams.setSingleLine();
         etParams.setVisibility(View.INVISIBLE);
-        if(rule instanceof ParametrizedRule){
+        if (rule instanceof ParametrizedRule) {
             HashMap<String, ParameterType> paramTypes = new HashMap<String, ParameterType>(((ParametrizedRule) rule).getParameterTypes());
-            if(paramTypes.size()>1){
+            if (paramTypes.size() > 1) {
                 String paramName = paramTypes.keySet().iterator().next(); // just get that one element out of the set
                 ParameterType paramType = paramTypes.get(paramName);
-                if(paramType.equals(ParameterType.NUMBER)) {
+                if (paramType.equals(ParameterType.NUMBER)) {
                     etParams.setInputType(InputType.TYPE_CLASS_NUMBER);
                 } else {
                     etParams.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -998,7 +1019,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
         // TODO: place parameters from default rules also in cardrules ui
 
-        if(popupList!=null) {
+        if (popupList != null) {
             popupList.addView(cardRuleView);
         }
         return cardRuleView;
@@ -1040,14 +1061,14 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // I could use getTag to get that rule back, or find by tag to get the view
 
         // set parameter view
-        if(!(rule instanceof ParametrizedRule)){
+        if (!(rule instanceof ParametrizedRule)) {
             // No need for params
             EditText etParam = (EditText) globalRuleView.findViewById(R.id.et_global_rule_param);
             etParam.setVisibility(View.INVISIBLE);
         } else {
             HashMap<String, ParameterType> paramTypes = new HashMap<String, ParameterType>(((ParametrizedRule) rule).getParameterTypes());
 
-            if (paramTypes.size()>1){
+            if (paramTypes.size() > 1) {
                 Log.w("LobbySettings", "Layout does not yet support more than one parameter per rule"); // TODO: multiple parameters for one rule?
             } else {
                 // the current usecase for DrawCard rule and StartWithCardsRule
@@ -1055,7 +1076,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 etParam.setSingleLine();
                 String paramName = paramTypes.keySet().iterator().next(); // just get that one element out of the set
                 ParameterType paramType = paramTypes.get(paramName);
-                if(paramType.equals(ParameterType.NUMBER)) {
+                if (paramType.equals(ParameterType.NUMBER)) {
                     etParam.setInputType(InputType.TYPE_CLASS_NUMBER);
                 } else {
                     etParam.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -1107,16 +1128,17 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     /**
      * Turn use of Card on or off
+     *
      * @param view
      * @param useThisCard
      */
-    private void onCardToggled(View view, boolean useThisCard){
+    private void onCardToggled(View view, boolean useThisCard) {
         // TODO: maybe store this setting and restore it when the card is untoggled? Or maybe that is too much effort for a useless feature
         Card card = this.cardsM.get(view);
         if (card == null) {
             Log.w("LobbySettings/onCardToggled", "This rule View has no assiciated Card instance");
-        } else{
-            if( useThisCard){
+        } else {
+            if (useThisCard) {
                 this.rulesContainer.addCard(card.getID(), getNumCardsFromView(view));
             } else {
                 this.rulesContainer.removeCard(card.getID());
@@ -1125,17 +1147,16 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     }
 
     /**
-     *
      * @param card
      * @param cardRuleView should have a Tag set that is of type BasicCardRule
      * @param toggledOn
      */
-    private void onCardRuleToggled(Card card, View cardRuleView, boolean toggledOn){
+    private void onCardRuleToggled(Card card, View cardRuleView, boolean toggledOn) {
         BasicCardRule rule = (BasicCardRule) cardRuleView.getTag();
 
-        if(toggledOn) {
+        if (toggledOn) {
             this.rulesContainer.addCardRule(rule, card.getID());
-        } else{
+        } else {
             this.rulesContainer.removeCardRule(rule.getName());
         }
     }
