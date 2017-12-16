@@ -1010,6 +1010,8 @@ A rule is only specified by its identifier and maybe some parameters, already pr
 
 List here which rules require which parameter format.
 
-`Wish Color`:`{"wishForColor":"blue"}`
+`"Wish Color"`:`{"wishForColor":"blue"}`
+
+`"Draw Cards"`:`{"Cards to draw":"3"}`
 
 Generally, we use the Rule's `.getName()` as identifiers for it.
