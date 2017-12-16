@@ -474,8 +474,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         Log.w("LobbySettings", "SaveSettings is probable unfinished if this log is still here.");
         this.rulesContainer = new RulesContainer(); // clear old settings
 
-        for(BasicGlobalRule globalRule : globalRulesM.values()){
-            this.rulesContainer.addGlobalRule(globalRule);
+        for(View view : globalRulesM.keySet()){
+            CheckBox cb = view.findViewById(R.id.cb_global_rule);
+            if(cb!=null && cb.isChecked()) {
+                this.rulesContainer.addGlobalRule(globalRulesM.get(view));
+            }
         }
 
         for(View view : cardsM.keySet()){
@@ -798,15 +801,25 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             }
         });
 
+        // sort cardrules for in the popup
+        ArrayList<BasicCardRule> sortedAllCardRules = new ArrayList<>(allCardRules);
+        Collections.sort(sortedAllCardRules, new Comparator<BasicCardRule>() {
+            @Override
+            public int compare(BasicCardRule basicCardRule, BasicCardRule t1) {
+                String n0 = basicCardRule.getName();
+                String n1 = t1.getName();
+                return n0.compareTo(n1);
+            }
+        });
+        final  ArrayList<BasicCardRule> allCardRulesf = sortedAllCardRules;
+
         // display all card-respective rules
         for(final View cardView : cardViews){
             addViewToCardViewsList(cardView);
-            // TODO: sort cardrules in the popup
 
             // prepare for RULES popup
             Button btnCardRules = cardView.findViewById(R.id.btn_card_rules);
             final Card card = cardsM.get(cardView);
-            final  android.support.v4.util.ArraySet<BasicCardRule> allCardRulesf = allCardRules;
             btnCardRules.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
