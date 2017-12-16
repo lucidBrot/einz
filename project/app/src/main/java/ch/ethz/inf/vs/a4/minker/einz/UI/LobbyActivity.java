@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.Image;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -253,20 +254,29 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         ImageView iconRole = usercard.findViewById(R.id.icn_role);
 
         if (role.contains("spectator")) {
-            iconRole.setImageResource(R.drawable.ic_spectator_black_24dp);
+            iconRole.setImageResource(R.drawable.ic_spectator_green_darker_24dp);
         } else if (role.contains("player")) {
-            iconRole.setImageResource(R.drawable.ic_person_black_24dp);
+            iconRole.setImageResource(R.drawable.ic_person_green_darker_24dp);
         } else {
 
         }
 
         // highlight admin
         if (username.equals(this.adminUsername)) {
-            usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default));
-            ((ImageView) usercard.findViewById(R.id.icn_role)).setColorFilter(getResources().getColor(R.color.red_darker));
-            ((ImageView) usercard.findViewById(R.id.btn_lobby_kick)).setColorFilter(getResources().getColor(R.color.red_darker));
-            ((TextView) usercard.findViewById(R.id.tv_lobbylist_username)).setTextColor(getResources().getColor(R.color.red_darker));
-            ((TextView) usercard.findViewById(R.id.tv_lobbylist_role)).setTextColor(getResources().getColor(R.color.red_darker));
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default, getApplicationContext().getTheme()));
+                ((ImageView) usercard.findViewById(R.id.icn_role)).getDrawable().setColorFilter(getResources().getColor(R.color.red_darker, getApplicationContext().getTheme()), PorterDuff.Mode.SRC_ATOP);
+                ((ImageView) usercard.findViewById(R.id.btn_lobby_kick)).getDrawable().setColorFilter(getResources().getColor(R.color.red_darker, getApplicationContext().getTheme()), PorterDuff.Mode.SRC_ATOP);
+                ((TextView) usercard.findViewById(R.id.tv_lobbylist_username)).setTextColor(getResources().getColor(R.color.red_darker, getApplicationContext().getTheme()));
+                ((TextView) usercard.findViewById(R.id.tv_lobbylist_role)).setTextColor(getResources().getColor(R.color.red_darker, getApplicationContext().getTheme()));
+            } else {
+                usercard.setCardBackgroundColor(getResources().getColor(R.color.red_default));
+                ((ImageView) usercard.findViewById(R.id.icn_role)).getDrawable().setColorFilter(getResources().getColor(R.color.red_darker), PorterDuff.Mode.SRC_ATOP);
+                ((ImageView) usercard.findViewById(R.id.btn_lobby_kick)).getDrawable().setColorFilter(getResources().getColor(R.color.red_darker), PorterDuff.Mode.SRC_ATOP);
+                ((TextView) usercard.findViewById(R.id.tv_lobbylist_username)).setTextColor(getResources().getColor(R.color.red_darker));
+                ((TextView) usercard.findViewById(R.id.tv_lobbylist_role)).setTextColor(getResources().getColor(R.color.red_darker));
+            }
+
 
 
         }
