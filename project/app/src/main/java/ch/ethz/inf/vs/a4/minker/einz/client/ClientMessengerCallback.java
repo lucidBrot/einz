@@ -77,7 +77,12 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         runOnMainThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(applicationContext, "FUCK I LOST CONNECTION", Toast.LENGTH_LONG).show();
+
+                if(parentClient.getConnection().isConnected()){
+                    Toast.makeText(applicationContext, "Connection timed out", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(applicationContext, "Could not connect to server", Toast.LENGTH_LONG).show();
+                }
                 if(lobbyUI!=null){
                     lobbyUI.onKeepaliveTimeout();
                 }
