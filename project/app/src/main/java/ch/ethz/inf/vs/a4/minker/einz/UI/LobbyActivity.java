@@ -426,6 +426,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
 
     private void onDefaultRulesToggle(ToggleButton button) {
         if(button.isChecked()){
+            this.usingDefaultRules = true;
             this.rulesContainer = RulesContainer.getDefaultRulesInstance();
             try {
                 String msg = this.rulesContainer.toMessage().getBody().toJSON().toString();
@@ -436,9 +437,8 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 e.printStackTrace();
             }
         } else {
-            // TODO: grey out disabled options when isChecked and enable again when Checked
-            //loadUISettingsIntoRulesContainer();
-
+            //TODO: loadUISettingsIntoRulesContainer();
+            this.usingDefaultRules = false;
         }
     }
 
@@ -471,6 +471,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
      * assumes the fields globalRulesM and cardsM and cardRulesM are appropriately set and stores the settings in the rulesContainer
      */
     private void saveSettings() {
+        if(usingDefaultRules){
+            this.rulesContainer = RulesContainer.getDefaultRulesInstance();
+            return;
+        }
+
         // TODO: write settings as profile (that can be loaded again after app restart) to disk?
         Log.w("LobbySettings", "SaveSettings is probable unfinished if this log is still here.");
         this.rulesContainer = new RulesContainer(); // clear old settings
@@ -500,7 +505,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 this.rulesContainer.addCardRuleKeepPreviousNumber(cardRule, card.getID());
             }
         }
-
     }
 
     @Override
@@ -740,6 +744,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
     private LinearLayout globalRuleList; // the list for global rules
     private LinearLayout cardList; // the list for card views
+    private boolean usingDefaultRules = true;
 
     // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
     // Cards each have one View which has multiple settings, so they are mapped <View, Card>
