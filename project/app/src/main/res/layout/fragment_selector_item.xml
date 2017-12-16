@@ -12,5 +12,6 @@
         android:layout_weight="0.33"
         android:background="@drawable/button_red"
         android:text="Placeholder"
-        android:textColor="@color/red_darker" />
+        android:textColor="@color/red_darker"
+        android:textAllCaps="false"/>
 </LinearLayout>

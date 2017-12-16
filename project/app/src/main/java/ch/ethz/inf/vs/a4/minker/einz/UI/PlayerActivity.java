@@ -511,7 +511,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             for(BasicCardRule rule : ruleMapping.get(playedCard.getID())) {
                 if(rule instanceof SelectorRule) {
                     SelectorRule selectorRule = ((SelectorRule) rule);
-                    showSelector(selectorRule.getSelectionTitle(), selectorRule.getChoices(currentGlobalState));
+                    showSelector(selectorRule.getSelectionTitle(), selectorRule.getChoices(currentGlobalState), rule.getName());
                 }
             }
         }else {
@@ -574,7 +574,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final String chosenColor = "green";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
-            colorWheelButtonSendMessage(chosenColor);
+            onItemSelected(chosenColor, "Wish Color");
         }
     }
 
@@ -583,7 +583,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final String chosenColor = "red";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
-            colorWheelButtonSendMessage(chosenColor);
+            onItemSelected(chosenColor, "Wish Color");
         }
     }
 
@@ -592,7 +592,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final String chosenColor = "blue";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
-            colorWheelButtonSendMessage(chosenColor);
+            onItemSelected(chosenColor, "Wish Color");
         }
     }
 
@@ -601,60 +601,83 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         final String chosenColor = "yellow";
         colorChosen = chosenColor;
         if(isWishingCard(lastPlayedCard)) {
-            colorWheelButtonSendMessage(chosenColor);
+            onItemSelected(chosenColor, "Wish Color");
+        }
+    }
+//    @Deprecated
+//    private void colorWheelButtonSendMessage(final String chosenColor){
+//        this.backgroundHandler.post(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    JSONObject playParameters;
+//                    try {
+//                        playParameters = new JSONObject("{\"Wish Color\":{\"wishForColor\":\"" + chosenColor + "\"}}");
+//                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
+//                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
+//                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//                } catch (SendMessageFailureException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//    }
+
+    @Override
+    public void onItemSelected(final String selection, final String ruleName){
+        hideSelector();
+        Log.d("SelectorCallback", "Got selectorCallback \"" + selection + "\"");
+
+        List<BasicCardRule> rules = ruleMapping.get(lastPlayedCard.getID());
+        SelectorRule selectorRule = null;
+        for(BasicCardRule rule : rules){
+            if(rule.getName().equals(ruleName)){
+                selectorRule = (SelectorRule) rule;
+            }
+        }
+
+        if(selectorRule != null) {
+            final SelectorRule finalRule = selectorRule;
+            this.backgroundHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JSONObject playParameters;
+                        try {
+                            playParameters = new JSONObject();
+                            JSONObject ruleParameter = finalRule.makeSelectionReadyForSend(selection);
+                            playParameters.put(ruleName, ruleParameter);
+                            EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard, playParameters);
+                            EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCard");
+                            ourClient.getConnection().sendMessage(new EinzMessage<>(header, body));
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (SendMessageFailureException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 
-    private void colorWheelButtonSendMessage(final String chosenColor){
-        this.backgroundHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    JSONObject playParameters;
-                    try {
-                        playParameters = new JSONObject("{\"Wish Color\":{\"wishForColor\":\"" + chosenColor + "\"}}");
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } catch (SendMessageFailureException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+    private void showSelector(String title, Map<String, String> choices, String ruleName){
+        ArrayList<String> values = new ArrayList<>();
+        ArrayList<String> keys = new ArrayList<>();
+        for(String key : choices.keySet()){
+            keys.add(key);
+            values.add(choices.get(key));
+        }
 
-    @Override
-    public void onItemSelected(final String selection){
-        hideSelector();
-        Log.d("SelectorCallback", "Got selectorCallback \"" + selection + "\"");
-        this.backgroundHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    JSONObject playParameters;
-                    try {
-                        playParameters = new JSONObject("{\"Wish Color\":{\"wishForColor\":\"" + selection + "\"}}");
-                        EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard,playParameters);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                } catch (SendMessageFailureException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
-    private void showSelector(String title, ArrayList<String> choices){
         selector = new SelectorFragment();
         Bundle arguments = new Bundle();
         arguments.putString(SelectorFragment.TITLE_KEY, title);
-        arguments.putStringArrayList(SelectorFragment.CHOICE_LIST_KEY, choices);
+        arguments.putStringArrayList(SelectorFragment.CHOICE_LIST_TEXT, keys);
+        arguments.putStringArrayList(SelectorFragment.CHOICE_LIST_VALUES, values);
+        arguments.putString(SelectorFragment.RULE_NAME, ruleName);
         selector.setArguments(arguments);
 
         View fragment = findViewById(R.id.selector_fragment);

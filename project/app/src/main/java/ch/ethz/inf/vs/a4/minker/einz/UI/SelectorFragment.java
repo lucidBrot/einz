@@ -4,15 +4,12 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 import android.content.Context;
 import android.os.Bundle;
 import android.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -24,13 +21,16 @@ import ch.ethz.inf.vs.a4.minker.einz.R;
  */
 public class SelectorFragment extends Fragment {
 
-    public static final String CHOICE_LIST_KEY = "choices";
+    public static final String CHOICE_LIST_TEXT = "choices_text";
     public static final String TITLE_KEY = "description";
+    public static final String RULE_NAME = "ruleName";
+    public static final String CHOICE_LIST_VALUES = "choices_values";
 
     private SelectorCallbackInterface caller;
     private ArrayAdapter<String> choiceAdapter;
 
     private String result = null;
+    private String ruleName = null;
 
     public SelectorFragment() {
         // Required empty public constructor
@@ -54,20 +54,24 @@ public class SelectorFragment extends Fragment {
                 title.setText(titleText);
             }
 
-            ArrayList<String> choices = arguments.getStringArrayList(CHOICE_LIST_KEY);
-            if (choices != null) {
-                for(String choice : choices){
+            ruleName = arguments.getString(RULE_NAME);
+
+            ArrayList<String> choicesText = arguments.getStringArrayList(CHOICE_LIST_TEXT);
+            ArrayList<String> choicesValues = arguments.getStringArrayList(CHOICE_LIST_VALUES);
+            if (choicesText != null && choicesValues != null) {
+                for(int i = 0; i < choicesText.size(); i++){
                     final View element  = inflater.inflate(R.layout.fragment_selector_item, container, false);
 
                     Button text = element.findViewById(R.id.selector_item);
-                    text.setText(choice);
+                    text.setText(choicesText.get(i));
+                    text.setTag(choicesValues.get(i));
 
                     text.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             Button text = view.findViewById(R.id.selector_item);
-                            result = (String) text.getText();
-                            caller.onItemSelected(result);
+                            result = (String) text.getTag();
+                            caller.onItemSelected(result, ruleName);
                         }
                     });
                     choiceList.addView(element);
@@ -89,7 +93,7 @@ public class SelectorFragment extends Fragment {
     }
 
     public interface SelectorCallbackInterface{
-        void onItemSelected(String selection);
+        void onItemSelected(String selection, String ruleName);
     }
 }
 

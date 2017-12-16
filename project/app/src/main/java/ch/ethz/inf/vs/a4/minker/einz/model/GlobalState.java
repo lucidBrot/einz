@@ -47,7 +47,7 @@ public class GlobalState {
 
     private HashMap<String, Integer> points; // String for player.getName(),  String for points
 
-    private JSONObject lastRuleSelection;
+    private JSONObject lastPlayParameters;
 
     /**
      * Creates an instance of a Global game state.
@@ -71,7 +71,7 @@ public class GlobalState {
         this.drawPile = new LinkedList<>();
         this.discardPile = new LinkedList<>();
         this.points = new HashMap<>();
-        this.lastRuleSelection = new JSONObject();
+        this.lastPlayParameters = new JSONObject();
     }
 
     /**
@@ -90,15 +90,6 @@ public class GlobalState {
 
     private GlobalState() {
         maxDiscardPileSize = 0;
-    }
-
-    /**
-     * Adds the given List of Cards to the Draw pile to refill the draw Pile.
-     *
-     * @param cards Cards to add to the Draw Pile
-     */
-    public void addCardsToDrawPile(List<Card> cards) {
-        drawPile.addAll(cards);
     }
 
     /**
@@ -181,6 +172,15 @@ public class GlobalState {
     }
 
     /**
+     * Adds the given List of Cards to the Draw pile to refill the draw Pile.
+     *
+     * @param cards Cards to add to the Draw Pile
+     */
+    public void addCardsToDrawPile(List<Card> cards) {
+        drawPile.addAll(cards);
+    }
+
+    /**
      * Draws a given amount of cards from the drawPile. If there are not enough cards on the drawPile
      * null is returned. The client has to fill up the drawPile first before drawing the same amount
      * again. If numberOfCards is smaller than one an empty List is returned.
@@ -213,15 +213,6 @@ public class GlobalState {
     }
 
     /**
-     * @return a list of all players, both finished and unfinished
-     */
-    public List<Player> getAllPlayers(){
-        List<Player> list = getPlayersOrdered();
-        list.addAll(getFinishedPlayers());
-        return list;
-    }
-
-    /**
      * Sets the amount of cards a player has to draw if he decides to draw cards. The value has to
      * be non-negative.
      *
@@ -234,12 +225,12 @@ public class GlobalState {
     }
 
     /**
-     * Returns the Player who's turn it is currently
-     *
-     * @return the Player on turn
+     * @return a list of all players, both finished and unfinished
      */
-    public Player getActivePlayer() {
-        return activePlayer;
+    public List<Player> getAllPlayers(){
+        List<Player> list = getPlayersOrdered();
+        list.addAll(getFinishedPlayers());
+        return list;
     }
 
     /**
@@ -268,6 +259,24 @@ public class GlobalState {
             result.put(container.name, container.getNumCardsInHand());
         }
         return result;
+    }
+
+    public Player getPlayer(String name){
+        for(PlayerContainer container : players){
+            if(container.name.equals(name)){
+                return container.player;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Returns the Player who's turn it is currently
+     *
+     * @return the Player on turn
+     */
+    public Player getActivePlayer() {
+        return activePlayer;
     }
 
     /**
@@ -350,12 +359,12 @@ public class GlobalState {
         } // else whatever. TODO: set this to null or what should be done here?
     }
 
-    public JSONObject getLastRuleSelection() {
-        return lastRuleSelection;
+    public JSONObject getLastPlayParameters() {
+        return lastPlayParameters;
     }
 
-    public void setLastRuleSelection(JSONObject lastRuleSelection) {
-        this.lastRuleSelection = lastRuleSelection;
+    public void setLastPlayParameters(JSONObject lastPlayParameters) {
+        this.lastPlayParameters = lastPlayParameters;
     }
 
     /**
@@ -386,7 +395,7 @@ public class GlobalState {
         serializedState.put("cardsToDraw", cardsToDraw);
         serializedState.put("numCardsInHand", numCardsInHand);
         serializedState.put("stack", stack);
-        serializedState.put("lastRuleSelection", lastRuleSelection);
+        serializedState.put("lastPlayParameters", lastPlayParameters);
 
         return serializedState;
     }
@@ -396,7 +405,7 @@ public class GlobalState {
 
         deserializedState.activePlayer = new Player(jsonObject.getString("activePlayer"));
         deserializedState.cardsToDraw = jsonObject.getInt("cardsToDraw");
-        deserializedState.lastRuleSelection = jsonObject.getJSONObject("lastRuleSelection");
+        deserializedState.lastPlayParameters = jsonObject.getJSONObject("lastPlayParameters");
 
         JSONArray numCardsInHand = jsonObject.getJSONArray("numCardsInHand");
         JSONArray stack = jsonObject.getJSONArray("stack");

@@ -1,21 +1,18 @@
 package ch.ethz.inf.vs.a4.minker.einz.client;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
-import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
-import ch.ethz.inf.vs.a4.minker.einz.UI.PlayerActivity;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessageHeader;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.UI.GameUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.UI.LobbyUIInterface;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.messagetypes.*;
-import ch.ethz.inf.vs.a4.minker.einz.sensors.OrientationGetter;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -366,7 +363,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
 
 
         final ArrayList<Card> currStack = new ArrayList<>(message.getBody().getGlobalstate().getDiscardPile());
-        final JSONObject playParameters = message.getBody().getGlobalstate().getLastRuleSelection();
+        final JSONObject playParameters = message.getBody().getGlobalstate().getLastPlayParameters();
 
 
         Runnable runnable = new Runnable() {

@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.a4.minker.einz.gamelogic;
 
-import android.util.Log;
-
 import ch.ethz.inf.vs.a4.minker.einz.CardLoader;
 import ch.ethz.inf.vs.a4.minker.einz.EinzSingleton;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -193,7 +191,7 @@ public class ServerFunction implements ServerFunctionDefinition {
                 globalState = CardRuleChecker.checkOnPlayAssignedCard(globalState, card, gameConfig);
                 globalState = CardRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
                 globalState = GlobalRuleChecker.checkOnPlayAnyCard(globalState, card, gameConfig);
-                globalState.setLastRuleSelection(playParameters);
+                globalState.setLastPlayParameters(playParameters);
                 MessageSender.sendPlayCardResponse(player, threadedEinzServer, true);
                 onChange();
                 return true;
