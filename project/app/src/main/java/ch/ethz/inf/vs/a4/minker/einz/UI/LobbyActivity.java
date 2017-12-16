@@ -426,10 +426,19 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     }
 
     private void onDefaultRulesToggle(ToggleButton button) {
-        toggleDefaultRules(button.isChecked());
+        toggleDefaultRules(button.isChecked(), false);
     }
 
-    private void toggleDefaultRules(boolean defaultRulesOn){
+    private void toggleDefaultRules(boolean defaultRulesOn, boolean needToToggleUIButtonText){
+        // show in UI
+        if(needToToggleUIButtonText) {
+            ToggleButton toggleButton = ((ToggleButton) findViewById(R.id.btn_lobby_default_rules_toggle));
+            if (toggleButton != null) {
+                toggleButton.setChecked(defaultRulesOn);
+            }
+        }
+        Log.d("LobbySettings", "using default rules: "+defaultRulesOn);
+
         if(defaultRulesOn){
             this.usingDefaultRules = true;
             setUIToDefaultSettings();
@@ -458,7 +467,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         for (View view : cardsM.keySet()) {
             EditText et = view.findViewById(R.id.et_number_of_cards);
             if (et != null) {
+                listenOnAnythingMaybeChanged=false;
                 et.setText(String.valueOf(container.getNumberOfCards(cardsM.get(view).getID())));
+                listenOnAnythingMaybeChanged=true;
             }
         }
 
@@ -467,9 +478,14 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             BasicGlobalRule rule = globalRulesM.get(view);
             BasicGlobalRule defaultRule = container.getGlobalRule(rule.getName());
             if (defaultRule == null) {
-                ((CheckBox) view.findViewById(R.id.cb_global_rule)).setChecked(false);
+                CheckBox checkBox = ((CheckBox) view.findViewById(R.id.cb_global_rule));
+                listenOnAnythingMaybeChanged=false;
+                checkBox.setChecked(false);
+                listenOnAnythingMaybeChanged=true;
             } else {
+                listenOnAnythingMaybeChanged=false;
                 ((CheckBox) view.findViewById(R.id.cb_global_rule)).setChecked(true);
+                listenOnAnythingMaybeChanged=true;
                 // show default parameters
                 try {
                     EditText et = view.findViewById(R.id.et_global_rule_param);
@@ -483,8 +499,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                             // fix idea: check also if edittext string is empty
                             String ettext = et.getText().toString();
                             if (r.equals(ettext) || ettext.equals("")) {
-
+                                listenOnAnythingMaybeChanged=false;
                                 et.setText(def);
+                                listenOnAnythingMaybeChanged=true;
                             }
                         }
                     }
@@ -606,7 +623,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
      * Hopefully called on all onClick events of the contents of these settings
      */
     private void onAnythingMaybeChanged(){
-        toggleDefaultRules(false);
+        // only do that if the user changed something, not when loading default rules
+        if(!listenOnAnythingMaybeChanged){return;}
+        toggleDefaultRules(false, true);
     }
 
     @Override
@@ -847,6 +866,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private LinearLayout globalRuleList; // the list for global rules
     private LinearLayout cardList; // the list for card views
     private boolean usingDefaultRules = false;
+    private boolean listenOnAnythingMaybeChanged = true; // look at the current usage of this before naively using it!
 
     // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
     // Cards each have one View which has multiple settings, so they are mapped <View, Card>
@@ -963,7 +983,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
 
         // initialize looks with default rules
-        setUIToDefaultSettings();
+        //      setUIToDefaultSettings();// included in toggleDefaultRules
+        // and make sure the button starts with the correct text
+        toggleDefaultRules(true, true);
     }
 
     /**
@@ -1019,7 +1041,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         cardRuleView.setTag(rule); // used in onCardRuleToggled
 
         CheckBox checkBox = (CheckBox) cardRuleView.findViewById(R.id.cb_card_rule);
+        listenOnAnythingMaybeChanged=false;
         checkBox.setText(rule.getName());
+        listenOnAnythingMaybeChanged=true;
 
         EditText etParams = (EditText) cardRuleView.findViewById(R.id.et_card_rule_param);
         etParams.setSingleLine();
@@ -1049,8 +1073,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                         // fix idea: check also if edittext string is empty
                         String ettext = etParams.getText().toString();
                         if (r.equals(ettext) || ettext.equals("")) {
-
+                            listenOnAnythingMaybeChanged=false;
                             etParams.setText(def);
+                            listenOnAnythingMaybeChanged=true;
                         }
                     }
                 }
@@ -1074,8 +1099,10 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
 
         // load UI looks from current settings
+        this.listenOnAnythingMaybeChanged=false;
         checkBox.setChecked(this.rulesContainer.containsCardRule(rule.getName(), theCard.getID()));
         //checkBox.setChecked(cardRulesM.get(theCard).contains(rule));//That approach didn't work
+        this.listenOnAnythingMaybeChanged=true;
 
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -1121,7 +1148,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             }
         }); // call onAnythingMaybeChanged when the text changes
 
+        listenOnAnythingMaybeChanged=false;
         tvCardID.setText(card.getName());
+        listenOnAnythingMaybeChanged=true;
 
         cardView.setTag(card); // yet to be used
 
@@ -1137,7 +1166,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // false because I don't want to add this view yet
 
         CheckBox checkBox = globalRuleView.findViewById(R.id.cb_global_rule);
+        listenOnAnythingMaybeChanged=false;
         checkBox.setText(rule.getName()); // set description for user
+        listenOnAnythingMaybeChanged=true;
         checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
