@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.animation.Animator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -66,6 +68,13 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_spectator);
+        Button endGame = findViewById(R.id.btn_end_game);
+        endGame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goBackToMainMenu();
+            }
+        });
 
         trayStack = findViewById(R.id.tray_stack_spec);
         colorBorder = findViewById(R.id.iv_wished_color);
@@ -77,6 +86,11 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
         //ourClient.getActionCallbackInterface().setGameUI(this);
 
         // this.ourClient.getActionCallbackInterface().getPlayerSeatings()
+    }
+
+    private void goBackToMainMenu() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     public void addPlayerToList(String addedPlayer){
@@ -313,7 +327,52 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
 
     @Override
     public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
+        LinearLayout endscreen = findViewById(R.id.ll_endscreen);
+        endscreen.setVisibility(View.VISIBLE);
+        HashMap<String, String> playerPoints = message.getBody().getPoints();
 
+        String winner = "MissingNo";
+        int winnerPoints = Integer.MAX_VALUE;
+        for (String player : allPlayers) {
+
+            LinearLayout winningPlayers = findViewById(R.id.ll_winning_players);
+
+            CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerpointlist_element, winningPlayers, false);
+            // false because don't add view yet - I first want to set some text
+
+            TextView tv_username = usercard.findViewById(R.id.tv_playerlist_username);
+            TextView tv_points = usercard.findViewById(R.id.tv_nr_of_points);
+
+            // set text
+            tv_username.setText(player);
+            String points = playerPoints.get(player);
+            int intPoints = Integer.parseInt(points);
+            tv_points.setText(playerPoints.get(player));
+            usercard.setTag(intPoints);
+
+            if(intPoints < winnerPoints){
+                winner = player;
+                winnerPoints = intPoints;
+            }
+
+            // add view
+            //winningPlayers.addView(usercard);
+            if(winningPlayers.getChildCount() > 0) {
+                for (int i = 0; i < winningPlayers.getChildCount(); i++) {
+                    View v = winningPlayers.getChildAt(i);
+                    if (intPoints < (int) v.getTag()) {
+                        winningPlayers.addView(usercard, i);
+                        break;
+                    } else if (i == winningPlayers.getChildCount() - 1) {
+                        winningPlayers.addView(usercard);
+                        break;
+                    }
+                }
+            } else {
+                winningPlayers.addView(usercard);
+            }
+        }
+        ((TextView)findViewById(R.id.tv_winner)).setText(winner + " won!");
     }
 
     @Override
@@ -368,7 +427,9 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
             if(cardViewOfPlayer instanceof CardView){
                 View textViewOfNrOfCards = cardViewOfPlayer.findViewById(R.id.tv_nr_of_cards);
                 if(textViewOfNrOfCards instanceof TextView){
-                    ((TextView) textViewOfNrOfCards).setText(numOfCurrplayerCards.toString());
+                    if(numOfCurrplayerCards != null) {
+                        ((TextView) textViewOfNrOfCards).setText(numOfCurrplayerCards.toString());
+                    }
                 }
             } else if(cardViewOfPlayer == null){
                 /*

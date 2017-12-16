@@ -95,15 +95,15 @@ import static java.lang.Thread.sleep;
  */
 public class PlayerActivity extends FullscreenActivity implements GameUIInterface, SelectorFragment.SelectorCallbackInterface {
     private static final int MAXCARDINHAND = 24;
-    private GridLayout mGrid,mGridScrollable;
+    private GridLayout mGrid, mGridScrollable;
     private ArrayList<Card> cardStack = new ArrayList<>();
-    private ImageView trayStack,trayStack2,colorBorder;
+    private ImageView trayStack, trayStack2, colorBorder;
 
     private String currentlyActivePlayer = "~";
 
     private ImageView drawPile;
     private LayoutInflater inflater;
-    private final double cardSizeRatio = 351.0/251.0;
+    private final double cardSizeRatio = 351.0 / 251.0;
     private boolean canDrawCard;
     private boolean canEndTurn;
     private Card lastPlayedCard = null;
@@ -140,14 +140,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     @Override
     protected void onPause() {
         super.onPause();
-        if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
+        if (ourClient != null && ourClient.getActionCallbackInterface() != null)
             ourClient.getActionCallbackInterface().setGameUI(null);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if(ourClient!=null && ourClient.getActionCallbackInterface()!=null)
+        if (ourClient != null && ourClient.getActionCallbackInterface() != null)
             ourClient.getActionCallbackInterface().setGameUI(this);
     }
 
@@ -246,11 +246,11 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         Point size = new Point();
         display.getRealSize(size);
 
-        double cardBigWidth_double = (((double) size.x) / 7.)*3.;
+        double cardBigWidth_double = (((double) size.x) / 7.) * 3.;
         cardBigWidth = (int) cardBigWidth_double;
-        cardBigHeight = (int) ((double)cardBigWidth * cardSizeRatio);
-        cardWidth  = (size.x / 8);
-        cardHeight = (size.y /(12));
+        cardBigHeight = (int) ((double) cardBigWidth * cardSizeRatio);
+        cardWidth = (size.x / 8);
+        cardHeight = (size.y / (12));
         //initCards();
 
         //add cardDrawables to mgrid
@@ -278,14 +278,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         //      currently, back only takes the user to the LobbyActivity, where they have to press back again.
     }
 
-    private int calculateNewIndex(GridLayout gl,float x, float y) {
+    private int calculateNewIndex(GridLayout gl, float x, float y) {
         // calculate which column to move to
         final float cellWidth = gl.getWidth() / gl.getColumnCount();
-        final int column = (int)(x / cellWidth);
+        final int column = (int) (x / cellWidth);
 
         // calculate which row to move to
         final float cellHeight = gl.getHeight() / gl.getRowCount();
-        final int row = (int)Math.floor(y / cellHeight);
+        final int row = (int) Math.floor(y / cellHeight);
 
         // the items in the GridLayout is organized as a wrapping list
         // and not as an actual grid, so this is how to get the new index
@@ -297,7 +297,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         return index;
     }
 
-    private void addCard(Card cardAdded){
+    private void addCard(Card cardAdded) {
         cards.add(cardAdded);
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -321,20 +321,20 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         //((BitmapDrawable)localImgView.getDrawable()).getBitmap().recycle();
 
         //localImgView.setImageResource(cardAdded.getImageRessourceID(getApplicationContext())); // TODO: @Chris fix OOM error. Seems to happen at the 12th addcard
-        localImgView.getLayoutParams().width  = cardWidth;
+        localImgView.getLayoutParams().width = cardWidth;
         localImgView.getLayoutParams().height = cardHeight;
 
-        localImgView2.getLayoutParams().width  = cardWidth;
+        localImgView2.getLayoutParams().width = cardWidth;
         localImgView2.getLayoutParams().height = cardHeight;
 
         Bitmap b;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
+            b = ((BitmapDrawable) getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
         } else {
-            b = ((BitmapDrawable)getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()))).getBitmap();
+            b = ((BitmapDrawable) getResources().getDrawable(cardAdded.getImageRessourceID(getApplicationContext()))).getBitmap();
         }
 
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, (int)(1.0/cardSizeRatio * (double)cardHeight),cardHeight, false);
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, (int) (1.0 / cardSizeRatio * (double) cardHeight), cardHeight, false);
 
         localImgView.setImageBitmap(bitmapResized);
         localImgView2.setImageBitmap(bitmapResized);
@@ -347,19 +347,19 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         mGridScrollable.addView(itemView2);
     }
 
-    private void rearrangeHandTooBig(){
+    private void rearrangeHandTooBig() {
         svHand.setVisibility(View.VISIBLE);
         llHand.setVisibility(View.GONE);
     }
 
-    private void rearrangeHandSmallEnough(){
+    private void rearrangeHandSmallEnough() {
         llHand.setVisibility(View.VISIBLE);
         svHand.setVisibility(View.GONE);
     }
 
-    private void removeCardFromHand(Card cardRemoved){
-        if(cardRemoved != null) {
-            if(!(mGridScrollable.getChildCount() == mGrid.getChildCount() && mGrid.getChildCount() == cards.size())){
+    private void removeCardFromHand(Card cardRemoved) {
+        if (cardRemoved != null) {
+            if (!(mGridScrollable.getChildCount() == mGrid.getChildCount() && mGrid.getChildCount() == cards.size())) {
                 System.out.println("will fail to remove card");
             }
 
@@ -368,13 +368,13 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
             cards.remove(cardRemoved);
 
-            if(cards.size() + 1 > MAXCARDINHAND && cards.size() <= MAXCARDINHAND){
+            if (cards.size() + 1 > MAXCARDINHAND && cards.size() <= MAXCARDINHAND) {
                 rearrangeHandSmallEnough();
             }
         }
     }
 
-    private void setlastplayedCard(Card lastplayedCard){
+    private void setlastplayedCard(Card lastplayedCard) {
         this.lastPlayedCard = lastplayedCard;
     }
 
@@ -384,19 +384,19 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         Bitmap b = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
+            b = ((BitmapDrawable) getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()), getApplicationContext().getTheme())).getBitmap();
         } else {
-            b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
+            b = ((BitmapDrawable) getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         }
 
-        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, cardBigWidth,cardBigHeight, false);
+        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, cardBigWidth, cardBigHeight, false);
         trayStack.setImageBitmap(bitmapResized);
 
         double direction;
 
-        if(orientationOfPlayer.containsKey(currentlyActivePlayer) && !Double.isNaN(orientationOfPlayer.get(currentlyActivePlayer))) {
-            if(currentlyActivePlayer.equals(ourClient.getUsername())){
-                direction = - 3.0/2.0 * Math.PI;
+        if (orientationOfPlayer.containsKey(currentlyActivePlayer) && !Double.isNaN(orientationOfPlayer.get(currentlyActivePlayer))) {
+            if (currentlyActivePlayer.equals(ourClient.getUsername())) {
+                direction = -3.0 / 2.0 * Math.PI;
             } else {
                 direction = orientationOfPlayer.get(currentlyActivePlayer);
             }
@@ -411,7 +411,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         trayStack.setVisibility(View.GONE);
         colorBorder.setVisibility(View.GONE);
 
-        trayStack.animate().translationX((int)xTranslation).translationY((int)yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new Runnable() {
+        trayStack.animate().translationX((int) xTranslation).translationY((int) yTranslation).setDuration(0).setInterpolator(new AccelerateDecelerateInterpolator()).withEndAction(new Runnable() {
             @Override
             public void run() {
                 trayStack.setVisibility(View.VISIBLE);
@@ -430,7 +430,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     }
 
     private void setFrameColor() {
-        switch (frameColor){
+        switch (frameColor) {
             case "GREEN":
                 colorBorder.setVisibility(View.VISIBLE);
                 colorBorder.setImageResource(R.drawable.card_border_green);
@@ -453,7 +453,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         }
     }
 
-    private void initCards(){
+    private void initCards() {
         // here's how you would do that
         CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
         addCard(cardLoader.getCardInstance("yellow_1"));
@@ -475,30 +475,30 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         addCard(new Card("clemens", "bluecard", CardText.ONE, CardColor.BLUE, "drawable", "card_take4"));*/
     }
 
-    public boolean checkCardsStillValid(ArrayList<Card> cardlist){
-        return checkCardListIdentical(cardlist,cards);
+    public boolean checkCardsStillValid(ArrayList<Card> cardlist) {
+        return checkCardListIdentical(cardlist, cards);
     }
 
-    public boolean checkCardListIdentical(ArrayList<Card> cardlist1,ArrayList<Card> cardlist2){
-        if(cardlist1.size() != cardlist2.size()){
+    public boolean checkCardListIdentical(ArrayList<Card> cardlist1, ArrayList<Card> cardlist2) {
+        if (cardlist1.size() != cardlist2.size()) {
             return false;
         }
 
         ArrayList<String> stringOfOwnCards = new ArrayList<>();
         ArrayList<String> stringOfGotCards = new ArrayList<>();
 
-        for(Card currCard:cardlist2){
+        for (Card currCard : cardlist2) {
             stringOfOwnCards.add(currCard.getID());
         }
 
-        for(Card currCard:cardlist1){
+        for (Card currCard : cardlist1) {
             stringOfGotCards.add(currCard.getID());
         }
 
         Collections.sort(stringOfGotCards);
         Collections.sort(stringOfOwnCards);
 
-        return(stringOfGotCards.equals(stringOfOwnCards));
+        return (stringOfGotCards.equals(stringOfOwnCards));
     }
 
     public void playCard(final Card playedCard) {
@@ -508,21 +508,21 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         if (isWishingCard(playedCard)) {
             displayColorWheel();
-        } else if(isSelectorCard(playedCard)){
-            for(BasicCardRule rule : ruleMapping.get(playedCard.getID())) {
-                if(rule instanceof SelectorRule) {
+        } else if (isSelectorCard(playedCard)) {
+            for (BasicCardRule rule : ruleMapping.get(playedCard.getID())) {
+                if (rule instanceof SelectorRule) {
                     SelectorRule selectorRule = ((SelectorRule) rule);
                     showSelector(selectorRule.getSelectionTitle(), selectorRule.getChoices(currentGlobalState), rule.getName());
                 }
             }
-        }else {
+        } else {
             this.backgroundHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         EinzPlayCardMessageBody body = new EinzPlayCardMessageBody(lastPlayedCard);
-                        EinzMessageHeader header = new EinzMessageHeader("playcard","PlayCard");
-                        ourClient.getConnection().sendMessage(new EinzMessage<>(header,body));
+                        EinzMessageHeader header = new EinzMessageHeader("playcard", "PlayCard");
+                        ourClient.getConnection().sendMessage(new EinzMessage<>(header, body));
                     } catch (SendMessageFailureException e) {
                         e.printStackTrace();
                     }
@@ -534,74 +534,74 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     private boolean isWishingCard(Card playedCard) {
         List<BasicCardRule> rules = ruleMapping.get(playedCard.getID());
-        if(rules == null){
+        if (rules == null) {
             return false;
         }
 
-        for(BasicCardRule rule : rules){
-            if(rule instanceof WishColorRule){
+        for (BasicCardRule rule : rules) {
+            if (rule instanceof WishColorRule) {
                 return true;
             }
         }
         return false;
     }
 
-    private boolean isSelectorCard(Card played){
+    private boolean isSelectorCard(Card played) {
         List<BasicCardRule> rules = ruleMapping.get(played.getID());
-        if(rules == null){
+        if (rules == null) {
             return false;
         }
 
-        for(BasicCardRule rule : rules){
-            if(rule instanceof SelectorRule){
+        for (BasicCardRule rule : rules) {
+            if (rule instanceof SelectorRule) {
                 return true;
             }
         }
         return false;
     }
 
-    public void displayColorWheel(){
+    public void displayColorWheel() {
         LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
         colorWheel.setVisibility(View.VISIBLE);
     }
 
-    public void hideColorWheel(){
+    public void hideColorWheel() {
         LinearLayout colorWheel = findViewById(R.id.ll_colorwheel);
         colorWheel.setVisibility(View.INVISIBLE);
     }
 
-    public void onColorWheelButtonGreenClick(){
+    public void onColorWheelButtonGreenClick() {
         hideColorWheel();
         final String chosenColor = "green";
         colorChosen = chosenColor;
-        if(isWishingCard(lastPlayedCard)) {
+        if (isWishingCard(lastPlayedCard)) {
             onItemSelected(chosenColor, "Wish Color");
         }
     }
 
-    public void onColorWheelButtonRedClick(){
+    public void onColorWheelButtonRedClick() {
         hideColorWheel();
         final String chosenColor = "red";
         colorChosen = chosenColor;
-        if(isWishingCard(lastPlayedCard)) {
+        if (isWishingCard(lastPlayedCard)) {
             onItemSelected(chosenColor, "Wish Color");
         }
     }
 
-    public void onColorWheelButtonBlueClick(){
+    public void onColorWheelButtonBlueClick() {
         hideColorWheel();
         final String chosenColor = "blue";
         colorChosen = chosenColor;
-        if(isWishingCard(lastPlayedCard)) {
+        if (isWishingCard(lastPlayedCard)) {
             onItemSelected(chosenColor, "Wish Color");
         }
     }
 
-    public void onColorWheelButtonYellowClick(){
+    public void onColorWheelButtonYellowClick() {
         hideColorWheel();
         final String chosenColor = "yellow";
         colorChosen = chosenColor;
-        if(isWishingCard(lastPlayedCard)) {
+        if (isWishingCard(lastPlayedCard)) {
             onItemSelected(chosenColor, "Wish Color");
         }
     }
@@ -628,19 +628,19 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 //    }
 
     @Override
-    public void onItemSelected(final String selection, final String ruleName){
+    public void onItemSelected(final String selection, final String ruleName) {
         hideSelector();
         Log.d("SelectorCallback", "Got selectorCallback \"" + selection + "\"");
 
         List<BasicCardRule> rules = ruleMapping.get(lastPlayedCard.getID());
         SelectorRule selectorRule = null;
-        for(BasicCardRule rule : rules){
-            if(rule.getName().equals(ruleName)){
+        for (BasicCardRule rule : rules) {
+            if (rule.getName().equals(ruleName)) {
                 selectorRule = (SelectorRule) rule;
             }
         }
 
-        if(selectorRule != null) {
+        if (selectorRule != null) {
             final SelectorRule finalRule = selectorRule;
             this.backgroundHandler.post(new Runnable() {
                 @Override
@@ -665,10 +665,10 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         }
     }
 
-    private void showSelector(String title, Map<String, String> choices, String ruleName){
+    private void showSelector(String title, Map<String, String> choices, String ruleName) {
         ArrayList<String> values = new ArrayList<>();
         ArrayList<String> keys = new ArrayList<>();
-        for(String key : choices.keySet()){
+        for (String key : choices.keySet()) {
             keys.add(key);
             values.add(choices.get(key));
         }
@@ -689,19 +689,19 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         fragmentTransaction.commit();
     }
 
-    private void hideSelector(){
+    private void hideSelector() {
         View fragment = findViewById(R.id.selector_fragment);
         fragment.setVisibility(View.GONE);
 
         Fragment currentFragment = getFragmentManager().findFragmentById(R.id.selector_fragment);
-        if(currentFragment != null) {
+        if (currentFragment != null) {
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.remove(currentFragment);
             fragmentTransaction.commit();
         }
     }
 
-    public void drawCard(){
+    public void drawCard() {
         this.backgroundHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -714,7 +714,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         });
     }
 
-    public void endTurn(){
+    public void endTurn() {
         this.backgroundHandler.post(new Runnable() {
             @Override
             public void run() {
@@ -727,29 +727,29 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         });
     }
 
-    public void clearHand(){
+    public void clearHand() {
         mGrid.removeAllViews();
         cards.clear();
         cardDrawables.clear();
     }
 
-    public void addToHand(ArrayList<Card> addedCards){
-        for (Card currCard:addedCards){
+    public void addToHand(ArrayList<Card> addedCards) {
+        for (Card currCard : addedCards) {
             addCard(currCard);
         }
-        if(cards.size() - addedCards.size() <= MAXCARDINHAND && cards.size() > MAXCARDINHAND){
+        if (cards.size() - addedCards.size() <= MAXCARDINHAND && cards.size() > MAXCARDINHAND) {
             rearrangeHandTooBig();
         }
     }
 
-    public void setAvailableActions(ArrayList<String> actions){
+    public void setAvailableActions(ArrayList<String> actions) {
         availableActions = actions;
         //canPlayCard = availableActions.contains("drawCards");
     }
 
-    public void addPlayerToList(String addedPlayer){
+    public void addPlayerToList(String addedPlayer) {
         //ensure no player is added twice
-        if(!allPlayers.contains(addedPlayer)) {
+        if (!allPlayers.contains(addedPlayer)) {
             LinearLayout playerList = findViewById(R.id.ll_playerlist);
 
             CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerlist_element, playerList, false);
@@ -777,15 +777,15 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         }
     }
 
-    public void removePlayerFromList(String playerToBeRemoved){
-        if(allPlayers.contains(playerToBeRemoved)) {
+    public void removePlayerFromList(String playerToBeRemoved) {
+        if (allPlayers.contains(playerToBeRemoved)) {
             LinearLayout playerList = findViewById(R.id.ll_playerlist);
 
-            for (int i = 0; i < playerList.getChildCount();) {
+            for (int i = 0; i < playerList.getChildCount(); ) {
                 View v = playerList.getChildAt(i);
 
-                if (v instanceof CardView && v.getTag().equals(playerToBeRemoved)){
-                       // Do something
+                if (v instanceof CardView && v.getTag().equals(playerToBeRemoved)) {
+                    // Do something
                     playerList.removeView(v);
                 } else {
                     i++;
@@ -800,7 +800,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         this.canDrawCard = canDrawCard;
 
-        if(canDrawCard){
+        if (canDrawCard) {
             drawPile = findViewById(R.id.draw_pile);
             drawPile.setOnTouchListener(new DrawCardListener());
         } else {
@@ -813,7 +813,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         this.canEndTurn = canEndTurn;
     }
 
-    public void goBackToMainMenu(){
+    public void goBackToMainMenu() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
@@ -855,9 +855,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onPlayCardResponse(EinzMessage<EinzPlayCardResponseMessageBody> message) {
-        if(message.getBody().getSuccess().equals("true")){
+        if (message.getBody().getSuccess().equals("true")) {
             setTopPlayedCard(lastPlayedCard);
-            if(lastPlayedCard != null){
+            if (lastPlayedCard != null) {
                 removeCardFromHand(lastPlayedCard);
             }
         }
@@ -882,24 +882,51 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void onGameOver(EinzMessage<EinzGameOverMessageBody> message) {
         LinearLayout endscreen = findViewById(R.id.ll_endscreen);
         endscreen.setVisibility(View.VISIBLE);
-        LinearLayout winningPlayers = findViewById(R.id.ll_winning_players);
-        HashMap<String,String> playerPoints = message.getBody().getPoints();
+        HashMap<String, String> playerPoints = message.getBody().getPoints();
 
-        for(String player:allPlayers){
+        String winner = "MissingNo";
+        int winnerPoints = Integer.MAX_VALUE;
+        for (String player : allPlayers) {
+
+            LinearLayout winningPlayers = findViewById(R.id.ll_winning_players);
 
             CardView usercard = (CardView) LayoutInflater.from(this).inflate(R.layout.cardview_playerpointlist_element, winningPlayers, false);
-                // false because don't add view yet - I first want to set some text
+            // false because don't add view yet - I first want to set some text
 
             TextView tv_username = usercard.findViewById(R.id.tv_playerlist_username);
             TextView tv_points = usercard.findViewById(R.id.tv_nr_of_points);
 
-                // set text
+            // set text
             tv_username.setText(player);
-            tv_points.setText(String.valueOf(playerPoints.get(player)));
+            String points = playerPoints.get(player);
+            int intPoints = Integer.parseInt(points);
+            tv_points.setText(playerPoints.get(player));
+            usercard.setTag(intPoints);
 
-                // add view
-            winningPlayers.addView(usercard);
+            if(intPoints < winnerPoints){
+                winner = player;
+                winnerPoints = intPoints;
+            }
+
+            // add view
+            //winningPlayers.addView(usercard);
+            if(winningPlayers.getChildCount() > 0) {
+                for (int i = 0; i < winningPlayers.getChildCount(); i++) {
+                    View v = winningPlayers.getChildAt(i);
+                    if (intPoints < (int) v.getTag()) {
+                        winningPlayers.addView(usercard, i);
+                        break;
+                    } else if (i == winningPlayers.getChildCount() - 1) {
+                        winningPlayers.addView(usercard);
+                        break;
+                    }
+                }
+            } else {
+                winningPlayers.addView(usercard);
+            }
         }
+        ((TextView)findViewById(R.id.tv_winner)).setText(winner + " won!");
+
     }
 
     @Override
@@ -907,10 +934,10 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         // Log.w("PlayerActivity", "setHand is currently enabled. This means that the cards for debugging will not be shown.");
         // to disable, just comment out the following four lines
         int numberOfCardsBefore = cards.size();
-        if(!checkCardsStillValid(hand)){
+        if (!checkCardsStillValid(hand)) {
             clearHand();
             addToHand(hand);
-            if(numberOfCardsBefore > MAXCARDINHAND && cards.size() <= MAXCARDINHAND){
+            if (numberOfCardsBefore > MAXCARDINHAND && cards.size() <= MAXCARDINHAND) {
                 rearrangeHandSmallEnough();
             } else if (numberOfCardsBefore <= MAXCARDINHAND && cards.size() > MAXCARDINHAND) {
                 rearrangeHandTooBig();
@@ -922,8 +949,6 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void setActions(ArrayList<String> actions) {
         setAvailableActions(actions);
     }
-
-
 
     @Override
     public void playerStartedTurn(String playerThatStartedTurn) {
@@ -947,16 +972,16 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
             findViewById(R.id.ll_its_your_turn).setVisibility(View.GONE);
         }
 
-        if(allPlayers.contains(playerThatStartedTurn)) {
+        if (allPlayers.contains(playerThatStartedTurn)) {
             LinearLayout playerList = findViewById(R.id.ll_playerlist);
 
-            for (int i = 0; i < playerList.getChildCount();i++) {
+            for (int i = 0; i < playerList.getChildCount(); i++) {
                 View v = playerList.getChildAt(i);
 
-                if (v instanceof CardView && v.getTag().equals(playerThatStartedTurn)){
+                if (v instanceof CardView && v.getTag().equals(playerThatStartedTurn)) {
                     // Do something
                     ((CardView) v).setCardBackgroundColor(getResources().getColor(R.color.blue_dark));
-                } else if(v instanceof CardView){
+                } else if (v instanceof CardView) {
                     ((CardView) v).setCardBackgroundColor(getResources().getColor(R.color.blue_default));
                 }
             }
@@ -969,19 +994,19 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
     public void onInitGame(EinzMessage<EinzInitGameMessageBody> message) {
         ArrayList<String> playerList = message.getBody().getTurnOrder();
 
-        for(String currPlayer:playerList){
+        for (String currPlayer : playerList) {
             addPlayerToList(currPlayer);
             double orientation = Math.random() * 2 * Math.PI;
-            orientationOfPlayer.put(currPlayer,orientation);
+            orientationOfPlayer.put(currPlayer, orientation);
         }
         ruleMapping = new HashMap<>();
         Iterator<String> cardIDs = message.getBody().getCardRules().keys();
         try {
-            while(cardIDs.hasNext()){
+            while (cardIDs.hasNext()) {
                 String cardID = cardIDs.next();
                 ArrayList<BasicCardRule> rulesForCard = new ArrayList<>();
                 JSONArray jsonRules = message.getBody().getCardRules().getJSONArray(cardID);
-                for(int i = 0; i < jsonRules.length(); i++){
+                for (int i = 0; i < jsonRules.length(); i++) {
                     String ruleName = jsonRules.getJSONObject(i).getString("id");
                     BasicCardRule ruleObject = (BasicCardRule) EinzSingleton.getInstance().getRuleLoader().getInstanceOfRule(ruleName);
                     rulesForCard.add(ruleObject);
@@ -995,18 +1020,20 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void setNumCardsInHandOfEachPlayer(HashMap<String, Integer> numCardsInHandOfEachPlayer) {
-        for (String currPlayer:allPlayers){
+        for (String currPlayer : allPlayers) {
             Integer numOfCurrplayerCards = numCardsInHandOfEachPlayer.get(currPlayer);
-            if(numOfCurrplayerCards==null){numOfCurrplayerCards=0;} // added this so it doesn't crash. does =0 make sense?
+            if (numOfCurrplayerCards == null) {
+                numOfCurrplayerCards = 0;
+            } // added this so it doesn't crash. does =0 make sense?
             LinearLayout playerList = findViewById(R.id.ll_playerlist);
             View cardViewOfPlayer = playerList.findViewWithTag(currPlayer);
 
-            if(cardViewOfPlayer instanceof CardView){
+            if (cardViewOfPlayer instanceof CardView) {
                 View textViewOfNrOfCards = cardViewOfPlayer.findViewById(R.id.tv_nr_of_cards);
-                if(textViewOfNrOfCards instanceof TextView){
+                if (textViewOfNrOfCards instanceof TextView) {
                     ((TextView) textViewOfNrOfCards).setText(numOfCurrplayerCards.toString());
                 }
-            } else if(cardViewOfPlayer == null){
+            } else if (cardViewOfPlayer == null) {
                 /*
                 removePlayerFromList(currPlayer);
                 addPlayerToList(currPlayer);*/
@@ -1021,7 +1048,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void setStack(ArrayList<Card> stack) {
-        if(!checkCardListIdentical(stack,cardStack)) {
+        if (!checkCardListIdentical(stack, cardStack)) {
             Card sndCard = null;
 
             final Card topCard = stack.get(stack.size() - 1);
@@ -1045,14 +1072,14 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
         String wishedColor;
 
-        if (wishColorRule != null){
+        if (wishColorRule != null) {
             wishedColor = wishColorRule.optString("wishForColor");
         } else {
             wishedColor = null;
         }
 
-        if(wishedColor != null){
-            if(isValidColor(wishedColor)){
+        if (wishedColor != null) {
+            if (isValidColor(wishedColor)) {
                 frameColor = wishedColor.toUpperCase();
             } else {
                 frameColor = "NONE";
@@ -1065,8 +1092,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     private boolean isValidColor(String inColor) {
         inColor = inColor.toUpperCase();
-        for(CardColor color : CardColor.values()){
-            if(color.color.equals(inColor)){
+        for (CardColor color : CardColor.values()) {
+            if (color.color.equals(inColor)) {
                 return true;
             }
         }
@@ -1092,7 +1119,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
 
-            if (motionEvent.getAction()==MotionEvent.ACTION_DOWN) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 final ClipData data = ClipData.newPlainText("", "");
 
                 View.DragShadowBuilder shadowBuilder = new CustomDragShadowBuilder(view);
@@ -1113,7 +1140,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
 
-            if (motionEvent.getAction()==MotionEvent.ACTION_DOWN) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                 final ClipData data = ClipData.newPlainText("", "");
 
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
@@ -1143,13 +1170,13 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                         // do nothing if hovering above own position
                         if (view == v) return true;
                         // get the new list index
-                        final int index = calculateNewIndex(mGrid,event.getX(), event.getY());
+                        final int index = calculateNewIndex(mGrid, event.getX(), event.getY());
                         // remove the view from the old position
-                        if(mGrid.indexOfChild(view)!=index) {
+                        if (mGrid.indexOfChild(view) != index) {
                             mGrid.removeView(view);
                             // and push to the new
                             // card got removed in the meantime if not true
-                            if(mGrid.getChildCount() < cards.size()) {
+                            if (mGrid.getChildCount() < cards.size()) {
                                 mGrid.addView(view, index);
                             }
                             //same shit for the other view
@@ -1160,7 +1187,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                                     mGridScrollable.removeView(view2);
 
                                     // card got removed in the meantime if not true
-                                    if(mGridScrollable.getChildCount() < cards.size()) {
+                                    if (mGridScrollable.getChildCount() < cards.size()) {
                                         mGridScrollable.addView(view2, index);
                                     }
                                 }
@@ -1214,9 +1241,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
                         // do nothing if hovering above own position
                         if (view == v) return true;
                         // get the new list index
-                        final int index = calculateNewIndex(mGridScrollable,event.getX(), event.getY());
+                        final int index = calculateNewIndex(mGridScrollable, event.getX(), event.getY());
                         // remove the view from the old position
-                        if(mGrid.indexOfChild(view)!=index) {
+                        if (mGrid.indexOfChild(view) != index) {
 
                             mGridScrollable.removeView(view);
                             // and push to the new
@@ -1265,8 +1292,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         }
     }
 
-    class CustomDragShadowBuilder extends View.DragShadowBuilder{
-        CustomDragShadowBuilder(View v){
+    class CustomDragShadowBuilder extends View.DragShadowBuilder {
+        CustomDragShadowBuilder(View v) {
             super(v);
         }
 
@@ -1274,7 +1301,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         public void onProvideShadowMetrics(Point shadowSize, Point shadowTouchPoint) {
             final View view = getView();
             if (view != null) {
-                shadowSize.set(view.getWidth()*2, view.getHeight()*2);
+                shadowSize.set(view.getWidth() * 2, view.getHeight() * 2);
                 shadowTouchPoint.set(shadowSize.x / 2, shadowSize.y);
             }
         }
@@ -1283,8 +1310,8 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         public void onDrawShadow(Canvas canvas) {
             final View view = getView();
             if (view != null) {
-                canvas.scale(2,2);
-                canvas.translate(0,0);
+                canvas.scale(2, 2);
+                canvas.translate(0, 0);
                 view.draw(canvas);
             }
         }
@@ -1306,7 +1333,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
                         //setlastplayedCard((Card)tmpView.getTag());
                         //remove card from inner cardlist
-                         playCard((Card)tmpView.getTag());
+                        playCard((Card) tmpView.getTag());
 
                         //cards.remove((Card) tmpView.getTag());
                         //System.out.println(cards);
