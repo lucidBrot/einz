@@ -479,7 +479,11 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                             String key = keys.next();
                             String r = ((ParametrizedRule) rule).getParameter().optString(key);
                             String def = ((ParametrizedRule) defaultRule).getParameter().optString(key);
-                            if (r.equals(et.getText().toString())) {
+                            /// this only works when the rule was correctly initialized and the editText as well
+                            // fix idea: check also if edittext string is empty
+                            String ettext = et.getText().toString();
+                            if (r.equals(ettext) || ettext.equals("")) {
+
                                 et.setText(def);
                             }
                         }
