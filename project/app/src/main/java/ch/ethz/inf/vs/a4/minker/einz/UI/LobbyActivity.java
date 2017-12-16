@@ -859,7 +859,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         cardList.removeAllViews();
         cardsM.clear();
         globalRulesM.clear();
-
+        this.rulesContainer = RulesContainer.getDefaultRulesInstance();
 
         // for all cards, store them in cardsM
         for (String cardID : cardLoader.getCardIDs()) {
