@@ -800,9 +800,6 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         boolean hotspotModeOn = wifiApManager.isWifiApEnabled();
         if (hotspotModeOn) {
             Toast.makeText(this, "You seem to be using a hotspot. Your IP within your own AP network is by default 192.168.43.1", Toast.LENGTH_LONG).show();
-            Log.d("LobbyActivity/IP",
-                    "SSID: " + wifiApManager.getWifiApConfiguration().SSID
-            );
         }
 
         for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements(); ) {
