@@ -14,6 +14,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.ParametrizedRule;
 import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
 import ch.ethz.inf.vs.a4.minker.einz.rules.defaultrules.*;
 import ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.CountNumberOfCardsAsPoints;
+import ch.ethz.inf.vs.a4.minker.einz.rules.otherrules.SwapHandCardRule;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -425,6 +426,10 @@ public class RulesContainer {
                     break;
                 }
 
+            }
+
+            if(cardID.toLowerCase().endsWith("_0")){
+                container.addCardRule(new SwapHandCardRule(), cardID);
             }
         }
         // now we have registered cardRules
