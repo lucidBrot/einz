@@ -846,7 +846,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
 
     @Override
     public void onUnregisterResponse(EinzMessage<EinzUnregisterResponseMessageBody> message) {
-        goBackToMainMenu();
+        if(!message.getBody().getReason().equals("finish")) {
+            goBackToMainMenu();
+        }
     }
 
     @Override

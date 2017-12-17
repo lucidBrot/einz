@@ -199,7 +199,7 @@ The **Client** sends this and Server only reacts to it. The Server's reaction is
 }
 ```
 
-##RegisterSuccess
+## RegisterSuccess
 
 If the client requests the same role multiple times, the request will still succeed. If the client requests different roles, one is chosen arbitrarily by the server. Therefore, the packet sent from the server contains the role the client was given.
 
@@ -306,13 +306,13 @@ We don't need to wait for the Server to respond. The Server logic will probably 
 However, the **Server** might decide to [kick](#kick) a player. For these purposes, [the Response](#unregisterplayer) exists.
 Also, the other Clients need to know about leaves.
 
-##UnregisterResponse
+## UnregisterResponse
 
 Sent by the **server** to all clients, including the one who was unregistered. After sending this message, the server can stop responding to this client. This might happen even after the game has started and will then be treated similarly to a client losing connection.
 
 `reason` : *String*
 
-> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server. *"server"* if the server is turning off or other internal reasons.
+> whether the client was kicked or asked to leave. *"kicked"* in the first case, *"disconnected"* if it asked to leave, *"timeout"* if the client suddenly stopped responding and was thus kicked by the server. *"finished"* if the server is turning off and kicks all clients. *"server"* for other internal reasons.
 
 ```Json
 {
@@ -653,7 +653,7 @@ The [response](#sendstate) will usually also be sent without being requested - e
 }
 ```
 
-##SendState
+## SendState
 
 The **server** sends this after being asked via [GetState](#getstate) or when appropriate, i.e. some player did something or the state changed for some other reason.
 

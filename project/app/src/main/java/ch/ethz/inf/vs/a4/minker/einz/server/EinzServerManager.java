@@ -809,10 +809,42 @@ public class EinzServerManager {
      */
     public void kickAllAndCloseSockets() {
         userListLock.writeLock().lock();
-        for(String username : getRegisteredClientHandlers().keySet()){
-            EinzServerClientHandler esch = getRegisteredClientHandlers().get(username);
-            kickUser(username, "server");
+        ConcurrentHashMap<String, EinzServerClientHandler> clientHandlers = getRegisteredClientHandlers();
+        for(String username : clientHandlers.keySet()){
+            EinzServerClientHandler esch = clientHandlers.get(username);
+            //kickUser(username, "server");
             // esch.stopThreadPatiently(); is already within kickUser
+
+            // inform all clients
+            // broadcast UnregisterResponse
+            EinzUnregisterResponseMessageBody body = new EinzUnregisterResponseMessageBody(username, "finish");
+            EinzMessageHeader header = new EinzMessageHeader("registration", "UnregisterResponse");
+            EinzMessage<EinzUnregisterResponseMessageBody> message = new EinzMessage<>(header, body);
+            try {
+                this.server.sendMessageToUser(username, message);
+            } catch (UserNotRegisteredException | JSONException e) {
+                e.printStackTrace();
+            }
+            // unregister them
+            getRegisteredClientRoles().remove(username);
+            getRegisteredClientHandlers().remove(username);
+            getRegisteredClientPositioning().remove(username);
+
+            // and stop the corresponding client
+            try {
+                if(esch!=null) {
+                    esch.setConnectedUser(null);
+                    esch.stopThreadPatiently();
+                    Log.d("servMan/unReg", "stopped Thread of " + username);
+                } else {
+                    Log.d("servMan/unReg", "there was no Thread of "+username+" that I could unregister");
+                }
+            }catch(java.lang.NullPointerException e){
+                Log.d("servMan/unReg", "ESCH didn't exist anymore. (Did you maybe shut down the server?)");
+                e.printStackTrace();
+            }
+            Log.d("servMan/unreg", "I have unregistered user "+username);
+
         }
         userListLock.writeLock().unlock();
     }
