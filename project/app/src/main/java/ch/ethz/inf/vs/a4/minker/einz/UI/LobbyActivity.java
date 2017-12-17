@@ -25,6 +25,7 @@ import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.RulesContainer;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.CardRuleChecker;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -457,11 +458,15 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     }
 
     private void setUIToDefaultSettings() {
-        usingDefaultRules = true;
+        setUIToGivenSettings(RulesContainer.getDefaultRulesInstance(), true);
+    }
+
+    private void setUIToGivenSettings(RulesContainer givenSettings, boolean defaultSettingsWerePassed) {
+        usingDefaultRules = defaultSettingsWerePassed;
         // cardsM should be unchanged and contain all cards
         // globalRulesM should be unchanged and contains all globalRules
         // cardRulesM is only changed in the end of the popup so we do not need to re-set this as long as we re-set the UI
-        RulesContainer container = RulesContainer.getDefaultRulesInstance();
+        RulesContainer container = givenSettings;
 
         // set card numbers to default
         for (View view : cardsM.keySet()) {
@@ -506,30 +511,18 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                         }
                     }
                 } catch (Exception e) {
-                    Toast.makeText(this, "resetting UI to default rules failed", Toast.LENGTH_SHORT).show();
-                    Log.w("LobbySettings", "Failed to load parameters for rule while fitting UI to default rules");
+                    Toast.makeText(this, "resetting UI to stored rules failed", Toast.LENGTH_SHORT).show();
+                    Log.w("LobbySettings", "Failed to load parameters for rule while fitting UI to given rules");
                 }
             }
         }
 
 
-        /* //that doesn't work... changing the popup loader now so that it always sets the current rules of the rulesContainer
+        /* //that(now deleted code) doesn't work... changing the popup loader now so that it always sets the current rules of the rulesContainer
         // cardrules will always display what currently is set in the cardRulesM
         // the below code is copypasted and modified from the initialization
-        // for all cards, store them in cardsM
-        for (String cardID : cardLoader.getCardIDs()){
-            Card card = cardLoader.getCardInstance(cardID);
-            View cardView = generateCardView(card);
-            this.cardsM.put(cardView, card);
-            ArrayList<BasicCardRule> list = new ArrayList<>();
-            for(String ruleName : ruleLoader.getRulesNames()){
-                if(this.rulesContainer.containsCardRule(ruleName, cardID)){
-                    list.add((BasicCardRule) ruleLoader.getInstanceOfRule(ruleName));
-                }
-            }
-            this.cardRulesM.put(card, list);
-        }
         */
+
     }
 
 
@@ -564,11 +557,26 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private void saveSettings() {
         if (usingDefaultRules) {
             this.rulesContainer = RulesContainer.getDefaultRulesInstance();
+            EinzSingleton.getInstance().setLastRulesSavedContainer(this.rulesContainer); // make them load the default version
             return;
         }
 
         // TODO: write settings as profile (that can be loaded again after app restart) to disk?
-        Log.w("LobbySettings", "SaveSettings is probable unfinished if this log is still here.");
+        Log.w("LobbySettings", "SaveSettings is probably unfinished if this log is still here.");
+
+        // store all unchanged card settings in cardRulesM so they don't get lost
+        for(Card card : cardsM.values()) {
+            String cardID = card.getID();
+            ArrayList<BasicCardRule> list = cardRulesM.get(card);
+            if(list==null || list.equals(new ArrayList<BasicCardRule>())){
+                // if nothing was stored yet for this card, store everything from the settings that would have been shown if the UI popup were to have been opened
+                // #grammar
+
+                ArrayList<BasicCardRule> cardRuleList = this.rulesContainer.getListOfCardRulesForCard(cardID, ruleLoader);
+                cardRulesM.put(card, cardRuleList);
+            }
+        }
+
         this.rulesContainer = new RulesContainer(); // clear old settings
 
         for (View view : globalRulesM.keySet()) {
@@ -612,11 +620,16 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
 
         for (Card card : cardRulesM.keySet()) {
+            ArrayList<BasicCardRule> rulesToAdd = new ArrayList<>();
             for (BasicCardRule cardRule : cardRulesM.get(card)) {
                 // for all cardrules belonging to card, add them
-                this.rulesContainer.addCardRuleKeepPreviousNumber(cardRule, card.getID());
+                rulesToAdd.add(cardRule);
             }
+            this.rulesContainer.setCardRulesKeepNumber(rulesToAdd, card.getID());// delete all previous cardrules for this card and set the ones we store anew
         }
+
+        // store settings in EinzSingleton to load them again when the popup is reopened
+        EinzSingleton.getInstance().setLastRulesSavedContainer(new RulesContainer(this.rulesContainer)); // store a deep copy that lives now independently in the singleton
     }
 
     /**
@@ -744,7 +757,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         Log.d("serverSetupActivity", "startServer was pressed");
         if (serverThread == null) { // only create one server
             this.serverLogicInterface = new ServerFunction(); // Fabians Part
-            ///server = new ThreadedEinzServer(this.getApplicationContext(), this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove serverPort specification
+            // try server on port 8080, but use any other free port if it is not available
             server = new ThreadedEinzServer(this.getApplicationContext(), 8080, this, this.serverLogicInterface);
             setIPAndPort(server);
             server.setDEBUG_ONE_MSG(false); // set to true to let server generate messages on same host
@@ -863,7 +876,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     private CardLoader cardLoader = EinzSingleton.getInstance().getCardLoader();
     private LinearLayout globalRuleList; // the list for global rules
     private LinearLayout cardList; // the list for card views
-    private boolean usingDefaultRules = false;
+    private boolean usingDefaultRules = false; // if true, saveSettings takes a shortcut when storing
     private boolean listenOnAnythingMaybeChanged = true; // look at the current usage of this before naively using it!
 
     // globalRules each have one View which can be toggled, so they are mapped <View, Rule>
@@ -877,7 +890,15 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         cardList.removeAllViews();
         cardsM.clear();
         globalRulesM.clear();
-        this.rulesContainer = RulesContainer.getDefaultRulesInstance();
+        RulesContainer oldSettings = EinzSingleton.getInstance().getLastRulesSavedContainer();
+        if(oldSettings!=null && oldSettings.getHeader()!=null){
+            this.rulesContainer = new RulesContainer(oldSettings); // deep copy to avoid changing the old settings before saving
+            usingDefaultRules = false;
+        } else {
+            oldSettings = null;
+            usingDefaultRules = true;
+            this.rulesContainer = RulesContainer.getDefaultRulesInstance(); // should already be a deep copy
+        }
 
         // for all cards, store them in cardsM
         for (String cardID : cardLoader.getCardIDs()) {
@@ -985,7 +1006,12 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         // initialize looks with default rules
         //      setUIToDefaultSettings();// included in toggleDefaultRules
         // and make sure the button starts with the correct text
-        toggleDefaultRules(true, true);
+        if(usingDefaultRules) {
+            toggleDefaultRules(true, true);
+        } else {
+            setUIToGivenSettings(this.rulesContainer, false);
+            Log.d("LobbySettings","Loaded stored settings");
+        }
     }
 
     /**

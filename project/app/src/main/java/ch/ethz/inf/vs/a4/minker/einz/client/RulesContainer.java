@@ -28,7 +28,29 @@ public class RulesContainer {
 
     private static RulesContainer defaultInstance = null;
 
+    // header is null if deep copy failed
     private EinzMessageHeader header = new EinzMessageHeader("startgame", "SpecifyRules");
+
+    /**
+     * performs a deep copy of the provided RulesContainer.
+     * If copying fails, the header field will be null and all other fields as normally initialized.
+     * @param cloneThis
+     */
+    public RulesContainer (RulesContainer cloneThis){
+        try {
+            this.cardRules = new JSONObject(cloneThis.cardRules.toString());
+            this.globalRules = new JSONArray(cloneThis.globalRules.toString());
+            this.header = cloneThis.header;
+        } catch(JSONException e){
+            this.cardRules = new JSONObject();
+            this.globalRules = new JSONArray();
+            this.header = null;
+        }
+    }
+
+    public RulesContainer(){
+
+    }
 
     public EinzMessage<EinzSpecifyRulesMessageBody> toMessage() {
         return new EinzMessage<>(header, this.toMessageBody());
@@ -43,6 +65,13 @@ public class RulesContainer {
 
     public synchronized void addGlobalRule(BasicGlobalRule rule) {
         globalRules.put(ruleToJSON(rule));
+    }
+
+    /**
+     * @return either the current header, or null in case of previous errors, e.g. when cloning
+     */
+    public EinzMessageHeader getHeader() {
+        return header;
     }
 
     /**
@@ -292,11 +321,10 @@ public class RulesContainer {
             defaultInstance = container;
         } else {
             try {
-                return (RulesContainer) defaultInstance.clone(); // don't compute multiple times
-            } catch (CloneNotSupportedException e) {
-                Log.d("RulesContainer", "Cloning not supported, so I'm recalculating everything again.");
+                return (new RulesContainer(defaultInstance));
             } catch (Exception e){
                 Log.d("RulesContainer", "I don't even care anymore. Calculating again.");
+                defaultInstance = container;
             }
         }
 
@@ -517,6 +545,35 @@ public class RulesContainer {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    /**
+     * returns a list of all card rules currently used for this card
+     * Make sure the ruleLoader you provide is initialized
+     * @param cardID
+     * @return
+     */
+    public ArrayList<BasicCardRule> getListOfCardRulesForCard(String cardID, RuleLoader ruleLoader) {
+        JSONObject card = cardRules.optJSONObject(cardID);
+        if(card==null){return new ArrayList<>();}
+        JSONArray rulelist = card.optJSONArray("rulelist");
+        String number = card.optString("number");
+        if(number==null || rulelist==null || Integer.valueOf(number)<1){
+            return new ArrayList<>();
+        } else {
+            ArrayList<BasicCardRule> list = new ArrayList<>();
+            for(int i=0; i<rulelist.length(); i++){
+                try {
+                    JSONObject jrule = rulelist.getJSONObject(i);
+                    String ruleName = jrule.getString("id");
+                    BasicCardRule rule = getCardRule(ruleName, cardID, ruleLoader);
+                    list.add(rule);
+                } catch (JSONException e) {
+                    continue;
+                }
+            }
+            return list;
         }
     }
 }

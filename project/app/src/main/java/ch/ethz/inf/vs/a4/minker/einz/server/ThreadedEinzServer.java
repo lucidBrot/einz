@@ -37,7 +37,7 @@ public class ThreadedEinzServer implements Runnable { // apparently, 'implements
         this.DEBUG_ECHO = DEBUG_ONE_MSG;
     }
 
-    private boolean DEBUG_ONE_MSG = true; // if true, this will simulate sending a debug message from the client. is set to false if PORT is 0
+    private boolean DEBUG_ONE_MSG = false; // if true, this will simulate sending a debug message from the client. is set to false if PORT is 0
     private BiMap<Thread, EinzServerClientHandler> clientHandlerBiMap = HashBiMap.create(); // list of registered clients and ESCHs
 
     private int numClients;
