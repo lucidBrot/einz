@@ -61,6 +61,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
     private ArrayList<Card> stack = new ArrayList<>();
 
     private String currentlyActivePlayer = "~";
+
     private HashMap<String, String> playerDirections = new HashMap<>();
     private HashMap<String, JSONObject> playerSeating = new HashMap<>();
     private HashMap<String,Double> orientationOfPlayer = new HashMap<>();
@@ -165,7 +166,7 @@ public class SpectatorActivity extends FullscreenActivity implements GameUIInter
             b = ((BitmapDrawable)getResources().getDrawable(cardToSet.getImageRessourceID(getApplicationContext()))).getBitmap();
         }
 
-        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, trayStack.getWidth(),(int)(cardSizeRatio * (double)trayStack.getWidth()), false);
+        final Bitmap bitmapResized = Bitmap.createScaledBitmap(b, (int) getResources().getDimension(R.dimen.spec_card_width),(int) getResources().getDimension(R.dimen.spec_card_height), false);
         trayStack.setImageBitmap(bitmapResized);
 
 
