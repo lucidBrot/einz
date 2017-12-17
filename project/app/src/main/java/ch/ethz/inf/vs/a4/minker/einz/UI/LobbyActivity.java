@@ -991,13 +991,13 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     /**
      * Overwrites the settings for this card
      *
-     * @param popupContainer
+     * @param cardRuleContainer the parent of the card-rule-views
      * @param card
      */
-    private void storeCardSpecificRules(LinearLayout popupContainer, Card card) {
+    private void storeCardSpecificRules(LinearLayout cardRuleContainer, Card card) {
         ArrayList<BasicCardRule> list = new ArrayList<>();
-        for (int i = 0; i < popupContainer.getChildCount(); i++) {
-            View view = popupContainer.getChildAt(i);
+        for (int i = 0; i < cardRuleContainer.getChildCount(); i++) {
+            View view = cardRuleContainer.getChildAt(i);
             CheckBox cb = view.findViewById(R.id.cb_card_rule);
             EditText et = view.findViewById(R.id.et_card_rule_param);
             if (cb != null && et != null) {
@@ -1021,9 +1021,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         this.cardRulesM.put(card, list);
 
         // store also in the current container. It will be overwritten in the end, but is used in the meantime to load rule settings for cardrules
-        for (BasicCardRule rule : list) {
-            this.rulesContainer.addCardRule(rule, card.getID());
-        }
+        this.rulesContainer.setCardRulesKeepNumber(list, card.getID());
     }
 
     /**

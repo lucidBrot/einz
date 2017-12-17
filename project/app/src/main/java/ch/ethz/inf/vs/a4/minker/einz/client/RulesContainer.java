@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class RulesContainer {
@@ -471,5 +472,45 @@ public class RulesContainer {
 
         return rule;
 
+    }
+
+    /**
+     * OVERWRITES any existing cardRules, including the number of a card
+     * @param list
+     * @param cardID
+     */
+    public void setCardRules(ArrayList<BasicCardRule> list, String cardID) {
+        try {
+            this.cardRules.put(cardID,new JSONObject());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        for(BasicCardRule rule : list){
+            addCardRule(rule, cardID);
+        }
+    }
+
+    public void setCardRulesKeepNumber(ArrayList<BasicCardRule> list, String cardID){
+        this.removeRulesOfCardButKeepNumber(cardID);
+        for(BasicCardRule rule : list){
+            addCardRule(rule, cardID);
+        }
+    }
+
+    /**
+     * removes all cardRules for this card, but keeps the number of cards in the deck of this type intact
+     */
+    private void removeRulesOfCardButKeepNumber(String cardId){
+        JSONObject cardJ = this.cardRules.optJSONObject(cardId);
+        if (cardJ != null) {
+            JSONObject newCardJ = new JSONObject();
+            try {
+                newCardJ.put("number", cardJ.optString("number")==null?"0":cardJ.optString("number"));
+                newCardJ.put("rulelist", new JSONArray());
+                this.cardRules.put(cardId, newCardJ);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
