@@ -543,6 +543,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
     public void onSettingsSaveClick() {
         saveAndSend();
         findViewById(R.id.ll_settingsframe).setVisibility(View.GONE);
+        findViewById(R.id.ll_card_popup_settingsframe).setVisibility(View.GONE);
         findViewById(R.id.ll_lobbyframe).setVisibility(View.VISIBLE);
         inSettingMode = false;
     }
