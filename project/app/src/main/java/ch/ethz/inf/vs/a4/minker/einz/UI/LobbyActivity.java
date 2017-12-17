@@ -744,7 +744,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         Log.d("serverSetupActivity", "startServer was pressed");
         if (serverThread == null) { // only create one server
             this.serverLogicInterface = new ServerFunction(); // Fabians Part
-            ///server = new ThreadedEinzServer(this.getApplicationContext(), this, serverLogicInterface); // 8080 is needed for debug client. TODO: remove serverPort specification
+            // try server on port 8080, but use any other free port if it is not available
             server = new ThreadedEinzServer(this.getApplicationContext(), 8080, this, this.serverLogicInterface);
             setIPAndPort(server);
             server.setDEBUG_ONE_MSG(false); // set to true to let server generate messages on same host
