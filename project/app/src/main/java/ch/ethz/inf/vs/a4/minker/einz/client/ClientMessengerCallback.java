@@ -255,7 +255,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    gameUI.onInitGame(message);
+                    if(gameUI!=null){gameUI.onInitGame(message);}
                 }
             };
             runOnMainThread(runnable);
@@ -265,7 +265,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
             Runnable runnable = new Runnable() {
                 @Override
                 public void run() {
-                    gameUI.onInitGame(message);
+                    if(gameUI!=null){gameUI.onInitGame(message);}
                 }
             };
 
@@ -318,7 +318,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
             @Override
             public void run() {
                 EinzMessage<EinzDrawCardsSuccessMessageBody> msg2 = msg;
-                gameUI.onDrawCardsSuccess(msg2);
+                if(gameUI!=null){gameUI.onDrawCardsSuccess(msg2);}
             }
         };
 
@@ -335,7 +335,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
             public void run() {
                 Toast.makeText(applicationContext,"You're not able to draw a card because " + reason, Toast.LENGTH_SHORT).show();
                 EinzMessage<EinzDrawCardsFailureMessageBody> msg2 =msg;
-                gameUI.onDrawCardsFailure(msg2);
+                if(gameUI!=null){gameUI.onDrawCardsFailure(msg2);}
             }
         };
 
@@ -360,7 +360,7 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
         runOnMainThread(new Runnable() {
             @Override
             public void run() {
-                gameUI.onPlayCardResponse(msg);
+                if(gameUI!=null){gameUI.onPlayCardResponse(msg);}
             }
         });
     }
@@ -423,7 +423,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
             @Override
             public void run() {
                 EinzMessage<EinzPlayerFinishedMessageBody> msg2 = msg;
-                gameUI.onPlayerFinished(msg2);
+                if(gameUI!=null) {
+                    gameUI.onPlayerFinished(msg2);
+                }
             }
         };
 
@@ -441,7 +443,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
             @Override
             public void run() {
                 EinzMessage<EinzGameOverMessageBody> msg2 = msg;
-                gameUI.onGameOver(msg2);
+                if(gameUI!=null){
+                gameUI.onGameOver(msg2);}
+
             }
         };
 
@@ -458,7 +462,9 @@ public class ClientMessengerCallback implements ClientActionCallbackInterface { 
             @Override
             public void run() {
                 EinzMessage<EinzCustomActionResponseMessageBody> msg2 = msg;
-                gameUI.onCustomActionResponse(msg2);
+                if(gameUI!=null) {
+                    gameUI.onCustomActionResponse(msg2);
+                }
             }
         };
         // TODO: implement onCustomActionResponse
