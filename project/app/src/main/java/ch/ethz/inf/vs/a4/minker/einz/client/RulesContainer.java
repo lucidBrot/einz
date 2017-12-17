@@ -291,7 +291,13 @@ public class RulesContainer {
         if (defaultInstance == null) {
             defaultInstance = container;
         } else {
-            return defaultInstance; // don't compute multiple times
+            try {
+                return (RulesContainer) defaultInstance.clone(); // don't compute multiple times
+            } catch (CloneNotSupportedException e) {
+                Log.d("RulesContainer", "Cloning not supported, so I'm recalculating everything again.");
+            } catch (Exception e){
+                Log.d("RulesContainer", "I don't even care anymore. Calculating again.");
+            }
         }
 
         // load deck
