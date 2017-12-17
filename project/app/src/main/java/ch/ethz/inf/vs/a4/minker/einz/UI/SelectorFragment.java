@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
 import ch.ethz.inf.vs.a4.minker.einz.R;
 
 /**
@@ -91,6 +93,14 @@ public class SelectorFragment extends Fragment {
         super.onAttach(context);
         if(context instanceof SelectorCallbackInterface){
             caller = (SelectorCallbackInterface) context;
+        }
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if(activity instanceof SelectorCallbackInterface){
+            caller = (SelectorCallbackInterface) activity;
         }
     }
 
