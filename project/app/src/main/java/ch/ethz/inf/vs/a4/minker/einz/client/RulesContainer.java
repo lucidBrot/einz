@@ -361,22 +361,30 @@ public class RulesContainer {
                 case "debug": {
                     container.addCardRuleWithNumber(new PlayColorRule(), cardID, "0");
                     container.addCardRuleWithNumber(new PlayTextRule(), cardID, "0");
-                    container.addCardRuleWithNumber(new IsValidDrawRule(), cardID, "0");
+//                    container.addCardRuleWithNumber(new IsValidDrawRule(), cardID, "0");
                     container.addCardRuleWithNumber(new PlayAlwaysRule(), cardID, "0");
                     break;
                 }
                 case "take4": {
                     container.addCardRule(new PlayColorRule(), cardID);
                     container.addCardRule(new PlayTextRule(), cardID);
-                    container.addCardRule(new IsValidDrawRule(), cardID);
+//                    container.addCardRule(new IsValidDrawRule(), cardID);
                     container.addCardRule(new PlayAlwaysRule(), cardID);
                     container.addCardRule(new WishColorRule(), cardID);
+                    DrawCardsRule drawCardsRule = new DrawCardsRule();
+                    try {
+                        JSONObject param = new JSONObject();
+                        param.put(DrawCardsRule.getParameterName(), 4);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    container.addCardRule(drawCardsRule, cardID);
                     break;
                 }
                 case "choose": {
                     container.addCardRule(new PlayColorRule(), cardID);
                     container.addCardRule(new PlayTextRule(), cardID);
-                    container.addCardRule(new IsValidDrawRule(), cardID);
+//                    container.addCardRule(new IsValidDrawRule(), cardID);
                     container.addCardRule(new PlayAlwaysRule(), cardID);
                     container.addCardRule(new WishColorRule(), cardID);
                     break;
@@ -397,7 +405,7 @@ public class RulesContainer {
                 default: {
                     container.addCardRule(new PlayColorRule(), cardID);
                     container.addCardRule(new PlayTextRule(), cardID);
-                    container.addCardRule(new IsValidDrawRule(), cardID);
+//                    container.addCardRule(new IsValidDrawRule(), cardID);
                     // differentiate further
                     Card tempCard = cardLoader.getCardInstance(cardID);
                     switch (tempCard.getText()) {

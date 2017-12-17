@@ -60,6 +60,16 @@ public abstract class BasicGlobalRule extends BasicRule {
         return false;
     }
 
+    /**
+     * Checks whether the player is allowed to draw cards.
+     * <br />
+     * In permissive mode at least one rule has to return true to allow the player to draw a card.
+     * @param state
+     * @return True if he is allowed to
+     */
+    public boolean isValidDrawCardsPermissive(GlobalState state){
+        return false;
+    }
 
     /**
      * Called after a player got kicked

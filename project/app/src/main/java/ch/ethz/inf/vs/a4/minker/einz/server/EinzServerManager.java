@@ -461,6 +461,7 @@ public class EinzServerManager {
                 if(role.equals("player")) {
                     serverFunctionInterface.removePlayer(new Player(username));
                     if(getAdminUsername().equals(username)){
+                        serverFunctionInterface.endGame();
                         server.shutdown();
                     }
                 } else if(role.equals("specator")){

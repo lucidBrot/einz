@@ -26,8 +26,8 @@ public class MainActivity extends FullscreenActivity implements View.OnClickList
         setContentView(R.layout.activity_main);
 
         // register onClick handlers
-        findViewById(R.id.btn_start_client).setOnClickListener(this);
-        findViewById(R.id.btn_start_server).setOnClickListener(this);
+        //findViewById(R.id.btn_start_client).setOnClickListener(this);
+        //findViewById(R.id.btn_start_server).setOnClickListener(this);
         // below: the non-debug listeners
         findViewById(R.id.btn_s_host_game).setOnClickListener(this);
         findViewById(R.id.btn_c_join_game).setOnClickListener(this);
@@ -63,16 +63,16 @@ public class MainActivity extends FullscreenActivity implements View.OnClickList
     @Override
     public void onClick(View view) {
         switch(view.getId()){
-            case R.id.btn_start_client:
-                // start client
-                Intent cintent = new Intent(this, PlayerActivity.class);
-                startActivity(cintent);
-                break;
-            case R.id.btn_start_server:
-                // start server
-                Intent sintent = new Intent(this, Debug_ServerActivity.class);
-                startActivity(sintent);
-                break;
+//            case R.id.btn_start_client:
+//                // start client
+//                Intent cintent = new Intent(this, PlayerActivity.class);
+//                startActivity(cintent);
+//                break;
+//            case R.id.btn_start_server:
+//                // start server
+//                Intent sintent = new Intent(this, Debug_ServerActivity.class);
+//                startActivity(sintent);
+//                break;
 
             case R.id.btn_s_host_game:
                 // actually start the UI intended for the admin, and the server then
