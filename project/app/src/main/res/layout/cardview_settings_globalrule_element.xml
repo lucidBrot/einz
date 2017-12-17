@@ -26,12 +26,13 @@
             android:drawableTint="@color/blue_darker"
             android:text="globalrule_1"
             android:textAlignment="center"
-            android:textColor="@color/blue_darker" />
+            android:textColor="@color/blue_darker"
+            app:buttonTint="@color/blue_darker" />
 
         <EditText
             android:id="@+id/et_global_rule_param"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:layout_weight=".5"
             android:ems="10"
@@ -39,8 +40,10 @@
             android:inputType="number"
             android:textAlignment="center"
             android:textColor="@color/blue_darker"
+            android:textColorLink="@color/blue_darker"
             android:textSize="14sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:backgroundTint="@color/blue_darker" />
 
     </LinearLayout>
 
