@@ -969,6 +969,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                     // show popup
                     settingsFrame.addView(myPopupLL);
                     settingsFrame.setVisibility(View.VISIBLE);
+                    findViewById(R.id.btn_save_settings).setVisibility(View.INVISIBLE);
 
                     settingsFrame.findViewById(R.id.btn_save_cardrule_popup).setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -976,6 +977,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                             // when the popup is closed
                             storeCardSpecificRules(popupContainer, card); // set for all cardrules their setting in cardRulesM only if checked. if checked, store with new params
                             settingsFrame.removeView(myPopupLL);
+                            findViewById(R.id.btn_save_settings).setVisibility(View.VISIBLE);
                         }
                     });
                 }
