@@ -958,7 +958,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             btnCardRules.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    final LinearLayout myPopupLL = (LinearLayout) LayoutInflater.from(LobbyActivity.this).inflate(R.layout.linearlayout_settings_cardrule_popup, (LinearLayout) findViewById(R.id.ll_settingsframe), false);
+                    final LinearLayout myPopupLL = (LinearLayout) LayoutInflater.from(LobbyActivity.this).inflate(R.layout.linearlayout_settings_cardrule_popup, (LinearLayout) findViewById(R.id.ll_card_popup_settingsframe), false);
                     final LinearLayout settingsFrame = ((LinearLayout) findViewById(R.id.ll_card_popup_settingsframe));
                     final LinearLayout popupContainer = myPopupLL.findViewById(R.id.ll_popup_container);
 
