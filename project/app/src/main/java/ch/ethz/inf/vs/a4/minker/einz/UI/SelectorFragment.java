@@ -3,7 +3,7 @@ package ch.ethz.inf.vs.a4.minker.einz.UI;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -43,7 +43,7 @@ public class SelectorFragment extends Fragment {
         // Inflate the layout for this fragment
         View inflatedView = inflater.inflate(R.layout.fragment_selector, container, false);
 
-        LinearLayout choiceList = inflatedView.findViewById(R.id.selector_list);
+        final LinearLayout choiceList = inflatedView.findViewById(R.id.selector_list);
 
         Bundle arguments =  getArguments();
         if(arguments != null) {
@@ -71,7 +71,9 @@ public class SelectorFragment extends Fragment {
                         public void onClick(View view) {
                             Button text = view.findViewById(R.id.selector_item);
                             result = (String) text.getTag();
-                            caller.onItemSelected(result, ruleName);
+                            if(caller != null) {
+                                caller.onItemSelected(result, ruleName);
+                            }
                         }
                     });
                     choiceList.addView(element);

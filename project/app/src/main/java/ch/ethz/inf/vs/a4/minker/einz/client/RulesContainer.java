@@ -375,6 +375,7 @@ public class RulesContainer {
                     try {
                         JSONObject param = new JSONObject();
                         param.put(DrawCardsRule.getParameterName(), 4);
+                        drawCardsRule.setParameter(param);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -479,14 +480,16 @@ public class RulesContainer {
         }
 
         JSONArray jrulelist = this.cardRules.optJSONObject(cardID).optJSONArray("rulelist");
-        if(jrulelist==null){return null;}
+        if(jrulelist==null){
+            return null;
+        }
         JSONObject jrule = null;
         String name = null;
         for(int i=0; i<jrulelist.length(); i++){
             jrule = jrulelist.optJSONObject(i);
             try {
                 name = jrule.getString("id");
-                if(jrule!=null && name.equals(ruleName)){
+                if(jrule != null && name.equals(ruleName)){
                     break;
                 } else {
                     jrule = null;
@@ -496,9 +499,13 @@ public class RulesContainer {
                 jrule = null;
             }
         }
-        if(jrule==null){return null;}
+        if(jrule==null){
+            return null;
+        }
 
-        if(!ruleLoader.getRulesNames().contains(name)){return null;}
+        if(!ruleLoader.getRulesNames().contains(name)){
+            return null;
+        }
 
         BasicCardRule rule = (BasicCardRule) ruleLoader.getInstanceOfRule(name);
         JSONObject params = jrule.optJSONObject("parameters");

@@ -650,6 +650,10 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
             super.onBackPressed();
         } else {
             onSettingsSaveClick();
+            final LinearLayout myPopupLL = (LinearLayout) LayoutInflater.from(LobbyActivity.this).inflate(R.layout.linearlayout_settings_cardrule_popup, (LinearLayout) findViewById(R.id.ll_card_popup_settingsframe), false);
+            final LinearLayout settingsFrame = ((LinearLayout) findViewById(R.id.ll_card_popup_settingsframe));
+            settingsFrame.removeView(myPopupLL);
+            findViewById(R.id.btn_save_settings).setVisibility(View.VISIBLE);
         }
         //TODO @Eric/@Chris Check if in SettingsState or LobbyState and do SaveAndGoBack if in SettingsState
     }
@@ -1036,6 +1040,7 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                             JSONObject params = new JSONObject();
                             params.put(firstParamName, et.getText().toString());
                             ((ParametrizedRule) rule).setParameter(params); // TODO: handle more than one parameter
+
                         } catch (JSONException e) {
                             Log.e("LobbySettings", "failed to save " + rule.getName() + " for card " + card.getID());
                         }

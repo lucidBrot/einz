@@ -1,7 +1,7 @@
 package ch.ethz.inf.vs.a4.minker.einz.UI;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -703,7 +703,7 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         View fragment = findViewById(R.id.selector_fragment);
         fragment.setVisibility(View.VISIBLE);
 
-        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.selector_fragment, selector);
         fragmentTransaction.commit();
     }
@@ -712,9 +712,9 @@ public class PlayerActivity extends FullscreenActivity implements GameUIInterfac
         View fragment = findViewById(R.id.selector_fragment);
         fragment.setVisibility(View.GONE);
 
-        Fragment currentFragment = getFragmentManager().findFragmentById(R.id.selector_fragment);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.selector_fragment);
         if (currentFragment != null) {
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
             fragmentTransaction.remove(currentFragment);
             fragmentTransaction.commit();
         }
