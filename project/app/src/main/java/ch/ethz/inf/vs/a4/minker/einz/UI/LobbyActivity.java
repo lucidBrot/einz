@@ -25,6 +25,7 @@ import ch.ethz.inf.vs.a4.minker.einz.*;
 import ch.ethz.inf.vs.a4.minker.einz.client.EinzClient;
 import ch.ethz.inf.vs.a4.minker.einz.client.RulesContainer;
 import ch.ethz.inf.vs.a4.minker.einz.client.SendMessageFailureException;
+import ch.ethz.inf.vs.a4.minker.einz.gamelogic.CardRuleChecker;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunction;
 import ch.ethz.inf.vs.a4.minker.einz.gamelogic.ServerFunctionDefinition;
 import ch.ethz.inf.vs.a4.minker.einz.messageparsing.EinzMessage;
@@ -561,7 +562,21 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
 
         // TODO: write settings as profile (that can be loaded again after app restart) to disk?
-        Log.w("LobbySettings", "SaveSettings is probable unfinished if this log is still here.");
+        Log.w("LobbySettings", "SaveSettings is probably unfinished if this log is still here.");
+
+        // store all unchanged card settings in cardRulesM so they don't get lost
+        for(Card card : cardsM.values()) {
+            String cardID = card.getID();
+            ArrayList<BasicCardRule> list = cardRulesM.get(card);
+            if(list==null || list.equals(new ArrayList<BasicCardRule>())){
+                // if nothing was stored yet for this card, store everything from the settings that would have been shown if the UI popup were to have been opened
+                // #grammar
+
+                ArrayList<BasicCardRule> cardRuleList = this.rulesContainer.getListOfCardRulesForCard(cardID, ruleLoader);
+                cardRulesM.put(card, cardRuleList);
+            }
+        }
+
         this.rulesContainer = new RulesContainer(); // clear old settings
 
         for (View view : globalRulesM.keySet()) {
@@ -605,10 +620,12 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
         }
 
         for (Card card : cardRulesM.keySet()) {
+            ArrayList<BasicCardRule> rulesToAdd = new ArrayList<>();
             for (BasicCardRule cardRule : cardRulesM.get(card)) {
                 // for all cardrules belonging to card, add them
-                this.rulesContainer.addCardRuleKeepPreviousNumber(cardRule, card.getID());
+                rulesToAdd.add(cardRule);
             }
+            this.rulesContainer.setCardRulesKeepNumber(rulesToAdd, card.getID());// delete all previous cardrules for this card and set the ones we store anew
         }
 
         // store settings in EinzSingleton to load them again when the popup is reopened
