@@ -35,13 +35,14 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="10dp"
             android:layout_weight=".5"
-            app:backgroundTint="@color/blue_darker"
+            android:backgroundTint="@color/blue_darker"
             android:ems="10"
             android:hint="params"
             android:inputType="number"
             android:textAlignment="center"
             android:textColor="@color/blue_darker"
             android:textColorLink="@color/blue_darker"
+            android:textCursorDrawable="@null"
             android:textSize="14sp"
             android:visibility="gone" />
 

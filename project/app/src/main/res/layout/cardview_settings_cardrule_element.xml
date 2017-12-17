@@ -32,12 +32,14 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="5dp"
             android:layout_weight=".2"
+            android:backgroundTint="@color/blue_darker"
             android:ems="10"
             android:hint="#cards"
             android:inputType="number"
             android:maxLines="1"
             android:textAlignment="center"
             android:textColor="@color/blue_darker"
+            android:textCursorDrawable="@null"
             android:textSize="14sp" />
 
         <Button
