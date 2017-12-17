@@ -617,6 +617,9 @@ public class LobbyActivity extends FullscreenActivity implements LobbyUIInterfac
                 this.rulesContainer.addCardRuleKeepPreviousNumber(cardRule, card.getID());
             }
         }
+
+        // store settings in EinzSingleton to load them again when the popup is reopened
+        EinzSingleton.getInstance().setLastRulesSavedContainer(new RulesContainer(this.rulesContainer)); // store a deep copy that lives now independently in the singleton
     }
 
     /**

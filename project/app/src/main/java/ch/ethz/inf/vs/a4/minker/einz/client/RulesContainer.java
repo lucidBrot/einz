@@ -28,7 +28,29 @@ public class RulesContainer {
 
     private static RulesContainer defaultInstance = null;
 
+    // header is null if deep copy failed
     private EinzMessageHeader header = new EinzMessageHeader("startgame", "SpecifyRules");
+
+    /**
+     * performs a deep copy of the provided RulesContainer.
+     * If copying fails, the header field will be null and all other fields as normally initialized.
+     * @param cloneThis
+     */
+    public RulesContainer (RulesContainer cloneThis){
+        try {
+            this.cardRules = new JSONObject(cloneThis.cardRules.toString());
+            this.globalRules = new JSONArray(cloneThis.globalRules.toString());
+            this.header = cloneThis.header;
+        } catch(JSONException e){
+            this.cardRules = new JSONObject();
+            this.globalRules = new JSONArray();
+            this.header = null;
+        }
+    }
+
+    public RulesContainer(){
+
+    }
 
     public EinzMessage<EinzSpecifyRulesMessageBody> toMessage() {
         return new EinzMessage<>(header, this.toMessageBody());
@@ -43,6 +65,13 @@ public class RulesContainer {
 
     public synchronized void addGlobalRule(BasicGlobalRule rule) {
         globalRules.put(ruleToJSON(rule));
+    }
+
+    /**
+     * @return either the current header, or null in case of previous errors, e.g. when cloning
+     */
+    public EinzMessageHeader getHeader() {
+        return header;
     }
 
     /**
