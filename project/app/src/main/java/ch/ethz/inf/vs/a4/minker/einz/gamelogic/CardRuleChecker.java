@@ -27,13 +27,13 @@ public class CardRuleChecker {
      * @return True if he is allowed to
      */
     public static boolean checkIsValidDrawCardsPermissive(GlobalState state, GameConfig gameConfig){
-        boolean permissive = false;
-        for (BasicRule r : gameConfig.allRules) {
-            if (r instanceof BasicCardRule) {
-                permissive = permissive || ((BasicCardRule) r).isValidDrawCardsPermissive(state);
-            }
-        }
-        return permissive;
+//        boolean permissive = false;
+//        for (BasicRule r : gameConfig.allRules) {
+//            if (r instanceof BasicCardRule) {
+//                permissive = permissive || ((BasicCardRule) r).isValidDrawCardsPermissive(state);
+//            }
+//        }
+        return true;
     }
 
     /**

@@ -10,7 +10,7 @@ import ch.ethz.inf.vs.a4.minker.einz.model.cards.Card;
  * TODO: Change this to BasicGlobalRule
  */
 
-public class IsValidDrawRule extends BasicCardRule {
+public class IsValidDrawRule extends BasicGlobalRule {
 
     @Override
     public String getName() {
